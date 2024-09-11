@@ -10,7 +10,7 @@ if (missingField.length)
     return next( 
         new ErrorHandler(
             JSON.stringify(
-                missingField.map((field) => ({ [field]: ` ${field} is required` }))
+                missingField.map((field) => ({ [field]: ` ${field}  is required` }))
               ).replace(/[{}\[\]\\"]/g, "")
         )
     )
