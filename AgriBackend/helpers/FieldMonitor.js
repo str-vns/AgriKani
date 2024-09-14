@@ -1,20 +1,19 @@
-const ErrorHandler = require("../utils/success-errorHandler")
-const { RESOURCE } = require("../constants/index")
+const ErrorHandler = require("../utils/errorHandler");
+const { RESOURCE } = require("../constants/index");
 
-const FieldMonitor = (req, res, next) => {
-    const missingField =  field.filter((field) => field === RESOURCE.IMAGE ?
-!req.file.image && !req.files : !req.body[field]);
+const checkRequiredFields = (fields) => (req, res, next) => {
+  const missingFields = fields.filter((field) =>
+    field === RESOURCE.IMAGE ? !req.body.image && !req.files : !req.body[field]
+  );
+  if (missingFields.length)
+    return next(
+      new ErrorHandler(
+        JSON.stringify(
+          missingFields.map((field) => ({ [field]:` ${field} is required` }))
+        ).replace(/[{}\[\]\\"]/g, "")
+      )
+    );
+  next();
+};
 
-if (missingField.length)
-
-    return next( 
-        new ErrorHandler(
-            JSON.stringify(
-                missingField.map((field) => ({ [field]: ` ${field}  is required` }))
-              ).replace(/[{}\[\]\\"]/g, "")
-        )
-    )
-    next()
-}
-
-module.exports = FieldMonitor
+module.exports = checkRequiredFields;

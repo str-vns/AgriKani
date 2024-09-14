@@ -4,7 +4,7 @@ const ROLE = require("./role");
 const STATUSCODE = require("./statusCode");
 const ERRORMESSAGE = require("./errorMessage");
 const PATH = require("./path")
-
+const GENDER = require("./gender")
 module.exports = {
   RESOURCE,
   METHOD,
@@ -12,4 +12,5 @@ module.exports = {
   STATUSCODE,
   ERRORMESSAGE,
   PATH,
+  GENDER
 };

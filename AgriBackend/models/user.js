@@ -1,15 +1,36 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const { RESOURCE } = require("../constants/index")
+const { RESOURCE } = require("../constants/index");
 // const crypto = require("crypto");
 // const jwt = require("jsonwebtoken");
 // const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
-    required: [true, "Please enter your name!"],
+    required: [true, "Please enter your First Name!"],
     maxLength: [30, "Your name cannot exceed 30 characters!"],
+  },
+  lastName: {
+    type: String,
+    required: [true, "Please enter your Last Name!"],
+    maxLength: [30, "Your name cannot exceed 30 characters!"],
+  },
+  age: {
+    type: Number,
+    required: [true, "Please enter your Age!"],
+    validate: {
+      validator: function(value) {
+        return value >= 18 && value <= 100;
+      },
+      message: 'Age must be between 18 and 100'
+    }
+  },
+  phoneNum: {
+    type: String,
+    required: [true, "Please enter your Last Name!"],
+    minlength: [11, "Phone Number must be 11 digits"],
+    maxlength: [11, "Phone Number must be 11 digits"],
   },
   email: {
     type: String,
@@ -20,34 +41,64 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "Please enter your password "],
-    minlength: [7, "Your password must be longer than 7 characters"],
+    minlength: [8, "Your password must be longer than 8 characters"],
     select: false,
   },
-  avatar: {
-    public_id: {
-      type: String,
-      required: true,
+  image: [
+    {
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      originalname: {
+        type: String,
+        required: true,
+      },
     },
-    url: {
+  ],
+  roles:
+  [
+    {
       type: String,
-      required: true,
+      enum: ["Admin", "Employee", "Customer"],
+      default: "Customer",
     },
-    originalname: {
+  ],
+  gender:
+    {
       type: String,
-      required: true,
-    }
-  },
-  role: {
-    type: String,
-    default: "user",
-  },
+      enum: ["male", "female", "prefer not to say"],
+      default: "Prefer not to say",
+    },
+  wishlist:
+  [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: RESOURCE.FPRODUCT,
+      },
+    },
+  ],
+  seniorAt:{
+    type: Boolean,
+    default: false,
+},
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  deletedAt: {
+    type: Boolean,
+    default: false,
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
-  otp: String 
+  otp: String,
 });
 
 // userSchema.pre("save", async function (next) {
@@ -80,4 +131,4 @@ const userSchema = new mongoose.Schema({
 //   return resetToken;
 // };
 
-module.exports = mongoose.model(RESOURCE.USER, userSchema)
+module.exports = mongoose.model(RESOURCE.USER, userSchema);
