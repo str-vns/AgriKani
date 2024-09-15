@@ -3,45 +3,79 @@ const CheckField = require("../helpers/FieldMonitor");
 const asyncHandler = require("express-async-handler");
 const userProcess = require("../process/userProcess");
 const SuccessHandler = require("../utils/successHandler");
-const ErrorHandler = require("../utils/errorHandler")
-const { STATUSCODE } = require("../constants/index")
+const ErrorHandler = require("../utils/errorHandler");
+const { STATUSCODE } = require("../constants/index");
 
 exports.SignUp = [
-  upload.array("image"),
-  CheckField(["firstName", "lastName", "age","phoneNum", "email", "password", "image"]),
+  upload.single("image"),
+  CheckField(["firstName", "lastName", "age", "phoneNum", "email", "password"]),
   asyncHandler(async (req, res) => {
-    console.log("Received file:", req.files)
     const user = await userProcess.registerUser(req);
     return SuccessHandler(
       res,
-      `User Name ${user?.firstName} ${" "} ${
-        user?.lastName
-      } has been created Successfully`,
+      `User Name ${user?.firstName} ${user?.lastName} has been created Successfully`,
       user
     );
   }),
 ];
 
-exports.GetAllUsers = asyncHandler(async (req, res, next)=>{
+exports.GetAllUsers = asyncHandler(async (req, res, next) => {
   const users = await userProcess.GetAllUserInfo();
 
   return users?.length === STATUSCODE.ZERO
-  ? next(new ErrorHandler("No User Found"))
-  : SuccessHandler(res, `All Users has been fetched Successfully`, users)
-})
+    ? next(new ErrorHandler("No User Found"))
+    : SuccessHandler(res, `All Users has been fetched Successfully`, users);
+});
 
 exports.UpdateUser = [
-  upload.array("image"),
-  CheckField(["firstName", "lastName","phoneNum","gender","image"]),
+  upload.single("image"),
+  CheckField(["firstName", "lastName", "phoneNum"]),
   asyncHandler(async (req, res) => {
-    console.log("Received file:", req.files)
-    const user = await userProcess.UpdateUserInfo(req, res, req.params.id);
+    const user = await userProcess.UpdateUserInfo(req, req.params.id);
     return SuccessHandler(
       res,
-      `User Name ${user?.firstName} ${" "} ${
-        user?.lastName
-      } has been created Successfully`,
+      `User Name ${user?.firstName} ${user?.lastName} has been created Successfully`,
       user
     );
   }),
 ];
+
+exports.DeleteUser = asyncHandler(async (req, res, next) => {
+  const user = await userProcess.DeleteUserInfo(req.params.id);
+
+  return user?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No User Found"))
+    : SuccessHandler(res, user);
+});
+
+exports.SoftDelUser = asyncHandler(async (req, res) => {
+  const user = await userProcess.SoftDeleteUserInfo(req.params.id);
+
+  return SuccessHandler(
+    res,
+    `User Name ${user?.firstName} ${user?.lastName} has been put in Archive Successfully`,
+    user
+  );
+});
+
+exports.RestoreUser = asyncHandler(async (req, res) => {
+  const user = await userProcess.RestoreUserInfo(req.params.id);
+
+  return SuccessHandler(
+    res,
+    `User Name ${user?.firstName} ${user?.lastName} has been Restore Successfully`,
+    user
+  );
+});
+
+exports.UserProfile = asyncHandler(async (req, res) => {
+  const user = await userProcess.ProfileUserInfo(req.params.id);
+
+  return user?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No User Found"))
+    : SuccessHandler(
+        res,
+        `${user?.firstName} ${user?.lastName} has been fetched Successfully`,
+        user
+      );
+});

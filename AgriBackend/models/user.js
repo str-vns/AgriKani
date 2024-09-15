@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
     minlength: [8, "Your password must be longer than 8 characters"],
     select: false,
   },
-  image: [
+  image: 
     {
       public_id: {
         type: String,
@@ -59,7 +59,6 @@ const userSchema = new mongoose.Schema({
         required: true,
       },
     },
-  ],
   roles:
   [
     {

@@ -21,10 +21,38 @@ const userRoutes = [
   },
   {
     method: METHOD.PUT,
-    path: PATH.USERS,
+    path: PATH.USER_ID,
     roles: [],
     middleware: [],
-    handler: userController.SignUp,
+    handler: userController.UpdateUser,
+  },
+  {
+    method: METHOD.DELETE,
+    path: PATH.USER_ID,
+    roles: [],
+    middleware: [],
+    handler: userController.DeleteUser,
+  },
+  {
+    method: METHOD.PATCH,
+    path: PATH.USER_ID,
+    roles: [],
+    middleware: [],
+    handler: userController.SoftDelUser,
+  },
+  {
+    method: METHOD.PATCH,
+    path: PATH.RESTORE_ID,
+    roles: [],
+    middleware: [],
+    handler: userController.RestoreUser,
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.USER_ID,
+    roles: [],
+    middleware: [],
+    handler: userController.UserProfile,
   },
 ];
 

@@ -9,42 +9,40 @@ const { cloudinary } = require("../utils/Cloudinary");
 
 //create ...
 exports.registerUser = async (req) => {
+  console.log("Received File:", req.file);
   const duplicateEmail = await User.findOne({ email: req.body.email })
     .collation({ locale: "en" })
-    .lean().exec();
+    .lean()
+    .exec();
 
   if (duplicateEmail) throw new ErrorHandler("Email is already exist");
 
-  const phone = req.body.phoneNum
+  const phone = req.body.phoneNum;
   if (!phone.match(/^\d{11}$/))
-    throw new ErrorHandler("Phone Number must be 11 Digits")
+    throw new ErrorHandler("Phone Number must be 11 Digits");
   else if (!phone.startsWith("09"))
-    throw new ErrorHandler("Phone Number must be start with 09")
+    throw new ErrorHandler("Phone Number must be start with 09");
   else if (!phone === STATUSCODE.ZERO)
-    throw new ErrorHandler("Phone Number is Required")
+    throw new ErrorHandler("Phone Number is Required");
 
-  const age  = req.body.age
+  const age = req.body.age;
   if (age < 18 || age > 100)
-    throw new ErrorHandler("Age must be between 18 and 100")
+    throw new ErrorHandler("Age must be between 18 and 100");
 
-  let images = [];
-  if (req.files && Array.isArray(req.files)) {
-    images = await Promise.all(
-      req.files.map(async (file) => {
-        const result = await cloudinary.uploader.upload(file.path, {
-          public_id: file.filename,
-        });
-        return {
-          public_id: result.public_id,
-           url: result.secure_url,
-          originalname: file.originalname,
-        };
-      })
-    );
+  let images = {};
+
+  if (req.file) {
+    const file = req.file;
+    const result = await cloudinary.uploader.upload(file.path, {
+      public_id: file.filename,
+    });
+    images = {
+      public_id: result.public_id,
+      url: result.secure_url,
+      originalname: file.originalname,
+    };
   }
-
-  if (images.length === STATUSCODE.ZERO)
-    throw new ErrorHandler("At least one image is required");
+  if (!images) throw new ErrorHandler("At least one image is required");
 
   const role = req.body.roles
     ? Array.isArray(req.body.roles)
@@ -52,9 +50,7 @@ exports.registerUser = async (req) => {
       : req.body.roles.split(", ")
     : [ROLE.CUSTOMER];
 
-    const gender = req.body.gender
-      ? req.body.gender
-    : GENDER.PNTS;
+  const gender = req.body.gender ? req.body.gender : GENDER.PNTS;
 
   const user = await User.create({
     firstName: req.body.firstName,
@@ -74,91 +70,151 @@ exports.registerUser = async (req) => {
 //Read ...
 exports.GetAllUserInfo = async () => {
   const users = await User.find()
-  .sort({createdAt: STATUSCODE.NEGATIVE_ONE}).lean().exec();
-  
-  return users;
-}
-
-//Update
-exports.UpdateUserInfo = async (req, ) => {
-  if(!mongoose.Types.ObjectId.isValid(id))
-    throw new ErrorHandler(`Invalid User ID: ${id}` );
-  
-  const userExist = await User.findById(id).lean().exec()
-  if(!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`)
-
-  const duplicateUser = await User.findOne(
-    { firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      _id: {$ne: id},
-    })
-    .collation({ locale: "en"})
+    .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
     .lean()
     .exec();
 
-    if(duplicateUser) throw new ErrorHandler("User already Exist")
+  return users;
+};
 
-let image_img = userExist.image || [];
-if (req.files) {
-  image_img = await Promise.all(
-    req.files.map(async (file) => {
-      const result = await cloudinary.uploader.upload(file.path, {
-        public_id: file.filename,
-      });
+//Update ..
+exports.UpdateUserInfo = async (req, id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
 
-      return {
-        public_id: result.public_id,
-        url: result.secure_url,
-        originalname: file.originalname,
-      };
-    })
-  );
-}
+  const userExist = await User.findById(id).lean().exec();
+  if (!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`);
+  console.log(userExist?.image?.public_id, "exist image");
 
-if (image_img.length === STATUSCODE.ZERO)
-  throw new ErrorHandler("Required to add one image");
+  const duplicateUser = await User.findOne({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    _id: { $ne: id },
+  })
+    .collation({ locale: "en" })
+    .lean()
+    .exec();
+  if (duplicateUser) throw new ErrorHandler("User already Exist");
 
-let roles = userExist.roles || req.body.roles
-if(req.body.roles) {
-  roles = Array.isArray(req.body.roles)
-  ? req.body.roles
-  : req.body.roles.split(", ");
-}
+  let image_img = userExist.image || {};
+  if (req.file) {
+    const file = req.file;
+    const result = await cloudinary.uploader.upload(file.path, {
+      public_id: file.filename,
+    });
+    image_img = {
+      public_id: result.public_id,
+      url: result.secure_url,
+      originalname: file.originalname,
+    };
+    await cloudinary.uploader.destroy(`${userExist.image.public_id}`);
+  }
 
-const updateUser = await User.findByIdAndUpdate(id, {
- ...req.body,
- roles: roles,
- image: image_img
-},
-{
-  new: true,
-  runValidators: true
-})
-.lean()
-.exec()
-;
+  if (image_img.length === STATUSCODE.ZERO)
+    throw new ErrorHandler("Required to add one image");
 
-if(!updateUser) throw new ErrorHandler(`User not Update with ID ${id}`)
-return updateUser;
-}
+  let roles = userExist.roles || req.body.roles;
+  if (req.body.roles) {
+    roles = Array.isArray(req.body.roles)
+      ? req.body.roles
+      : req.body.roles.split(", ");
+  }
 
-//Delete
+  const updateUser = await User.findByIdAndUpdate(
+    id,
+    {
+      ...req.body,
+      roles: roles,
+      image: image_img,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .lean()
+    .exec();
+  if (!updateUser) throw new ErrorHandler(`User not Update with ID ${id}`);
+  return updateUser;
+};
+
+//Delete ...
 exports.DeleteUserInfo = async (id) => {
-  if(!mongoose.Types.ObjectId.isValid(id))
-    throw new ErrorHandler(`Invalid User ID: ${id}`)
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
 
-  const userExist = await User.findOne({ _id: id })
-  if(!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`)
+  const userExist = await User.findOne({ _id: id });
+  if (!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`);
 
-    const publicIds = userExist.avatar.map((avatar) => avatar.public_id)
-    
-    await Promise.all(
-      User.deleteOne({ _id: id}).lean().exec(),
-      cloudinary.uploader.destroy(publicIds),
-      // Products.deleteMany({ user: id}).lean().exec(),
-      // Transactions.deleteMany({ user: id}).lean().exec(),
-      // Reviews.deleteMany({ user: id}).lean().exec(),
-    )
+  const publicIds = userExist.image.public_id;
 
-      return userExist
-}
+  await Promise.all([
+    User.deleteOne({ _id: id }).lean().exec(),
+    cloudinary.uploader.destroy(publicIds),
+    // Products.deleteMany({ user: id}).lean().exec(),
+    // Transactions.deleteMany({ user: id}).lean().exec(),
+    // Reviews.deleteMany({ user: id}).lean().exec(),
+  ]);
+
+  return userExist;
+};
+
+//SoftDelete ...
+exports.SoftDeleteUserInfo = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
+
+  const userExist = await User.findOne({ _id: id });
+  if (!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`);
+
+  const softDelUser = await User.findByIdAndUpdate(
+    id,
+    {
+      deletedAt: "true",
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .lean()
+    .exec();
+  if (!softDelUser) throw new ErrorHandler(`User not SoftDelete with ID ${id}`);
+  return softDelUser;
+};
+
+//Restore ...
+exports.RestoreUserInfo = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
+
+  const userExist = await User.findOne({ _id: id });
+  if (!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`);
+
+  const restoreUser = await User.findByIdAndUpdate(
+    id,
+    {
+      deletedAt: "false",
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .lean()
+    .exec();
+  if (!restoreUser) throw new ErrorHandler(`User not SoftDelete with ID ${id}`);
+  return restoreUser;
+};
+
+//Profile ...
+exports.ProfileUserInfo = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
+
+  const singleUser = await User.findById(id).lean().exec();
+
+  if (!singleUser) throw new ErrorHandler(`User not exist with ID: ${id}`);
+
+  return singleUser;
+};
