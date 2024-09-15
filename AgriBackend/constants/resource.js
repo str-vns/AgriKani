@@ -1,6 +1,6 @@
 module.exports = {
     USER: "user",
-    FPRODUCT: "fproduct",
+    PRODUCT: "product",
     CONVERSATION: "conversation",
     ORDER: "order",
     JWT: "jwt",
