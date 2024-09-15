@@ -77,7 +77,7 @@ exports.GetAllUserInfo = async () => {
   return users;
 };
 
-//Update ..
+//Update ...
 exports.UpdateUserInfo = async (req, id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid User ID: ${id}`);
