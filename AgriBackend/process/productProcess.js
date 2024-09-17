@@ -2,7 +2,7 @@ const Product = require("../models/product");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
-const { cloudinary } = require("../utils/Cloudinary");
+const { cloudinary } = require("../utils/cloudinary");
 
 // NOTE Three DOTS MEANS OK IN COMMENT
 
@@ -43,64 +43,64 @@ exports.CreateProductProcess = async (req) => {
 };
 
 //Read ...
-exports.GetAllUserInfo = async () => {
-  const users = await User.find()
+exports.GetAllProdductInfo = async () => {
+  const products = await Product.find()
     .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
     .lean()
     .exec();
 
-  return users;
+  return products;
 };
 
 //Update ...
-exports.UpdateUserInfo = async (req, id) => {
+exports.UpdateProductInfo = async (req, id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ErrorHandler(`Invalid User ID: ${id}`);
+    throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
-  const userExist = await User.findById(id).lean().exec();
-  if (!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`);
-  console.log(userExist?.image?.public_id, "exist image");
+  const productExist = await Product.findById(id).lean().exec();
+  if (!productExist) throw new ErrorHandler(`Product not exist with ID: ${id}`);
+console.log(productExist, "Full product object");
 
-  const duplicateUser = await User.findOne({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    _id: { $ne: id },
-  })
-    .collation({ locale: "en" })
-    .lean()
-    .exec();
-  if (duplicateUser) throw new ErrorHandler("User already Exist");
+if (Array.isArray(productExist.image)) {
+ 
+  productExist.image.forEach((img, index) => {
+    console.log(img?.public_id, `Image ${index + 1} public_id`);
+  });
+} else {
+  console.log("productExist.image is not an array, it is:", typeof productExist.image);
+}
 
-  let image_img = userExist.image || {};
-  if (req.file) {
-    const file = req.file;
-    const result = await cloudinary.uploader.upload(file.path, {
-      public_id: file.filename,
-    });
-    image_img = {
-      public_id: result.public_id,
-      url: result.secure_url,
-      originalname: file.originalname,
-    };
-    await cloudinary.uploader.destroy(`${userExist.image.public_id}`);
+
+  let image = productExist.image || [];
+  if (req.files && Array.isArray(req.files)) {
+    image = await Promise.all(
+      req.files.map(async (file) => {
+        const result = await cloudinary.uploader.upload(file.path, {
+          public_id: file.filename,
+        });
+
+        image.forEach((img, index) => {
+             cloudinary.uploader.destroy(img.public_id)
+          console.log(img?.public_id, `Image ${index + 1} public_id`);
+        });
+        
+        return {
+          public_id: result.public_id,
+           url: result.secure_url,
+          originalname: file.originalname,
+        };
+        
+      })
+      
+    );
   }
 
-  if (image_img.length === STATUSCODE.ZERO)
-    throw new ErrorHandler("Required to add one image");
 
-  let roles = userExist.roles || req.body.roles;
-  if (req.body.roles) {
-    roles = Array.isArray(req.body.roles)
-      ? req.body.roles
-      : req.body.roles.split(", ");
-  }
-
-  const updateUser = await User.findByIdAndUpdate(
+  const updateProduct = await Product.findByIdAndUpdate(
     id,
     {
       ...req.body,
-      roles: roles,
-      image: image_img,
+      image: image,
     },
     {
       new: true,
@@ -109,43 +109,42 @@ exports.UpdateUserInfo = async (req, id) => {
   )
     .lean()
     .exec();
-  if (!updateUser) throw new ErrorHandler(`User not Update with ID ${id}`);
-  return updateUser;
+  if (!updateProduct) throw new ErrorHandler(`Product not Update with ID ${id}`);
+  return updateProduct;
 };
 
 //Delete ...
-exports.DeleteUserInfo = async (id) => {
+exports.DeleteProductInfo = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ErrorHandler(`Invalid User ID: ${id}`);
+    throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
-  const userExist = await User.findOne({ _id: id });
-  if (!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`);
+  const productExist = await Product.findOne({ _id: id });
+  if (!productExist) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
-  const publicIds = userExist.image.public_id;
+  const publicIds = productExist.image.public_id;
 
   await Promise.all([
-    User.deleteOne({ _id: id }).lean().exec(),
+    Product.deleteOne({ _id: id }).lean().exec(),
     cloudinary.uploader.destroy(publicIds),
-    // Products.deleteMany({ user: id}).lean().exec(),
-    // Transactions.deleteMany({ user: id}).lean().exec(),
-    // Reviews.deleteMany({ user: id}).lean().exec(),
+    // Category.deleteMany({ product: id}).lean().exec(),
+    // Type.deleteMany({ product: id}).lean().exec(),
   ]);
 
-  return userExist;
+  return productExist;
 };
 
 //SoftDelete ...
-exports.SoftDeleteUserInfo = async (id) => {
+exports.SoftDeleteProductInfo = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ErrorHandler(`Invalid User ID: ${id}`);
+    throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
-  const userExist = await User.findOne({ _id: id });
-  if (!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`);
+  const productExist = await Product.findOne({ _id: id });
+  if (!productExist) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
-  const softDelUser = await User.findByIdAndUpdate(
+  const softDelProduct = await Product.findByIdAndUpdate(
     id,
     {
-      deletedAt: "true",
+      deletedAt: Date.now(),
     },
     {
       new: true,
@@ -154,22 +153,22 @@ exports.SoftDeleteUserInfo = async (id) => {
   )
     .lean()
     .exec();
-  if (!softDelUser) throw new ErrorHandler(`User not SoftDelete with ID ${id}`);
-  return softDelUser;
+  if (!softDelProduct) throw new ErrorHandler(`Product not SoftDelete with ID ${id}`);
+  return softDelProduct;
 };
 
 //Restore ...
-exports.RestoreUserInfo = async (id) => {
+exports.RestoreProductInfo = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ErrorHandler(`Invalid User ID: ${id}`);
+    throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
-  const userExist = await User.findOne({ _id: id });
-  if (!userExist) throw new ErrorHandler(`User not exist with ID: ${id}`);
+  const productExist = await Product.findOne({ _id: id });
+  if (!productExist) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
-  const restoreUser = await User.findByIdAndUpdate(
+  const restoreProduct = await Product.findByIdAndUpdate(
     id,
     {
-      deletedAt: "false",
+      deletedAt: null,
     },
     {
       new: true,
@@ -178,18 +177,18 @@ exports.RestoreUserInfo = async (id) => {
   )
     .lean()
     .exec();
-  if (!restoreUser) throw new ErrorHandler(`User not SoftDelete with ID ${id}`);
-  return restoreUser;
+  if (!restoreProduct) throw new ErrorHandler(`Product was not retrive with ID ${id}`);
+  return restoreProduct;
 };
 
-//Profile ...
-exports.ProfileUserInfo = async (id) => {
+//Single Product ...
+exports.singleProduct = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ErrorHandler(`Invalid User ID: ${id}`);
+    throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
-  const singleUser = await User.findById(id).lean().exec();
+  const singleProduct = await Product.findById(id).lean().exec();
 
-  if (!singleUser) throw new ErrorHandler(`User not exist with ID: ${id}`);
+  if (!singleProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
-  return singleUser;
+  return singleProduct;
 };

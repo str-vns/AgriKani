@@ -26,6 +26,9 @@ const productSchema = new mongoose.Schema({
   category: [{
     type: String,
   }],
+  type: [{
+    type: String,
+  }],
   image: [{
     public_id: {
       type: String,

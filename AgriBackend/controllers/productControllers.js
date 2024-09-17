@@ -1,4 +1,4 @@
-const { upload } = require("../utils/Cloudinary");
+const { upload } = require("../utils/cloudinary");
 const CheckField = require("../helpers/FieldMonitor");
 const asyncHandler = require("express-async-handler");
 const productProcess = require("../process/productProcess");
@@ -20,63 +20,63 @@ exports.productCreate = [
     }),
   ];
 
-exports.GetAllUsers = asyncHandler(async (req, res, next) => {
-  const users = await userProcess.GetAllUserInfo();
+exports.GetAllProduct = asyncHandler(async (req, res, next) => {
+  const products = await productProcess.GetAllProdductInfo();
 
-  return users?.length === STATUSCODE.ZERO
-    ? next(new ErrorHandler("No User Found"))
-    : SuccessHandler(res, `All Users has been fetched Successfully`, users);
+  return products?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Product Found"))
+    : SuccessHandler(res, `All Product has been fetched Successfully`, products);
 });
 
-exports.UpdateUser = [
-  upload.single("image"),
-  CheckField(["firstName", "lastName", "phoneNum"]),
+exports.UpdateProduct = [
+  upload.array("image"),
+  CheckField(["productName", "description", "pricing", "stock", "image"]),
   asyncHandler(async (req, res) => {
-    const user = await userProcess.UpdateUserInfo(req, req.params.id);
+    const products = await productProcess.UpdateProductInfo(req, req.params.id);
     return SuccessHandler(
       res,
-      `User Name ${user?.firstName} ${user?.lastName} has been created Successfully`,
-      user
+      `Product Name ${products?.productName} has been Update Successfully`,
+      products
     );
   }),
 ];
 
-exports.DeleteUser = asyncHandler(async (req, res, next) => {
-  const user = await userProcess.DeleteUserInfo(req.params.id);
+exports.DeleteProduct = asyncHandler(async (req, res, next) => {
+  const product = await productProcess.DeleteProductInfo(req.params.id);
 
-  return user?.length === STATUSCODE.ZERO
-    ? next(new ErrorHandler("No User Found"))
-    : SuccessHandler(res, user);
+  return product?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Product Found"))
+    : SuccessHandler(res, product);
 });
 
-exports.SoftDelUser = asyncHandler(async (req, res) => {
-  const user = await userProcess.SoftDeleteUserInfo(req.params.id);
+exports.SoftDelProduct = asyncHandler(async (req, res) => {
+  const product = await productProcess.SoftDeleteProductInfo(req.params.id);
 
   return SuccessHandler(
     res,
-    `User Name ${user?.firstName} ${user?.lastName} has been put in Archive Successfully`,
-    user
+    `Product ${product.productName} has been put in Archive Successfully`,
+    product
   );
 });
 
-exports.RestoreUser = asyncHandler(async (req, res) => {
-  const user = await userProcess.RestoreUserInfo(req.params.id);
+exports.RestoreProduct = asyncHandler(async (req, res) => {
+  const restoreProduct = await productProcess.RestoreProductInfo(req.params.id);
 
   return SuccessHandler(
     res,
-    `User Name ${user?.firstName} ${user?.lastName} has been Restore Successfully`,
-    user
+    `The Product ${restoreProduct.productName} has been Restore Successfully`,
+    restoreProduct
   );
 });
 
-exports.UserProfile = asyncHandler(async (req, res) => {
-  const user = await userProcess.ProfileUserInfo(req.params.id);
+exports.SingleProduct = asyncHandler(async (req, res) => {
+  const product = await productProcess.singleProduct(req.params.id);
 
-  return user?.length === STATUSCODE.ZERO
-    ? next(new ErrorHandler("No User Found"))
+  return product?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Product Found"))
     : SuccessHandler(
         res,
-        `${user?.firstName} ${user?.lastName} has been fetched Successfully`,
-        user
+        `${product.productName} has been fetched Successfully`,
+        product
       );
 });
