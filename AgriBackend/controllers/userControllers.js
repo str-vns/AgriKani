@@ -1,4 +1,4 @@
-const { upload } = require("../utils/Cloudinary");
+const { upload } = require("../utils/cloudinary");
 const CheckField = require("../helpers/FieldMonitor");
 const asyncHandler = require("express-async-handler");
 const userProcess = require("../process/userProcess");
@@ -34,7 +34,7 @@ exports.UpdateUser = [
     const user = await userProcess.UpdateUserInfo(req, req.params.id);
     return SuccessHandler(
       res,
-      `User Name ${user?.firstName} ${user?.lastName} has been created Successfully`,
+      `User Name ${user?.firstName} ${user?.lastName} has been Update Successfully`,
       user
     );
   }),

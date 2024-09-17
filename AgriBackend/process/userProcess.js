@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
-const { cloudinary } = require("../utils/Cloudinary");
+const { cloudinary } = require("../utils/cloudinary");
 
 // NOTE Three DOTS MEANS OK IN COMMENT
 
@@ -203,7 +203,7 @@ exports.RestoreUserInfo = async (id) => {
   )
     .lean()
     .exec();
-  if (!restoreUser) throw new ErrorHandler(`User not SoftDelete with ID ${id}`);
+  if (!restoreUser) throw new ErrorHandler(`User was no retrive with ID ${id}`);
   return restoreUser;
 };
 
