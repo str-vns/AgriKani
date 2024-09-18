@@ -10,11 +10,13 @@ const cookieParser = require("cookie-parser");
 const users = require("./routes/user")
 const auth = require("./routes/auth")
 const products = require("./routes/product")
+const conversation = require("./routes/Chat/conversation")
+const messages = require("./routes/Chat/message")
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/v2", users, auth, products);
+app.use("/api/v2", users, auth, products, conversation, messages);
 
 module.exports = app
