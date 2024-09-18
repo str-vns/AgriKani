@@ -73,3 +73,8 @@
 20240914	10:49:26	5f3444d7-0607-4b78-b656-cce1712578d6	POST	/api/v2/users	undefined
 20240914	10:53:02	9b76b37f-017a-4b5f-9698-d4ddea7a7006	POST	/api/v2/users	undefined
 20240915	20:42:47	303e0782-7977-4895-b5a5-1ad84c779245	POST	/api/v2/login	undefined
+20240917	13:37:55	56b4387e-adc4-4a1d-8edc-0abe2176296c	DELETE	/api/v2/products/66e9126aed0a05ecbd629d89	undefined
+20240917	14:49:40	03e0791d-b479-4a50-b4c0-85e0a35bd3fe	GET	/api/v2/t	undefined
+20240917	14:49:46	b03e5e49-c149-419e-9959-ca5dc510a0c7	POST	/api/v2/t	undefined
+20240917	14:51:19	24c7a910-24b9-43d2-8d53-b2c97a1c2cb4	POST	/api/v2/t	undefined
+20240918	19:29:21	077fc1f1-9ad9-4f2d-bd09-b5f53e90581e	POST	/api/v2/m	undefined
