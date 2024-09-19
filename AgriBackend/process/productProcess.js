@@ -3,7 +3,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const { cloudinary } = require("../utils/cloudinary");
-
+const { uploadImageMultiple , uploadImageMultipleDel } = require("../utils/imageCloud")
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -17,18 +17,7 @@ exports.CreateProductProcess = async (req) => {
 
   let image = [];
   if (req.files && Array.isArray(req.files)) {
-    image = await Promise.all(
-      req.files.map(async (file) => {
-        const result = await cloudinary.uploader.upload(file.path, {
-          public_id: file.filename,
-        });
-        return {
-          public_id: result.public_id,
-           url: result.secure_url,
-          originalname: file.originalname,
-        };
-      })
-    );
+    image = await uploadImageMultiple(req.files)
   }
 
   if (image.length === STATUSCODE.ZERO)
@@ -73,26 +62,7 @@ if (Array.isArray(productExist.image)) {
 
   let image = productExist.image || [];
   if (req.files && Array.isArray(req.files)) {
-    image = await Promise.all(
-      req.files.map(async (file) => {
-        const result = await cloudinary.uploader.upload(file.path, {
-          public_id: file.filename,
-        });
-
-        image.forEach((img, index) => {
-             cloudinary.uploader.destroy(img.public_id)
-          console.log(img?.public_id, `Image ${index + 1} public_id`);
-        });
-        
-        return {
-          public_id: result.public_id,
-           url: result.secure_url,
-          originalname: file.originalname,
-        };
-        
-      })
-      
-    );
+    image = uploadImageMultipleDel(req.files)
   }
 
 

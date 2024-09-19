@@ -5,6 +5,7 @@ const ErrorHandler = require("../../utils/errorHandler");
 const mongoose = require("mongoose");
 const { encryptText, decryptText } = require("../../utils/encrypt")
 const { uploadImageMultiple } = require("../../utils/imageCloud")
+const { cloudinary } = require("../../utils/cloudinary");
 
 exports.newMessage = async (req) => {
   if (!req.body) throw new ErrorHandler("No message body", STATUSCODE.BADREQ);
@@ -55,28 +56,10 @@ exports.unsentMessage = async (id) => {
     ? messageExist.image.map((img) => img.public_id)
     : [];
 
-  const cipher = crypto.createCipheriv(algorithm, skey, iv);
-  let encrypted = cipher.update("This message was unsent", "utf-8", "hex");
-  encrypted += cipher.final("hex");
-  const authTag = cipher.getAuthTag().toString("hex");
+  const {encrypted, authTag, skey, iv} = encryptText("This message was unsent")
 
-  const updateMessage = {
-    text: encrypted,
-    image: hasimage ? [] : messageExist.image,
-    key: skey.toString("hex"),
-    iv: iv.toString("hex"),
-    tag: authTag,
-  };
-  await Promise.all([
-    Message.updateOne({ _id: id }, updateMessage).lean().exec(),
-    hasimage
-      ? cloudinary.uploader.destroy(publicIds, { resource_type: "image" })
-      : Promise.resolve(),
-    // Category.deleteMany({ product: id}).lean().exec(),
-    // Type.deleteMany({ product: id}).lean().exec(),
-  ]);
 
-  await UnsentMessage.create({
+  const unsentMess = await UnsentMessage.create({
     originalMessageId: id,
     sender: messageExist.sender,
     key: messageExist.key,
@@ -87,5 +70,20 @@ exports.unsentMessage = async (id) => {
     unsentAt: new Date(),
   });
 
-  return messageExist;
+  const updateMessage = {
+    text: encrypted,
+    image: hasimage ? [] : messageExist.image,
+    key: skey.toString("hex"),
+    iv: iv.toString("hex"),
+    tag: authTag,
+  };
+
+  await Promise.all([
+    Message.updateOne({ _id: id }, updateMessage).lean().exec(),
+    // Category.deleteMany({ product: id}).lean().exec(),
+    // Type.deleteMany({ product: id}).lean().exec(),
+  ]);
+
+
+  return unsentMess;
 };

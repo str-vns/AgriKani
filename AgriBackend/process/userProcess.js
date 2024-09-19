@@ -3,8 +3,8 @@ const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
-const { cloudinary } = require("../utils/cloudinary");
-
+const { uploadImageSingle } = require("../utils/imageCloud")
+const { cloudinary } = require("../utils/cloudinary")
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -32,15 +32,7 @@ exports.registerUser = async (req) => {
   let images = {};
 
   if (req.file) {
-    const file = req.file;
-    const result = await cloudinary.uploader.upload(file.path, {
-      public_id: file.filename,
-    });
-    images = {
-      public_id: result.public_id,
-      url: result.secure_url,
-      originalname: file.originalname,
-    };
+    images = await uploadImageSingle(req.file)
   }
   if (!images) throw new ErrorHandler("At least one image is required");
 
@@ -98,15 +90,7 @@ exports.UpdateUserInfo = async (req, id) => {
 
   let image_img = userExist.image || {};
   if (req.file) {
-    const file = req.file;
-    const result = await cloudinary.uploader.upload(file.path, {
-      public_id: file.filename,
-    });
-    image_img = {
-      public_id: result.public_id,
-      url: result.secure_url,
-      originalname: file.originalname,
-    };
+    image_img = await uploadImageSingle(req.file)
     await cloudinary.uploader.destroy(`${userExist.image.public_id}`);
   }
 
