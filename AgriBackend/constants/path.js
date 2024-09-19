@@ -13,5 +13,9 @@ module.exports = {
     CONVERSATION_ID: "/t/:id",
     RESTORE_CONVERSATION_ID: "/restore/t/:id",
     MESSAGE: "/m",
-    MESSAGE_ID: "/m/:id"
+    MESSAGE_ID: "/m/:id",
+    SHIPPING: "/shipping",
+    SHIPPING_ID: "/shipping/:id",
+    ADDRESS: "/address",
+    ADDRESS_ID: "/address/:id",
 }

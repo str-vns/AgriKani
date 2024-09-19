@@ -4,6 +4,8 @@ module.exports = {
     CONVERSATION: "conversation",
     MESSAGES: "messages",
     UNSENT_MESSAGES: "unsentmessages",
+    ADDRESS: "address",
+    SHIPPING: "shipping",
     ORDER: "order",
     JWT: "jwt",
     NONE: "none",
