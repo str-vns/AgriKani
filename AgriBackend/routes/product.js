@@ -21,25 +21,25 @@ const productRoutes = [
     method: METHOD.PUT,
     path: PATH.PRODUCTS_ID,
     roles: [],
-    handler: productController.UpdateProduct
+    handler: productController.UpdateProduct,
   },
   {
     method: METHOD.DELETE,
     path: PATH.PRODUCTS_ID,
     roles: [],
-    handler: productController.DeleteProduct
+    handler: productController.DeleteProduct,
   },
   {
     method: METHOD.PATCH,
     path: PATH.PRODUCTS_ID,
     roles: [],
-    handler: productController.SoftDelProduct
+    handler: productController.SoftDelProduct,
   },
   {
     method: METHOD.PATCH,
     path: PATH.RESTORE_PRODUCT_ID,
     roles: [],
-    handler: productController.RestoreProduct
+    handler: productController.RestoreProduct,
   },
   {
     method: METHOD.GET,

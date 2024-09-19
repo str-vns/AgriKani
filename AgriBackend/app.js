@@ -7,16 +7,17 @@ const corsOptions = require("./config/corOptions");
 const cookieParser = require("cookie-parser");
 
 // Routes
-const users = require("./routes/user")
-const auth = require("./routes/auth")
-const products = require("./routes/product")
-const conversation = require("./routes/Chat/conversation")
-const messages = require("./routes/Chat/message")
+const users = require("./routes/user");
+const auth = require("./routes/auth");
+const products = require("./routes/product");
+const conversation = require("./routes/Chat/conversation");
+const messages = require("./routes/Chat/message");
+const address = require("./routes/address");
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/v2", users, auth, products, conversation, messages);
+app.use("/api/v2", users, auth, products, conversation, messages, address);
 
-module.exports = app
+module.exports = app;

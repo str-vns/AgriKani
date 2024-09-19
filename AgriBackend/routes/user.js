@@ -58,7 +58,9 @@ const userRoutes = [
 
 userRoutes.forEach((route) => {
   const { method, path, roles = [], middleware = [], handler } = route;
-  router[method](path, middleware.concat(authorizeRoles(...roles)), handler);
+  router[method](path, 
+    middleware.concat(authorizeRoles(...roles)), 
+    handler);
 });
 
 module.exports = router;
