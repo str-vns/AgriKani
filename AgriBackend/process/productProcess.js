@@ -3,7 +3,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const { cloudinary } = require("../utils/cloudinary");
-const { uploadImageMultiple , uploadImageMultipleDel } = require("../utils/imageCloud")
+const { uploadImageMultiple } = require("../utils/imageCloud")
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -60,11 +60,21 @@ if (Array.isArray(productExist.image)) {
 }
 
 
-  let image = productExist.image || [];
-  if (req.files && Array.isArray(req.files)) {
-    image = uploadImageMultipleDel(req.files)
-  }
+let image = productExist.image || [];
 
+if (req.files && Array.isArray(req.files)) {
+  await Promise.all(
+    image.map(async (img, index) => {
+      try {
+        const result = await cloudinary.uploader.destroy(img.public_id);
+        console.log(img?.public_id, `Image ${index + 1} public_id deleted:`, result);
+      } catch (error) {
+        console.error(`Failed to delete Image ${index + 1}:`, error);
+      }
+    })
+  );
+  image = await uploadImageMultiple(req.files);
+}
 
   const updateProduct = await Product.findByIdAndUpdate(
     id,
