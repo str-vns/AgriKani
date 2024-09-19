@@ -1,37 +1,20 @@
 const Message = require("../../models/ChatFeats/messages");
 const UnsentMessage = require("../../models/ChatFeats/unsentMessageLog")
-const cloudinary = require("cloudinary");
 const { STATUSCODE } = require("../../constants/index");
 const ErrorHandler = require("../../utils/errorHandler");
-const algorithm = "aes-256-gcm";
-const crypto = require("crypto");
-const skey = crypto.randomBytes(32);
-const iv = crypto.randomBytes(12);
 const mongoose = require("mongoose");
+const { encryptText, decryptText } = require("../../utils/encrypt")
+const { uploadImageMultiple } = require("../../utils/imageCloud")
 
 exports.newMessage = async (req) => {
   if (!req.body) throw new ErrorHandler("No message body", STATUSCODE.BADREQ);
 
   let image = [];
   if (req.files && Array.isArray(req.files)) {
-    image = await Promise.all(
-      req.files.map(async (file) => {
-        const result = await cloudinary.uploader.upload(file.path, {
-          public_id: file.filename,
-        });
-        return {
-          public_id: result.public_id,
-          url: result.secure_url,
-          originalname: file.originalname,
-        };
-      })
-    );
+    image = await uploadImageMultiple(req.files)
   }
 
-  const cipher = crypto.createCipheriv(algorithm, skey, iv);
-  let encrypted = cipher.update(req.body.text, "utf-8", "hex");
-  encrypted += cipher.final("hex");
-  const authTag = cipher.getAuthTag().toString("hex");
+  const {encrypted, authTag, skey, iv} = encryptText(req.body.text)
   console.log(authTag);
   const message = await Message.create({
     ...req.body,
@@ -54,16 +37,8 @@ exports.getMesssages = async (id) => {
   });
 
   const decryptedMessage = messages.map((msg) => {
-    let decipher = crypto.createDecipheriv(
-      algorithm,
-      Buffer.from(msg.key,"hex"),
-      Buffer.from(msg.iv, "hex")
-    );
-    decipher.setAuthTag(Buffer.from(msg.tag, "hex"));
-    let decrypted = decipher.update(msg.text, "hex", "utf-8");
-    decrypted += decipher.final("utf-8");
-
-    return { ...msg.toObject(), decryptedText: decrypted };
+    const decryptedText = decryptText(msg.text, msg.key, msg.iv, msg.tag) 
+    return { ...msg.toObject(), decryptedText: decryptedText };
   });
 
   return decryptedMessage;
