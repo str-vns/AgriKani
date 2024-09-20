@@ -1,0 +1,173 @@
+const ErrorHandler = require("../utils/errorHandler");
+const { STATUSCODE, ROLE } = require("../constants/index");
+const { default: mongoose } = require("mongoose");
+const { cloudinary } = require("../utils/cloudinary");
+const { uploadImageMultiple } = require("../utils/imageCloud")
+const Farm = require("../models/farm")
+// NOTE Three DOTS MEANS OK IN COMMENT
+
+//create ...
+exports.CreateFarmProcess = async (req) => {
+    const duplicateFarm = await Farm.findOne({ farmName: req.body.farmName })
+    .collation({ locale: "en" })
+    .lean()
+    .exec();
+
+  if (duplicateFarm) throw new ErrorHandler("Farm Name is already exist");
+
+  let image = [];
+  if (req.files && Array.isArray(req.files)) {
+    image = await uploadImageMultiple(req.files)
+  }
+
+  if (image.length === STATUSCODE.ZERO)
+    throw new ErrorHandler("At least one image is required");
+
+  const farm = await Farm.create({
+    ...req.body,
+    image: image,
+  });
+
+  return farm;
+};
+
+//Read ...
+exports.GetAllFarm = async () => {
+  const farm = await Farm.find()
+    .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
+    .lean()
+    .exec();
+
+  return farm;
+};
+
+//Update ...
+exports.UpdateFarmInfo = async (req, id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+
+  const farmExist = await Farm.findOne({user: id}).lean().exec();
+  if (!farmExist) throw new ErrorHandler(`Farm not exist with ID: ${id}`);
+console.log(farmExist, "Full Farm object");
+
+if (Array.isArray(farmExist.image)) {
+    farmExist.image.forEach((img, index) => {
+    console.log(img?.public_id, `Image ${index + 1} public_id`);
+  });
+} else {
+  console.log("farmExist.image is not an array, it is:", typeof farmExist.image);
+}
+
+
+let image = farmExist.image || [];
+
+if (req.files && Array.isArray(req.files)) {
+  await Promise.all(
+    image.map(async (img, index) => {
+      try {
+        const result = await cloudinary.uploader.destroy(img.public_id);
+        console.log(img?.public_id, `Image ${index + 1} public_id deleted:`, result);
+      } catch (error) {
+        console.error(`Failed to delete Image ${index + 1}:`, error);
+      }
+    })
+  );
+  image = await uploadImageMultiple(req.files);
+}
+
+  const updateFarm = await Farm.findByIdAndUpdate(
+    farmExist._id,
+    {
+      ...req.body,
+      image: image,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .lean()
+    .exec();
+  if (!updateFarm) throw new ErrorHandler(`Farm not Update with ID ${id}`);
+  return updateFarm;
+};
+
+//Delete ...
+exports.DeleteFarmInfo = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+
+  const farmExist = await Farm.findOne({ _id: id });
+  if (!farmExist) throw new ErrorHandler(`Farm not exist with ID: ${id}`);
+
+  const publicIds = farmExist.image.public_id;
+
+  await Promise.all([
+    Farm.deleteOne({ _id: id }).lean().exec(),
+    cloudinary.uploader.destroy(publicIds),
+    // Category.deleteMany({ product: id}).lean().exec(),
+    // Type.deleteMany({ product: id}).lean().exec(),
+  ]);
+
+  return farmExist;
+};
+
+//SoftDelete ...
+exports.SoftDeleteFarmInfo = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+
+  const farmExist = await Farm.findOne({ _id: id });
+  if (!farmExist) throw new ErrorHandler(`Farm not exist with ID: ${id}`);
+
+  const softDelFarm = await Farm.findByIdAndUpdate(
+    id,
+    {
+      deletedAt: Date.now(),
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .lean()
+    .exec();
+  if (!softDelFarm) throw new ErrorHandler(`Farm not SoftDelete with ID ${id}`);
+  return softDelFarm;
+};
+
+//Restore ...
+exports.RestoreFarmInfo = async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id))
+        throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+
+    const farmExist = await Farm.findOne({ _id: id });
+    if (!farmExist) throw new ErrorHandler(`Farm not exist with ID: ${id}`);
+
+  const restoreFarm = await Farm.findByIdAndUpdate(
+    id,
+    {
+      deletedAt: null,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .lean()
+    .exec();
+  if (!restoreFarm) throw new ErrorHandler(`Farm was not retrive with ID ${id}`);
+  return restoreFarm;
+};
+
+//Single Product ...
+exports.singleFarm = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+
+  const singleFarm = await Farm.findOne({ user: id}).lean().exec();
+
+  if (!singleFarm) throw new ErrorHandler(`Product not exist with ID: ${id}`);
+
+  return singleFarm;
+};
