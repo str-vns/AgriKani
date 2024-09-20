@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Farm = require("../models/farm")
 const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
@@ -135,6 +136,7 @@ exports.DeleteUserInfo = async (id) => {
   await Promise.all([
     User.deleteOne({ _id: id }).lean().exec(),
     cloudinary.uploader.destroy(publicIds),
+    Farm.deleteMany({ user: id }).lean().exec(),
     // Products.deleteMany({ user: id}).lean().exec(),
     // Transactions.deleteMany({ user: id}).lean().exec(),
     // Reviews.deleteMany({ user: id}).lean().exec(),
