@@ -11,5 +11,5 @@ module.exports = {
     NONE: "none",
     IMAGES: "images",
     IMAGE: "image",
-    FARMERDATA: "farmerdata",
+    FARMINFO: "farminfo",
 }

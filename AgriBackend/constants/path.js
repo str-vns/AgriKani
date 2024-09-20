@@ -18,4 +18,7 @@ module.exports = {
     SHIPPING_ID: "/shipping/:id",
     ADDRESS: "/address",
     ADDRESS_ID: "/address/:id",
+    FARM: "/farm",
+    FARM_ID: "/farm/:id",
+    RESTORE_FARM_ID: "/restore/farm/:id",
 }
