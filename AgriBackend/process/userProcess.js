@@ -119,7 +119,23 @@ exports.UpdateUserInfo = async (req, id) => {
   )
     .lean()
     .exec();
+
   if (!updateUser) throw new ErrorHandler(`User not Update with ID ${id}`);
+  
+  await Product.updateMany(
+    { "reviews.user": id }, 
+    {
+      $set: {
+        "reviews.$[elem].avatar": image_img,  
+        "reviews.$[elem].firstName": req.body.firstName || userExist.firstName,  
+        "reviews.$[elem].lastName": req.body.lastName || userExist.lastName,     
+      },
+    },
+    {
+      arrayFilters: [{ "elem.user": id }],  
+      new: true,
+    }
+  ).exec();
   return updateUser;
 };
 

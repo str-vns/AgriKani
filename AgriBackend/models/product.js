@@ -43,6 +43,72 @@ const productSchema = new mongoose.Schema({
       required: true,
     },
   }],
+  numOfReviews: {
+    type: Number,
+    default: 0,
+  },
+  ratings: {
+    type: Number,
+    default: 0,
+  },
+  reviews: {
+    type: Number,
+    default: 0,
+  },
+  reviews: [
+    {
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      firstName: {
+        type: String,
+        required: true,
+      },
+      lastName: {
+        type: String,
+        required: true,
+      },
+      avatar: {
+        public_id: {
+          type: String,
+        },
+        url: {
+          type: String,
+        },
+        originalname: {
+          type: String,
+          required: true,
+        },
+      },
+      rating: {
+        type: Number,
+        required: true,
+      },
+      comment: {
+        type: String,
+        required: true,
+      },
+
+      image: [
+        {
+          public_id: {
+            type: String,
+            required: true,
+          },
+          url: {
+            type: String,
+            required: true,
+          },
+          originalname: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
+    },
+  ],
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
