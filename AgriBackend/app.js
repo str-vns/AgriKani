@@ -14,11 +14,11 @@ const conversation = require("./routes/Chat/conversation");
 const messages = require("./routes/Chat/message");
 const address = require("./routes/address");
 const farms = require("./routes/farm")
-
+const comment = require("./routes/comment")
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/v2", users, auth, products, conversation, messages, address, farms);
+app.use("/api/v2", users, auth, products, conversation, messages, address, farms, comment);
 
 module.exports = app;
