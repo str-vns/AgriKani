@@ -21,5 +21,9 @@ module.exports = {
     FARM: "/farm",
     FARM_ID: "/farm/:id",
     RESTORE_FARM_ID: "/restore/farm/:id",
-    COMMENT: "/products/comment"
+    COMMENT: "/products/comment",
+    POST: "/p",
+    POST_ID: "/p/:id",
+    RESTORE_POST_ID: "/restore/p/:id",
+    POST_USER_ID: "/p/user/:id"
 }
