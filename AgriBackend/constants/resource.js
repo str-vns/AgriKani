@@ -13,4 +13,5 @@ module.exports = {
     IMAGE: "image",
     FARMINFO: "farminfo",
     COMMENT: "comment",
+    POST: "post",
 }
