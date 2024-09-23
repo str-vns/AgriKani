@@ -3,14 +3,19 @@ const { uploadImageMultiple, uploadImageSingle } = require("../utils/imageCloud"
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const Product = require("../models/product");
+const User = require("../models/user")
 const ErrorHandler = require("../utils/errorHandler");
+const user = require("../models/user");
 
 exports.CreateProductReview = async (req) => {
+  console.log(req.body.user)
+  const userId = req.body.user
     // if (!mongoose.Types.ObjectId.isValid(req.body.user))
     //     throw new ErrorHandler(`Invalid Address ID: ${req.body.user}`);
-   
     const product = await Product.findById(req.body.productId)
-    const isReview = product.reviews.find((prod) => prod.user)
+    const users = await User.findById(req.body.user)
+    console.log(users)
+    const isReview = product.reviews.find((prod) => prod.user?.toString() === userId?.toString());
     let image = product.reviews.image || []
     if(req.files || Array.isArray(req.files))
     {
@@ -27,14 +32,9 @@ exports.CreateProductReview = async (req) => {
         image = await uploadImageMultiple(req.files)
     }
 
-    let images = {}
-    if (req.file) {
-        images = await uploadImageSingle(req.file)
-      }
-
     if(isReview) {
         product.reviews.forEach((review) => {
-            if(review.user.toString() === req.user.id.toString())
+            if(review.user?.toString() === userId?.toString())
             {
                 review.comment = req.body.comment
                 review.rating =  req.body.rating
@@ -46,7 +46,10 @@ exports.CreateProductReview = async (req) => {
         product.reviews.push(
             {
                 ...req.body,
-                avatar: images,
+                user: users._id,
+                firstName: users.firstName,
+                lastName: users.lastName,
+                avatar: users.image,
                 image: image
             }
         )
@@ -54,4 +57,6 @@ exports.CreateProductReview = async (req) => {
     }
     product.ratings = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
     await product.save({ validateBeforeSave: false})
+
+    return product
 }

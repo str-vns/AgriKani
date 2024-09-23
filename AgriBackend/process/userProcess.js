@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Farm = require("../models/farm")
+const Product = require("../models/product")
 const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
