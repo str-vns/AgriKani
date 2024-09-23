@@ -7,17 +7,17 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE } = require("../constants/index");
 
 exports.CreatePost = [
-    upload.array("image"), 
-    asyncHandler(async (req, res) => {
-      const post = await postProcess.CreatePostProcess(req);
-  
-      return SuccessHandler(
-        res,
-        `Post: ${post?._id} has been created successfully`,
-        post
-      );
-    }),
-  ];
+  upload.array("image"),
+  asyncHandler(async (req, res) => {
+    const post = await postProcess.CreatePostProcess(req);
+
+    return SuccessHandler(
+      res,
+      `Post: ${post?._id} has been created successfully`,
+      post
+    );
+  }),
+];
 
 exports.GetPost = asyncHandler(async (req, res, next) => {
   const post = await postProcess.GetAllPostInfo();
@@ -72,21 +72,23 @@ exports.SinglePost = asyncHandler(async (req, res) => {
 
   return post?.length === STATUSCODE.ZERO
     ? next(new ErrorHandler("No Post Found"))
-    : SuccessHandler(
-        res,
-        `${post._id} has been fetched Successfully`,
-        post
-      );
+    : SuccessHandler(res, `${post._id} has been fetched Successfully`, post);
 });
 
 exports.UserPost = asyncHandler(async (req, res) => {
-    const post = await postProcess.userPost(req.params.id);
-  
-    return post?.length === STATUSCODE.ZERO
-      ? next(new ErrorHandler("No Post Found"))
-      : SuccessHandler(
-          res,
-          `${post._id} has been fetched Successfully`,
-          post
-        );
-  });
+  const post = await postProcess.userPost(req.params.id);
+
+  return post?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Post Found"))
+    : SuccessHandler(res, `${post._id} has been fetched Successfully`, post);
+});
+
+exports.LikePost = asyncHandler(async (req, res) => {
+  const post = await postProcess.likePost(req, req.params.id);
+
+  return SuccessHandler(
+    res,
+    `Post ${post._id} has been liked Successfully`,
+    post
+  );
+});

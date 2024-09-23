@@ -3,7 +3,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const { cloudinary } = require("../utils/cloudinary");
-const { uploadImageMultiple } = require("../utils/imageCloud")
+const { uploadImageMultiple } = require("../utils/imageCloud");
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -12,7 +12,7 @@ exports.CreatePostProcess = async (req) => {
 
   let image = [];
   if (req.files && Array.isArray(req.files)) {
-    image = await uploadImageMultiple(req.files)
+    image = await uploadImageMultiple(req.files);
   }
 
   const post = await Post.create({
@@ -41,31 +41,36 @@ exports.UpdatePostInfo = async (req, id) => {
   const postExist = await Post.findById(id).lean().exec();
   if (!postExist) throw new ErrorHandler(`Post not exist with ID: ${id}`);
 
-if (Array.isArray(postExist.image)) {
- 
+  if (Array.isArray(postExist.image)) {
     postExist.image.forEach((img, index) => {
-    console.log(img?.public_id, `Image ${index + 1} public_id`);
-  });
-} else {
-  console.log("productExist.image is not an array, it is:", typeof productExist.image);
-}
+      console.log(img?.public_id, `Image ${index + 1} public_id`);
+    });
+  } else {
+    console.log(
+      "productExist.image is not an array, it is:",
+      typeof productExist.image
+    );
+  }
 
+  let image = postExist.image || [];
 
-let image = postExist.image || [];
-
-if (req.files && Array.isArray(req.files)) {
-  await Promise.all(
-    image.map(async (img, index) => {
-      try {
-        const result = await cloudinary.uploader.destroy(img.public_id);
-        console.log(img?.public_id, `Image ${index + 1} public_id deleted:`, result);
-      } catch (error) {
-        console.error(`Failed to delete Image ${index + 1}:`, error);
-      }
-    })
-  );
-  image = await uploadImageMultiple(req.files);
-}
+  if (req.files && Array.isArray(req.files)) {
+    await Promise.all(
+      image.map(async (img, index) => {
+        try {
+          const result = await cloudinary.uploader.destroy(img.public_id);
+          console.log(
+            img?.public_id,
+            `Image ${index + 1} public_id deleted:`,
+            result
+          );
+        } catch (error) {
+          console.error(`Failed to delete Image ${index + 1}:`, error);
+        }
+      })
+    );
+    image = await uploadImageMultiple(req.files);
+  }
 
   const updatePost = await Post.findByIdAndUpdate(
     id,
@@ -148,7 +153,8 @@ exports.RestorePostInfo = async (id) => {
   )
     .lean()
     .exec();
-  if (!restorePost) throw new ErrorHandler(`Post was not retrive with ID ${id}`);
+  if (!restorePost)
+    throw new ErrorHandler(`Post was not retrive with ID ${id}`);
   return restorePost;
 };
 
@@ -165,12 +171,36 @@ exports.singlePost = async (id) => {
 };
 
 exports.userPost = async (id) => {
-    if (!mongoose.Types.ObjectId.isValid(id))
-      throw new ErrorHandler(`Invalid Post ID: ${id}`);
-  
-    const userPost = await Post.find({ author: id}).lean().exec();
-  
-    if (!userPost) throw new ErrorHandler(`User not exist with ID: ${id}`);
-  
-    return userPost;
-  };
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Post ID: ${id}`);
+
+  const userPost = await Post.find({ author: id }).lean().exec();
+
+  if (!userPost) throw new ErrorHandler(`User not exist with ID: ${id}`);
+
+  return userPost;
+};
+
+//Edit user
+exports.likePost = async (req, id) => {
+  const userId = req.body.user;
+  console.log(userId)
+  const post = await Post.findById(id);
+ console.log(post)
+ const isLiked = post.likes.findIndex(
+  (like) => like._id.toString() === userId.toString()
+);
+console.log(isLiked)
+
+  if (isLiked === -1) {
+    post.likes.push({ _id: userId });
+    post.likeCount += 1;
+  } else {
+    post.likes.splice(isLiked, 1);
+    post.likeCount -= 1;
+  }
+
+  await post.save();
+
+  return post;
+};

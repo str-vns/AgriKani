@@ -78,9 +78,21 @@ const postSchema = new mongoose.Schema({
       ],
     },
   ],
-  deletedAt:{
+  deletedAt: {
     type: Date,
     default: null,
+  },
+  likes: [
+    {
+      user: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    },
+  ],
+  likeCount: {
+    type: Number,
+    default: 0,
   },
   createdAt: {
     type: Date,

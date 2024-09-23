@@ -53,6 +53,12 @@ const postRoutes = [
     roles: [],
     handler: postControllers.UserPost,
   },
+  {
+    method: METHOD.POST,
+    path: PATH.POST_ID,
+    roles: [],
+    handler: postControllers.LikePost,
+  },
 ];
 
 postRoutes.forEach((route) => {
