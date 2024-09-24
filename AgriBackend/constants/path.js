@@ -25,5 +25,8 @@ module.exports = {
     POST: "/p",
     POST_ID: "/p/:id",
     RESTORE_POST_ID: "/restore/p/:id",
-    POST_USER_ID: "/p/user/:id"
+    POST_USER_ID: "/p/user/:id",
+    SHARE_POST: "/s",
+    SHARE_POST_ID: "/s/:id",
+    RESTORE_SHARE_POST_ID: "/restore/share/:id"
 }
