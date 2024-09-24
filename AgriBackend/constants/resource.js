@@ -14,4 +14,5 @@ module.exports = {
     FARMINFO: "farminfo",
     COMMENT: "comment",
     POST: "post",
+    SHAREPOST: "sharepost",
 }
