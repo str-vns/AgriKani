@@ -15,11 +15,10 @@ exports.newMessage = async (req) => {
     image = await uploadImageMultiple(req.files)
   }
 
-  const {encrypted, authTag, skey, iv} = encryptText(req.body.text)
+  const {encrypted, authTag, iv} = encryptText(req.body.text)
   console.log(authTag);
   const message = await Message.create({
     ...req.body,
-    key: skey.toString("hex"),
     iv: iv.toString("hex"),
     tag: authTag,
     text: encrypted,

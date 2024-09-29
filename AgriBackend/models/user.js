@@ -81,6 +81,12 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  iv: {
+    type: String,
+  },
+  tag: {
+    type: String
+  },
   seniorAt:{
     type: Boolean,
     default: false,
@@ -90,8 +96,8 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
   deletedAt: {
-    type: Boolean,
-    default: false,
+    type: Date,
+    default: null,
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,

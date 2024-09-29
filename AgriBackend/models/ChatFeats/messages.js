@@ -28,9 +28,6 @@ const MessageSchema = new mongoose.Schema(
           },
       },
     ],
-    key: {
-      type: String,
-    },
     iv: {
       type: String,
     },

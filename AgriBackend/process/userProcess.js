@@ -6,7 +6,8 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const { uploadImageSingle } = require("../utils/imageCloud")
-const { cloudinary } = require("../utils/cloudinary")
+const { cloudinary } = require("../utils/cloudinary");
+const { encryptText } = require("../utils/encrypt");
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -45,13 +46,24 @@ exports.registerUser = async (req) => {
     : [ROLE.CUSTOMER];
 
   const gender = req.body.gender ? req.body.gender : GENDER.PNTS;
-
-  const user = await User.create({
+  const fieldsToEncrypt = {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
-    age: req.body.age,
+    age: req.body.age.toString(), 
     phoneNum: req.body.phoneNum,
     email: req.body.email,
+  };
+
+  const encryptedFields = {};
+  for (const [key, value] of Object.entries(fieldsToEncrypt)) {
+    const { encrypted, authTag, iv } = encryptText(value);
+    encryptedFields[key] = encrypted;
+    encryptedFields[`${key}_iv`] = iv.toString("hex"); // Store IV in hex format
+    encryptedFields[`${key}_tag`] = authTag; // Store authTag
+  }
+
+  const user = await User.create({
+    ...encryptedFields,
     password: await bcrypt.hash(req.body.password, Number(process.env.SALT)),
     roles: role,
     gender: gender,
@@ -173,7 +185,7 @@ exports.SoftDeleteUserInfo = async (id) => {
   const softDelUser = await User.findByIdAndUpdate(
     id,
     {
-      deletedAt: "true",
+      deletedAt: Date.now(),
     },
     {
       new: true,
@@ -197,7 +209,7 @@ exports.RestoreUserInfo = async (id) => {
   const restoreUser = await User.findByIdAndUpdate(
     id,
     {
-      deletedAt: "false",
+      deletedAt: null,
     },
     {
       new: true,
