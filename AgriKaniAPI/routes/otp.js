@@ -13,8 +13,7 @@ const otpRoutes = [
 
 otpRoutes.forEach((route) => {
   const { method, path, roles = [], middleware = [], handler } = route;
-  router[method](path, 
-    handler);
+  router[method](path, handler);
 });
 
 module.exports = router;
