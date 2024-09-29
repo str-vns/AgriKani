@@ -28,5 +28,6 @@ module.exports = {
     POST_USER_ID: "/p/user/:id",
     SHARE_POST: "/s",
     SHARE_POST_ID: "/s/:id",
-    RESTORE_SHARE_POST_ID: "/restore/share/:id"
+    RESTORE_SHARE_POST_ID: "/restore/share/:id",
+    OTP: "/send-otp"
 }
