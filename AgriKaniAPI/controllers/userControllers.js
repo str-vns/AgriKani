@@ -8,7 +8,7 @@ const { STATUSCODE } = require("../constants/index");
 
 exports.SignUp = [
   upload.single("image"),
-  CheckField(["firstName", "lastName", "age", "phoneNum", "email", "password"]),
+  CheckField(["firstName", "lastName", "age", "phoneNum", "email", "password", "otp"]),
   asyncHandler(async (req, res) => {
     const user = await userProcess.registerUser(req);
     return SuccessHandler(

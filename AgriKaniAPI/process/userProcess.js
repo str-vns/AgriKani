@@ -1,13 +1,13 @@
 const User = require("../models/user");
 const Farm = require("../models/farm")
 const Product = require("../models/product")
+const Otp = require("../models/otp")
 const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const { uploadImageSingle } = require("../utils/imageCloud")
 const { cloudinary } = require("../utils/cloudinary");
-const { encryptText } = require("../utils/encrypt");
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -32,6 +32,12 @@ exports.registerUser = async (req) => {
   if (age < 18 || age > 100)
     throw new ErrorHandler("Age must be between 18 and 100");
 
+  const response =  await Otp.findOne({ email: req.body.email})
+  .sort({createdAt: -1}).limit(1).lean().exec();
+
+  if(!response)
+    throw new ErrorHandler("Otp is not Valid");
+  
   let images = {};
 
   if (req.file) {
@@ -46,24 +52,10 @@ exports.registerUser = async (req) => {
     : [ROLE.CUSTOMER];
 
   const gender = req.body.gender ? req.body.gender : GENDER.PNTS;
-  const fieldsToEncrypt = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    age: req.body.age.toString(), 
-    phoneNum: req.body.phoneNum,
-    email: req.body.email,
-  };
-
-  const encryptedFields = {};
-  for (const [key, value] of Object.entries(fieldsToEncrypt)) {
-    const { encrypted, authTag, iv } = encryptText(value);
-    encryptedFields[key] = encrypted;
-    encryptedFields[`${key}_iv`] = iv.toString("hex"); // Store IV in hex format
-    encryptedFields[`${key}_tag`] = authTag; // Store authTag
-  }
+ 
 
   const user = await User.create({
-    ...encryptedFields,
+    ...req.body,
     password: await bcrypt.hash(req.body.password, Number(process.env.SALT)),
     roles: role,
     gender: gender,
