@@ -17,6 +17,7 @@ const farms = require("./routes/farm");
 const comment = require("./routes/comment");
 const post = require("./routes/post");
 const shared = require("./routes/sharedpost")
+const otp = require("./routes/otp")
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -33,7 +34,8 @@ app.use(
   farms,
   comment,
   post,
-  shared
+  shared,
+  otp
 );
 
 module.exports = app;
