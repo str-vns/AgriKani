@@ -5,7 +5,7 @@ const connectDB = require("./config/db");
 const PORT = process.env.PORT || 4000;
 const { logger, logEvents } = require("./middleware/logger");
 const { STATUSCODE } = require("./constants/index");
-
+const { analyzeMixedLanguage } = require("./utils/mixLanguage")
 connectDB();
 app.use(logger);
 
@@ -25,3 +25,8 @@ mongoose.connection.on("error", (err) => {
     "mongoLog.log"
   );
 });
+
+
+
+// var result = analyzeMixedLanguage('tanga ka, BOBO PA, pero Mabait ka But its fine' )
+// console.log(result)
