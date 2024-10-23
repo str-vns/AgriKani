@@ -32,11 +32,20 @@ exports.registerUser = async (req) => {
   if (age < 18 || age > 100)
     throw new ErrorHandler("Age must be between 18 and 100");
 
-  const response =  await Otp.findOne({ email: req.body.email})
-  .sort({createdAt: -1}).limit(1).lean().exec();
+  const response = await Otp.findOne({ 
+    email: req.body.email,   
+    otp: req.body.otp        
+  })
+  .sort({ createdAt: -1 })      
+  .limit(1)                    
+  .lean()                      
+  .exec();                     
 
-  if(!response)
-    throw new ErrorHandler("Otp is not Valid");
+if (!response) {
+  throw new ErrorHandler("Otp is not Valid or Email is not Match");
+}
+
+
   
   let images = {};
 

@@ -11,6 +11,7 @@ exports.SignUp = [
   CheckField(["firstName", "lastName", "age", "phoneNum", "email", "password", "otp"]),
   asyncHandler(async (req, res) => {
     const user = await userProcess.registerUser(req);
+
     return SuccessHandler(
       res,
       `User Name ${user?.firstName} ${user?.lastName} has been created Successfully`,
