@@ -3,6 +3,7 @@ const { CONVERSATION } = require("./resource");
 module.exports = {
     USERS: "/users",
     USER_ID: "/users/:id",
+    SINGLE_USER: "/user/:id",
     RESTORE_ID: "/restore/users/:id",
     LOGIN: "/signin",
     LOGOUT: "/signout",

@@ -234,3 +234,37 @@ exports.ProfileUserInfo = async (id) => {
 
   return singleUser;
 };
+
+exports.SingerUser = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
+
+  const singleUser = await User.findById(id).lean().exec();
+
+  if (!singleUser) throw new ErrorHandler(`User not exist with ID: ${id}`);
+
+  return singleUser;
+};
+
+exports.wishlistProduct = async (id) => {
+  const userId = req.body.user;
+  console.log(userId)
+  const wish = await User.findById(id);
+ console.log(post)
+ const isLiked = post.likes.findIndex(
+  (like) => like._id.toString() === userId.toString()
+);
+console.log(isLiked)
+
+  if (isLiked === -1) {
+    post.likes.push({ _id: userId });
+    post.likeCount += 1;
+  } else {
+    post.likes.splice(isLiked, 1);
+    post.likeCount -= 1;
+  }
+
+  await post.save();
+
+  return post;
+}

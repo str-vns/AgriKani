@@ -54,6 +54,12 @@ const userRoutes = [
     middleware: [verifyJWT],
     handler: userController.UserProfile,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.SINGLE_USER,
+    roles: [],
+    handler: userController.SingleUser,
+  },
 ];
 
 userRoutes.forEach((route) => {

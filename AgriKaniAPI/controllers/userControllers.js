@@ -80,3 +80,15 @@ exports.UserProfile = asyncHandler(async (req, res) => {
         user
       );
 });
+
+exports.SingleUser = asyncHandler(async (req, res) => {
+  const user = await userProcess.ProfileUserInfo(req.params.id);
+
+  return user?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No User Found"))
+    : SuccessHandler(
+        res,
+        `${user?.firstName} ${user?.lastName} has been fetched Successfully`,
+        user
+      );
+});
