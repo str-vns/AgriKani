@@ -31,6 +31,7 @@
     "nodemailer": "^6.9.15",
     "otp-generator": "^4.0.1",
     "sentiment": "^5.0.2",
+    "socket.io": "^4.8.1",
     "uuid": "^9.0.0",
     "validator": "^13.9.0"
   },

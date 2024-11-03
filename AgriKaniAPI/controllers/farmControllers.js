@@ -10,19 +10,18 @@ exports.CreateFarm = [
     upload.array("image"), 
     CheckField([
         "farmName",
-        "region",
-        "province",
         "city",
         "barangay",
         "address",
         "postalCode",
-        "image",
         "latitude",
+        "image",
         "longitude",
+        "user",
       ]),
     asyncHandler(async (req, res) => {
       const farm = await farmProcess.CreateFarmProcess(req);
-  
+     
       return SuccessHandler(
         res,
         `Farm: ${farm?.farmName} has been created successfully`,

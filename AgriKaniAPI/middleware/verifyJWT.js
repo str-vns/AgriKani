@@ -1,6 +1,6 @@
-// const { verifyAccessToken } = require("../utils/token");
+const { verifyAccessToken } = require("../utils/token");
 const ErrorHandler = require("../utils/errorHandler");
-// const { getBlacklistedTokens } = require("../services/userService");
+const { getBlacklistedTokens } = require("../process/userProcess");
 const { STATUSCODE } = require("../constants/index");
 
 exports.verifyJWT = async (req, res, next) => {

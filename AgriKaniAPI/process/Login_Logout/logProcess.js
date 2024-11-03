@@ -21,7 +21,8 @@ exports.LoginUser = async (email, password) => {
     accountUser.email,
     accountUser.roles,
     accountUser.firstName,
-    accountUser.lastName
+    accountUser.lastName,
+    accountUser.image
   );
   const accessTokenMaxAge = 7 * 24 * 60 * 60 * 1000;
 

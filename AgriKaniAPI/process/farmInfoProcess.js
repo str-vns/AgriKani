@@ -4,16 +4,25 @@ const { default: mongoose } = require("mongoose");
 const { cloudinary } = require("../utils/cloudinary");
 const { uploadImageMultiple } = require("../utils/imageCloud")
 const Farm = require("../models/farm")
+const User = require("../models/user")
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
 exports.CreateFarmProcess = async (req) => {
+  
     const duplicateFarm = await Farm.findOne({ farmName: req.body.farmName })
     .collation({ locale: "en" })
     .lean()
     .exec();
-
   if (duplicateFarm) throw new ErrorHandler("Farm Name is already exist");
+ 
+  const user = await User.findById(req.body.user).exec(); 
+  if (!user) throw new ErrorHandler("User not found");
+  
+  if (!user.roles.includes(ROLE.COOPERATIVE)) {
+      user.roles.push(ROLE.COOPERATIVE); 
+      await user.save();
+  }
 
   let image = [];
   if (req.files && Array.isArray(req.files)) {

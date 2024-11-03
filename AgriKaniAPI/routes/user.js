@@ -60,6 +60,12 @@ const userRoutes = [
     roles: [],
     handler: userController.SingleUser,
   },
+  {
+    method: METHOD.POST,
+    path: PATH.WISH_USER_ID,
+    roles: [ROLE.CUSTOMER, ROLE.FARMER],
+    handler: userController.WishlistUser,
+  },
 ];
 
 userRoutes.forEach((route) => {

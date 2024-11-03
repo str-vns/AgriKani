@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const { RESOURCE } = require('../constants/index')
 
-exports.generateAccessToken = (email, roles,firstName,lastName) => {
+exports.generateAccessToken = (email, roles,firstName,lastName, image) => {
     const accessToken = jwt.sign(
         {
             CustomerInfo:
@@ -10,6 +10,7 @@ exports.generateAccessToken = (email, roles,firstName,lastName) => {
                 roles: roles,
                 firstName: firstName,
                 lastName: lastName,
+                image: image,
             }
         },
         process.env.ACCESS_TOKEN_SECRET,

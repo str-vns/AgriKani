@@ -172,3 +172,14 @@ exports.singleProduct = async (id) => {
 
   return singleProduct;
 };
+
+exports.CoopOnlyProduct = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
+
+  const coopOnlyProduct = await Product.find({ user: id }).lean().exec();
+
+  if (!coopOnlyProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
+
+  return coopOnlyProduct;
+};

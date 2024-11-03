@@ -7,25 +7,29 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE } = require("../constants/index");
 
 exports.productCreate = [
-    upload.array("image"), 
-    CheckField(["productName", "description", "pricing", "stock", "image"]),
-    asyncHandler(async (req, res) => {
-      const product = await productProcess.CreateProductProcess(req);
-  
-      return SuccessHandler(
-        res,
-        `Product: ${product?.productName} has been created successfully`,
-        product
-      );
-    }),
-  ];
+  upload.array("image"),
+  CheckField(["productName", "description", "pricing", "stock", "image"]),
+  asyncHandler(async (req, res) => {
+    const product = await productProcess.CreateProductProcess(req);
+
+    return SuccessHandler(
+      res,
+      `Product: ${product?.productName} has been created successfully`,
+      product
+    );
+  }),
+];
 
 exports.GetAllProduct = asyncHandler(async (req, res, next) => {
   const products = await productProcess.GetAllProdductInfo();
 
   return products?.length === STATUSCODE.ZERO
     ? next(new ErrorHandler("No Product Found"))
-    : SuccessHandler(res, `All Product has been fetched Successfully`, products);
+    : SuccessHandler(
+        res,
+        `All Product has been fetched Successfully`,
+        products
+      );
 });
 
 exports.UpdateProduct = [
@@ -78,5 +82,17 @@ exports.SingleProduct = asyncHandler(async (req, res) => {
         res,
         `${product.productName} has been fetched Successfully`,
         product
+      );
+});
+
+exports.CoopOnlyProducts = asyncHandler(async (req, res) => {
+  const coopProducts = await productProcess.CoopOnlyProduct(req.params.id);
+
+  return coopProducts?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Product Found"))
+    : SuccessHandler(
+        res,
+        `All Product has been fetched Successfully`,
+        coopProducts
       );
 });

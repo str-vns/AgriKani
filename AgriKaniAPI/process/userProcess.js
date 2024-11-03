@@ -8,6 +8,7 @@ const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const { uploadImageSingle } = require("../utils/imageCloud")
 const { cloudinary } = require("../utils/cloudinary");
+const blacklistedTokens = [];
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -86,6 +87,7 @@ exports.GetAllUserInfo = async () => {
 
 //Update ...
 exports.UpdateUserInfo = async (req, id) => {
+  console.log("Received File:", req.file);
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid User ID: ${id}`);
 
@@ -150,6 +152,9 @@ exports.UpdateUserInfo = async (req, id) => {
       new: true,
     }
   ).exec();
+ 
+  
+ 
   return updateUser;
 };
 
@@ -246,25 +251,34 @@ exports.SingerUser = async (id) => {
   return singleUser;
 };
 
-exports.wishlistProduct = async (id) => {
-  const userId = req.body.user;
-  console.log(userId)
-  const wish = await User.findById(id);
- console.log(post)
- const isLiked = post.likes.findIndex(
-  (like) => like._id.toString() === userId.toString()
-);
-console.log(isLiked)
+exports.getBlacklistedTokens = () => {
+  return blacklistedTokens;
+};
 
-  if (isLiked === -1) {
-    post.likes.push({ _id: userId });
-    post.likeCount += 1;
-  } else {
-    post.likes.splice(isLiked, 1);
-    post.likeCount -= 1;
+exports.wishlistProduct = async (productId, id) => {
+  console.log(productId)
+  console.log(id)
+  const product = await Product.findById(productId);
+  if (!product) {
+    throw new ErrorHandler("Product not found");
+  }
+  console.log("user: ", id)
+  const user = await User.findById(id);
+  if (!user) {
+    throw new ErrorHandler("User not found");
   }
 
-  await post.save();
+  const isWished = user.wishlist.findIndex(item => item.product.toString() === product._id.toString());
 
-  return post;
+  if (isWished === -1) {
+    user.wishlist.push({ product: product});
+  } else {
+    user.wishlist.splice(isWished, 1);
+  }
+
+  await user.save();
+
+
+
+  return user;
 }

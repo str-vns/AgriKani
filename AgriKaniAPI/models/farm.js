@@ -8,26 +8,18 @@ const farmSchema = new mongoose.Schema({
     required: [true, "Please enter your Farm!"],
     maxLength: [100, "Your name cannot exceed 100 characters!"],
   },
-  region: {
+  address: {
     type: String,
-    required: [true, "Please enter the Region!"],
-  },
-  province: {
-    type: String,
-    required: [true, "Please enter the Province!"],
-  },
-  city: {
-    type: String,
-    required: [true, "Please enter the City!"],
+    required: [true, "Please enter the Address!"],
   },
   barangay:
   {
     type: String,
     required: [true, "Please enter the Barangay!"],
   },
-  address: {
+  city: {
     type: String,
-    required: [true, "Please enter the Address!"],
+    required: [true, "Please enter the City!"],
   },
   postalCode: {
     type: String,

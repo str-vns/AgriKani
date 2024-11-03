@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/productControllers");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
-const { METHOD, PATH, ROLES } = require("../constants/index");
+const { METHOD, PATH, ROLE } = require("../constants/index");
 
 const productRoutes = [
   {
@@ -47,6 +47,12 @@ const productRoutes = [
     roles: [],
     handler: productController.SingleProduct,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.COOP_ONLY_PRODUCTS_ID,
+    roles: [ROLE.COOPERATIVE],
+    handler: productController.CoopOnlyProducts
+  }
 ];
 
 productRoutes.forEach((route) => {
