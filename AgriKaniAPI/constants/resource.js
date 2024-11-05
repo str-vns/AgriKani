@@ -6,6 +6,8 @@ module.exports = {
     UNSENT_MESSAGES: "unsentmessages",
     ADDRESS: "address",
     SHIPPING: "shipping",
+    CATEGORY: "category",
+    TYPE: "type",
     ORDER: "order",
     JWT: "jwt",
     NONE: "none",

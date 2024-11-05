@@ -1,4 +1,4 @@
-const { CONVERSATION } = require("./resource");
+const { CONVERSATION, CATEGORY, TYPE } = require("./resource");
 
 module.exports = {
     USERS: "/users",
@@ -10,8 +10,12 @@ module.exports = {
     LOGOUT: "/signout",
     PRODUCTS: "/products",
     PRODUCTS_ID: "/products/:id",
+    PRODUCTS_EDIT_ID: "/products/edit/:id",
+    PRODUCTS_SOFTDEL_ID: "/products/softdel/:id",
     COOP_ONLY_PRODUCTS_ID: "/products/coop/:id",
     RESTORE_PRODUCT_ID: "/restore/products/:id",
+    IMAGE_PRODUCT_DELETE: "/products/image/:id/:imageId",
+    PRODUCT_ARCHIVE_ID: "/products/archive/:id",
     CONVERSATION: "/t",
     CONVERSATION_ID: "/t/:id",
     RESTORE_CONVERSATION_ID: "/restore/t/:id",
@@ -32,5 +36,9 @@ module.exports = {
     SHARE_POST: "/s",
     SHARE_POST_ID: "/s/:id",
     RESTORE_SHARE_POST_ID: "/restore/share/:id",
-    OTP: "/send-otp"
+    OTP: "/send-otp",
+    CATEGORY: "/category",
+    CATEGORY_ID: "/category/:id",
+    TYPE: "/type",
+    TYPE_ID: "/type/:id",
 }
