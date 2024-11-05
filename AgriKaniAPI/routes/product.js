@@ -3,6 +3,7 @@ const router = express.Router();
 const productController = require("../controllers/productControllers");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
 const { METHOD, PATH, ROLE } = require("../constants/index");
+const { path } = require("../app");
 
 const productRoutes = [
   {
@@ -19,19 +20,19 @@ const productRoutes = [
   },
   {
     method: METHOD.PUT,
-    path: PATH.PRODUCTS_ID,
-    roles: [],
+    path: PATH.PRODUCTS_EDIT_ID,
+    roles: [ROLE.COOPERATIVE],
     handler: productController.UpdateProduct,
   },
   {
     method: METHOD.DELETE,
     path: PATH.PRODUCTS_ID,
-    roles: [],
+    roles: [ROLE.COOPERATIVE],
     handler: productController.DeleteProduct,
   },
   {
     method: METHOD.PATCH,
-    path: PATH.PRODUCTS_ID,
+    path: PATH.PRODUCTS_SOFTDEL_ID,
     roles: [],
     handler: productController.SoftDelProduct,
   },
@@ -52,7 +53,19 @@ const productRoutes = [
     path: PATH.COOP_ONLY_PRODUCTS_ID,
     roles: [ROLE.COOPERATIVE],
     handler: productController.CoopOnlyProducts
-  }
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.PRODUCT_ARCHIVE_ID,
+    roles: [ROLE.COOPERATIVE],
+    handler: productController.CoopOnlyArcProducts,
+  },
+  {
+    method: METHOD.PUT,
+    path: PATH.IMAGE_PRODUCT_DELETE,
+    roles: [],
+    handler: productController.DeleteProductImage,
+  },
 ];
 
 productRoutes.forEach((route) => {

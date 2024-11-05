@@ -43,6 +43,7 @@ exports.GetAllProdductInfo = async () => {
 
 //Update ...
 exports.UpdateProductInfo = async (req, id) => {
+  console.log(req.body)
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
@@ -177,9 +178,50 @@ exports.CoopOnlyProduct = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid User ID: ${id}`);
 
-  const coopOnlyProduct = await Product.find({ user: id }).lean().exec();
+  const coopOnlyProduct = await Product.find({ user: id, deletedAt: null }).lean().exec();
 
   if (!coopOnlyProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
   return coopOnlyProduct;
 };
+
+exports.CoopOnlyArchiveProduct = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
+
+  const coopOnlyArchiveProduct = await Product.find({ user: id, deletedAt:  { $ne: null } }).lean().exec();
+
+  if (!coopOnlyArchiveProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
+
+  return coopOnlyArchiveProduct;
+};
+
+exports.deleteImage = async (id, imageId) => {
+  console.log("Product ID:", id);
+  console.log("Image ID:", imageId);
+  // Check if the provided product ID is valid
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Product ID: ${id}`);
+
+  // Find the product by ID
+  const singleProduct = await Product.findById(id).lean().exec();
+  if (!singleProduct) throw new ErrorHandler(`Product does not exist with ID: ${id}`);
+
+  // Find the image to delete by its _id
+  const imageToDelete = singleProduct.image.find(img => img._id.toString() === imageId);
+  if (!imageToDelete) {
+    throw new ErrorHandler(`Image with ID: ${imageId} does not exist in the product.`);
+  }
+
+  // Delete the image from Cloudinary
+  await cloudinary.uploader.destroy(imageToDelete.public_id);
+
+  // Remove the image from the product's image array
+  await Product.updateOne(
+    { _id: id },
+    { $pull: { image: { _id: imageId } } }
+  );
+
+  console.log('Image deleted successfully');
+  return { message: 'Image deleted successfully' };
+}

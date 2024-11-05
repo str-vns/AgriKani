@@ -73,7 +73,7 @@ exports.RestoreProduct = asyncHandler(async (req, res) => {
   );
 });
 
-exports.SingleProduct = asyncHandler(async (req, res) => {
+exports.SingleProduct = asyncHandler(async (req, res, next) => {
   const product = await productProcess.singleProduct(req.params.id);
 
   return product?.length === STATUSCODE.ZERO
@@ -85,7 +85,7 @@ exports.SingleProduct = asyncHandler(async (req, res) => {
       );
 });
 
-exports.CoopOnlyProducts = asyncHandler(async (req, res) => {
+exports.CoopOnlyProducts = asyncHandler(async (req, res, next) => {
   const coopProducts = await productProcess.CoopOnlyProduct(req.params.id);
 
   return coopProducts?.length === STATUSCODE.ZERO
@@ -95,4 +95,31 @@ exports.CoopOnlyProducts = asyncHandler(async (req, res) => {
         `All Product has been fetched Successfully`,
         coopProducts
       );
+});
+
+exports.CoopOnlyArcProducts = asyncHandler(async (req, res, next) => {
+  const coopArcProducts = await productProcess.CoopOnlyArchiveProduct(
+    req.params.id
+  );
+
+  return coopArcProducts?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Product Found"))
+    : SuccessHandler(
+        res,
+        `All Product has been fetched Successfully`,
+        coopArcProducts
+      );
+});
+
+exports.DeleteProductImage = asyncHandler(async (req, res) => {
+  const product = await productProcess.deleteImage(
+    req.params.id,
+    req.params.imageId
+  );
+
+  return SuccessHandler(
+    res,
+    `Product Image has been deleted Successfully`,
+    product
+  );
 });
