@@ -18,7 +18,8 @@ const comment = require("./routes/comment");
 const post = require("./routes/post");
 const shared = require("./routes/sharedpost")
 const otp = require("./routes/otp")
-
+const type = require("./routes/type");
+const category = require("./routes/category");
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
@@ -35,7 +36,9 @@ app.use(
   comment,
   post,
   shared,
-  otp
+  otp,
+  category,
+  type,
 );
 
 module.exports = app;
