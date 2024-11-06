@@ -3,7 +3,7 @@ const router = express.Router();
 const productController = require("../controllers/productControllers");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
 const { METHOD, PATH, ROLE } = require("../constants/index");
-const { path } = require("../app");
+
 
 const productRoutes = [
   {
