@@ -18,4 +18,5 @@ module.exports = {
     POST: "post",
     SHAREPOST: "sharepost",
     OTP: "otp",
+    ORDER: "order",
 }

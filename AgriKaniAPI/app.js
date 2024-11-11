@@ -17,7 +17,8 @@ const farms = require("./routes/farm");
 const comment = require("./routes/comment");
 const post = require("./routes/post");
 const shared = require("./routes/sharedpost")
-const otp = require("./routes/otp")
+const otp = require("./routes/otp");
+const order = require("./routes/order");
 const type = require("./routes/type");
 const category = require("./routes/category");
 app.use(cors(corsOptions));
@@ -37,6 +38,7 @@ app.use(
   post,
   shared,
   otp,
+  order,
   category,
   type,
 );
