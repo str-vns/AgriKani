@@ -4,14 +4,14 @@ const { RESOURCE } = require('../constants/index');
 const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.ObjectId,
-        ref: 'User',
+        ref: 'user',
         required: true,
     },
     orderItems: [
         {
             product: {
                 type: mongoose.Schema.ObjectId,
-                ref: 'Product',
+                ref: 'product',
                 required: true,
             },
             quantity: {
@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema({
     ],
     shippingAddress: {
         type: mongoose.Schema.ObjectId,
-        ref: 'Address',
+        ref: 'address',
         required: true,
     },
     paymentMethod: {
