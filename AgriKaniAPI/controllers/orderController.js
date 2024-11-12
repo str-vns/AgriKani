@@ -4,6 +4,7 @@ const User = require("../models/user");
 const ErrorHandler = require("../utils/errorHandler");
 const SuccessHandler = require("../utils/successHandler");
 const { STATUSCODE } = require("../constants/index");
+const orderProcess = require("../process/orderProcess")
 const mongoose = require('mongoose');
 
 // Create a new order
@@ -80,27 +81,12 @@ const jwt = require("jsonwebtoken"); // Import JWT if needed for token decoding
 // Get a single order by ID
 
 // Controller
-exports.getOrderById = asyncHandler(async (req, res, next) => {
-    // Log the req.user object to check if it's set correctly
-    console.log("req.user:", req.user);
+exports.GetOrderUser = asyncHandler(async (req, res, next) => {
+  const Orders = await orderProcess.getOrderById(req.params.id);
 
-    // Check if req.user is valid and contains an 'id'
-    const userId = req.user?.id;
-    
-    if (!userId) {
-        return next(new ErrorHandler("User ID not found in request", 400));
-    }
-
-    // Proceed with fetching orders by user ID
-    const orders = await Order.find({ user: userId })
-        .populate("user", "firstName lastName email")
-        .populate("orderItems.product", "productName pricing");
-
-    if (!orders || orders.length === 0) {
-        return next(new ErrorHandler("No orders found for this user", 404));
-    }
-
-    return SuccessHandler(res, "Orders fetched successfully", orders);
+  return Orders?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No User Order Found"))
+    : SuccessHandler(res, `All Order has been fetched Successfully`, Orders);
 });
 
   
