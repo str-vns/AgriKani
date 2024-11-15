@@ -102,3 +102,13 @@ exports.WishlistUser = asyncHandler(async (req, res) => {
     wish
   );
 });
+
+exports.UsersWish = asyncHandler(async (req, res) => {
+  const wish = await userProcess.wishlistProductGet(req.params.id);
+  console.log(wish, "Wishlist User");
+  return SuccessHandler(
+    res,
+    `User ${wish?.firstName} ${wish?.lastName} wishlist has been add Successfully`,
+    wish
+  );
+});

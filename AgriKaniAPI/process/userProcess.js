@@ -282,3 +282,16 @@ exports.wishlistProduct = async (productId, id) => {
 
   return user;
 }
+
+exports.wishlistProductGet = async (id) => {
+  mongoose.Types.ObjectId.isValid(id)
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
+  }
+
+  const userWish = await User.findById(id).populate({path:"wishlist.product", select: "productName pricing price image.url description stock user"}).lean().exec();
+  if(!userWish) {
+    throw new ErrorHandler("User not found");
+  }
+  return userWish;
+}

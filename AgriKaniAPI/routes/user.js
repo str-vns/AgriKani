@@ -3,6 +3,8 @@ const router = express.Router();
 const userController = require("../controllers/userControllers");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
 const { METHOD, PATH, ROLE } = require("../constants/index");
+const method = require("../constants/method");
+const path = require("../constants/path");
 
 const userRoutes = [
   {
@@ -66,6 +68,12 @@ const userRoutes = [
     roles: [ROLE.CUSTOMER, ROLE.FARMER],
     handler: userController.WishlistUser,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.WISH_ID,
+    roles: [],
+    handler: userController.UsersWish
+  }
 ];
 
 userRoutes.forEach((route) => {
