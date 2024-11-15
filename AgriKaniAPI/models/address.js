@@ -14,14 +14,6 @@ const addressSchema = new mongoose.Schema({
     minlength: [11, "Phone Number must be 11 digits"],
     maxlength: [11, "Phone Number must be 11 digits"],
   },
-  region: {
-    type: String,
-    required: [true, "Please enter the Region!"],
-  },
-  province: {
-    type: String,
-    required: [true, "Please enter the Province!"],
-  },
   city: {
     type: String,
     required: [true, "Please enter the City!"],
@@ -41,13 +33,17 @@ const addressSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: "user",
     required: true,
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  defaultIt:{
+    type: Boolean,
+    default: false,
+  }
 });
 
 module.exports = mongoose.model(RESOURCE.ADDRESS, addressSchema);

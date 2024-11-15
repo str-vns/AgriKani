@@ -10,7 +10,7 @@ const sharedPostSchema = new mongoose.Schema({
   },
   sharedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "user",
     required: true,
   },
   sharedComment: { type: String, default: "" },

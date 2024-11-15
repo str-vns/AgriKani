@@ -15,7 +15,7 @@ const io = socketIO(8900, {
   },
 });
 
-// Pass the io instance to the handler
+
 handleSocketConnections(io);
 
 console.log("Socket.IO is running and ready for connections");

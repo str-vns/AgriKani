@@ -21,14 +21,14 @@ const postSchema = new mongoose.Schema({
   ],
   author: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: "user",
     required: true,
   },
   comment: [
     {
       user: {
         type: mongoose.Schema.ObjectId,
-        ref: "User",
+        ref: "user",
         required: true,
       },
       firstName: {
@@ -86,7 +86,7 @@ const postSchema = new mongoose.Schema({
     {
       user: {
         type: mongoose.Schema.ObjectId,
-        ref: "User",
+        ref: "user",
       },
     },
   ],

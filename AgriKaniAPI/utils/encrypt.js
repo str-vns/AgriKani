@@ -13,13 +13,21 @@ const encryptText = (data) => {
 };
 
 const decryptText = (data, iv, tag) => {
+  if (!iv) {
+    throw new Error("Initialization vector (iv) is undefined");
+  }
+  if (!tag) {
+    throw new Error("Authentication tag (tag) is undefined");
+  }
+
   const decipher = crypto.createDecipheriv(
     algorithm,
     encryptKey,
     Buffer.from(iv, "hex")
   );
   decipher.setAuthTag(Buffer.from(tag, "hex"));
-  let decrypted = decipher.update(data,  "hex", "utf-8");
+
+  let decrypted = decipher.update(data, "hex", "utf-8");
   decrypted += decipher.final("utf-8");
 
   return decrypted;

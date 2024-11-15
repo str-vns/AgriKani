@@ -21,7 +21,7 @@ const productRoutes = [
   {
     method: METHOD.PUT,
     path: PATH.PRODUCTS_EDIT_ID,
-    roles: [ROLE.COOPERATIVE],
+    roles: [],
     handler: productController.UpdateProduct,
   },
   {
@@ -51,13 +51,13 @@ const productRoutes = [
   {
     method: METHOD.GET,
     path: PATH.COOP_ONLY_PRODUCTS_ID,
-    roles: [ROLE.COOPERATIVE],
+    roles: [],
     handler: productController.CoopOnlyProducts
   },
   {
     method: METHOD.GET,
     path: PATH.PRODUCT_ARCHIVE_ID,
-    roles: [ROLE.COOPERATIVE],
+    roles: [ROLE.CUSTOMER, ROLE.COOPERATIVE],
     handler: productController.CoopOnlyArcProducts,
   },
   {

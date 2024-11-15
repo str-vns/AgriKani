@@ -1,4 +1,4 @@
-const { CONVERSATION, CATEGORY, TYPE } = require("./resource");
+const { CONVERSATION, CATEGORY, TYPE, ORDER } = require("./resource");
 
 module.exports = {
     USERS: "/users",
@@ -44,4 +44,8 @@ module.exports = {
     CATEGORY_ID: "/category/:id",
     TYPE: "/type",
     TYPE_ID: "/type/:id",
+    ORDER: "/order",
+    ORDER_ID: "/order/:id",
+    ORDER_USER_ID: "/order/user/:id",
+    
 }

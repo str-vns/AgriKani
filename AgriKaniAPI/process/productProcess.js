@@ -43,45 +43,45 @@ exports.GetAllProdductInfo = async () => {
 
 //Update ...
 exports.UpdateProductInfo = async (req, id) => {
-  console.log(req.body)
+  console.log("Received File:", req.files);
+  console.log(req.body);
+
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
+  // Check if the product exists
   const productExist = await Product.findById(id).lean().exec();
   if (!productExist) throw new ErrorHandler(`Product not exist with ID: ${id}`);
-console.log(productExist, "Full product object");
+  
+  console.log(productExist, "Full product object");
 
-if (Array.isArray(productExist.image)) {
- 
-  productExist.image.forEach((img, index) => {
-    console.log(img?.public_id, `Image ${index + 1} public_id`);
-  });
-} else {
-  console.log("productExist.image is not an array, it is:", typeof productExist.image);
-}
+  // Check if image field exists and is an array
+  if (Array.isArray(productExist.image)) {
+    productExist.image.forEach((img, index) => {
+      console.log(img?.public_id, `Image ${index + 1} public_id`);
+    });
+  } else {
+    console.log("productExist.image is not an array, it is:", typeof productExist.image);
+  }
 
+  // Start with existing images
+  let image = productExist.image || [];
 
-let image = productExist.image || [];
+  // If there are new files in the request, add them to the existing images
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    // Assuming uploadImageMultiple handles the new images and returns their URIs
+    const newImages = await uploadImageMultiple(req.files);
 
-if (req.files && Array.isArray(req.files)) {
-  await Promise.all(
-    image.map(async (img, index) => {
-      try {
-        const result = await cloudinary.uploader.destroy(img.public_id);
-        console.log(img?.public_id, `Image ${index + 1} public_id deleted:`, result);
-      } catch (error) {
-        console.error(`Failed to delete Image ${index + 1}:`, error);
-      }
-    })
-  );
-  image = await uploadImageMultiple(req.files);
-}
+    // Merge new images with existing images
+    image = [...image, ...newImages];
+  }
 
+  // Update the product in the database
   const updateProduct = await Product.findByIdAndUpdate(
     id,
     {
       ...req.body,
-      image: image,
+      image: image, // Save the merged images (old + new)
     },
     {
       new: true,
@@ -90,7 +90,9 @@ if (req.files && Array.isArray(req.files)) {
   )
     .lean()
     .exec();
-  if (!updateProduct) throw new ErrorHandler(`Product not Update with ID ${id}`);
+
+  if (!updateProduct) throw new ErrorHandler(`Product not updated with ID ${id}`);
+  
   return updateProduct;
 };
 
@@ -175,6 +177,7 @@ exports.singleProduct = async (id) => {
 };
 
 exports.CoopOnlyProduct = async (id) => {
+  console.log("User ID:", id);
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid User ID: ${id}`);
 

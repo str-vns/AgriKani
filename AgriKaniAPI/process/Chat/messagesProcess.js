@@ -35,10 +35,19 @@ exports.getMesssages = async (id) => {
   const messages = await Message.find({
     conversationId: id,
   });
-
   const decryptedMessage = messages.map((msg) => {
-    const decryptedText = decryptText(msg.text, msg.key, msg.iv, msg.tag) 
-    return { ...msg.toObject(), decryptedText: decryptedText };
+    if (!msg.text || !msg.iv || !msg.tag) {
+      console.warn(`Skipping message with missing fields:`, msg);
+      return { ...msg.toObject(), decryptedText: null }; // Skip decryption, return `null` for `decryptedText`
+    }
+  
+    try {
+      const decryptedText = decryptText(msg.text, msg.iv, msg.tag);
+      return { ...msg.toObject(), decryptedText: decryptedText };
+    } catch (error) {
+      console.error(`Error decrypting message with id ${msg._id}:`, error);
+      return { ...msg.toObject(), decryptedText: null }; // Return `null` if decryption fails
+    }
   });
 
   return decryptedMessage;
