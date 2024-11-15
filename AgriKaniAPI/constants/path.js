@@ -49,4 +49,9 @@ module.exports = {
     ORDER_ID: "/order/:id",
     ORDER_USER_ID: "/order/user/:id",
     
+     // Blog Routes
+     BLOG: "/blog",                // Route to create and get blogs
+     BLOG_ID: "/blog/:id",          // Route to update, delete, and get a single blog
+     RESTORE_BLOG_ID: "/restore/blog/:id",  // Route to restore a deleted blog
+     BLOG_USER_ID: "/blog/user/:id", 
 }

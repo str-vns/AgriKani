@@ -21,6 +21,8 @@ const otp = require("./routes/otp");
 const order = require("./routes/order");
 const type = require("./routes/type");
 const category = require("./routes/category");
+const blog = require ("./routes/blog");
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
@@ -41,6 +43,8 @@ app.use(
   order,
   category,
   type,
+  blog,
+
 );
 
 module.exports = app;
