@@ -1,160 +1,72 @@
 const asyncHandler = require("express-async-handler");
-const Order = require("../models/order");
-const User = require("../models/user");
 const ErrorHandler = require("../utils/errorHandler");
 const SuccessHandler = require("../utils/successHandler");
+const orderProcess = require("../process/orderProcess");
 const { STATUSCODE } = require("../constants/index");
-const orderProcess = require("../process/orderProcess")
-const mongoose = require('mongoose');
+const { sendOrderReceipt } = require("../receipt/receipt");  // Import sendOrderReceipt
 
 // Create a new order
 exports.createOrder = asyncHandler(async (req, res, next) => {
   const { orderItems, shippingAddress, paymentMethod, totalPrice, user } = req.body;
+  const orderDetails = req.body;
 
-  if (!orderItems || orderItems.length === 0) {
-    return next(new ErrorHandler("No order items provided", STATUSCODE.BAD_REQUEST));
+  try {
+    // Create the order
+    const createdOrder = await orderProcess.createOrderProcess({
+      user,
+      orderItems,
+      shippingAddress,
+      paymentMethod,
+      totalPrice,
+    });
+
+    // Send receipt email after order creation
+    const orderReceiptDetails = {
+      orderId: createdOrder._id,   // Assuming the order has an ID
+      totalAmount: createdOrder.totalPrice,   // Assuming totalPrice is part of the order
+      items: createdOrder.orderItems,   // Assuming orderItems is part of the order
+    };
+
+    // Send the email receipt to the user's email
+    await sendOrderReceipt(user.email, orderReceiptDetails);
+
+    // Return success response
+    return SuccessHandler(res, "Order has been created successfully and receipt sent.", { order: createdOrder });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
   }
-
-  // Fetch the full user information using req.body.user
-  const userDoc = await User.findById(user);  // Here, you access the user ID from the body
-  if (!userDoc) {
-    return next(new ErrorHandler("User not found", STATUSCODE.NOT_FOUND));
-  }
-
-  const order = new Order({
-    user: userDoc._id,  // Use the user ID from the fetched user
-    orderItems,
-    shippingAddress,
-    paymentMethod,
-    totalPrice,
-  });
-
-  const createdOrder = await order.save();
-  return SuccessHandler(res, "Order has been created successfully", createdOrder);
 });
-
-
-const jwt = require("jsonwebtoken"); // Import JWT if needed for token decoding
-
-// Create a new order
-// exports.createOrder = asyncHandler(async (req, res, next) => {
-//   const { orderItems, shippingAddress, paymentMethod, totalPrice } = req.body;
-  
-//   // Extract the user from the decoded token (you need to verify the token in your middleware)
-//   const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
-  
-//   if (!token) {
-//     return next(new ErrorHandler("Authorization token not found", STATUSCODE.UNAUTHORIZED));
-//   }
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);  // Decode the token
-//     const userId = decoded.userId;  // Assuming userId is in the token payload
-
-//     const userDoc = await User.findById(userId);  // Use the user ID from the token
-//     if (!userDoc) {
-//       return next(new ErrorHandler("User not found", STATUSCODE.NOT_FOUND));
-//     }
-
-//     // Check if orderItems is empty
-//     if (!orderItems || orderItems.length === 0) {
-//       return next(new ErrorHandler("No order items provided", STATUSCODE.BAD_REQUEST));
-//     }
-
-//     const order = new Order({
-//       user: userDoc._id,  // Use the user ID from the token
-//       orderItems,
-//       shippingAddress,
-//       paymentMethod,
-//       totalPrice,
-//     });
-
-//     const createdOrder = await order.save();
-//     return SuccessHandler(res, "Order has been created successfully", createdOrder);
-
-//   } catch (error) {
-//     return next(new ErrorHandler("Invalid token or user not found", STATUSCODE.UNAUTHORIZED));
-//   }
-// });
-
-
-// Get a single order by ID
-
-// Controller
-exports.GetOrderUser = asyncHandler(async (req, res, next) => {
-  const Orders = await orderProcess.getOrderById(req.params.id);
-
-  return Orders?.length === STATUSCODE.ZERO
-    ? next(new ErrorHandler("No User Order Found"))
-    : SuccessHandler(res, `All Order has been fetched Successfully`, Orders);
-});
-
-  
-
-
-  
-
-// Get all orders for a user
-// exports.getUserOrders = asyncHandler(async (req, res, next) => {
-//     const { user } = req.body;  // Make sure the user is sent in the body
-  
-//     // Check if user is provided
-//     if (!user) {
-//       return next(new ErrorHandler("User ID is required", STATUSCODE.BAD_REQUEST));
-//     }
-  
-//     const orders = await Order.find({ user: user })  // Use the user ID from req.body
-//       .populate("user", "firstName lastName email")  // Populate user details
-//       .populate("orderItems.product", "productName pricing");  // Populate product details
-  
-//     if (!orders || orders.length === 0) {
-//       return next(new ErrorHandler("No orders found", STATUSCODE.NOT_FOUND));
-//     }
-  
-//     return SuccessHandler(res, "Orders fetched successfully", orders);
-//   });
-  
-// Get all orders for a user
-exports.getUserOrders = asyncHandler(async (req, res, next) => {
-    // Assuming user ID comes from the authenticated user (e.g., JWT token)
-    const userId = req.user ? req.user.id : req.params.userId;  // Use req.user.id or userId from params
-    
-    // Check if user ID is provided
-    if (!userId) {
-      return next(new ErrorHandler("User ID is required", STATUSCODE.BAD_REQUEST));
-    }
-  
-    // Find orders for the user
-    const orders = await Order.find({ user: userId }) // Use the user ID from req.user or req.params
-      .populate("user", "firstName lastName email") // Populate user details
-      .populate("orderItems.product", "productName pricing"); // Populate product details
-  
-    // If no orders are found, return a not found error
-    if (!orders || orders.length === 0) {
-      return next(new ErrorHandler("No orders found", STATUSCODE.NOT_FOUND));
-    }
-  
-    // Send the successful response with the fetched orders
-    return SuccessHandler(res, "Orders fetched successfully", orders);
-  });
-  
-
-
 
 // Update order status
 exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
+  const { orderId } = req.params;
   const { status } = req.body;
-  const order = await Order.findById(req.params.id);
 
-  if (!order) {
-    return next(new ErrorHandler("Order not found", STATUSCODE.NOT_FOUND));
+  try {
+    const updatedOrder = await orderProcess.updateOrderStatusProcess(orderId, status);
+    return SuccessHandler(res, "Order status updated successfully", updatedOrder);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
   }
+});
 
-  order.orderStatus = status;
-  if (status === "Delivered") {
-    order.deliveredAt = Date.now();
+// Delete an order
+exports.deleteOrder = asyncHandler(async (req, res, next) => {
+  const { orderId } = req.params;
+
+  try {
+    await orderProcess.deleteOrderProcess(orderId);
+    return SuccessHandler(res, "Order deleted successfully");
+  } catch (error) {
+    return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
   }
+});
 
-  const updatedOrder = await order.save();
-  return SuccessHandler(res, "Order status updated successfully", updatedOrder);
+// Get order by user ID
+exports.GetOrderUser = asyncHandler(async (req, res, next) => {
+  const Orders = await orderProcess.getOrderById(req.params.id);
+  
+  return Orders?.length === STATUSCODE.ZERO
+      ? next(new ErrorHandler("No User Order Found", STATUSCODE.NOT_FOUND))
+      : SuccessHandler(res, "All orders fetched successfully", Orders);
 });
