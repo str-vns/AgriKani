@@ -289,7 +289,17 @@ exports.wishlistProductGet = async (id) => {
     throw new ErrorHandler(`Invalid User ID: ${id}`);
   }
 
-  const userWish = await User.findById(id).populate({path:"wishlist.product", select: "productName pricing price image.url description stock user"}).lean().exec();
+  const userWish = await User.findById(id)
+  .populate({
+    path: "wishlist.product", // Correct path to populate product
+    select: "productName pricing price image.url description stock user"
+  })
+  .populate({
+    path: "wishlist.product.reviews", 
+    select: "firstName lastName comment rating"
+  })
+  .lean() 
+  .exec();
   if(!userWish) {
     throw new ErrorHandler("User not found");
   }
