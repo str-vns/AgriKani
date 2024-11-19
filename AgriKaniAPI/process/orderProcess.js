@@ -65,6 +65,7 @@ exports.getOrderById = async (id) => {
     .populate({ path: "user", select: "firstName lastName email image.url" })
     .populate({ path: "orderItems.product", select: "productName pricing price image.url" })
     .populate({ path: "shippingAddress", select: "address city phoneNum" })
+    .sort({ createdAt: -1 })
     .lean()
     .exec();
 

@@ -33,7 +33,7 @@ exports.CreateProductProcess = async (req) => {
 
 //Read ...
 exports.GetAllProdductInfo = async () => {
-  const products = await Product.find()
+  const products = await Product.find({ deletedAt: null }).populate({path: "reviews.user", select: "firstName lastName image.url"})
     .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
     .lean()
     .exec();
@@ -64,24 +64,19 @@ exports.UpdateProductInfo = async (req, id) => {
     console.log("productExist.image is not an array, it is:", typeof productExist.image);
   }
 
-  // Start with existing images
   let image = productExist.image || [];
 
-  // If there are new files in the request, add them to the existing images
   if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-    // Assuming uploadImageMultiple handles the new images and returns their URIs
     const newImages = await uploadImageMultiple(req.files);
 
-    // Merge new images with existing images
     image = [...image, ...newImages];
   }
 
-  // Update the product in the database
   const updateProduct = await Product.findByIdAndUpdate(
     id,
     {
       ...req.body,
-      image: image, // Save the merged images (old + new)
+      image: image, 
     },
     {
       new: true,
@@ -202,24 +197,20 @@ exports.CoopOnlyArchiveProduct = async (id) => {
 exports.deleteImage = async (id, imageId) => {
   console.log("Product ID:", id);
   console.log("Image ID:", imageId);
-  // Check if the provided product ID is valid
+
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
-  // Find the product by ID
   const singleProduct = await Product.findById(id).lean().exec();
   if (!singleProduct) throw new ErrorHandler(`Product does not exist with ID: ${id}`);
 
-  // Find the image to delete by its _id
   const imageToDelete = singleProduct.image.find(img => img._id.toString() === imageId);
   if (!imageToDelete) {
     throw new ErrorHandler(`Image with ID: ${imageId} does not exist in the product.`);
   }
 
-  // Delete the image from Cloudinary
   await cloudinary.uploader.destroy(imageToDelete.public_id);
 
-  // Remove the image from the product's image array
   await Product.updateOne(
     { _id: id },
     { $pull: { image: { _id: imageId } } }

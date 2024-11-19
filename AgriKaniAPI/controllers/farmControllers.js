@@ -42,12 +42,6 @@ exports.UpdateFarm = [
     upload.array("image"), 
     CheckField([
         "farmName",
-        "region",
-        "province",
-        "city",
-        "barangay",
-        "address",
-        "postalCode",
         "image",
       ]),
   asyncHandler(async (req, res) => {
@@ -98,4 +92,17 @@ exports.SingleFarm = asyncHandler(async (req, res) => {
         `${farm.farmName} has been fetched Successfully`,
         farm
       );
+});
+
+exports.DeleteFarmImage = asyncHandler(async (req, res) => {
+  const farm = await farmProcess.FarmDeleteImage(
+    req.params.id,
+    req.params.imageId
+  );
+
+  return SuccessHandler(
+    res,
+    `Farm Image has been deleted Successfully`,
+    farm
+  );
 });

@@ -14,7 +14,7 @@ exports.CreateProductReview = async (req) => {
     //     throw new ErrorHandler(`Invalid Address ID: ${req.body.user}`);
     const product = await Product.findById(req.body.productId)
     const users = await User.findById(req.body.user)
-    console.log(users)
+    
     const isReview = product.reviews.find((prod) => prod.user?.toString() === userId?.toString());
     let image = product.reviews.image || []
     if(req.files || Array.isArray(req.files))
@@ -47,9 +47,6 @@ exports.CreateProductReview = async (req) => {
             {
                 ...req.body,
                 user: users._id,
-                firstName: users.firstName,
-                lastName: users.lastName,
-                avatar: users.image,
                 image: image
             }
         )

@@ -47,6 +47,12 @@ const farmRoutes = [
     roles: [],
     handler: farmController.SingleFarm,
   },
+  {
+    method: METHOD.PUT,
+    path: PATH.IMAGE_FARM_DELETE,
+    roles: [],
+    handler: farmController.DeleteFarmImage,
+  },
 ];
 
 farmRoutes.forEach((route) => {

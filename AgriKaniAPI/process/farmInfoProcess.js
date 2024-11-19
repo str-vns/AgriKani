@@ -43,6 +43,7 @@ exports.CreateFarmProcess = async (req) => {
 //Read ...
 exports.GetAllFarm = async () => {
   const farm = await Farm.find()
+    .populate({ path: "user", select: "firstName lastName email image.url" })
     .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
     .lean()
     .exec();
@@ -55,7 +56,7 @@ exports.UpdateFarmInfo = async (req, id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Farm ID: ${id}`);
 
-  const farmExist = await Farm.findOne({user: id}).lean().exec();
+  const farmExist = await Farm.findById(id).lean().exec();
   if (!farmExist) throw new ErrorHandler(`Farm not exist with ID: ${id}`);
 console.log(farmExist, "Full Farm object");
 
@@ -69,20 +70,11 @@ if (Array.isArray(farmExist.image)) {
 
 
 let image = farmExist.image || [];
-
-if (req.files && Array.isArray(req.files)) {
-  await Promise.all(
-    image.map(async (img, index) => {
-      try {
-        const result = await cloudinary.uploader.destroy(img.public_id);
-        console.log(img?.public_id, `Image ${index + 1} public_id deleted:`, result);
-      } catch (error) {
-        console.error(`Failed to delete Image ${index + 1}:`, error);
-      }
-    })
-  );
-  image = await uploadImageMultiple(req.files);
-}
+ 
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    const newImages = await uploadImageMultiple(req.files);
+    image = [...image, ...newImages];
+  }
 
   const updateFarm = await Farm.findByIdAndUpdate(
     farmExist._id,
@@ -174,9 +166,44 @@ exports.singleFarm = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Farm ID: ${id}`);
 
-  const singleFarm = await Farm.findOne({ user: id}).lean().exec();
+  const singleFarm = await Farm.findOne({ user: id})
+  .populate({path: "user",select: "firstName lastName email image.url"} ).lean().exec();
 
   if (!singleFarm) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
   return singleFarm;
 };
+
+
+
+  exports.FarmDeleteImage = async (farmId, imageId) => {
+
+    if (!mongoose.Types.ObjectId.isValid(farmId)) {
+      throw new ErrorHandler(`Invalid Farm ID: ${farmId}`);
+    }
+  
+    const farmExist = await Farm.findById(farmId).lean().exec();
+    if (!farmExist) {
+      throw new ErrorHandler(`Farm not exist with ID: ${farmId}`);
+    }
+  
+    const imageToDelete = farmExist.image.find(img => img._id.toString() === imageId);
+    if (!imageToDelete || !imageToDelete.public_id) {
+      throw new ErrorHandler(`Image with ID: ${imageId} does not exist or does not have a public_id.`);
+    }
+  
+    const publicId = imageToDelete.public_id;
+  
+    try {
+      await cloudinary.uploader.destroy(publicId);
+    } catch (error) {
+      throw new ErrorHandler(`Cloudinary deletion failed: ${error.message}`);
+    }
+  
+    await Farm.updateOne(
+      { _id: farmId },
+      { $pull: { image: { _id: imageId } } }
+    );
+  
+    return Farm.findById(farmId).exec();
+  };

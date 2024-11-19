@@ -62,25 +62,10 @@ const productSchema = new mongoose.Schema({
         ref: "user",
         required: true,
       },
-      firstName: {
-        type: String,
+      order: {
+        type: mongoose.Schema.ObjectId,
+        ref: "order",
         required: true,
-      },
-      lastName: {
-        type: String,
-        required: true,
-      },
-      avatar: {
-        public_id: {
-          type: String,
-        },
-        url: {
-          type: String,
-        },
-        originalname: {
-          type: String,
-          required: true,
-        },
       },
       rating: {
         type: Number,

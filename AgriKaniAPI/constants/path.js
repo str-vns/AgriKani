@@ -28,6 +28,7 @@ module.exports = {
     ADDRESS_ID: "/address/:id",
     FARM: "/farm",
     FARM_ID: "/farm/:id",
+    IMAGE_FARM_DELETE: "/farm/image/:id/:imageId",
     RESTORE_FARM_ID: "/restore/farm/:id",
     COMMENT: "/products/comment",
     POST: "/p",

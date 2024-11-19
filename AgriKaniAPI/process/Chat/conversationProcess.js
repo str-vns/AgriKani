@@ -8,9 +8,12 @@ const { cloudinary } = require("../../utils/cloudinary");
 
 //create ...
 exports.CreateNewConversationProcess = async (req) => {
-console.log(req.body)
- if(!req.body)
-    throw new ErrorHandler("Not Sender and receiver Ids")
+  console.log("rec",req); // Debugging the body of the request
+  
+  if (!req.body || !req.body.senderId || !req.body.receiverId) {
+    throw new ErrorHandler("Missing senderId or receiverId");
+  }
+
   const conversation = await Conversation.create({
     members: [req.body.senderId, req.body.receiverId]
   });
