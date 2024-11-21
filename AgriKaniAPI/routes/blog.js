@@ -10,7 +10,7 @@ router.post("/blog", verifyJWT, CreateBlog)
 router.get('/blog', blogController.GetAllBlogs);
 router.get('/blog/:id', blogController.GetAllBlogs);
 router.put('/blog/:id', verifyJWT, blogController.UpdateBlog);
-router.delete('/blog/:id', verifyJWT, blogController.DeleteBlog);
+router.delete('/blog/:id',blogController.DeleteBlog);
 
 const blogRoutes = [
   {
