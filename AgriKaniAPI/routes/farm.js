@@ -53,6 +53,12 @@ const farmRoutes = [
     roles: [],
     handler: farmController.DeleteFarmImage,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.COOP_ID_ORDERS,
+    roles: [],
+    handler: farmController.GetCoopOrders,
+  }
 ];
 
 farmRoutes.forEach((route) => {
