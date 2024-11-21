@@ -4,6 +4,10 @@ module.exports = {
     USERS: "/users",
     USER_ID: "/users/:id",
     SINGLE_USER: "/user/:id",
+
+    RESTORE_ID: "/restore/users/:id", // Restore user route
+    SOFTDELETE_USER_ID: "/users/softdel/:id", // Soft delete user route
+
     RESTORE_ID: "/restore/users/:id",
     WISH_USER_ID: "/wish/users/:productId/:id",
     WISH_ID: "/wish/:id",
@@ -31,10 +35,12 @@ module.exports = {
     IMAGE_FARM_DELETE: "/farm/image/:id/:imageId",
     RESTORE_FARM_ID: "/restore/farm/:id",
     COMMENT: "/products/comment",
+
     POST: "/p",
     POST_ID: "/p/:id",
     RESTORE_POST_ID: "/restore/p/:id",
     POST_USER_ID: "/p/user/:id",
+
     SHARE_POST: "/s",
     SHARE_POST_ID: "/s/:id",
     RESTORE_SHARE_POST_ID: "/restore/share/:id",
@@ -55,4 +61,7 @@ module.exports = {
      BLOG_ID: "/blog/:id",          // Route to update, delete, and get a single blog
      RESTORE_BLOG_ID: "/restore/blog/:id",  // Route to restore a deleted blog
      BLOG_USER_ID: "/blog/user/:id", 
+
+
+
 }
