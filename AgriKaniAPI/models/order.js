@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const { RESOURCE } = require('../constants/index');
 
 const orderSchema = new mongoose.Schema({
-    user: {
+user: {
         type: mongoose.Schema.ObjectId,
         ref: 'user',
         required: true,
     },
     orderItems: [
-        {
+        {    
             product: {
                 type: mongoose.Schema.ObjectId,
                 ref: 'product',
@@ -22,6 +22,23 @@ const orderSchema = new mongoose.Schema({
             price: {
                 type: Number,
                 required: true,
+            },
+            orderConfirmation: {
+                type: Date,
+                default: Date.now,
+            },
+            orderStatus: {
+                type: String,
+                enum: ['Pending', 'Shipping', 'Delivered', 'Cancelled', 'Processing'],
+                default: 'Pending',
+            },
+            productUser: {
+                type: mongoose.Schema.ObjectId,
+                ref: 'user',
+                required: true,
+            },
+              deliveredAt: {
+                type: Date
             },
         },
     ],
@@ -40,17 +57,9 @@ const orderSchema = new mongoose.Schema({
         required: true,
         default: 0.0,
     },
-    orderStatus: {
-        type: String,
-        enum: ['Pending', 'Shipped', 'Delivered', 'Cancelled'],
-        default: 'Pending',
-    },
     createdAt: {
         type: Date,
         default: Date.now,
-    },
-    deliveredAt: {
-        type: Date,
     },
 });
 
