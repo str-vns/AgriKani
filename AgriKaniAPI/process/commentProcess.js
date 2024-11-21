@@ -10,12 +10,15 @@ const user = require("../models/user");
 exports.CreateProductReview = async (req) => {
   console.log(req.body.user)
   const userId = req.body.user
+  const orderId = req.body.order
     // if (!mongoose.Types.ObjectId.isValid(req.body.user))
     //     throw new ErrorHandler(`Invalid Address ID: ${req.body.user}`);
     const product = await Product.findById(req.body.productId)
     const users = await User.findById(req.body.user)
     
-    const isReview = product.reviews.find((prod) => prod.user?.toString() === userId?.toString());
+    const isReview = product.reviews.find(
+      (prod) => prod.user?.toString() === userId?.toString() && prod.order?.toString() === orderId?.toString()
+    );
     let image = product.reviews.image || []
     if(req.files || Array.isArray(req.files))
     {
@@ -57,3 +60,4 @@ exports.CreateProductReview = async (req) => {
 
     return product
 }
+
