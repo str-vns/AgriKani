@@ -106,3 +106,15 @@ exports.DeleteFarmImage = asyncHandler(async (req, res) => {
     farm
   );
 });
+
+exports.GetCoopOrders = asyncHandler(async (req, res) => {
+  const coop = await farmProcess.CoopOrders(req.params.id);
+
+  return coop?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Farm Found"))
+    : SuccessHandler(
+        res,
+        `All Cooperative Orders has been fetched Successfully`,
+        coop
+      );
+});

@@ -11,6 +11,7 @@ const path = require("path");
 // Create a new order
 exports.createOrder = asyncHandler(async (req, res, next) => {
   const { orderItems, shippingAddress, paymentMethod, totalPrice, user } = req.body;
+  console.log("orderItems", orderItems);
   try {
     const createdOrder = await orderProcess.createOrderProcess({
       user,
@@ -53,11 +54,8 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
 
 // Update order status
 exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
-  const { orderId } = req.params;
-  const { status } = req.body;
-
   try {
-    const updatedOrder = await orderProcess.updateOrderStatusProcess(orderId, status);
+    const updatedOrder = await orderProcess.updateOrderStatusProcess(req.params.id, req);
     return SuccessHandler(res, "Order status updated successfully", updatedOrder);
   } catch (error) {
     return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
@@ -84,6 +82,15 @@ exports.GetOrderUser = asyncHandler(async (req, res, next) => {
       ? next(new ErrorHandler("No User Order Found", STATUSCODE.NOT_FOUND))
       : SuccessHandler(res, "All orders fetched successfully", Orders);
   
+});
+
+exports.updateOrderStatusCoop = asyncHandler(async (req, res, next) => {
+  try {
+    const updatedOrder = await orderProcess.updateOrderStatusCoop(req.params.id, req);
+    return SuccessHandler(res, "Order status updated successfully", updatedOrder);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
+  }
 });
 
 const sendOrderReceipt = async (userEmail, orderDetails) => {
