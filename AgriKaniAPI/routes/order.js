@@ -29,11 +29,17 @@ const orderRoutes = [
     roles: [],
     handler: orderController.deleteOrder,
   },
+  {
+    method: METHOD.PATCH,
+    path: PATH.COOP_ID_UPDATE_ORDERS,
+    roles: [],
+    handler: orderController.updateOrderStatusCoop,
+  },
 ];
 
 orderRoutes.forEach((route) => {
   const { method, path, roles = [], handler } = route;
-  router[method](path, verifyJWT, authorizeRoles(...roles), handler);
+  router[method](path, authorizeRoles(...roles), handler);
 });
 
 module.exports = router;
