@@ -5,6 +5,7 @@ const { cloudinary } = require("../utils/cloudinary");
 const { uploadImageMultiple } = require("../utils/imageCloud")
 const Farm = require("../models/farm")
 const User = require("../models/user")
+const Orders = require("../models/order")
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -174,9 +175,7 @@ exports.singleFarm = async (id) => {
   return singleFarm;
 };
 
-
-
-  exports.FarmDeleteImage = async (farmId, imageId) => {
+exports.FarmDeleteImage = async (farmId, imageId) => {
 
     if (!mongoose.Types.ObjectId.isValid(farmId)) {
       throw new ErrorHandler(`Invalid Farm ID: ${farmId}`);
@@ -207,3 +206,25 @@ exports.singleFarm = async (id) => {
   
     return Farm.findById(farmId).exec();
   };
+
+
+exports.CoopOrders = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+  
+   const orders = await Orders.find({ "orderItems.productUser": id })
+   .populate({ path: "user", select: "firstName lastName image.url" })
+   .populate({ path: "orderItems.product", select: "productName image.url pricing" })
+   .populate({ path: "shippingAddress", select: "address city" })
+ 
+
+  let totalPrice = 0;
+  orders.forEach(order => {
+    const orderTotal = order.orderItems.reduce((sum, item) => {
+      return sum + (item.price || 0);
+    }, 0);
+
+    totalPrice += orderTotal; 
+  });
+  return orders;
+};

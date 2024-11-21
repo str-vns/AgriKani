@@ -68,34 +68,55 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
 //   return await order.save();
 // };
 
-exports.updateOrderStatusProcess = async (orderId, status) => {
-    if (!['Pending', 'Shipped', 'Delivered', 'Cancelled'].includes(status)) {
-    throw new ErrorHandler("Invalid status", 400);
-  }
+exports.updateOrderStatusProcess = async (id, req) => {
+  console.log(req.body.productId, "Request body");
+
+   if (!['Pending', 'Processing', 'Shipping', 'Delivered', 'Cancelled'].includes(req.body.orderStatus)) {
+     throw new ErrorHandler("Invalid status", 400);
+   }
   
-  const order = await Order.findById(orderId);
+  const order = await Order.findById(id);
   if (!order) {
     throw new ErrorHandler("Order not found", 404);
   }
 
-  if (status === 'Cancelled' && order.orderStatus !== 'Cancelled') {
-    // Replenish stock for canceled orders
-    for (const item of order.orderItems) {
-      const product = await Product.findById(item.product);
+  if (req.body.orderStatus === 'Cancelled') {
+    const matchedOrderItem = order.orderItems.find(item => item.product.toString() === req.body.productId);
+      if (matchedOrderItem.orderStatus !== 'Cancelled') {
+        try {
+          const product = await Product.findById(req.body.productId);
+  
+          if (!product) {
+            console.warn(`Product with ID ${req.body.productId} not found.`);
+          }
+          product.stock += matchedOrderItem.quantity;
+          order.totalPrice -= matchedOrderItem.price;
+          await product.save();
+        } catch (error) {
+          console.error(`Error replenishing stock for product ${item.product}:`, error);
+        }
+      }
+  }
 
-      if (product) {
-        product.stock += item.quantity;
-        await product.save();
+  order.orderItems.forEach((item) => {
+  
+    if (item.product.toString() === req.body.productId) {
+      console.log(item, "Matched Order Item");
+  
+      if (item.orderStatus !== req.body.orderStatus) {
+        item.orderStatus = req.body.orderStatus;
+  
+        if (req.body.orderStatus === 'Delivered') {
+          item.deliveredAt = Date.now();
+        }
       }
     }
-  }
+  });
+  
 
-  order.orderStatus = status;
-  if (status === 'Delivered') {
-    order.deliveredAt = Date.now();
-  }
+  await order.save();
 
-  return await order.save();
+ return order
 };
 
 
@@ -147,3 +168,42 @@ exports.getOrderById = async (id) => {
 
   return orders;
 };
+
+exports.updateOrderStatusCoop = async (id, req) => {
+  console.log(req.body.productId, "Request body");
+   console.log(req.body.orderStatus, "Request body");
+  if (!['Pending', 'Processing', 'Shipping', 'Delivered', 'Cancelled'].includes(req.body.orderStatus)) {
+    throw new ErrorHandler("Invalid status", 400);
+  }
+
+  const order = await Order.findById(id);
+  if (!order) {
+    throw new ErrorHandler("Order not found", 404);
+  }
+
+  const products = req.body.productId;
+  const matchedOrderItems = order.orderItems.filter(item =>
+    products.includes(item.product.toString())
+  );
+  
+  for (const matchedItem of matchedOrderItems) {
+    if (matchedItem.orderStatus !== req.body.orderStatus) {
+      const product = await Product.findById(matchedItem.product);
+      
+
+      matchedItem.orderStatus = req.body.orderStatus;
+      product.stock -= matchedItem.quantity;
+  
+      if (req.body.orderStatus === 'Delivered') {
+        matchedItem.deliveredAt = Date.now(); 
+      }
+  
+      await product.save();
+    }
+  }
+  
+
+  await order.save();
+
+ return order
+}
