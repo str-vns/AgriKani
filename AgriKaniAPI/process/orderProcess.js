@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Order = require("../models/order");
 const User = require("../models/user");
+const Product = require("../models/product")
 const ErrorHandler = require("../utils/errorHandler");
 const mongoose = require("mongoose");
 
@@ -15,6 +16,26 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
     throw new ErrorHandler("User not found", 404);
   }
 
+  // Validate and update stock
+  for (const item of orderItems) {
+    const product = await Product.findById(item.product);
+
+    if (!product) {
+      throw new ErrorHandler(`Product with ID ${item.product} not found`, 404);
+    }
+
+    if (product.stock < item.quantity) {
+      throw new ErrorHandler(
+        `Insufficient stock for product ${product.productName}. Available stock: ${product.stock}`,
+        400
+      );
+    }
+
+    // Deduct stock
+    product.stock -= item.quantity;
+    await product.save();
+  }
+
   const order = new Order({
     user: userDoc._id,
     orderItems,
@@ -26,15 +47,47 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
   return await order.save();
 };
 
+
+
 // Update order status
+// exports.updateOrderStatusProcess = async (orderId, status) => {
+//   if (!['Pending', 'Shipped', 'Delivered', 'Cancelled'].includes(status)) {
+//     throw new ErrorHandler("Invalid status", 400);
+//   }
+
+//   const order = await Order.findById(orderId);
+//   if (!order) {
+//     throw new ErrorHandler("Order not found", 404);
+//   }
+
+//   order.orderStatus = status;
+//   if (status === 'Delivered') {
+//     order.deliveredAt = Date.now();
+//   }
+
+//   return await order.save();
+// };
+
 exports.updateOrderStatusProcess = async (orderId, status) => {
-  if (!['Pending', 'Shipped', 'Delivered', 'Cancelled'].includes(status)) {
+    if (!['Pending', 'Shipped', 'Delivered', 'Cancelled'].includes(status)) {
     throw new ErrorHandler("Invalid status", 400);
   }
-
+  
   const order = await Order.findById(orderId);
   if (!order) {
     throw new ErrorHandler("Order not found", 404);
+  }
+
+  if (status === 'Cancelled' && order.orderStatus !== 'Cancelled') {
+    // Replenish stock for canceled orders
+    for (const item of order.orderItems) {
+      const product = await Product.findById(item.product);
+
+      if (product) {
+        product.stock += item.quantity;
+        await product.save();
+      }
+    }
   }
 
   order.orderStatus = status;
@@ -45,11 +98,30 @@ exports.updateOrderStatusProcess = async (orderId, status) => {
   return await order.save();
 };
 
+
 // Delete an order
+// exports.deleteOrderProcess = async (orderId) => {
+//   const order = await Order.findById(orderId);
+//   if (!order) {
+//     throw new ErrorHandler("Order not found", 404);
+//   }
+
+//   await order.remove();
+// };
 exports.deleteOrderProcess = async (orderId) => {
   const order = await Order.findById(orderId);
   if (!order) {
     throw new ErrorHandler("Order not found", 404);
+  }
+
+  // Replenish stock
+  for (const item of order.orderItems) {
+    const product = await Product.findById(item.product);
+
+    if (product) {
+      product.stock += item.quantity;
+      await product.save();
+    }
   }
 
   await order.remove();

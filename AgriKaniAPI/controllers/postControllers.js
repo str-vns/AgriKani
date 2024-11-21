@@ -40,12 +40,20 @@ exports.UpdatePost = [
 ];
 
 exports.DeletePost = asyncHandler(async (req, res, next) => {
-  const post = await postProcess.DeletePostInfo(req.params.id);
+  try {
+    const post = await postProcess.DeletePostInfo(req.params.id);
 
-  return post?.length === STATUSCODE.ZERO
-    ? next(new ErrorHandler("No Post Found"))
-    : SuccessHandler(res, post);
+    if (!post) {
+      return next(new ErrorHandler("No Post Found", STATUSCODE.NOT_FOUND));
+    }
+
+    return SuccessHandler(res, post);
+  } catch (error) {
+    return next(error); // Ensure any unhandled errors are passed to the middleware
+  }
 });
+
+
 
 exports.SoftDelPost = asyncHandler(async (req, res) => {
   const post = await postProcess.SoftDeletePostInfo(req.params.id);

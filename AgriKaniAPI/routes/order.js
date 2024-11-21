@@ -19,13 +19,13 @@ const orderRoutes = [
   },
   {
     method: METHOD.PUT,
-    path: `${PATH.ORDER}/:orderId/status`,
+    path: PATH.ORDER_STATUS_EDIT,
     roles: [],
     handler: orderController.updateOrderStatus,
   },
   {
     method: METHOD.DELETE,
-    path: `${PATH.ORDER}/:orderId`,
+    path: PATH.ORDER_DELETE,
     roles: [],
     handler: orderController.deleteOrder,
   },

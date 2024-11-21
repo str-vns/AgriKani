@@ -42,13 +42,13 @@ module.exports = {
     ORDER: "/order",
     ORDER_ID: "/order/:id",
     ORDER_USER_ID: "/order/user/:id",
+    ORDER_STATUS_EDIT:"/order/edit/:orderId",
+    ORDER_DELETE:"/order/delete/:orderId",
     CATEGORY: "/category",
     CATEGORY_ID: "/category/:id",
     TYPE: "/type",
     TYPE_ID: "/type/:id",
-    ORDER: "/order",
-    ORDER_ID: "/order/:id",
-    ORDER_USER_ID: "/order/user/:id",
+
     
      // Blog Routes
      BLOG: "/blog",                // Route to create and get blogs
