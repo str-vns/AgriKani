@@ -41,6 +41,8 @@ module.exports = {
     RESTORE_POST_ID: "/restore/p/:id",
     POST_USER_ID: "/p/user/:id",
 
+    APPROVE_POST: "/p/approve/:id",
+    POST_STATUS_APPROVE:"/approve/p",
     SHARE_POST: "/s",
     SHARE_POST_ID: "/s/:id",
     RESTORE_SHARE_POST_ID: "/restore/share/:id",
@@ -50,6 +52,7 @@ module.exports = {
     ORDER_USER_ID: "/order/user/:id",
     ORDER_STATUS_EDIT:"/order/edit/:orderId",
     ORDER_DELETE:"/order/delete/:orderId",
+    ORDER_RECEIPT:"/order/receipt/:orderId",
     CATEGORY: "/category",
     CATEGORY_ID: "/category/:id",
     TYPE: "/type",

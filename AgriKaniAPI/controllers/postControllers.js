@@ -53,8 +53,6 @@ exports.DeletePost = asyncHandler(async (req, res, next) => {
   }
 });
 
-
-
 exports.SoftDelPost = asyncHandler(async (req, res) => {
   const post = await postProcess.SoftDeletePostInfo(req.params.id);
 
@@ -99,4 +97,23 @@ exports.LikePost = asyncHandler(async (req, res) => {
     `Post ${post._id} has been liked Successfully`,
     post
   );
+});
+
+// Approve Post
+exports.UpdateStatusPost = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+  const post = await postProcess.UpdateStatusPost(req.params.id, status);
+  return SuccessHandler(
+    res,
+    `Post ${post._id} has been ${status} successfully`,
+    post
+  );
+});
+
+exports.GetApprovedPosts = asyncHandler(async (req, res, next) => {
+  const approvedPosts = await postProcess.GetApprovedPosts();
+
+  return approvedPosts?.length === 0
+    ? next(new ErrorHandler("No Approved Posts Found"))
+    : SuccessHandler(res, `Approved Posts fetched successfully`, approvedPosts);
 });

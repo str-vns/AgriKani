@@ -27,6 +27,10 @@ exports.CreatePostProcess = async (req) => {
 exports.GetAllPostInfo = async () => {
   const post = await Post.find()
     .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
+    .populate({
+      path: 'author',
+      select: 'firstName lastName', // Only fetch these fields from the user schema
+    })
     .lean()
     .exec();
 
@@ -203,4 +207,35 @@ console.log(isLiked)
   await post.save();
 
   return post;
+};
+
+// Approve Post
+exports.UpdateStatusPost = async (id, status) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Post ID: ${id}`);
+
+  const postExist = await Post.findById(id).lean().exec();
+  if (!postExist) throw new ErrorHandler(`Post not exist with ID: ${id}`);
+
+  if (!['approved'].includes(status)) {
+    throw new ErrorHandler('Status must be either "approved"');
+  }
+
+  const updatePost = await Post.findByIdAndUpdate(
+    id,
+    { status: status },
+    { new: true }
+  );
+
+  return updatePost;
+};
+
+// Filter approved posts
+exports.GetApprovedPosts = async () => {
+  const approvedPosts = await Post.find({ status: "approved" })
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
+
+  return approvedPosts;
 };

@@ -59,6 +59,18 @@ const postRoutes = [
     roles: [],
     handler: postControllers.LikePost,
   },
+  {
+    method: METHOD.PUT,
+    path: PATH.APPROVE_POST,
+    roles: [],
+    handler: postControllers.UpdateStatusPost,
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.POST_STATUS_APPROVE,
+    roles: [],
+    handler: postControllers.GetApprovedPosts,
+  },
 ];
 
 postRoutes.forEach((route) => {
