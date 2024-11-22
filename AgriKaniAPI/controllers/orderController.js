@@ -5,8 +5,9 @@ const orderProcess = require("../process/orderProcess");
 const { STATUSCODE } = require("../constants/index");
 const generateReceiptPDF = require("../utils/pdfreceipts");
 const sendEmailWithAttachment = require("../utils/emailreceipts");
-const User = require("../models/user");
+const Order = require("../models/order");
 const path = require("path");
+const fs = require("fs");
 
 // Create a new order
 exports.createOrder = asyncHandler(async (req, res, next) => {
@@ -21,34 +22,62 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
       totalPrice,
     });
 
-    const userRecord = await User.findById(createdOrder.user);
-    if (!userRecord) {
-      return next(new ErrorHandler("User not found", 404));
+    // Populate the order with user, product, and address details
+    const populatedOrder = await Order.findById(createdOrder._id)
+      .populate({ path: "user", select: "firstName lastName email" })
+      .populate({ path: "orderItems.product", select: "productName pricing" })
+      .populate({ path: "shippingAddress", select: "fullName phoneNum address city postalCode" })
+      .lean();
+
+    if (!populatedOrder) {
+      return next(new ErrorHandler("Order not found after creation", 404));
     }
 
-    // Generate PDF receipt
-    const receiptPath = path.join(__dirname, `../receipts/${createdOrder._id}.pdf`);
-    generateReceiptPDF(createdOrder, receiptPath);
+    // Generate receipt
+    const receiptFolder = path.join(__dirname, "../receipts");
+    if (!fs.existsSync(receiptFolder)) {
+      fs.mkdirSync(receiptFolder);
+    }
+    const receiptPath = path.join(receiptFolder, `${createdOrder._id}.pdf`);
+    await generateReceiptPDF(populatedOrder, receiptPath);
 
-    // Send email with receipt
-    const userEmail = userRecord.email; // Ensure this retrieves the correct email
-    const emailText = `
-      Thank you for your order!
-      Order ID: ${createdOrder._id}
-      Total Price: $${createdOrder.totalPrice}
-      Payment Method: ${createdOrder.paymentMethod}
+    // Send receipt via email
+    const userEmail = populatedOrder.user.email;
+    const emailSubject = `Receipt for Order #${populatedOrder._id}`;
+    const emailHtml = `
+      <p>Dear ${populatedOrder.user.firstName},</p>
+      <p>Thank you for your purchase! Please find your order receipt attached.</p>
+      <h4>Order Details:</h4>
+      <p>
+        <strong>Order ID:</strong> ${populatedOrder._id}<br>
+        <strong>Total Price:</strong> ₱${populatedOrder.totalPrice}<br>
+        <strong>Payment Method:</strong> ${populatedOrder.paymentMethod}<br>
+        <strong>Shipping Address:</strong><br>
+        ${populatedOrder.shippingAddress.fullName}<br>
+        ${populatedOrder.shippingAddress.address}, ${populatedOrder.shippingAddress.city}, 
+        ${populatedOrder.shippingAddress.postalCode}<br>
+        <strong>Phone:</strong> ${populatedOrder.shippingAddress.phoneNum}
+      </p>
+      <h4>Products Ordered:</h4>
+      <ul>
+        ${populatedOrder.orderItems
+          .map(
+            (item) => `        
+          <li>
+            ${item.product.productName} - Quantity: ${item.quantity} - Unit Price: ₱${item.product.pricing}
+          </li>`
+          )
+          .join("")}
+      </ul>
+      <p>We appreciate your business and hope to serve you again soon!</p>
     `;
-    await sendEmailWithAttachment(
-      userEmail,
-      "Order Receipt",
-      emailText,
-      receiptPath
-    );
+    
+    // Send email with the generated receipt and the email content
+    await sendEmailWithAttachment(userEmail, emailSubject, "", receiptPath, emailHtml);
 
-
-    return SuccessHandler(res, "Order has been created successfully", createdOrder);
+    return SuccessHandler(res, "Order created and receipt sent successfully", createdOrder);
   } catch (error) {
-    return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
   }
 });
 
@@ -94,33 +123,25 @@ exports.updateOrderStatusCoop = asyncHandler(async (req, res, next) => {
 });
 
 
+exports.getReceipt = asyncHandler(async (req, res, next) => {
+  const { orderId } = req.params;
+  const receiptPath = path.join(__dirname, `../receipts/${orderId}.pdf`);
 
-const sendOrderReceipt = async (userEmail, orderDetails) => {
-  const receiptFolder = path.join(__dirname, "../receipts");
-
-  // Ensure the receipts folder exists
-  if (!fs.existsSync(receiptFolder)) {
-    fs.mkdirSync(receiptFolder);
+  if (!fs.existsSync(receiptPath)) {
+    console.error(`Receipt not found at path: ${receiptPath}`);
+    return next(new ErrorHandler("Receipt not found", 404));
   }
 
-  // Generate PDF receipt path
-  const receiptPath = path.join(receiptFolder, `${orderDetails._id}.pdf`);
+  res.setHeader("Content-Type", "application/pdf");
+  res.download(receiptPath, `${orderId}-receipt.pdf`, (err) => {
+    if (err) {
+      console.error(`Error while downloading receipt: ${err.message}`);
+      return next(new ErrorHandler("Error while downloading receipt", 500));
+    }
+  });
+});
 
-  try {
-    // Generate the receipt PDF
-    await generateReceiptPDF(orderDetails, receiptPath);
 
-    // Send email with attachment
-    const emailSubject = `Receipt for Order #${orderDetails._id}`;
-    const emailText = `Thank you for your order! Your total amount is ₱${orderDetails.totalPrice}.`;
-
-    await sendEmailWithAttachment(userEmail, emailSubject, emailText, receiptPath);
-    console.log("Order receipt sent to:", userEmail);
-
-  } catch (error) {
-    console.error("Error sending receipt:", error);
-  }
-};
 
 exports.getDailySalesReport = asyncHandler(async (req, res, next) => {
   try {

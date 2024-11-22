@@ -11,6 +11,7 @@ const generateReceiptPDF = (order, filePath) => {
 
     // Header
     doc.fontSize(20).text("Order Receipt", { align: "center" });
+    doc.moveDown();
 
     // Order Details
     doc
@@ -22,6 +23,18 @@ const generateReceiptPDF = (order, filePath) => {
       .text(`Payment Method: ${order.paymentMethod}`)
       .moveDown();
 
+    // Shipping Address
+    doc.fontSize(16).text("Shipping Address:", { underline: true });
+    doc
+      .fontSize(12)
+      .text(order.shippingAddress.fullName)
+      .text(order.shippingAddress.address)
+      .text(
+        `${order.shippingAddress.city}, ${order.shippingAddress.postalCode}`
+      )
+      .text(`Phone: ${order.shippingAddress.phoneNum}`)
+      .moveDown();
+
     // Items
     doc.fontSize(16).text("Items:", { underline: true });
     order.orderItems.forEach((item, index) => {
@@ -30,14 +43,17 @@ const generateReceiptPDF = (order, filePath) => {
         .text(
           `${index + 1}. ${item.product.productName} - Quantity: ${
             item.quantity
-          } - Price: ₱${item.price}`
+          } - Unit Price: ₱${item.product.pricing} - Subtotal: ₱${(
+            item.quantity * item.product.pricing
+          ).toFixed(2)}`
         );
     });
+    doc.moveDown();
 
     // Total
     doc
       .fontSize(14)
-      .text(`\nTotal Price: ₱${order.totalPrice}`, { align: "right" });
+      .text(`Total Price: ₱${order.totalPrice}`, { align: "right" });
 
     // Footer
     doc
