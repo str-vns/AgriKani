@@ -1,6 +1,5 @@
 /AgriFrontend
 .env
-/node_modules
 Default.env.txt
 mongoLog.log 
 reqLog.log
