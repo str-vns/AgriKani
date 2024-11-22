@@ -62,8 +62,8 @@ const blogRoutes = [
 
 blogRoutes.forEach((route) => {
   const { method, path, roles = [], handler } = route;
-  console.log(`Registering route: ${method.toUpperCase()} ${path}`);
-  console.log(`Handler: ${handler ? 'Defined' : 'Undefined'}`);
+  // console.log(`Registering route: ${method.toUpperCase()} ${path}`);
+  // console.log(`Handler: ${handler ? 'Defined' : 'Undefined'}`);
   router[method](path, authorizeRoles(...roles), handler);
 });
 
