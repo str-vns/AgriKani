@@ -2,7 +2,7 @@ require("dotenv").config({ path: "./config/.env" });
 const app = require("./app")
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
-const PORT = process.env.PORT || 4000 ;
+const PORT = process.env.PORT || 3000 ;
 const { logger, logEvents } = require("./middleware/logger");
 const { STATUSCODE } = require("./constants/index");
 const { analyzeMixedLanguage } = require("./utils/mixLanguage")
