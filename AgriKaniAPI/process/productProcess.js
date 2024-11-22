@@ -219,3 +219,52 @@ exports.deleteImage = async (id, imageId) => {
   console.log('Image deleted successfully');
   return { message: 'Image deleted successfully' };
 }
+exports.getRankedProducts = async (req, res, next) => {
+  try {
+    const rankedProducts = await Product.aggregate([
+      // Group by productId and sum the quantities
+      { 
+        $group: { 
+          _id: "$productId", 
+          totalQty: { $sum: "$quantity" } 
+        }
+      },
+      // Lookup the product details to get the name and total quantity sold
+      { 
+        $lookup: {
+          from: 'products', // Assuming the collection is called 'products'
+          localField: '_id', // Match on the _id field of the productId
+          foreignField: '_id', // Match the productId with the _id of the products collection
+          as: 'productDetails' // The resulting array with product details
+        }
+      },
+      // Unwind the array so we can access the name and other details easily
+      { 
+        $unwind: {
+          path: "$productDetails", 
+          preserveNullAndEmptyArrays: true // Keep even if there's no matching product
+        }
+      },
+      // Project the final output, including name and totalQty
+      { 
+        $project: {
+          productId: "$_id", // Keep the productId
+          name: "$productDetails.name", // Get the name of the product
+          totalQty: 1 // Keep total quantity
+        }
+      },
+      // Sort by total quantity in descending order
+      { 
+        $sort: { totalQty: -1 } 
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      rankedProducts: rankedProducts,
+    });
+  } catch (error) {
+    next(error); // Pass error to the next middleware for handling
+  }
+};
+

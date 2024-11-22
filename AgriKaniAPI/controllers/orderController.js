@@ -93,6 +93,8 @@ exports.updateOrderStatusCoop = asyncHandler(async (req, res, next) => {
   }
 });
 
+
+
 const sendOrderReceipt = async (userEmail, orderDetails) => {
   const receiptFolder = path.join(__dirname, "../receipts");
 
@@ -119,3 +121,45 @@ const sendOrderReceipt = async (userEmail, orderDetails) => {
     console.error("Error sending receipt:", error);
   }
 };
+
+exports.getDailySalesReport = asyncHandler(async (req, res, next) => {
+  try {
+    const report = await orderProcess.getDailySalesReport();
+    
+    if (!report || report.length === 0) {
+      return next(new ErrorHandler("No sales data found for today", STATUSCODE.NOT_FOUND));
+    }
+
+    return SuccessHandler(res, "Daily sales report fetched successfully", report);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+  }
+});
+
+exports.getWeeklySalesReport = asyncHandler(async (req, res, next) => {
+  try {
+    const report = await orderProcess.getWeeklySalesReport();
+    
+    if (!report || report.length === 0) {
+      return next(new ErrorHandler("No sales data found for the last week", STATUSCODE.NOT_FOUND));
+    }
+
+    return SuccessHandler(res, "Weekly sales report fetched successfully", report);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+  }
+});
+
+exports.getMonthlySalesReport = asyncHandler(async (req, res, next) => {
+  try {
+    const report = await orderProcess.getMonthlySalesReport();
+    
+    if (!report || report.length === 0) {
+      return next(new ErrorHandler("No sales data found for this month", STATUSCODE.NOT_FOUND));
+    }
+
+    return SuccessHandler(res, "Monthly sales report fetched successfully", report);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+  }
+});

@@ -14,7 +14,10 @@ module.exports = {
     LOGIN: "/signin",
     LOGOUT: "/signout",
     PRODUCTS: "/products",
+
+    RANKED_PRODUCTS: "/products/ranked",
     PRODUCTS_ID: "/products/:id",
+
     PRODUCTS_EDIT_ID: "/products/edit/:id",
     PRODUCTS_SOFTDEL_ID: "/products/softdel/:id",
     COOP_ONLY_PRODUCTS_ID: "/products/coop/:id",
@@ -69,6 +72,13 @@ module.exports = {
      RESTORE_BLOG_ID: "/restore/blog/:id",  // Route to restore a deleted blog
      BLOG_USER_ID: "/blog/user/:id", 
 
+     //DASHBOARD DETAILS
+     TOTAL_USERS: "/users/count",
+     TOTAL_TYPE_USERS:"/users/type",
+
+     DAILYSALES_REPORT: "/order/daily",
+     WEEKLY_SALES_REPORT: "/order/weekly",
+     MONTHLY_SALES_REPORT: "/order/monthly",
 
 
 }

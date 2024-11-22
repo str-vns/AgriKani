@@ -207,3 +207,153 @@ exports.updateOrderStatusCoop = async (id, req) => {
 
  return order
 }
+exports.getRankedProducts = async () => {
+  try {
+    // Aggregate orders to get the total quantity sold for each product
+    const rankedProducts = await Order.aggregate([
+      { $unwind: "$orderItems" },  // Deconstruct the orderItems array in each order
+      {
+        $group: {
+          _id: "$orderItems.product",  // Group by product ID
+          totalQuantitySold: { $sum: "$orderItems.quantity" },  // Sum the quantity sold for each product
+        }
+      },
+      {
+        $sort: { totalQuantitySold: -1 }  // Sort products by total quantity sold in descending order
+      },
+      {
+        $lookup: {
+          from: "products",  // Look up the product details from the "products" collection
+          localField: "_id",  // Join on the product ID from the orderItems
+          foreignField: "_id", // Match it with the _id field in the products collection
+          as: "productDetails"  // The matched product will be placed in the productDetails array
+        }
+      },
+      { 
+        $unwind: "$productDetails"  // Flatten the productDetails array to get the product name directly
+      },
+      {
+        $project: {
+          productId: "$_id",  // Include the product ID
+          totalQuantitySold: 1,  // Include the total quantity sold
+          name: "$productDetails.name",  // Get the product name from the joined data
+          price: "$productDetails.price",  // Optionally, include the price of the product
+        }
+      }
+    ]);
+
+    return rankedProducts;  // Return the ranked products
+  } catch (error) {
+    console.error("Error fetching ranked products:", error);
+    throw error;  // Rethrow the error to be handled by the controller
+  }
+};
+exports.getDailySalesReport = async () => {
+  // Get the start of the current day (midnight)
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);  // Set the time to 00:00:00 (midnight)
+
+  const currentDate = new Date();  // Current date and time
+
+  return await Order.aggregate([
+    { 
+      $match: { 
+        createdAt: { 
+          $gte: startOfDay,  // Match orders from the start of the current day
+          $lte: currentDate  // Until the current date (inclusive of time)
+        } 
+      } 
+    },
+    {
+      $unwind: "$orderItems"  // Unwind the orderItems array to count each product separately
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: "$totalPrice" },  // Sum of total price for the day
+        totalQuantity: { $sum: "$orderItems.quantity" },  // Sum of quantities sold for the day
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalRevenue: 1,
+        totalQuantity: 1,
+      },
+    },
+  ]);
+};
+
+exports.getWeeklySalesReport = async () => {
+  // Calculate the date 7 days ago from today
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);  // Subtract 7 days
+
+  const currentDate = new Date(); // Current date
+
+  return await Order.aggregate([
+    { 
+      $match: { 
+        createdAt: { 
+          $gte: sevenDaysAgo,  // Match orders from the last 7 days
+          $lte: currentDate   // Until the current date
+        } 
+      } 
+    },
+    {
+      $unwind: "$orderItems"  // Unwind the orderItems array to count each product separately
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: "$totalPrice" }, // Sum of total price
+        totalQuantity: { $sum: "$orderItems.quantity" },  // Sum of all item quantities
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalRevenue: 1,
+        totalQuantity: 1,
+      },
+    },
+  ]);
+};
+
+exports.getMonthlySalesReport = async () => {
+  // Get the first day of the current month
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);  // Set the date to 1st of the current month
+  startOfMonth.setHours(0, 0, 0, 0);  // Set time to midnight to get the start of the month
+
+  const currentDate = new Date(); // Current date
+
+  return await Order.aggregate([
+    { 
+      $match: { 
+        createdAt: { 
+          $gte: startOfMonth,  // Match orders from the start of the current month
+          $lte: currentDate   // Until the current date
+        } 
+      } 
+    },
+    {
+      $unwind: "$orderItems"  // Unwind the orderItems array to count each product separately
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: "$totalPrice" }, // Sum of total price
+        totalQuantity: { $sum: "$orderItems.quantity" },  // Sum of all item quantities
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalRevenue: 1,
+        totalQuantity: 1,
+      },
+    },
+  ]);
+};
+

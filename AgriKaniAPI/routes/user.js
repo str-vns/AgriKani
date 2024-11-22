@@ -6,6 +6,9 @@ const { METHOD, PATH, ROLE } = require("../constants/index");
 const method = require("../constants/method");
 const path = require("../constants/path");
 
+router.get("/users/count", userController.GetUserCount);
+router.get("/users/type", userController.getUserTypeCount);
+
 const userRoutes = [
   {
     method: METHOD.GET,

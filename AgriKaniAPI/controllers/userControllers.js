@@ -8,7 +8,15 @@ const { STATUSCODE } = require("../constants/index");
 
 exports.SignUp = [
   upload.single("image"),
-  CheckField(["firstName", "lastName", "age", "phoneNum", "email", "password", "otp"]),
+  CheckField([
+    "firstName",
+    "lastName",
+    "age",
+    "phoneNum",
+    "email",
+    "password",
+    "otp",
+  ]),
   asyncHandler(async (req, res) => {
     const user = await userProcess.registerUser(req);
 
@@ -94,7 +102,10 @@ exports.SingleUser = asyncHandler(async (req, res) => {
 });
 
 exports.WishlistUser = asyncHandler(async (req, res) => {
-  const wish = await userProcess.wishlistProduct(req.params.productId, req.params.id);
+  const wish = await userProcess.wishlistProduct(
+    req.params.productId,
+    req.params.id
+  );
   console.log(wish, "Wishlist User");
   return SuccessHandler(
     res,
@@ -111,4 +122,26 @@ exports.UsersWish = asyncHandler(async (req, res) => {
     `User ${wish?.firstName} ${wish?.lastName} wishlist has been add Successfully`,
     wish
   );
+});
+
+exports.GetUserCount = asyncHandler(async (req, res) => {
+  const userCount = await userProcess.GetTotalUserCount();
+  
+  return userCount === STATUSCODE.ZERO
+    ? res.status(200).json({ message: "No users found", count: 0 })
+    : SuccessHandler(res, `Total users fetched successfully`, { count: userCount });
+});
+
+exports.getUserTypeCount = asyncHandler(async (req, res, next) => {
+  try {
+    const userTypeCount = await userProcess.getUserTypeCount();
+
+    if (userTypeCount.length === 0) {
+      return next(new ErrorHandler("No users found", STATUSCODE.NOT_FOUND));
+    }
+
+    return SuccessHandler(res, "User type countss1s fetched successfully", userTypeCount);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+  }
 });

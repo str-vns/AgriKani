@@ -4,6 +4,11 @@ const orderController = require("../controllers/orderController");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
 const { METHOD, PATH, ROLES } = require("../constants/index");
 
+router.get('/order/daily', orderController.getDailySalesReport);
+router.get('/order/weekly', orderController.getWeeklySalesReport);
+router.get('/order/monthly', orderController.getMonthlySalesReport);
+
+
 const orderRoutes = [
   {
     method: METHOD.POST,

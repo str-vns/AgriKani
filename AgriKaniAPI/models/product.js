@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const { RESOURCE } = require("../constants/index");
 
+
 const productSchema = new mongoose.Schema({
   productName: {
     type: String,

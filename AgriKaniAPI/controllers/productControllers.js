@@ -5,7 +5,7 @@ const productProcess = require("../process/productProcess");
 const SuccessHandler = require("../utils/successHandler");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE } = require("../constants/index");
-
+const orderProcess = require('../process/orderProcess');
 exports.productCreate = [
   upload.array("image"),
   CheckField(["productName", "description", "pricing", "stock", "image"]),
@@ -122,4 +122,16 @@ exports.DeleteProductImage = asyncHandler(async (req, res) => {
     `Product Image has been deleted Successfully`,
     product
   );
+});
+exports.getRankedProducts = asyncHandler(async (req, res, next) => {
+  try {
+    const rankedProducts = await orderProcess.getRankedProducts();
+    if (rankedProducts.length === 0) {
+      return next(new ErrorHandler("No products found", STATUSCODE.NOT_FOUND));
+    }
+
+    return SuccessHandler(res, "Ranked products fetched successfully", rankedProducts);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+  }
 });

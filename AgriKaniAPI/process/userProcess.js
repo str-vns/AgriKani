@@ -1,12 +1,12 @@
 const User = require("../models/user");
-const Farm = require("../models/farm")
-const Product = require("../models/product")
-const Otp = require("../models/otp")
+const Farm = require("../models/farm");
+const Product = require("../models/product");
+const Otp = require("../models/otp");
 const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
-const { uploadImageSingle } = require("../utils/imageCloud")
+const { uploadImageSingle } = require("../utils/imageCloud");
 const { cloudinary } = require("../utils/cloudinary");
 const blacklistedTokens = [];
 // NOTE Three DOTS MEANS OK IN COMMENT
@@ -33,25 +33,23 @@ exports.registerUser = async (req) => {
   if (age < 18 || age > 100)
     throw new ErrorHandler("Age must be between 18 and 100");
 
-  const response = await Otp.findOne({ 
-    email: req.body.email,   
-    otp: req.body.otp        
+  const response = await Otp.findOne({
+    email: req.body.email,
+    otp: req.body.otp,
   })
-  .sort({ createdAt: -1 })      
-  .limit(1)                    
-  .lean()                      
-  .exec();                     
+    .sort({ createdAt: -1 })
+    .limit(1)
+    .lean()
+    .exec();
 
-if (!response) {
-  throw new ErrorHandler("Otp is not Valid or Email is not Match");
-}
+  if (!response) {
+    throw new ErrorHandler("Otp is not Valid or Email is not Match");
+  }
 
-
-  
   let images = {};
 
   if (req.file) {
-    images = await uploadImageSingle(req.file)
+    images = await uploadImageSingle(req.file);
   }
   if (!images) throw new ErrorHandler("At least one image is required");
 
@@ -62,7 +60,6 @@ if (!response) {
     : [ROLE.CUSTOMER];
 
   const gender = req.body.gender ? req.body.gender : GENDER.PNTS;
- 
 
   const user = await User.create({
     ...req.body,
@@ -107,7 +104,7 @@ exports.UpdateUserInfo = async (req, id) => {
 
   let image_img = userExist.image || {};
   if (req.file) {
-    image_img = await uploadImageSingle(req.file)
+    image_img = await uploadImageSingle(req.file);
     await cloudinary.uploader.destroy(`${userExist.image.public_id}`);
   }
 
@@ -137,24 +134,22 @@ exports.UpdateUserInfo = async (req, id) => {
     .exec();
 
   if (!updateUser) throw new ErrorHandler(`User not Update with ID ${id}`);
-  
+
   await Product.updateMany(
-    { "reviews.user": id }, 
+    { "reviews.user": id },
     {
       $set: {
-        "reviews.$[elem].avatar": image_img,  
-        "reviews.$[elem].firstName": req.body.firstName || userExist.firstName,  
-        "reviews.$[elem].lastName": req.body.lastName || userExist.lastName,     
+        "reviews.$[elem].avatar": image_img,
+        "reviews.$[elem].firstName": req.body.firstName || userExist.firstName,
+        "reviews.$[elem].lastName": req.body.lastName || userExist.lastName,
       },
     },
     {
-      arrayFilters: [{ "elem.user": id }],  
+      arrayFilters: [{ "elem.user": id }],
       new: true,
     }
   ).exec();
- 
-  
- 
+
   return updateUser;
 };
 
@@ -256,52 +251,83 @@ exports.getBlacklistedTokens = () => {
 };
 
 exports.wishlistProduct = async (productId, id) => {
-  console.log(productId)
-  console.log(id)
+  console.log(productId);
+  console.log(id);
   const product = await Product.findById(productId);
   if (!product) {
     throw new ErrorHandler("Product not found");
   }
-  console.log("user: ", id)
+  console.log("user: ", id);
   const user = await User.findById(id);
   if (!user) {
     throw new ErrorHandler("User not found");
   }
 
-  const isWished = user.wishlist.findIndex(item => item.product.toString() === product._id.toString());
+  const isWished = user.wishlist.findIndex(
+    (item) => item.product.toString() === product._id.toString()
+  );
 
   if (isWished === -1) {
-    user.wishlist.push({ product: product});
+    user.wishlist.push({ product: product });
   } else {
     user.wishlist.splice(isWished, 1);
   }
 
   await user.save();
 
-
-
   return user;
-}
+};
 
 exports.wishlistProductGet = async (id) => {
-  mongoose.Types.ObjectId.isValid(id)
+  mongoose.Types.ObjectId.isValid(id);
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ErrorHandler(`Invalid User ID: ${id}`);
   }
 
   const userWish = await User.findById(id)
-  .populate({
-    path: "wishlist.product", // Correct path to populate product
-    select: "productName pricing price image.url description stock user"
-  })
-  .populate({
-    path: "wishlist.product.reviews", 
-    select: "firstName lastName comment rating"
-  })
-  .lean() 
-  .exec();
-  if(!userWish) {
+    .populate({
+      path: "wishlist.product", // Correct path to populate product
+      select: "productName pricing price image.url description stock user",
+    })
+    .populate({
+      path: "wishlist.product.reviews",
+      select: "firstName lastName comment rating",
+    })
+    .lean()
+    .exec();
+  if (!userWish) {
     throw new ErrorHandler("User not found");
   }
   return userWish;
-}
+};
+
+exports.GetTotalUserCount = async () => {
+  const count = await User.countDocuments();
+  return count;
+};
+exports.getUserTypeCount = async () => {
+  return await User.aggregate([
+    { $unwind: "$roles" },  // Unwind the roles array to count each role separately
+    {
+      $project: {
+        // Normalize the role names to lowercase to avoid distinctions like "Cooperative" vs "Cooperatives"
+        role: { $toLower: "$roles" },  // Convert role names to lowercase for consistent grouping
+      },
+    },
+    {
+      $group: {
+        _id: "$role",  // Group by normalized role
+        count: { $sum: 1 },  // Count the number of users for each normalized role
+      },
+    },
+    {
+      $project: {
+        _id: 0,  // Exclude _id
+        role: "$_id",  // Include the role name as a field
+        count: 1,  // Include the count field
+      },
+    },
+  ]);
+};
+
+

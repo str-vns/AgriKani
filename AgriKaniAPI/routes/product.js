@@ -4,6 +4,7 @@ const productController = require("../controllers/productControllers");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
 const { METHOD, PATH, ROLE } = require("../constants/index");
 
+router.get("/products/ranked", productController.getRankedProducts);
 
 const productRoutes = [
   {
