@@ -14,7 +14,7 @@ const io = socketIO(server, {
       "http://localhost:5173",          // Local development frontend URL
       "http://localhost:4000",          // Local development backend URL (if applicable)
     ],
-    methods: ["GET", "POST"],  // Allowed methods (optional)
+
   },
 });
 
