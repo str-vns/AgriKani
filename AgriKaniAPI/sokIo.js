@@ -6,7 +6,7 @@ const handleSocketConnections = require("./socketHandler");
 
 const server = http.createServer(app);
 
-const io = socketIO(8900, {
+const io = socketIO(4000, {
   cors: {
     origin: [
       "https://agrikani.onrender.com",
