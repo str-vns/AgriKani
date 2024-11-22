@@ -1,22 +1,22 @@
 require("dotenv").config({ path: "./config/.env" });
-const app = require("./app");  // Your Express app
+const app = require("./app")
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
+const PORT = process.env.PORT || 4000 ;
 const { logger, logEvents } = require("./middleware/logger");
 const { STATUSCODE } = require("./constants/index");
-const { server } = require("./sokIo");  // Socket.IO server
-
-const PORT = process.env.PORT || 4000;  // Use 4000 for both HTTP and Socket.IO server
+const { analyzeMixedLanguage } = require("./utils/mixLanguage")
+const { server } = require("./sokIo");
 
 connectDB();
 app.use(logger);
 
 mongoose.connection.once("open", () => {
-  // Start the server on the same port
+
   server.listen(PORT, () => {
-    console.log(`Server is running on ${mongoose.connection.host}:${PORT}`);
+    console.log(`Server is running and connected to MongoDB on ${mongoose.connection.host}:${PORT}`);
     logEvents(
-      `Server is running on ${mongoose.connection.host}:${PORT}`,
+      `Server is running and connected to MongoDB on ${mongoose.connection.host}:${PORT}`,
       "mongoLog.log"
     );
   });
@@ -29,3 +29,7 @@ mongoose.connection.on("error", (err) => {
     "mongoLog.log"
   );
 });
+
+
+// var result = analyzeMixedLanguage('tanga ka, BOBO PA, pero Mabait ka But its fine' )
+// console.log(result)

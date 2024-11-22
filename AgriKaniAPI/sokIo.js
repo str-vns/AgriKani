@@ -1,24 +1,24 @@
+// socketIO.js
 const socketIO = require("socket.io");
 const http = require("http");
-const app = require("./app");
+const app = require("./app");  
 const handleSocketConnections = require("./socketHandler");
 
 const server = http.createServer(app);
 
-// Start socket.io on port 4000
-const io = socketIO(server, {
+const io = socketIO(3000, {
   cors: {
     origin: [
-      "https://agrikani.onrender.com",
-      "http://localhost:5173", // your local dev URL for testing
+      "https://agrikani.onrender.com/",
+      "http://localhost:5173", 
+      "http://localhost:4000",
     ],
   },
 });
 
+
 handleSocketConnections(io);
 
-server.listen(4000, () => {
-  console.log("Socket.IO server running on port 4000");
-});
+console.log("Socket.IO is running and ready for connections");
 
 module.exports = { io, server };
