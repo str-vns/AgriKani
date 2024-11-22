@@ -23,6 +23,7 @@ const type = require("./routes/type");
 const category = require("./routes/category");
 const blog = require ("./routes/blog");
 
+app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
