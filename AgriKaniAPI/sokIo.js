@@ -6,10 +6,10 @@ const handleSocketConnections = require("./socketHandler");
 
 const server = http.createServer(app);
 
-const io = socketIO(3000, {
+const io = socketIO(8900, {
   cors: {
     origin: [
-      "https://agrikani.onrender.com/",
+      "https://agrikani.onrender.com:8900",
       "http://localhost:5173", 
       "http://localhost:4000",
     ],
