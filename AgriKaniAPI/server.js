@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const connectDB = require("./config/db");
 const { logger, logEvents } = require("./middleware/logger");
 const { STATUSCODE } = require("./constants/index");
-const { server } = require("./socketIO");  // Socket.IO server
+const { server } = require("./sokIo");  // Socket.IO server
 
 const PORT = process.env.PORT || 4000;  // Use 4000 for both HTTP and Socket.IO server
 
