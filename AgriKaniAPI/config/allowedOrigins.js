@@ -3,7 +3,6 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4000",
   "http://localhost:8900",
-  "https://agrikani.onrender.com:8900", 
   "https://agrikani.onrender.com",
 ];
 
