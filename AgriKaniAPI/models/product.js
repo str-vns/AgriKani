@@ -13,17 +13,15 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please enter the product description!"],
   },
-  pricing: {
-    type: Number,
-    required: [true, "Please enter the product price!"],
-    min: [1, "Price must be at least 1 or higher"],
-  },
-  stock: {
-    type: Number,
-    min: [1, "Stock must be at least 1"],
-    max: [200, "Stock cannot exceed 200"],
-    required: [true, "Please enter the stock quantity!"],
-  },
+  stock: [
+    {
+       inventory: {
+        type: mongoose.Schema.ObjectId,
+        ref: RESOURCE.INVENTORYMANAGEMENT,
+        required: true,
+      },
+    }
+  ],
   category: [{
     type: String,
   }],
@@ -98,6 +96,10 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "user",
     required: true,
+  },
+  apporivedAt:{
+    type: Date,
+    default: null,
   },
   createdAt: {
     type: Date,

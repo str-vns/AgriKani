@@ -104,16 +104,25 @@ const farmSchema = new mongoose.Schema({
       ],
     },
   ],
+   
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "user",
     required: true,
   },
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+  },
+  approvedAt: {
+    type: Date,
+    default: null,
+  },
   deletedAt: {
     type: Date,
     default: null,
   },
-
   createdAt: {
     type: Date,
     default: Date.now,

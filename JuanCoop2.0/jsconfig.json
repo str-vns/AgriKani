@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "@*":[ "./*"],
+        "@navigators/*": ["./scripts/navigators/*"],
+        "@assets/*": ["./assets/*"],
+        "@screens/*": ["./scripts/screens/*"],
+        "@shared/*":["./scripts/shared/*"],
+        "@context/*" : ["./scripts/context/*"],
+        "@redux/*" : ["./scripts/redux/*"],
+        "@config/*" : ["./config/*"],
+        "@src/*" : ["./src/*"],
+        "@components/*" : ["./components/*"],
+        "@SocketIo" : ["./SocketIo"],
+      }
+    }
+  }

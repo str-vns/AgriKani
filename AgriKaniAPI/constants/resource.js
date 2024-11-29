@@ -20,4 +20,5 @@ module.exports = {
     OTP: "otp",
     BLOG: "blog",
     PRODUCTION: "production",
+    INVENTORYM: "inventorym",
 }
