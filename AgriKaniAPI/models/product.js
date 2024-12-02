@@ -13,15 +13,12 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please enter the product description!"],
   },
-  stock: [
-    {
-       inventory: {
-        type: mongoose.Schema.ObjectId,
-        ref: RESOURCE.INVENTORYMANAGEMENT,
-        required: true,
-      },
-    }
-  ],
+  stock: {
+    type: Number,
+    required: [true, "Please enter the stock quantity!"],
+    min: [1, "Stock must be at least 1"],
+    max: [200, "Stock cannot exceed 200"],
+  },
   category: [{
     type: String,
   }],
