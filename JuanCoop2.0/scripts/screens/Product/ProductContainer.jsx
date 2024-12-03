@@ -18,6 +18,7 @@ import CategoryFilter from "../Filter/CategoryFilter";
 import ProductList from "./ProductList";
 import { useDispatch, useSelector } from "react-redux";
 import { getProduct } from "@redux/Actions/productActions";
+import { allCoops } from "@redux/Actions/coopActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Profileuser } from "@redux/Actions/userActions";
@@ -27,12 +28,13 @@ import UserFooter from "../Others/UserFooter";
 
 const ProductContainer = () => {
   const { products, error } = useSelector((state) => state.allProducts);
+  const { coops } = useSelector((state) => state.allCoops); 
   const { categories } = useSelector((state) => state.categories);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
-  console.log("userId: ", userId);
+
   const [focus, setFocus] = useState(false);
   const [token, setToken] = useState();
   const [active, setActive] = useState([]);
@@ -40,10 +42,12 @@ const ProductContainer = () => {
   const [errors, setErrors] = useState(null);
   const [searchtext, setSearchText] = useState("");
   const [productFilter, setProductFilter] = useState([]);
+  const [coopFilter, setCoopFilter] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const searchProduct = (text) => {
     if (!text.trim()) {
       setProductFilter(products);
+      setCoopFilter(coops);
       setFocus(false);
       setSearchText("");
     } else {
@@ -52,6 +56,13 @@ const ProductContainer = () => {
           item.productName.toLowerCase().includes(text.toLowerCase())
         )
       );
+
+      setCoopFilter(
+        coops.filter((item) =>
+          item.farmName.toLowerCase().includes(text.toLowerCase())
+        )
+      )
+  
       setFocus(true);
       setSearchText(text);
     }
@@ -94,11 +105,12 @@ const ProductContainer = () => {
       setActive(-1);
       dispatch(getProduct());
       dispatch(categoryList());
+      dispatch(allCoops());
     }, [dispatch])
   );
 
   const searchHandler = () => {
-    navigation.navigate("SearchProduct", { productFilter: productFilter });
+    navigation.navigate("SearchProduct", { productFilter: productFilter, coopFilter: coopFilter });
     setSearchText("");
   };
   return (
