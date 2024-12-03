@@ -166,7 +166,7 @@ export const OTPregister = (OtpData) => async (dispatch) => {
   }
 };
 export const Profileuser = (userDataId, token) => async (dispatch) => {
-
+   console.log("userDataId", userDataId);
   try {
 
     dispatch({ type: USER_PROFILE_REQUEST });
@@ -521,6 +521,7 @@ export const clearRegister = () => async (dispatch) => {
     type: CLEAR_REGISTER,
   });
 };
+
 export const clearErrors = () => async (dispatch) => {
 	dispatch({
 		type: CLEAR_ERRORS
