@@ -63,7 +63,7 @@ const UserSignIn = () => {
       setError("");
     } else if (context?.stateUser?.isAuthenticated) {
       console.log("Navigating to Home");
-      navigation.navigate("Home");
+      navigation.navigate("Home", { screen: "Home" });
       setEmail("");
       setPassword("");
       setError("");

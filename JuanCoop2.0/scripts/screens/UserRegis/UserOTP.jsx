@@ -47,7 +47,7 @@ const UserOTP = (props) => {
       setTimeout(() => {
         dispatch(clearErrors());
         setErrors(""); 
-      }, 10000); 
+      }, 1000); 
     }
 
     const registerInfo = {
@@ -57,6 +57,7 @@ const UserOTP = (props) => {
   
     console.log('Register Info:', registerInfo);  
     dispatch(registeruser(registerInfo));
+
   };
   
 
@@ -86,12 +87,13 @@ const UserOTP = (props) => {
     console.log("User State: ", user);
     console.log("Is Authenticated: ", isAuthenticated);
   
-    if (user?.email && user?.password) {
+    if (isAuthenticated && user?.email && user?.password) {
       const userCredentials = { email: user.email, password: registration.registration.password };
       console.log("Attempting auto login with: ", userCredentials);
       loginUser(userCredentials, context.dispatch);
       setOtp(['', '', '', '', '', '']);
-      navigation.navigate("ProductContainer");
+      dispatch(clearErrors());
+      navigation.navigate("Home");
     }
   }, [isAuthenticated, user, navigation, context.dispatch]);
 

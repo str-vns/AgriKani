@@ -297,12 +297,12 @@ const UserRegistration = () => {
           <Text style={styles.buttonText}>Register</Text>
         </TouchableOpacity>
 
-        <Text style={styles.agreement}>
+        {/* <Text style={styles.agreement}>
           Already have an account?{" "}
           <Text style={styles.linkText} onPress={() => handleSignInPress()}>
             Sign In
           </Text>
-        </Text>
+        </Text> */}
       </View>
     </ScrollView>
   );
