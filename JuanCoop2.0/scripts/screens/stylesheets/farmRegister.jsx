@@ -70,11 +70,14 @@ export default StyleSheet.create({
   },
   mapContainer: {
     height: 250,
-    marginTop: 20,
+    marginTop: 10,
     borderRadius: 10,
     overflow: "hidden",
     borderColor: "#ddd",
     borderWidth: 1,
+    marginRight: 10,
+    marginLeft: 10,
+
   },
   map: {
     ...StyleSheet.absoluteFillObject,

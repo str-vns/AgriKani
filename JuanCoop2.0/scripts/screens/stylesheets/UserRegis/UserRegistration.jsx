@@ -49,7 +49,7 @@ export default StyleSheet.create({
       padding: 15,
       borderRadius: 10,
       alignItems: "center",
-      marginBottom: 50,
+      marginBottom: 100,
     },
     buttonText: {
       color: "#fff",
