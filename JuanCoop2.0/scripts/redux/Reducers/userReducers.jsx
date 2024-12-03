@@ -65,6 +65,12 @@ export const RegisterReducer = (state = { user: {} }, action) => {
       case WISH_USER_FAIL:
         case WISHLIST_FAIL:
       return {isAuthenticated: false, loading: false, error: action.payload };
+      case CLEAR_ERRORS:
+        return {
+          ...state,
+          error: null,
+          isAuthenticated: false,
+        };
     default:
       return state;
   }
@@ -222,7 +228,7 @@ export const AllUsersReducer = (state = { users: [] }, action) => {
       return { ...state, loading: false, error: action.payload };
 
     case CLEAR_ERRORS:
-      return { ...state, error: null };
+      return { ...state, error: null, isAuthenticated: false };
 
     default:
       return state;
