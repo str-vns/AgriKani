@@ -1,15 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from 'react-native-chart-kit'; // For the line chart
 import { useNavigation } from '@react-navigation/native'; // Assuming navigation is set up
 import styles from './css/styles';
+import { Profileuser } from "@redux/Actions/userActions";
+import AuthGlobal from "@redux/Store/AuthGlobal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from 'react-redux';
 
 const FarmerDashboard = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
-
-  // State for toggling between Daily, Weekly, Monthly
+  const context = useContext(AuthGlobal);
+  const userId = context?.stateUser?.userProfile?._id;
+  const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(null);
+  const [errors, setErrors] = useState(null);
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        const res = await AsyncStorage.getItem("jwt");
+        if (res) {
+          setToken(res);
+          if (userId) {
+            dispatch(Profileuser(userId, res));
+          } else {
+            setErrors('User ID is missing.');
+          }
+        } else {
+          setErrors('No JWT token found.');
+        }
+      } catch (error) {
+        console.error('Error retrieving JWT:', error);
+        setErrors('Failed to retrieve JWT token.');
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchUserData();
+  }, [userId, dispatch]);
+  
   const [selectedTab, setSelectedTab] = useState('Weekly');
 
   // Sample line chart data
@@ -38,6 +73,8 @@ const FarmerDashboard = () => {
       stroke: '#FFA500', // Orange stroke
     },
   }  
+
+
 
   return (
     <ScrollView style={styles.container}>

@@ -1,10 +1,9 @@
-import React, {  useCallback,  useContext,  useEffect,  useRef,  useState, } from "react";
-import { View, Text, TextInput, TouchableOpacity,  StyleSheet, Image,  ScrollView,  Button,  Modal, } from "react-native";
+import React, {  useContext,  useEffect,  useRef,  useState, } from "react";
+import { View, Text, TextInput, TouchableOpacity, Image,  ScrollView,  Button,  Modal, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker, UrlTile } from "react-native-maps";
+import { FlatList } from "native-base";
 import { useDispatch, useSelector } from "react-redux";
 import { reverseCode, forwardCode } from "@redux/Actions/locationActions";
-import { FlatList } from "native-base";
 import { registerCoop } from "@redux/Actions/coopActions";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
@@ -12,12 +11,15 @@ import * as Location from "expo-location";
 import styles from "@screens/stylesheets/farmRegister";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
+import { WebView } from "react-native-webview";
+
 
 const FarmRegistration = ({ navigation }) => {
   const navigate = useNavigation();
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const draggingTimeout = useRef(null);
+  const webViewRef = useRef(null);
   const userInfo = context.stateUser?.userProfile?._id;
   const { GeoLoading, location, GeoError } = useSelector((state) => state.Geolocation);
   const { authentication } = useSelector((state) => state.Coop);
@@ -55,44 +57,38 @@ const FarmRegistration = ({ navigation }) => {
     fetchJwt();
   }, []);
 
-  //main Load
-  useFocusEffect(
-    useCallback(() => {
-      const getCurrentLocation = async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMessage("Permission to access location was denied");
-          return;
-        }
+  useEffect(() => {
+    const getCurrentLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to access location was denied");
+        return;
+      }
 
-        try {
-          const locations = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.High,
-          });
+      try {
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
 
-          const { latitude, longitude } = locations.coords;
+        const { latitude, longitude } = location.coords;
 
-          setMarkerCoordinate({ lat: latitude, lng: longitude });
-          setMapRegion({
-            latitude,
-            longitude,
-            latitudeDelta: 0.002,
-            longitudeDelta: 0.002,
-          });
+        setMarkerCoordinate({ lat: latitude, lng: longitude });
+        setMapRegion({
+          latitude,
+          longitude,
+          latitudeDelta: 0.002,
+          longitudeDelta: 0.002,
+        });
 
-          dispatch(reverseCode(latitude, longitude));
-          setPreviousLocation({ latitude, longitude });
-        } catch (error) {
-          console.log("Error getting Location", error);
-          setErrorMessage("Could not retrieve location. Please try again.");
-        }
-      };
+        dispatch(reverseCode(latitude, longitude));
+      } catch (error) {
+        console.error("Error getting Location:", error);
+      }
+    };
 
-      getCurrentLocation();
-    }, []) // Empty array as dependencies, so it only runs on focus
-  );
+    getCurrentLocation();
+  }, []);
 
-  //set send Info
   useEffect(() => {
     if (location && location.address && location.position) {
       setMyAddress(location.address.label);
@@ -107,6 +103,24 @@ const FarmRegistration = ({ navigation }) => {
     }
   }, [location, GeoError]);
 
+  useEffect(() => {
+    if (webViewRef.current && markerCoordinate) {
+      webViewRef.current.postMessage(JSON.stringify(markerCoordinate));
+    }
+  }, [markerCoordinate]);
+
+  const handleMessage = (event) => {
+    const { lat, lng } = JSON.parse(event.nativeEvent.data);
+    setMarkerCoordinate({ lat, lng });
+    dispatch(reverseCode(lat, lng));
+  };
+
+  const handleMarkerDragEnd = (event) => {
+    const { lat, lng } = JSON.parse(event.nativeEvent.data);
+    setMarkerCoordinate({ lat, lng });
+    dispatch(reverseCode(lat, lng));
+  };
+
   const handleAddressSelect = (result) => {
     const aAddress = result;
     const locations = result.position;
@@ -118,6 +132,7 @@ const FarmRegistration = ({ navigation }) => {
       latitudeDelta: 0.002,
       longitudeDelta: 0.002,
     });
+    // setErrorMessage(`Selected Location:\nLatitude: ${location.lat}\nLongitude: ${location.lng}`);
     setAddress("");
     setMyAddress(aAddress.address.label);
     setBarangay(aAddress.address.district);
@@ -128,27 +143,29 @@ const FarmRegistration = ({ navigation }) => {
     setModalVisible(false);
   };
 
-  const handleMarkerDrag = (e) => {
-    const { latitude, longitude } = e.nativeEvent.coordinate;
-    setMarkerCoordinate({ lat: latitude, lng: longitude });
-    if (draggingTimeout.current) {
-      clearTimeout(draggingTimeout.current);
-    }
-    draggingTimeout.current = setTimeout(() => {
-      setMapRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0.002,
-        longitudeDelta: 0.002,
-      });
-    }, 2000);
-  };
 
-  const handleMarkerDragEnd = async (e) => {
-    const { latitude, longitude } = e.nativeEvent.coordinate;
-    dispatch(reverseCode(latitude, longitude));
-  };
+  // const handleMarkerDrag = (e) => {
+  //   const { latitude, longitude } = e.nativeEvent.coordinate;
+  //   setMarkerCoordinate({ lat: latitude, lng: longitude });
+  //   if (draggingTimeout.current) {
+  //     clearTimeout(draggingTimeout.current);
+  //   }
+  //   draggingTimeout.current = setTimeout(() => {
+  //     setMapRegion({
+  //       latitude,
+  //       longitude,
+  //       latitudeDelta: 0.002,
+  //       longitudeDelta: 0.002,
+  //     });
+  //   }, 2000);
+  // };
 
+
+  // const handleMarkerDragEnd = async (e) => {
+  //   const { latitude, longitude } = e.nativeEvent.coordinate;
+  //   dispatch(reverseCode(latitude, longitude));
+  // };
+  
   const forwardGeoCode = async () => {
     if (address === "") {
       setErrorMessage("Please enter an address to search");
@@ -176,63 +193,117 @@ const FarmRegistration = ({ navigation }) => {
       aspect: [4, 3],
       quality: 1,
     });
-
+  
     // Check if the result is not canceled and has assets
     if (!result.canceled && result.assets && result.assets.length > 0) {
       // console.log(result);
       // Access the first asset for its URI
       const uri = result.assets[0].uri;
-
+  
       // Update the state with the new image URI
-      setMainImage((prevImages) => [...prevImages, uri]);
-      setImage((prevImages) => [...prevImages, uri]);
+      setMainImage(prevImages => [...prevImages, uri]);
+      setImage(prevImages => [...prevImages, uri]);
     } else {
       console.log("No image selected or an error occurred.");
     }
-  };
+  }
 
-  const deleteImage = (index) => {
-    setImage((prevImages) => prevImages.filter((_, i) => i !== index));
-  };
+const deleteImage = (index) => {
+    setImage(prevImages => prevImages.filter((_, i) => i !== index));
+}
 
   const handleRegisterFarm = () => {
-    if (
-      !farmName ||
-      !myaddress ||
-      !city ||
-      !barangay ||
-      !postalCode ||
-      !image.length
-    ) {
-      setErrors("Please fill in all fields and select an image");
-      return;
-    }
 
-    const coopRegistration = {
-      farmName: farmName,
-      address: myaddress,
-      city: city,
-      barangay: barangay,
-      postalCode: postalCode,
-      image: image,
-      latitude: latitude,
-      longitude: longitude,
-      user: userInfo,
-    };
+      if(!farmName || !myaddress || !city || !barangay || !postalCode || !image.length) {
+        setErrors("Please fill in all fields and select an image");
+          return;
+      }
 
-    dispatch(registerCoop(coopRegistration, token));
-    setFarmName("");
-    setMyAddress("");
-    setCity("");
-    setBarangay("");
-    setPostalCode("");
-    setImage([]);
-    setLatitude("");
-    setLongitude("");
-    setErrors(null);
+      const coopRegistration = {
+        farmName: farmName, 
+        address: myaddress,
+        city: city,
+        barangay: barangay,
+        postalCode: postalCode,
+        image: image,
+        latitude: latitude,
+        longitude: longitude,
+        user: userInfo,
+      }
 
-    navigate.navigate("CoopDashboard");
+      dispatch(registerCoop(coopRegistration, token));
+      setFarmName("");
+      setMyAddress("");
+      setCity("");
+      setBarangay("");
+      setPostalCode("");
+      setImage([]);
+      setLatitude("");
+      setLongitude("");
+      setErrors(null);
+
+        navigate.navigate("CoopDashboard");
+
   };
+
+  const mapHtml = `
+  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Leaflet Map with Draggable Markers</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" />
+    <style>
+      body { margin: 0; padding: 0; }
+      #map { position: absolute; top: 0; bottom: 0; width: 100%; height: 100vh; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"></script>
+    <script>
+      const initialLat = ${markerCoordinate.lat};
+      const initialLng = ${markerCoordinate.lng};
+
+      var map = L.map('map').setView([initialLat, initialLng], 19);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      var marker = L.marker([initialLat, initialLng], { 
+        draggable: true,
+      }).addTo(map);
+
+      var inactivityTimer;
+      function resetMapPosition() {
+        map.setView([initialLat, initialLng], 19);
+        console.log("Map reset to initial position.");
+      }
+
+      marker.on('dragend', function (e) {
+        var newLatLng = e.target.getLatLng();
+        window.ReactNativeWebView.postMessage(JSON.stringify({ lat: newLatLng.lat, lng: newLatLng.lng }));
+        resetInactivityTimer();
+      });
+
+      map.on('moveend', function () {
+        // Reset inactivity timer each time the map is moved
+        resetInactivityTimer();
+      });
+
+      function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(resetMapPosition, 5000); 
+      }
+
+      resetInactivityTimer();
+    </script>
+  </body>
+</html>
+  `
+
 
   return (
     <View style={styles.container}>
@@ -250,29 +321,21 @@ const FarmRegistration = ({ navigation }) => {
           ? `Lat: ${previousLocation.latitude}, Long: ${previousLocation.longitude}`
           : "Locating..."
       }`}</Text> */}
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <View style={styles.mapContainer}>
-          {mapRegion && (
-            <MapView style={styles.map} region={mapRegion} provider={null}>
-              <UrlTile 
-                urlTemplate="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                maximumZ={19}
-              />
-              <Marker
-                coordinate={{
-                  latitude: markerCoordinate.lat,
-                  longitude: markerCoordinate.lng,
-                }}
-                draggable
-                onDrag={handleMarkerDrag}
-                onDragEnd={handleMarkerDragEnd}
-              />
-            </MapView>
-          )}
-        </View>
-
-        <Text style={styles.label}>{longitude}</Text>
+            <WebView
+        ref={webViewRef}
+        originWhitelist={['*']}
+        source={{ html: mapHtml }}
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        onMessage={handleMarkerDragEnd}
+        scrollEnabled={false}
+      />
         <Button title="Search Location" onPress={() => setModalVisible(true)} />
+        </View>
+    
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+
 
         <Text style={styles.label}>Coop Name</Text>
         <TextInput
