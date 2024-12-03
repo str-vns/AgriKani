@@ -3,19 +3,20 @@ import io from "socket.io-client";
 import  config  from "@config";
 // const SOCKET_SERVER_URL = `${config.SOCKET_ADDRESS}`;
 // console.log(SOCKET_SERVER_URL, "SOCKET_SERVER_URL");
-const SocketContext = createContext(null); // Use createContext instead of useState
+const SocketContext = createContext(null); 
 
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
-
+    // https://agrikani.onrender.com
     useEffect(() => {
       // Create a Socket.IO connection
-      const socketConnection = io("https://agrikani.onrender.com", {
+      const socketConnection = io("http://192.168.50.236:4000", {
         transports: ["websocket"],
         cors: {
           origin: [
-            "http://localhost:5173", // Local development URL
-            "https://agrikani.onrender.com:8900", // Production frontend URL
+            "http://localhost:5173",
+            "https://agrikani.onrender.com:8900",
+            "http://localhost:4000",
           ],
         },
       });
@@ -23,7 +24,6 @@ export const SocketProvider = ({ children }) => {
       // Set the socket connection
       setSocket(socketConnection);
   
-      // Listen for successful connection
       socketConnection.on("connect", () => {
         console.log("Connected to Socket.IO server");
       });
@@ -32,17 +32,14 @@ export const SocketProvider = ({ children }) => {
         console.log(data.message);
       });
   
-      // Handle connection errors
       socketConnection.on("connect_error", (error) => {
         console.error("Socket connection error:", error);
       });
   
-      // Handle disconnection
       socketConnection.on("disconnect", () => {
         console.log("Disconnected from Socket.IO server");
       });
   
-      // Clean up the socket connection on unmount
       return () => {
         if (socketConnection) {
           console.log("Disconnecting from Socket.IO server...");
