@@ -79,7 +79,7 @@ const UserProfile = () => {
     <Text style={styles.backButtonText}>{"< Back"}</Text>
   </TouchableOpacity>) : (
      <TouchableOpacity
-     onPress={() =>  navigation.navigate("UserHome")} // Go back to previous screen
+     onPress={() =>  navigation.navigate("Home")} // Go back to previous screen
      style={styles.backButtonContainer}
    >
      <Text style={styles.backButtonText}>{"< Back"}</Text>
