@@ -21,7 +21,7 @@ const CategoryFilter = (props) => {
   const { item } = props;
 
   const categoryHandler = (valId) => {
-    const filteredProducts = products.filter((item) => 
+  const filteredProducts = products.filter((item) => 
   item.category.some((categoryId) => categoryId === valId)
   );
     navigation.navigate('SearchProduct', { productFilter: filteredProducts });

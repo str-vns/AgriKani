@@ -19,8 +19,9 @@ import { useDispatch, useSelector } from "react-redux";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 const SearchProduct = (props) => {
-console.log(props.route.params.productFilter)
+  // console.log("props: ", props.route.params.coopFilter);
   const context = useContext(AuthGlobal);
   const { user, error } = useSelector((state) => state.userOnly);
   const userId = context?.stateUser?.userProfile?._id;
@@ -28,6 +29,7 @@ console.log(props.route.params.productFilter)
   const dispatch = useDispatch();  
   const defaultImageUrl = "@assets/img/eggplant.png";
   const product = props.route.params.productFilter;
+  const coops = props.route.params.coopFilter;
   const [wishlist, setWishlist] = useState([]);
   const [token, setToken] = useState();
   const [isLogin, setIsLogin] = useState(false);
@@ -58,12 +60,9 @@ console.log(props.route.params.productFilter)
             (item) => item.product === product?.id
           );
           setWishlist(matchingProducts);
-          // console.log("Wishlist: ", matchingProducts);
         } else {
-          // console.log("User has no wishlist or wishlist is not an array");
         }
       } else {
-        // console.log("You are not logged in");
       }
     };
 
@@ -103,6 +102,36 @@ console.log(props.route.params.productFilter)
     <Feather name="menu" size={28} color="black" />
   </TouchableOpacity>
 
+  {coops && coops.length > 0 ? (
+  <ScrollView
+    horizontal
+    showsHorizontalScrollIndicator={false}
+    contentContainerStyle={styles.categoryScrollContainer}
+  >
+    {coops.map((coop, index) => (
+      <TouchableOpacity
+        key={coop?._id || index} // Ensure unique key, using coop._id or index as fallback
+        style={styles.categoryBox}
+        onPress={() =>
+  navigation.navigate("Home", {
+    screen: "CoopFarmProfile",
+    params: { coop: coop }, 
+  })
+}
+      >
+        <Image
+          source={{
+            uri: coop?.user?.image?.url || "https://img.icons8.com/color/452/fruit.png", // Fallback image
+          }}
+          style={styles.categoryIcon}
+        />
+        <Text style={styles.categoryText} ellipsizeMode="tail" numberOfLines={1}>
+          {coop?.farmName}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </ScrollView>
+) : null}
  
   {product && product.length > 0 ? (
     <ScrollView contentContainerStyle={style.scrollViewContent}>

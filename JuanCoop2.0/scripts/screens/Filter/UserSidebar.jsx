@@ -21,6 +21,7 @@ const UserSidebar = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const dispatch = useDispatch();
   const { loading, user, error } = useSelector((state) => state.userOnly);
+  console.log("User:", user);
   const userslogin = context.stateUser.user.CustomerInfo;
   const userId = context?.stateUser?.userProfile?._id;
   const userInfo = context.stateUser.user.CustomerInfo;
@@ -35,6 +36,7 @@ const UserSidebar = () => {
       icon: "notifications-outline",
       key: "notifications",
     },
+    { label: "Directions", icon: "navigate-outline", key: "CoopDistance" },
     { label: "Track Order", icon: "location-outline", key: "track-order" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     { label: "About Us", icon: "information-circle-outline", key: "about-us" },
@@ -61,6 +63,7 @@ const UserSidebar = () => {
 
   const NoItems = [
     { label: "Home", icon: "home-outline", key: "home" },
+    { label: "Distance", icon: "navigate-outline", key: "CoopDistance" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     { label: "About Us", icon: "information-circle-outline", key: "about-us" },
   ];
@@ -78,6 +81,8 @@ const UserSidebar = () => {
       navigation.navigate("UserAddress");
     }else if (key === "track-order") {
       navigation.navigate("UserOrderList");
+    } else if (key === "CoopDistance") {
+      navigation.navigate("Home", { screen: "CoopDistance" });
     }
 
   };
@@ -86,7 +91,9 @@ const UserSidebar = () => {
     setActiveItem(key);
 
     if (key === "home") {
-      navigation.navigate("Home");
+      navigation.navigate("Home", { screen: "ProductContainer" });
+    } else if (key === "CoopDistance") {
+      navigation.navigate("Home", { screen: "CoopDistance" });
     }
   };
 
@@ -99,7 +106,7 @@ const UserSidebar = () => {
     } else if (key === "profile") {
       navigation.navigate("Profile");
     } else if (key === "messages") {
-      navigation.navigate("Messages");
+      navigation.navigate("Messaging");
     } else if (key === "productArchive") {
       navigation.navigate("productArchive");
     } else if (key === "product") {
