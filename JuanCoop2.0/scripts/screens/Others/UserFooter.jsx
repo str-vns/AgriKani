@@ -11,13 +11,13 @@ const UserFooter = () => {
 
   const handleMessage = () => {
     { context?.stateUser?.isAuthenticated ? 
-      navigation.navigate("Messages") : 
-      navigation.navigate("Login") }
+      navigation.navigate("Home", { screen: "Messages" }) : 
+      navigation.navigate("RegisterScreen", { screen: "Login" }); }
   }
   const handleWish = () => {
     { context?.stateUser?.isAuthenticated ? 
-      navigation.navigate("Wishlist") : 
-      navigation.navigate("Login") }
+      navigation.navigate("Home", { screen: "Wishlist" }) : 
+      navigation.navigate("RegisterScreen", { screen: "Login" });}
   }
 
   return (
@@ -36,6 +36,32 @@ const UserFooter = () => {
             px="4"
           >
             <HStack alignItems="center" justifyContent="space-between">
+            <Pressable
+                cursor="pointer"
+                opacity={selected === 1 ? 1 : 0.5}
+                py="2"
+                flex={1}
+                onPress={() => {
+                  setSelected(1);
+                  navigation.navigate("Home", { screen: "ProductContainer" });
+                }}
+              >
+                <Center>
+                  <Icon
+                    mb="1"
+                    as={<MaterialIcons name="home" />}
+                    color={selected === 1 ? "#f7b900" : "gray.400"}
+                    size="lg"
+                  />
+                  <Text
+                    color={selected === 1 ? "#f7b900" : "gray.400"}
+                    fontSize="12"
+                  >
+                    Home
+                  </Text>
+                </Center>
+              </Pressable>
+
               <Pressable
                 cursor="pointer"
                 opacity={selected === 0 ? 1 : 0.5}
@@ -66,37 +92,12 @@ const UserFooter = () => {
                 </Center>
               </Pressable>
 
-              <Pressable
-                cursor="pointer"
-                opacity={selected === 1 ? 1 : 0.5}
-                py="2"
-                flex={1}
-                onPress={() => {
-                  setSelected(1);
-                  navigation.navigate("Search");
-                }}
-              >
-                <Center>
-                  <Icon
-                    mb="1"
-                    as={<MaterialIcons name="search" />}
-                    color={selected === 1 ? "#f7b900" : "gray.400"}
-                    size="lg"
-                  />
-                  <Text
-                    color={selected === 1 ? "#f7b900" : "gray.400"}
-                    fontSize="12"
-                  >
-                    Search
-                  </Text>
-                </Center>
-              </Pressable>
 
               <Pressable
                 cursor="pointer"
                 onPress={() => {
                   setSelected(2);
-                  navigation.navigate("Cart");
+                  navigation.navigate("Home", { screen: "Cart" });
                 }}
                 p="4"
                 bg="#f7b900"
