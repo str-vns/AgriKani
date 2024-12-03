@@ -19,15 +19,22 @@ import {
 } from "native-base";
 import React, { useContext } from "react";
 import "react-native-gesture-handler";
-import CoopFarmProfile from "@screens/Farmer/FarmerProfile";
-import EditFarm from "@screens/Farmer/FarmEdit";
-import OrderCoop from "@screens/Farmer/Order/OrderList";
+import Dashboards from "@screens/admin/dashboard";
+import Forum from "@screens/admin/forum";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { Alert, BackHandler } from "react-native";
 import Sidebar from "@src/screens/Filter/UserSidebar";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import BlogList from "@src/screens/admin/Blog/BlogList";
+import BlogCreate from "@src/screens/admin/Blog/BlogCreate";
+import BlogUpdate from "@src/screens/admin/Blog/BlogUpdate";
+import BlogCard from "@src/screens/admin/Blog/BlogCard";
+import CoopLists from "@screens/admin/Coop/Cooplist";
+import UserList from "@src/screens/admin/User/UserList";
+import barGraph from "@src/screens/admin/rankProduct";
+
 global.__reanimatedWorkletInit = () => {};
 
 const Drawer = createDrawerNavigator();
@@ -148,28 +155,74 @@ const Index = () => {
     <Box safeArea flex={1}>
       <Drawer.Navigator drawerContent={(props) => <Sidebar {...props} />}>
         <Drawer.Screen
-          name="Order"
+          name="AdminDashboards"
           options={{
             headerShown: false,
             tabBarShowLabel: false,
           }}
-          component={OrderCoop}
+          component={Dashboards}
         />
         <Drawer.Screen
-          name="EditFarm"
+          name="Forum"
+          component={Forum}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+        />
+
+        <Drawer.Screen
+          name="BlogList"
+          component={BlogList}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+        />
+
+        <Drawer.Screen
+          name="BlogCreate"
+          component={BlogCreate}
           options={{
             headerShown: false,
             tabBarShowLabel: false,
           }}
-          component={EditFarm}
+        />
+        <Drawer.Screen
+          name="BlogUpdate"
+          component={BlogUpdate}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
+        />
+        <Drawer.Screen
+          name="BlogCard"
+          component={BlogCard}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
+        />
+
+        <Drawer.Screen
+          name="UserList"
+          component={UserList}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
+        />
+
+        <Drawer.Screen
+          name="CoopList"
+          component={CoopLists}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
         />
           <Drawer.Screen
-          name="CoopFarmProfile"
+          name="barGraph"
+          component={barGraph}
           options={{
             headerShown: false,
             tabBarShowLabel: false,
           }}
-          component={CoopFarmProfile}
         />
       </Drawer.Navigator>
     </Box>
