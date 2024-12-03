@@ -1,18 +1,45 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDailySales, getWeeklySales, getMonthlySales } from '../../redux/Actions/salesActions';
 import { View, Text, StyleSheet, RefreshControl, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import AuthGlobal from "@redux/Store/AuthGlobal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Profileuser } from "@redux/Actions/userActions";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation(); 
-  
+  const context = useContext(AuthGlobal);
+  const userId = context?.stateUser?.userProfile?._id;
+
   const { dailySales, weeklySales, monthlySales } = useSelector((state) => state.sales);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Fetch sales data on screen focus
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        const res = await AsyncStorage.getItem("jwt");
+        if (res) {
+          setToken(res);
+
+          dispatch(Profileuser(userId, res));
+        } else {
+          setErrors("No JWT token found.");
+        }
+      } catch (error) {
+        console.error("Error retrieving JWT:", error);
+        setErrors("Failed to retrieve JWT token.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userId, dispatch]);
+
   useFocusEffect(
     useCallback(() => {
       dispatch(getDailySales());
