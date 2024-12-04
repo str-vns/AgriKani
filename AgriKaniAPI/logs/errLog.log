@@ -130,3 +130,11 @@
 20241109	20:58:35	67485b04-540d-4d19-bcff-7b2abe38688b	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
 20241109	21:07:47	533c398c-4bb3-4f78-9c7b-f8d8843a91d5	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
 20241109	21:07:47	99a2edfd-0aa7-4634-b9cc-ff017e09a6c8	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20241204	13:05:27	043c7acc-1863-465e-8846-2e94e05be3ca	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20241204	13:05:37	c7402181-c9bc-49ec-9463-a9d8cf14922a	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20241204	13:38:58	8d027603-6b5f-4a1b-8d0e-3ed80290e306	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20241204	13:38:59	4b49eea8-6027-4ff7-9cdf-2326fc0218c8	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20241204	13:39:00	05bb2c50-d231-4e56-a487-eeacec2cb0f0	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20241204	13:39:07	420157e8-51fd-4142-882e-e8971b206d6b	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20241204	13:39:24	73b78d79-01a4-472d-86de-d56d666cdf4b	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20241204	13:39:35	1c1eff6e-e8b0-4c89-b738-086d4341609b	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
