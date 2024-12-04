@@ -49,22 +49,11 @@ const handleSocketConnections = (io) => {
     });
 
     socket.on("sendNotification", ({ senderName, receiverName, type }) => {
-      // Store the notification in a database
-      const notificationData = {
-        senderName,
-        receiverName,
-        type,
-        createdAt: new Date(),
-        // You can also store the read/unread status
-        read: false,
-      };
-    
-      // Save the notification in the database (e.g., MongoDB, PostgreSQL, etc.)
-      saveNotificationToDB(notificationData);
-    
       const user = getUser(receiverName);
       if (user && user.socketId) {
         io.to(user.socketId).emit("getNotification", { senderName, type });
+      } else {
+        console.error("User or socketId not found for receiver:", receiverName);
       }
     });
 
