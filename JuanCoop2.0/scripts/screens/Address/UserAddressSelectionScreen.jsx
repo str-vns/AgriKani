@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
 import Ionicons from "react-native-vector-icons/Ionicons"; // For icons
 import { Card } from "react-native-elements"; // For the address card styling
 import { useNavigation } from "@react-navigation/native"; // Import useNavigation
@@ -42,21 +41,7 @@ const UserAddressSelectionScreen = () => {
         <Stepper currentStep={1} />
       </View>
       {/* Map View */}
-      <MapView
-        style={styles.map}
-        initialRegion={region}
-        onRegionChangeComplete={onRegionChange}
-      >
-        {/* Marker Pin */}
-        <Marker
-          coordinate={{
-            latitude: region.latitude,
-            longitude: region.longitude,
-          }}
-        >
-          <Ionicons name="location" size={40} color="#4287f5" />
-        </Marker>
-      </MapView>
+   
 
       {/* Bottom Sheet for Address */}
       <View style={styles.bottomSheet}>

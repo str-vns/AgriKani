@@ -1,21 +1,21 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Button, Modal, ActivityIndicator } from 'react-native';
+import React, { useState, useContext, useEffect, useRef, useCallback} from 'react';
+import { View, TextInput, TouchableOpacity, Text, Button, Modal, ActivityIndicator, BackHandler  } from 'react-native';
 import { FlatList } from "native-base";
 import { useDispatch, useSelector } from 'react-redux';
 import { reverseCode, forwardCode } from "@redux/Actions/locationActions";
-import { addAddress, updateAddress } from '@src/redux/Actions/addressActions';
+import { updateAddress } from '@src/redux/Actions/addressActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { WebView } from "react-native-webview";
 import styles from "@screens/stylesheets/Address/addressForm";
-import * as Location from "expo-location";
+import { useFocusEffect } from '@react-navigation/native';
 
-const UserAddressForm = ({ route, navigation }) => {
+const UserAddressEdit = ({ route, navigation }) => {
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const webViewRef = useRef(null);
   const { GeoLoading, location, GeoError } = useSelector((state) => state.Geolocation);
-  const { addressData = {}, isEdit = false } = route.params || {};
+  const { addressData = {} } = route.params ;
   const userId = context?.stateUser?.userProfile?._id;
   const [address, setAddress] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -24,16 +24,17 @@ const UserAddressForm = ({ route, navigation }) => {
   const [markerCoordinate, setMarkerCoordinate] = useState({  lat: 14.5995,
     lng: 120.9842, });
   const [isLoading, setIsLoading] = useState(false);
+
   const [form, setForm] = useState({
-    city:  '',
-    barangay:  '',
-    address:  '',
-    postalCode:  '',
-    latitude:  '',
-    longitude:  '',
+    city:  addressData?.city || "",
+    barangay: addressData?.barangay || "",
+    address:   addressData?.address || "",
+    postalCode: addressData?.postalCode || "",
+    latitude:  addressData?.latitude || "",
+    longitude: addressData?.longitude || "",
   });
 
-
+  
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -46,31 +47,21 @@ const UserAddressForm = ({ route, navigation }) => {
 
     fetchJwt();
   }, []);
+  
+  useFocusEffect( 
+    useCallback(() => {
 
-  useEffect(() => {
-    const getCurrentLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission to access location was denied");
-        return;
-      }
+        if (addressData ) {
+            setForm({ ...form, ...addressData });
+        }  
+        setMarkerCoordinate({ lat: addressData?.latitude , lng: addressData?.longitude });
 
-      try {
-        const location = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.High,
-        });
+    }, [addressData])
+  )
 
-        const { latitude, longitude } = location.coords;
-
-        setMarkerCoordinate({ lat: latitude, lng: longitude });
-        dispatch(reverseCode(latitude, longitude));
-      } catch (error) {
-        console.error("Error getting Location:", error);
-      }
-    };
-
-    getCurrentLocation();
-  }, []);
+  const handleChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
 
   useEffect(() => {
     if (location && location.address && location.position) {
@@ -127,29 +118,18 @@ const UserAddressForm = ({ route, navigation }) => {
     setErrorMessage("");
   };
 
-  useEffect(() => {
-    if (isEdit && addressData) {
-      setForm({ ...form, ...addressData });
-    }
-  }, [addressData, isEdit]);
-
-  const handleChange = (name, value) => {
-    setForm({ ...form, [name]: value });
-  };
-
   const handleSubmit = () => {
     const payload = { ...form, userId };
     setIsLoading(true);
-
     try {
-      dispatch(addAddress(payload));
-      setIsLoading(false);
-      navigation.goBack(); 
-
+        
+        dispatch(updateAddress(payload, addressData._id));
+        setIsLoading(false);
+        setForm({city: '', barangay: '', address: '', postalCode: '', latitude: '', longitude: '' });
+        navigation.goBack(); 
     } catch (error) {
-      setErrorMessage("Address is required");
+        console.error("Error updating address: ", error);
     }
-
   };
 
   const mapHtml = `
@@ -210,9 +190,24 @@ const UserAddressForm = ({ route, navigation }) => {
 </html>
   `;
   
+  const handleBackPress = () => {
+
+    setForm({ city: '', barangay: '', address: '', postalCode: '', latitude: '', longitude: '' });
+    navigation.goBack();
+    return true; 
+  };
+
+  useEffect(() => {
+   
+    BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+    return () => {
+      BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+    };
+  }, []);
   return (
     <View style={styles.formContainer}>
-      <Text style={styles.title}>{isEdit ? 'Edit Address' : 'Add Address'}</Text>
+      <Text style={styles.title}>Edit Address</Text>
 
       <View style={styles.mapContainer}>
             <WebView
@@ -239,7 +234,7 @@ const UserAddressForm = ({ route, navigation }) => {
       ))}
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         {isLoading ? ( <ActivityIndicator size="small" color="#fff" /> ) :  
-        <Text style={styles.buttonText} disabled={isLoading}>{isEdit ? 'Update Address' : 'Add Address'}</Text>}
+        <Text style={styles.buttonText} disabled={isLoading} >Update Address</Text>}
     
       </TouchableOpacity>
 
@@ -310,4 +305,4 @@ const UserAddressForm = ({ route, navigation }) => {
 };
 
 
-export default UserAddressForm;
+export default UserAddressEdit;

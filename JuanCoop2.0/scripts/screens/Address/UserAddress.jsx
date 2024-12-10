@@ -1,9 +1,10 @@
-import React, { useEffect, useContext, useState } from "react"; 
+import React, { useEffect, useContext, useState, useCallback } from "react"; 
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAddresses, deleteAddress } from "@src/redux/Actions/addressActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from "@react-navigation/native";
 
 const UserAddress = ({ route, navigation }) => {
   const context = useContext(AuthGlobal);
@@ -13,11 +14,15 @@ const UserAddress = ({ route, navigation }) => {
   const loading = useSelector((state) => state.addresses.loading);
   const error = useSelector((state) => state.addresses.error);
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     if (userId) {
       dispatch(fetchAddresses(userId));
     }
-  }, [dispatch, userId]);
+  },[dispatch, userId])
+)
+
+
 
   const handleDelete = (id) => {
     Alert.alert(
@@ -37,20 +42,15 @@ const UserAddress = ({ route, navigation }) => {
   };
 
   const handleEdit = (address) => {
-    navigation.navigate('UserAddressFormScreen', { addressData: address, isEdit: true });
+    navigation.navigate('UserAddressEdit',{ addressData: address });
   };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>Your Addresses</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('UserAddressFormScreen')}
-        >
           <Ionicons name="add-circle-outline" size={24} color="#fff" />
           <Text style={styles.addButtonText}>Add New Address</Text>
-        </TouchableOpacity>
       </View>
 
       {loading && <Text style={styles.loadingText}>Loading...</Text>}
@@ -58,19 +58,15 @@ const UserAddress = ({ route, navigation }) => {
 
       {Array.isArray(addresses) && addresses.length > 0 ? (
         addresses.map((address) => (
-          <TouchableOpacity
+          <View
             key={address._id}
-            onPress={() => handleSelectAddress(address)}
             style={styles.addressContainer}
           >
             <View style={styles.titleRow}>
-              <Text style={styles.addressTitle}>{address.fullName}</Text>
+              <Text style={styles.addressTitle}>{address.address},  {address.barangay}, {address.city}</Text>
               <Ionicons name="location-outline" size={20} color="#f7b900" />
             </View>
-            <Text style={styles.addressText}>Phone: {address.phoneNum}</Text>
-            <Text style={styles.addressText}>
-              {address.address}, {address.barangay}, {address.city}, {address.province}, {address.region}
-            </Text>
+            <Text style={styles.addressText}>Phone:  {address.userId?.phoneNum}</Text>
             <Text style={styles.addressText}>Postal Code: {address.postalCode}</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
@@ -88,7 +84,7 @@ const UserAddress = ({ route, navigation }) => {
                 <Text style={styles.buttonText}>Delete</Text>
               </TouchableOpacity>
             </View>
-          </TouchableOpacity>
+          </View>
         ))
       ) : (
         <Text style={styles.noAddressText}>No addresses found.</Text>
