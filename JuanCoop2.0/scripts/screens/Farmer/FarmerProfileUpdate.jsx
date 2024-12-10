@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView 
 import DropDownPicker from 'react-native-dropdown-picker';  // Import the dropdown picker
 import Icon from 'react-native-vector-icons/Feather';  // Feather icons
 import { Ionicons } from '@expo/vector-icons';
-import MapView, { Marker } from 'react-native-maps';
+
 
 const FarmerProfileUpdate = ({ navigation }) => {
   // Farmer Information States
@@ -146,7 +146,7 @@ const FarmerProfileUpdate = ({ navigation }) => {
         />
 
         {/* Map for farm location */}
-        <View style={styles.mapContainer}>
+        {/* <View style={styles.mapContainer}>
           <MapView
             style={styles.map}
             region={location}
@@ -158,7 +158,7 @@ const FarmerProfileUpdate = ({ navigation }) => {
               onDragEnd={(e) => setLocation(e.nativeEvent.coordinate)}
             />
           </MapView>
-        </View>
+        </View> */}
 
         {/* Save Changes Button */}
         <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>

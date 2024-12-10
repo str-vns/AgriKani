@@ -10,33 +10,33 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Image,
   ScrollView,
   Button,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import MapView, { Marker } from "react-native-maps";
-import * as Location from "expo-location";
 import { useDispatch, useSelector } from "react-redux";
 import { reverseCode, forwardCode } from "@redux/Actions/locationActions";
 import { FlatList } from "native-base";
 import * as ImagePicker from "expo-image-picker";
 import AuthGlobal from "@redux/Store/AuthGlobal";
-import { registerCoop } from "@redux/Actions/coopActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { getCoop } from "@redux/Actions/productActions";
 import { deleteCoopImage, UpdateCoop } from "@redux/Actions/coopActions";
+import { WebView } from "react-native-webview";
+import styles from "@screens/stylesheets/Coop/CoopFolderdes/FarmEdit";
 
 const FarmRegistration = ({ navigation }) => {
-  const navigate = useNavigation();
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
-  const { loading, location, error } = useSelector((state) => state.Lokication);
+  const webViewRef = useRef(null);
+  const { GeoLoading, location, GeoError } = useSelector(
+    (state) => state.Geolocation
+  );
   const { coop } = useSelector((state) => state.singleCoop);
-  const { authentication } = useSelector((state) => state.Coop);
   const userInfo = context.stateUser?.userProfile?._id;
   const farmId = coop?._id;
   const [farmName, setFarmName] = useState("");
@@ -48,46 +48,18 @@ const FarmRegistration = ({ navigation }) => {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [image, setImage] = useState([]);
-  const [coordinates, setCoordinates] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [newImage, setNewImage] = useState([]);
-  const [previousLocation, setPreviousLocation] = useState(null);
-  const [mapRegion, setMapRegion] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [token, setToken] = useState("");
   const [markerCoordinate, setMarkerCoordinate] = useState({
-    lat: 37.78825,
-    lng: -122.4324,
+    lat: 14.5995,
+    lng: 120.9842,
   });
-  const draggingTimeout = useRef(null);
-  const [mainImage, setMainImage] = useState("");
 
-  useEffect(() => {
-    const getCurrentLocation = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMessage("Permission to access location was denied");
-        return;
-      }
-      // Retrieve and set the current location
-      const locations = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-      const { latitude, longitude } = locations.coords;
-      setMarkerCoordinate({ lat: latitude, lng: longitude });
-      setMapRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0.002,
-        longitudeDelta: 0.002,
-      });
-      dispatch(reverseCode(latitude, longitude)); // Fetch address based on coordinates
-    };
-    getCurrentLocation();
-  }, []);
-
+  //Token
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -108,7 +80,7 @@ const FarmRegistration = ({ navigation }) => {
       }
     }, [userInfo])
   );
-  console.log(coop.image);
+
   useEffect(() => {
     if (coop) {
       setFarmName(coop?.farmName);
@@ -126,20 +98,41 @@ const FarmRegistration = ({ navigation }) => {
           : []
       );
     }
+    setMarkerCoordinate({ lat: coop?.latitude, lng: coop?.longitude });
+    dispatch(reverseCode(coop?.latitude, coop?.longitude));
   }, [coop]);
+
+  useEffect(() => {
+    if (location && location.address && location.position) {
+      setMyAddress(location.address.label);
+      setBarangay(location.address.district);
+      setCity(location.address.city);
+      setPostalCode(location.address.postalCode);
+      setLatitude(location.position.lat);
+      setLongitude(location.position.lng);
+    }
+    if (GeoError) {
+      setErrorMessage(GeoError);
+    }
+  }, [location, GeoError]);
+
+  useEffect(() => {
+    if (webViewRef.current && markerCoordinate) {
+      webViewRef.current.postMessage(JSON.stringify(markerCoordinate));
+    }
+  }, [markerCoordinate]);
+
+  const handleMarkerDragEnd = (event) => {
+    const { lat, lng } = JSON.parse(event.nativeEvent.data);
+    setMarkerCoordinate({ lat, lng });
+    dispatch(reverseCode(lat, lng));
+  };
 
   const handleAddressSelect = (result) => {
     const aAddress = result;
     const locations = result.position;
     setMarkerCoordinate(locations);
-    setCoordinates(locations);
-    setMapRegion({
-      latitude: locations.lat,
-      longitude: locations.lng,
-      latitudeDelta: 0.002,
-      longitudeDelta: 0.002,
-    });
-    // setErrorMessage(`Selected Location:\nLatitude: ${location.lat}\nLongitude: ${location.lng}`);
+
     setAddress("");
     setMyAddress(aAddress.address.label);
     setBarangay(aAddress.address.district);
@@ -150,46 +143,14 @@ const FarmRegistration = ({ navigation }) => {
     setModalVisible(false);
   };
 
-  const handleMarkerDrag = (e) => {
-    const { latitude, longitude } = e.nativeEvent.coordinate;
-    setMarkerCoordinate({ lat: latitude, lng: longitude });
-    if (draggingTimeout.current) {
-      clearTimeout(draggingTimeout.current);
-    }
-    draggingTimeout.current = setTimeout(() => {
-      setMapRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0.002,
-        longitudeDelta: 0.002,
-      });
-    }, 2000);
-  };
-
-  const handleMarkerDragEnd = async (e) => {
-    const { latitude, longitude } = e.nativeEvent.coordinate;
-    dispatch(reverseCode(latitude, longitude));
-  };
-
   const forwardGeoCode = async () => {
     if (address === "") {
       setErrorMessage("Please enter an address to search");
-      return; // Stop execution if there's no address
+      return;
     }
-    // Dispatch the action and wait for the results
     dispatch(forwardCode(address));
     setErrorMessage("");
   };
-
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text>Error: {error}</Text>
-      </View>
-    );
-  }
-
-  const noLocations = !location || location.length === 0;
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -202,7 +163,6 @@ const FarmRegistration = ({ navigation }) => {
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const newImages = [];
       result.assets.forEach((asset) => {
-        // Check for duplicates and add only if not found
         if (!image.some((existingImage) => existingImage.uri === asset.uri)) {
           newImages.push(asset.uri);
         }
@@ -217,35 +177,107 @@ const FarmRegistration = ({ navigation }) => {
 
   const deleteImage = (imageId, index) => {
     setImage((prevImages) => prevImages.filter((_, i) => i !== index));
-    dispatch(deleteCoopImage(farmId, imageId)); // Ensure correct imageId is passed here
+    dispatch(deleteCoopImage(farmId, imageId));
   };
 
   const handleRegisterFarm = () => {
-    if (
-      !farmName ||
-      !myaddress ||
-      !city ||
-      !barangay ||
-      !postalCode ||
-      !image.length
-    ) {
-      setErrors("Please fill in all fields and select an image");
-      return;
+    setIsLoading(true);
+    try {
+      if (
+        !farmName ||
+        !myaddress ||
+        !city ||
+        !barangay ||
+        !postalCode ||
+        !image.length
+      ) {
+        setErrors("Please fill in all fields and select an image");
+        return;
+      }
+
+      const coopRegistration = {
+        farmName,
+        address: myaddress,
+        city,
+        barangay: barangay,
+        postalCode,
+        latitude,
+        longitude,
+        image: newImage,
+        id: farmId,
+      };
+
+      dispatch(UpdateCoop(coopRegistration, token));
+      setFarmName("");
+      setImage([]);
+      setNewImage([]);
+      setErrors("");
+      setIsLoading(false);
+      navigation.navigate("Profile");
+    } catch (error) {
+      console.error("Error registering farm: ", error);
+      setErrors("Error registering farm. Please try again.");
+      setIsLoading(false);
     }
-
-    const coopRegistration = {
-      farmName,
-      image: newImage,
-      id: farmId,
-    };
-
-    dispatch(UpdateCoop(coopRegistration, token)); 
-    setFarmName("");
-    setImage([]); 
-    setNewImage([]);
-    setErrors("")
-    navigation.navigate('Profile'); 
   };
+
+  const mapHtml = `
+  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>Leaflet Map with Draggable Markers</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" />
+    <style>
+      body { margin: 0; padding: 0; }
+      #map { position: absolute; top: 0; bottom: 0; width: 100%; height: 100vh; }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"></script>
+    <script>
+      const initialLat = ${markerCoordinate.lat};
+      const initialLng = ${markerCoordinate.lng};
+
+      var map = L.map('map').setView([initialLat, initialLng], 19);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      var marker = L.marker([initialLat, initialLng], { 
+        draggable: true,
+      }).addTo(map);
+
+      var inactivityTimer;
+      function resetMapPosition() {
+        map.setView([initialLat, initialLng], 19);
+        console.log("Map reset to initial position.");
+      }
+
+      marker.on('dragend', function (e) {
+        var newLatLng = e.target.getLatLng();
+        window.ReactNativeWebView.postMessage(JSON.stringify({ lat: newLatLng.lat, lng: newLatLng.lng }));
+        resetInactivityTimer();
+      });
+
+      map.on('moveend', function () {
+        // Reset inactivity timer each time the map is moved
+        resetInactivityTimer();
+      });
+
+      function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(resetMapPosition, 5000); 
+      }
+
+      resetInactivityTimer();
+    </script>
+  </body>
+</html>
+  `;
 
   return (
     <View style={styles.container}>
@@ -258,25 +290,21 @@ const FarmRegistration = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Farm Registration</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        <View style={styles.mapContainer}>
-          {mapRegion && (
-            <MapView style={styles.map} region={mapRegion}>
-              <Marker
-                coordinate={{
-                  latitude: markerCoordinate.lat,
-                  longitude: markerCoordinate.lng,
-                }}
-                draggable
-                onDrag={handleMarkerDrag}
-                onDragEnd={handleMarkerDragEnd}
-              />
-            </MapView>
-          )}
-        </View>
 
+      <View style={styles.mapContainer}>
+        <WebView
+          ref={webViewRef}
+          originWhitelist={["*"]}
+          source={{ html: mapHtml }}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          onMessage={handleMarkerDragEnd}
+          scrollEnabled={false}
+        />
         <Button title="Search Location" onPress={() => setModalVisible(true)} />
+      </View>
 
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <Text style={styles.label}>Coop Name</Text>
         <TextInput
           style={styles.input}
@@ -287,11 +315,19 @@ const FarmRegistration = ({ navigation }) => {
 
         <Text style={styles.label}>Coop Address</Text>
         <TextInput
-           style={[styles.input, { textAlign: 'left', paddingLeft: 10, paddingRight: 10, fontSize: 16 }]}
+          style={[
+            styles.input,
+            {
+              textAlign: "left",
+              paddingLeft: 10,
+              paddingRight: 10,
+              fontSize: 16,
+            },
+          ]}
           placeholder="Enter Farm Address"
           value={myaddress}
           onChangeText={setMyAddress}
-          editable={false} 
+          editable={false}
         />
 
         <Text style={styles.label}>Barangay</Text>
@@ -300,7 +336,7 @@ const FarmRegistration = ({ navigation }) => {
           placeholder="Enter Barangay"
           value={barangay}
           onChangeText={setBarangay}
-          editable={false} 
+          editable={false}
         />
 
         <Text style={styles.label}>City</Text>
@@ -309,7 +345,7 @@ const FarmRegistration = ({ navigation }) => {
           placeholder="Enter City"
           value={city}
           onChangeText={setCity}
-          editable={false} 
+          editable={false}
         />
 
         <Text style={styles.label}>Postal Code</Text>
@@ -319,10 +355,9 @@ const FarmRegistration = ({ navigation }) => {
           value={postalCode}
           onChangeText={setPostalCode}
           keyboardType="numeric"
-          editable={false} 
+          editable={false}
         />
 
-        {/* Image Picker */}
         <TouchableOpacity onPress={pickImage}>
           <Text style={styles.selectImageButton}>Select Images</Text>
         </TouchableOpacity>
@@ -351,9 +386,14 @@ const FarmRegistration = ({ navigation }) => {
           style={styles.registerButton}
           onPress={() => handleRegisterFarm()}
         >
-          <Text style={styles.registerButtonText}>Update Cooperative</Text>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.registerButtonText}>Update Cooperative</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
+
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -375,16 +415,21 @@ const FarmRegistration = ({ navigation }) => {
                 style={styles.searchButton}
                 onPress={forwardGeoCode}
               >
-                <Text style={styles.searchButtonText}>🔍</Text>
+                {GeoLoading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.searchButtonText}>🔍</Text>
+                )}
               </TouchableOpacity>
             </View>
             {errorMessage ? (
+                <View style={styles.errorContainer}> 
               <Text style={styles.error}>{errorMessage}</Text>
+              </View>
             ) : null}
 
-            {noLocations ? (
+            {GeoError ? (
               <>
-                <Text>No locations found</Text>
                 <Button title="Close" onPress={() => setModalVisible(false)} />
               </>
             ) : (
@@ -414,177 +459,5 @@ const FarmRegistration = ({ navigation }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollViewContainer: {
-    padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 15,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    elevation: 3,
-  },
-  backButton: {
-    marginRight: 10,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    flex: 1,
-    textAlign: "center",
-    color: "#333",
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: "500",
-    marginBottom: 10,
-    color: "#000",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 20,
-    backgroundColor: "#fff",
-    fontSize: 18,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-  },
-  imagePicker: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 15,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    backgroundColor: "#f9f9f9",
-  },
-  image: {
-    width: 50,
-    height: 50,
-    marginRight: 10,
-  },
-  imagePickerText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  mapContainer: {
-    height: 250,
-    marginTop: 20,
-    borderRadius: 10,
-    overflow: "hidden",
-    borderColor: "#ddd",
-    borderWidth: 1,
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  registerButton: {
-    backgroundColor: "#FEC120",
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  registerButtonText: {
-    fontSize: 22,
-    color: "#000",
-    fontWeight: "bold",
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    width: "80%",
-    borderRadius: 10,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  searchInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
-    borderRadius: 5,
-  },
-  searchButton: {
-    marginLeft: 8,
-    padding: 10,
-    backgroundColor: "#007AFF",
-    borderRadius: 5,
-  },
-  searchButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  resultsList: {
-    marginTop: 10,
-  },
-  resultItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  error: {
-    color: "red",
-  },
-  selectImageButton: {
-    // Add styles for your button here
-    fontSize: 18,
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  imageContainer: {
-    position: "relative", // Enables absolute positioning of children
-    marginRight: 10, // Space between images
-  },
-  image: {
-    width: 100, // Adjust this value for larger images
-    height: 100, // Adjust this value for larger images
-    borderRadius: 8, // Optional: for rounded corners
-    overflow: "hidden", // Ensures rounded corners are applied to the image
-  },
-  deleteButton: {
-    position: "absolute",
-    top: 5, // Distance from the top of the image
-    right: 5, // Distance from the right of the image
-    backgroundColor: "white", // Optional: background color for better visibility
-    borderRadius: 12, // Optional: rounded button
-    padding: 5, // Space around the icon
-  },
-});
 
 export default FarmRegistration;
