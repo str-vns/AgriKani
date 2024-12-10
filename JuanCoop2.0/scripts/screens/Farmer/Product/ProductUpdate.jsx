@@ -46,8 +46,6 @@ const ProductUpdate = (props) => {
   const userInfo = context?.stateUser?.userProfile?._id;
   const productId = singleProduct?._id;
 
-
-
   useEffect(() => {
     const loadProductData = () => {
       const matchingCats = categories.filter((cat) => singleProduct.category.includes(cat._id));
