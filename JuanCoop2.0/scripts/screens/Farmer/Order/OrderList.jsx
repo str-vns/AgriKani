@@ -8,8 +8,10 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  ActivityIndicator
 } from "react-native";
 import { allCoopOrders } from "@redux/Actions/coopActions";
+import { fetchCoopOrders } from "@redux/Actions/orderActions";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../css/styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,13 +20,25 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { updateCoopOrders } from "@redux/Actions/coopActions";
+import { sendNotifications } from "@redux/Actions/notificationActions";
+import { useSocket } from '../../../../SocketIo';
+
 const OrderList = ({ navigation }) => {
   const dispatch = useDispatch()
   const context =  useContext(AuthGlobal);
+  const socket = useSocket();
   const userId = context.stateUser.userProfile?._id;
-  const { orders } = useSelector((state) => state.coopOrders);
+  const userName = context.stateUser.userProfile?.firstName;
+  const {orderloading, orders, ordererror } = useSelector((state) => state.coopOrdering);
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = React.useState(false);
+  const filteredOrders = (Array.isArray(orders) ? orders : []).map((order) => ({
+    ...order,
+    orderItems: Array.isArray(order.orderItems)
+      ? order.orderItems.filter((item) => item.productUser === userId)
+      : [], 
+  })).filter((order) => order.orderItems.length > 0);
+
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -39,7 +53,7 @@ const OrderList = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(()=>{
-      dispatch(allCoopOrders(userId, token))
+      dispatch(fetchCoopOrders(userId, token))
     },[])
   )
 
@@ -47,23 +61,48 @@ const OrderList = ({ navigation }) => {
     setRefresh(true);
   
       setTimeout(() => {
-        dispatch(allCoopOrders(userId, token));
+        dispatch(fetchCoopOrders(userId, token));
         setRefresh(false);
       }, 500);
   
   }, [userId, token, dispatch]);
  
-  const handleProcessOrder = (orderId, productId) => {
-
+  const handleProcessOrder = (orderId, productId, Items ) => {
     setRefresh(true);
     try {
+    let productNames = []
 
+    Items?.orderItems?.forEach(item => {
+      if(item.product?.productName)
+      {
+        productNames.push(item.product?.productName)
+      }
+    });
+    const productList = productNames.join(", ")
+
+    const notification = {
+      title: `Order: ${orderId}`, 
+      content: `Your order ${productList} is now being processed.`,
+      url: Items?.orderItems[0]?.product?.image[0].url,
+      user: Items.user._id,
+      senderId: userId
+    }
+
+      socket.emit("sendNotification", {
+        senderName: userName,
+        receiverName:  Items?.user?._id,
+        type: "order",
+      }
+
+      )
       const orderupdateInfo = {
         productId,
         orderStatus: "Processing",
       }
-      dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
 
+      dispatch(sendNotifications(notification , token))
+      dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
+      setRefresh(false);
       onRefresh()
    } catch (error) {
      console.error("Error deleting or refreshing orders:", error);
@@ -74,17 +113,42 @@ const OrderList = ({ navigation }) => {
    
   };
 
-  const handleShippingOrder = (orderId, productId) => {
+  const handleShippingOrder = (orderId, productId, Items) => {
 
     setRefresh(true);
     try {
+      let productNames = []
 
+      Items?.orderItems?.forEach(item => {
+        if(item.product?.productName)
+        {
+          productNames.push(item.product?.productName)
+        }
+      });
+      const productList = productNames.join(", ")
+  
+      const notification = {
+        title: `Order: ${orderId}`, 
+        content: `Your order ${productList} is now being Shipped.`,
+        url: Items?.orderItems[0]?.product?.image[0].url,
+        user: Items.user._id,
+        senderId: userId
+      }
+  
+        socket.emit("sendNotification", {
+          senderName: userName,
+          receiverName:  Items?.user?._id,
+          type: "order",
+        }
+      )
       const orderupdateInfo = {
         productId,
         orderStatus: "Shipping",
       }
-      dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
 
+      dispatch(sendNotifications(notification , token))
+      dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
+      setRefresh(false);
       onRefresh()
    } catch (error) {
      console.error("Error deleting or refreshing orders:", error);
@@ -95,17 +159,43 @@ const OrderList = ({ navigation }) => {
    
   };
 
-  const handleDeliveryOrder = (orderId, productId) => {
+  const handleDeliveryOrder = (orderId, productId, Items) => {
 
     setRefresh(true);
     try {
+      let productNames = []
+
+      Items?.orderItems?.forEach(item => {
+        if(item.product?.productName)
+        {
+          productNames.push(item.product?.productName)
+        }
+      });
+      const productList = productNames.join(", ")
+  
+      const notification = {
+        title: `Order: ${orderId}`, 
+        content: `Your order ${productList} has been Delivered Enjoy!.`,
+        url: Items?.orderItems[0]?.product?.image[0].url,
+        user: Items.user._id,
+        senderId: userId
+      }
+
+      socket.emit("sendNotification", {
+        senderName: userName,
+        receiverName:  Items?.user?._id,
+        type: "order",
+      }
+    )
 
       const orderupdateInfo = {
         productId,
         orderStatus: "Delivered",
       }
-      dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
 
+      dispatch(sendNotifications(notification , token))
+      dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
+      setRefresh(false);
       onRefresh()
    } catch (error) {
      console.error("Error deleting or refreshing orders:", error);
@@ -160,13 +250,12 @@ const OrderList = ({ navigation }) => {
             {item?.orderItems?.length > 0 ? (
   item.orderItems.flat().map((orderItem, index) => { 
 
-    console.log(orderItem.product, "Order Item");
+ 
     return (
       <View key={`${item._id}-${index}`} style={styles.orderItemContainer}>
 
         <View style={styles.imageAndTextContainer}>
-        {
-  orderItem.product?.image && orderItem.product?.image?.length > 0 ? (
+        {orderItem.product?.image && orderItem.product?.image?.length > 0 ? (
     <Image
       source={{ uri: orderItem.product.image[0].url }}
       style={styles.orderImage}
@@ -178,6 +267,9 @@ const OrderList = ({ navigation }) => {
 }
 
           <View style={styles.textContainer}>
+          {orderItem.product?.productName && (
+  <Text style={styles.orderItemName}>{orderItem.product.productName}</Text>
+)}
             <Text style={styles.orderItemName}>{orderItem.productName}</Text>
             <Text style={styles.orderItemPrice}>Price: ${orderItem.price}</Text>
             <Text style={styles.orderItemQuantity}>Quantity: {orderItem.quantity}</Text>
@@ -201,8 +293,7 @@ const OrderList = ({ navigation }) => {
 )}
 
 
-{
-  item?.orderItems?.length > 0 && (
+{item?.orderItems?.length > 0 && (
     (item?.orderItems?.flat().every((orderItem) => orderItem.orderStatus === "Pending")) ||
       (item?.orderItems?.flat().some((orderItem) => orderItem.orderStatus === "Pending"))) && (
  <TouchableOpacity
@@ -213,7 +304,8 @@ const OrderList = ({ navigation }) => {
      item.orderItems
        .flat() 
        .filter((orderItem) => orderItem.orderStatus !== "Cancelled") 
-       .map((orderItem) => orderItem.product._id) 
+       .map((orderItem) => orderItem.product._id),
+    item
    )
  }
 >
@@ -234,7 +326,9 @@ const OrderList = ({ navigation }) => {
      item.orderItems
        .flat() 
        .filter((orderItem) => orderItem.orderStatus !== "Cancelled") 
-       .map((orderItem) => orderItem.product._id) 
+       .map((orderItem) => orderItem.product._id),
+    item  
+      
    )
  }
 >
@@ -255,7 +349,8 @@ const OrderList = ({ navigation }) => {
      item.orderItems
        .flat() 
        .filter((orderItem) => orderItem.orderStatus !== "Cancelled") 
-       .map((orderItem) => orderItem.product._id) 
+       .map((orderItem) => orderItem.product._id),
+    item  
    )
  }
 >
@@ -283,21 +378,27 @@ const OrderList = ({ navigation }) => {
   
         <Text style={styles.headerTitle}>Order List</Text>
       </View>
+      {orderloading ? (
+  <ActivityIndicator size="large" color="black" style={styles.loader} />
+) : (
+  <>
+    {filteredOrders && filteredOrders.length > 0 ? (
+      <FlatList
+        data={filteredOrders}
+        keyExtractor={(item) => item._id}  
+        renderItem={renderOrder}           
+        ItemSeparatorComponent={() => <View style={styles.separator} />} 
+        ListEmptyComponent={
+          <Text style={styles.noOrdersText}>No orders found.</Text>
+        }  
+      />
+    ) : (
+      <Text style={styles.noOrdersText}>No orders found.</Text>
+    )}
+  </>
+)}
   
-  
-      {orders && orders.length > 0 ? (
-        <FlatList
-          data={orders}
-          keyExtractor={(item) => item._id}  // Unique identifier for each order
-          renderItem={renderOrder}           // Function to render each item
-          ItemSeparatorComponent={() => <View style={styles.separator} />} // Optional separator
-          ListEmptyComponent={
-            <Text style={styles.noOrdersText}>No orders found.</Text>
-          }  // Custom message when no orders
-        />
-      ) : (
-        <Text style={styles.noOrdersText}>No orders found.</Text>
-      )}
+      
     </View>
   );
 };

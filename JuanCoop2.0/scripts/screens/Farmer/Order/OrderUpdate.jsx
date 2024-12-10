@@ -3,11 +3,10 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Ionicons } from '@expo/vector-icons';
 import styles from '../css/styles';
-
+import { useSocket } from '../../../SocketIo';
 const OrderUpdate = ({ route, navigation }) => {
   const { order } = route.params || {};
-
-  // State to manage form fields
+  const socket = useSocket();
   const [id, setId] = useState(order ? order.id : '');
   const [noOfItems, setNoOfItems] = useState(order ? order.no_of_items : '');
   const [totalPrice, setTotalPrice] = useState(order ? order.total_price : '');
@@ -29,8 +28,11 @@ const OrderUpdate = ({ route, navigation }) => {
       Alert.alert('Error', 'Please fill out all fields.');
       return;
     }
-
-    // Simulate saving data (you'll replace this with actual logic when the backend is ready)
+  
+  // socket.emit("sendNotification", {
+  //   senderName: 
+  // })
+    
     Alert.alert('Success', 'Order saved successfully.');
     navigation.goBack();
   };
@@ -58,7 +60,7 @@ const OrderUpdate = ({ route, navigation }) => {
           placeholder="Order ID"
           value={id}
           onChangeText={setId}
-          editable={false} // Make Order ID non-editable
+          editable={false} 
         />
         <TextInput
           style={styles.input}
