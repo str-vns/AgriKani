@@ -3,16 +3,9 @@ const validator = require("validator");
 const { RESOURCE } = require("../constants/index");
 
 const addressSchema = new mongoose.Schema({
-  fullName: {
+  address: {
     type: String,
-    required: [true, "Please enter the name!"],
-    maxLength: [100, "Product name cannot exceed 100 characters!"],
-  },
-  phoneNum: {
-    type: String,
-    required: [true, "Please enter your Last Name!"],
-    minlength: [11, "Phone Number must be 11 digits"],
-    maxlength: [11, "Phone Number must be 11 digits"],
+    required: [true, "Please enter the Address!"],
   },
   city: {
     type: String,
@@ -23,13 +16,17 @@ const addressSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please enter the Barangay!"],
   },
-  address: {
-    type: String,
-    required: [true, "Please enter the Address!"],
-  },
   postalCode: {
     type: String,
     required: [true, "Please enter the Postal Code!"],
+  },
+  latitude: {
+    type: String,
+    required: [true, "Please enter the Latitude!"],
+  },
+  longitude: {
+    type: String,
+    required: [true, "Please enter the Longitude!"],
   },
   userId: {
     type: mongoose.Schema.ObjectId,

@@ -99,6 +99,11 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  deviceToken: [
+    {
+      type: String,
+    }
+  ],
   resetPasswordToken: String,
   resetPasswordExpire: Date,
 });
