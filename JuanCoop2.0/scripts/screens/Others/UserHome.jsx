@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, Image, Button } from 'react-native';
-import MapView from 'react-native-maps';
+
 import FooterNav from '../../../components/footer'; 
 
 const UserHome = () => {
@@ -16,7 +16,7 @@ const UserHome = () => {
         </View>
 
         {/* Map View */}
-        <MapView
+        {/* <MapView
           style={styles.map}
           initialRegion={{
             latitude: 40.7128,
@@ -24,7 +24,7 @@ const UserHome = () => {
             latitudeDelta: 0.05,
             longitudeDelta: 0.05,
           }}
-        />
+        /> */}
 
         {/* Farmers List */}
         <View style={styles.farmerList}>
