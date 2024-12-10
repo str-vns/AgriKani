@@ -38,6 +38,9 @@ import {
   COUNT_USER_REQUEST, 
   COUNT_USER_SUCCESS,
   COUNT_USER_FAIL,
+  SAVE_USER_DEVICE_TOKEN_REQUEST,
+  SAVE_USER_DEVICE_TOKEN_SUCCESS,
+  SAVE_USER_DEVICE_TOKEN_FAIL,
 
 } from "../Constants/userConstants";
 import baseURL from "@assets/commons/baseurl";
@@ -516,6 +519,38 @@ export const countUsers = (token) => async (dispatch) => {
     console.log("Error from countUsers", errorMessage);
   }
 };
+
+export const saveDeviceToken = (saveDtoken) => async (dispatch) => {
+  try {
+    dispatch({ type: SAVE_USER_DEVICE_TOKEN_REQUEST });
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    console.log("Device Token:", saveDtoken);
+
+    const { data } = await axios.post(`${baseURL}deviceToken`, saveDtoken, config);
+    console.log("API Response:", data);
+
+    dispatch({
+      type: SAVE_USER_DEVICE_TOKEN_SUCCESS,
+      payload: data.details || "No details available", 
+    });
+  } catch (error) {
+    console.error("Error from saveDeviceToken:", error);
+
+    dispatch({
+      type: SAVE_USER_DEVICE_TOKEN_FAIL,
+      payload: error.response && error.response.data
+        ? error.response.data.message
+        : error.message,
+    });
+  }
+};
+
 export const clearRegister = () => async (dispatch) => {
   dispatch({
     type: CLEAR_REGISTER,

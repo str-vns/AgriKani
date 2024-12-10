@@ -12,6 +12,9 @@ import {
   ORDER_DELETE_REQUEST,
   ORDER_DELETE_SUCCESS,
   ORDER_DELETE_FAIL,
+  ORDER_COOP_USER_REQUEST,
+  ORDER_COOP_USER_SUCCESS,
+  ORDER_COOP_USER_FAIL
 } from '../Constants/orderConstants';
 import baseURL from '@assets/commons/baseurl';
 
@@ -152,3 +155,27 @@ export const deleteOrder = (productId, token) => async (dispatch, getState) => {
     });
   }
 };
+
+export const fetchCoopOrders = (coopId, token) => async (dispatch) => {
+
+  try{
+  
+    dispatch({ type: ORDER_COOP_USER_REQUEST });
+  
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  
+    const { data } = await axios.get(`${baseURL}coop/ordersList/${coopId}`, config);
+  
+    dispatch({ type: ORDER_COOP_USER_SUCCESS, payload: data.details });
+
+  } catch (error) {
+    dispatch({
+      type: ORDER_COOP_USER_FAIL,
+      payload: error.response ? error.response.data.message : error.message,
+    });
+  }
+}

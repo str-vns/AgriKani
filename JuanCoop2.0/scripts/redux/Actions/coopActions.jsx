@@ -31,7 +31,7 @@ import {
   
       formData.append("farmName", coop?.farmName);
       formData.append("address", coop?.address);
-      formData.append("barangay", coop?.lastName);
+      formData.append("barangay", coop?.barangay);
       formData.append("city", coop?.city);
       formData.append("postalCode", coop?.postalCode);
       formData.append("latitude", coop?.latitude);
@@ -66,12 +66,20 @@ import {
   };
   
   export const UpdateCoop = (coop, token) => async (dispatch) => {
+    console.log("coop", coop);
   
     try {
       dispatch({ type: COOP_UPDATE_REQUEST });
   
       const formData = new FormData();
       formData.append("farmName", coop?.farmName);
+      formData.append("address", coop?.address);
+      formData.append("barangay", coop?.barangay);
+      formData.append("city", coop?.city);
+      formData.append("postalCode", coop?.postalCode);
+      formData.append("latitude", coop?.latitude);
+      formData.append("longitude", coop?.longitude);
+
       if (coop?.image?.length) {
         coop?.image.forEach((imageUri) => {
           const newImageUri = "file:///" + imageUri.split("file:/").join("");
@@ -89,7 +97,7 @@ import {
           Authorization: `Bearer ${token}`,
           
         },
-        timeout: 10000,
+        timeout: 5000,
       };
   
   

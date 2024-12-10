@@ -23,27 +23,27 @@ export const addAddress = (addressData) => async (dispatch) => {
       payload: response.data.details,
     });
  // Success notification
- toast.success("Address added successfully!", {
-    position: "top-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-  });
+//  toast.success("Address added successfully!", {
+//     position: "top-right",
+//     autoClose: 5000,
+//     hideProgressBar: false,
+//     closeOnClick: true,
+//     pauseOnHover: true,
+//     draggable: true,
+//     progress: undefined,
+//   });
 } catch (error) {
   console.error("Error adding address:", error);
      // Error notification
-     toast.error("Failed to add address. Please try again.", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+    //  toast.error("Failed to add address. Please try again.", {
+    //     position: "top-right",
+    //     autoClose: 5000,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    //   });
     }
   };
 
