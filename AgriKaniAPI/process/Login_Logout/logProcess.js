@@ -3,6 +3,7 @@ const token = require("../../utils/token");
 const User = require("../../models/user");
 const ErrorHandler = require("../../utils/errorHandler");
 const { RESOURCE } = require("../../constants/index")
+
 const blacklistedTokens = [];
 // NOTE Three DOTS MEANS OK IN COMMENT
 
@@ -48,3 +49,19 @@ exports.LogoutUser = async (cookies, res) => {
 exports.getBlacklistedTokens = () => {
   return blacklistedTokens;
 };
+
+//Save Device Token ...
+exports.saveDeviceToken = async (req) => {
+  const user = await User.findOne({ email: req.body.email, }).exec();
+  const deviceToken = req.body.deviceToken;
+  if (!deviceToken) throw new ErrorHandler("Device Token is required");
+
+  if (!user.deviceToken.includes(deviceToken)){
+    user.deviceToken.push(deviceToken);
+    await user.save();
+    console.log("Device Token Saved");
+  } else {
+    console.log("Device Token Already Exists");
+    return "Device Token Already Exists";
+  }
+}

@@ -18,6 +18,7 @@ exports.CreateAddressProcess = async (req) => {
 //Read ...
 exports.GetAllAddressInfo = async () => {
   const address = await Address.find()
+    .populate({ path: "userId", select: "firstName lastName email image.url phoneNum" })
     .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
     .lean()
     .exec();
@@ -72,7 +73,9 @@ exports.singleAddress = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Address ID: ${id}`);
 
-  const addressProduct = await Address.find({ userId: id}).lean().exec();
+  const addressProduct = await Address.find({ userId: id})
+  .populate({ path: "userId", select: "firstName lastName email image.url phoneNum" })
+  .lean().exec();
 
   if (!addressProduct) throw new ErrorHandler(`Address not exist with ID: ${id}`);
 

@@ -47,27 +47,6 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
   return await order.save();
 };
 
-
-
-// Update order status
-// exports.updateOrderStatusProcess = async (orderId, status) => {
-//   if (!['Pending', 'Shipped', 'Delivered', 'Cancelled'].includes(status)) {
-//     throw new ErrorHandler("Invalid status", 400);
-//   }
-
-//   const order = await Order.findById(orderId);
-//   if (!order) {
-//     throw new ErrorHandler("Order not found", 404);
-//   }
-
-//   order.orderStatus = status;
-//   if (status === 'Delivered') {
-//     order.deliveredAt = Date.now();
-//   }
-
-//   return await order.save();
-// };
-
 exports.updateOrderStatusProcess = async (id, req) => {
   console.log(req.body.productId, "Request body");
 
@@ -120,15 +99,6 @@ exports.updateOrderStatusProcess = async (id, req) => {
 };
 
 
-// Delete an order
-// exports.deleteOrderProcess = async (orderId) => {
-//   const order = await Order.findById(orderId);
-//   if (!order) {
-//     throw new ErrorHandler("Order not found", 404);
-//   }
-
-//   await order.remove();
-// };
 exports.deleteOrderProcess = async (orderId) => {
   const order = await Order.findById(orderId);
   if (!order) {
@@ -148,7 +118,6 @@ exports.deleteOrderProcess = async (orderId) => {
   await order.remove();
 };
 
-// Get order by user ID
 exports.getOrderById = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ErrorHandler(`Invalid User ID: ${id}`, 400);
@@ -207,6 +176,31 @@ exports.updateOrderStatusCoop = async (id, req) => {
 
  return order
 }
+
+exports.getCoopOrderById = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ErrorHandler(`Invalid User ID: ${id}`, 400);
+  }
+
+  const orders = await Order.find({ "orderItems.productUser": id })
+    .populate({ path: "user", select: "firstName lastName email image.url" })
+    .populate({ path: "orderItems.product", select: "user productName pricing price image.url", match: { user: id } })
+    .populate({ path: "shippingAddress", select: "address city phoneNum" })
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
+
+  if (!orders || orders.length === 0) {
+    throw new ErrorHandler(`No orders found for user ID: ${id}`, 404);
+  }
+
+  const filteredOrders = orders.filter(order =>
+    order.orderItems.every(item => item.productUser !== id)
+  );
+
+  return filteredOrders;
+}
+
 exports.getRankedProducts = async () => {
   try {
     // Aggregate orders to get the total quantity sold for each product
@@ -248,6 +242,7 @@ exports.getRankedProducts = async () => {
     throw error;  // Rethrow the error to be handled by the controller
   }
 };
+
 exports.getDailySalesReport = async () => {
   // Get the start of the current day (midnight)
   const startOfDay = new Date();

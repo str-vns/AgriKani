@@ -219,6 +219,7 @@ exports.deleteImage = async (id, imageId) => {
   console.log('Image deleted successfully');
   return { message: 'Image deleted successfully' };
 }
+
 exports.getRankedProducts = async (req, res, next) => {
   try {
     const rankedProducts = await Product.aggregate([
