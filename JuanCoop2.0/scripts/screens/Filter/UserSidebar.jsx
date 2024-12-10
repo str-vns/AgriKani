@@ -47,7 +47,11 @@ const UserSidebar = () => {
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Product", icon: "cube-outline", key: "product" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
-    { label: "Product Archive",icon: "archive-outline",key: "productArchive", },
+    {
+      label: "Product Archive",
+      icon: "archive-outline",
+      key: "productArchive",
+    },
     { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Community Forum", icon: "create-outline", key: "Forum" },
     { label: "Orders", icon: "clipboard-outline", key: "orders" },
@@ -55,7 +59,7 @@ const UserSidebar = () => {
 
   const AdminItems = [
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
-    { label: "User", icon: "person-circle-outline", key: "user" },//
+    { label: "User", icon: "person-circle-outline", key: "user" }, //
     { label: "Cooperative", icon: "storefront-outline", key: "coop" },
     { label: "News", icon: "newspaper-outline", key: "news" }, //how to declare this
     { label: "Community", icon: "people-outline", key: "community" },
@@ -72,19 +76,18 @@ const UserSidebar = () => {
     setActiveItem(key);
 
     if (key === "home") {
-      navigation.navigate("Home");
+      navigation.navigate("Home", { screen: "ProductContainer" });
     } else if (key === "profile") {
       navigation.navigate("Profile");
     } else if (key === "messages") {
       navigation.navigate("Messages");
     } else if (key === "address") {
       navigation.navigate("UserAddress");
-    }else if (key === "track-order") {
+    } else if (key === "track-order") {
       navigation.navigate("UserOrderList");
     } else if (key === "CoopDistance") {
       navigation.navigate("Home", { screen: "CoopDistance" });
     }
-
   };
 
   const NoPress = (key) => {
@@ -111,12 +114,11 @@ const UserSidebar = () => {
       navigation.navigate("productArchive");
     } else if (key === "product") {
       navigation.navigate("ProductsList");
-    }else if (key === "news") {
+    } else if (key === "news") {
       navigation.navigate("BlogLists");
-    }else if (key === "Forum") {
+    } else if (key === "Forum") {
       navigation.navigate("CommunityForum");
-    } else if (key === "orders")
-    {
+    } else if (key === "orders") {
       navigation.navigate("OrderList");
     }
     // Add other navigation conditions for different items
@@ -136,7 +138,7 @@ const UserSidebar = () => {
       navigation.navigate("BlogList");
     } else if (key === "community") {
       navigation.navigate("PostList");
-    }else if (key === "barGraph") {
+    } else if (key === "barGraph") {
       navigation.navigate("barGraph");
     }
   };
@@ -163,6 +165,7 @@ const UserSidebar = () => {
             <Text style={styles.profileName}>
               {user?.firstName} {user?.lastName}
             </Text>
+            <Text style={styles.profileRole}>Cooperative</Text>
           </>
         ) : context?.stateUser?.isAuthenticated &&
           userInfo?.roles &&
@@ -175,20 +178,10 @@ const UserSidebar = () => {
             <Text style={styles.profileName}>
               {user?.firstName} {user?.lastName}
             </Text>
+            <Text style={styles.profileRole}>User</Text>
           </>
-        ) : null}
-
-        {context?.stateUser &&
-        context?.stateUser?.isAuthenticated &&
-        userInfo.roles.includes("Customer") ? (
-          <Text style={styles.profileRole}>User</Text>
-        ) : context?.stateUser &&
-          context?.stateUser?.isAuthenticated &&
-          userInfo.roles.includes("Customer") &&
-          userInfo.roles.includes("Cooperative") ? (
-          <Text style={styles.profileRole}>Cooperative</Text>
-        ) : context?.stateUser &&
-          context?.stateUser?.isAuthenticated &&
+        ) : context?.stateUser?.isAuthenticated &&
+          userInfo?.roles &&
           userInfo.roles.includes("Admin") ? (
           <Text style={styles.profileRole}>Admin</Text>
         ) : null}
@@ -204,35 +197,35 @@ const UserSidebar = () => {
       userslogin?.roles[1] &&
       userslogin?.roles[1]?.includes("Cooperative") ? (
         <>
-        <ScrollView>
-          <View style={styles.menuContainer}>
-            {CoopItems.map((item) => (
-              <TouchableOpacity
-                key={item.key}
-                style={[
-                  styles.menuItem,
-                  activeItem === item.key
-                    ? { backgroundColor: "#fef8e5" }
-                    : null,
-                ]}
-                onPress={() => CoopPress(item.key)}
-              >
-                <Ionicons
-                  name={item.icon}
-                  size={24}
-                  color={activeItem === item.key ? "#000" : "#666"}
-                />
-                <Text
+          <ScrollView>
+            <View style={styles.menuContainer}>
+              {CoopItems.map((item) => (
+                <TouchableOpacity
+                  key={item.key}
                   style={[
-                    styles.menuLabel,
-                    activeItem === item.key ? styles.activeLabel : null,
+                    styles.menuItem,
+                    activeItem === item.key
+                      ? { backgroundColor: "#fef8e5" }
+                      : null,
                   ]}
+                  onPress={() => CoopPress(item.key)}
                 >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                  <Ionicons
+                    name={item.icon}
+                    size={24}
+                    color={activeItem === item.key ? "#000" : "#666"}
+                  />
+                  <Text
+                    style={[
+                      styles.menuLabel,
+                      activeItem === item.key ? styles.activeLabel : null,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </ScrollView>
           <View style={styles.footerContainer}>
             <TouchableOpacity
