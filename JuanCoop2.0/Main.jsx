@@ -14,6 +14,7 @@ import UserNavigators from "@navigators/UserNavigators";
 import CoopProductNavigators from "@navigators/CoopProductNavigators";
 import MessagesNavigators from "@navigators/MessagesNavigators";
 import BlogNavigators from "@navigators/BlogNavigators";
+
 import AuthGlobal from "@redux/Store/AuthGlobal";
 
 const Stack = createStackNavigator();
@@ -25,7 +26,7 @@ const Main = () => {
 
   const handleBackPress = () => {
     const currentRoute = navigation.getCurrentRoute()?.name;
-
+    console.log("Current Route:", navigation.getCurrentRoute());
     if (currentRoute === "Coop") { 
       Alert.alert("Exit App", "Exiting the application?", [
         {
