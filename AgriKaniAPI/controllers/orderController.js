@@ -113,6 +113,14 @@ exports.GetOrderUser = asyncHandler(async (req, res, next) => {
   
 });
 
+exports.GetOrderCoop = asyncHandler(async (req, res, next) => {
+  const Orders = await orderProcess.getCoopOrderById(req.params.id);
+
+  return Orders?.length === STATUSCODE.ZERO
+      ? next(new ErrorHandler("No User Order Found", STATUSCODE.NOT_FOUND))
+      : SuccessHandler(res, "All orders fetched successfully", Orders);
+});
+
 exports.updateOrderStatusCoop = asyncHandler(async (req, res, next) => {
   try {
     const updatedOrder = await orderProcess.updateOrderStatusCoop(req.params.id, req);
@@ -121,7 +129,6 @@ exports.updateOrderStatusCoop = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
   }
 });
-
 
 exports.getReceipt = asyncHandler(async (req, res, next) => {
   const { orderId } = req.params;
@@ -140,8 +147,6 @@ exports.getReceipt = asyncHandler(async (req, res, next) => {
     }
   });
 });
-
-
 
 exports.getDailySalesReport = asyncHandler(async (req, res, next) => {
   try {

@@ -32,3 +32,12 @@ exports.logout = asyncHandler(async (req, res) => {
 
   return SuccessHandler(res, "User Successfully Logout", cookies);
 });
+
+exports.DeviceToken = [
+  FieldMonitor(["deviceToken"]),
+  asyncHandler(async (req, res) => {
+    const user = await logProcess.saveDeviceToken(req);
+
+    return SuccessHandler(res, "Device Token has been saved", user);
+  }),
+]

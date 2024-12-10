@@ -7,14 +7,12 @@ const { STATUSCODE } = require("../constants/index");
 
 exports.AddressCreate = [
   CheckField([
-    "fullName",
-    "phoneNum",
-    "region",
-    "province",
     "city",
     "barangay",
     "address",
     "postalCode",
+    "latitude",
+    "longitude",
   ]),
   asyncHandler(async (req, res) => {
     const address = await addressProcess.CreateAddressProcess(req);
@@ -37,14 +35,12 @@ exports.AddressRead = asyncHandler(async (req, res, next) => {
 
 exports.AddressUpdate = [
   CheckField([
-    "fullName",
-    "phoneNum",
-    "region",
-    "province",
     "city",
     "barangay",
     "address",
     "postalCode",
+    "latitude",
+    "longitude",
   ]),
   asyncHandler(async (req, res) => {
     const address = await addressProcess.UpdateAddressInfo(req, req.params.id);
