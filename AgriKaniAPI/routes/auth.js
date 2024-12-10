@@ -17,6 +17,12 @@ const authRoutes = [
     middleware: [],
     handler: authController.logout,
   },
+  {
+    method: METHOD.POST,
+    path: PATH.USER_DEVICE_TOKEN,
+    middleware: [],
+    handler: authController.DeviceToken,
+  },
 ];
 
 authRoutes.forEach((route) => {

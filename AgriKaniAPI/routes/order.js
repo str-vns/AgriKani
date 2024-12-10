@@ -40,6 +40,12 @@ const orderRoutes = [
     roles: [],
     handler: orderController.updateOrderStatusCoop,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.COOP_USER_ORDERS_ID,
+    roles: [],
+    handler: orderController.GetOrderCoop,
+  }
 ];
 
 orderRoutes.forEach((route) => {
