@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useContext  } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux';
@@ -141,7 +141,10 @@ const UserOTP = (props) => {
       </View>
       {errors ? <Error message={errors} /> : null}
       <TouchableOpacity style={styles.verifyButton} onPress={handleVerify}>
-        <Text style={styles.buttonText}>Verify</Text>
+        {loading ? (<ActivityIndicator size="small" color="#fff" /> )
+        : 
+        (<Text style={styles.buttonText}>Verify</Text>)}
+        
       </TouchableOpacity>
 
       <TouchableOpacity

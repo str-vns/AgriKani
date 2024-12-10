@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -8,8 +8,11 @@ import Error from "@shared/Error";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSocket } from "../../../SocketIo";
 import styles from "@screens/stylesheets/UserRegis/UserSignIn";
-
+import messaging from '@react-native-firebase/messaging';
+import { saveDeviceToken } from "@redux/Actions/userActions";
+import { useDispatch } from "react-redux";
 const UserSignIn = () => {
+  const dispatch = useDispatch();
   const socket = useSocket();
   const context = useContext(AuthGlobal);
   const navigation = useNavigation();
@@ -17,7 +20,9 @@ const UserSignIn = () => {
   const [password, setPassword] = useState("");
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [isPasswordVisible, setPasswordVisible] = useState(false);
+  const [fcmToken, setFcmToken] = useState("");
   const [error, setError] = useState("");
   const userInfo = context?.stateUser?.user?.CustomerInfo;
   const user = context?.stateUser?.userProfile;
@@ -39,6 +44,52 @@ const UserSignIn = () => {
     };
   }, [socket, user?._id]);
 
+  const requestUserPermission = async () => {
+    const authStatus = await messaging().requestPermission();
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        console.log("Authorization status:", authStatus)
+      }
+  }
+
+  useEffect(() => {
+    if(requestUserPermission())
+    {
+      messaging()
+      .getToken()
+      .then(token => {
+        setFcmToken(token);
+      })
+    } else {
+      console.log("No permission granted", authStatus)
+    }
+    
+    messaging()
+    .getInitialNotification()
+    .then(async (remoteMessage) => {
+      if (remoteMessage) {
+        console.log("Notification caused app to open from quit state:", remoteMessage.notification);
+      }
+    })
+
+    messaging().onNotificationOpenedApp((remoteMessage) => {
+      console.log("Notification caused app to open from background state:", remoteMessage.notification);
+    })
+
+    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+      console.log("Message handled in the background:", remoteMessage);
+    })
+
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+      Alert.alert("A new FCM message arrived!", JSON.stringify(remoteMessage));
+    })
+
+    return unsubscribe;
+  }, [])
+
   useEffect(() => {
     if (
       context?.stateUser?.isAuthenticated &&
@@ -46,37 +97,79 @@ const UserSignIn = () => {
       userInfo.roles.includes("Customer") &&
       userInfo.roles.includes("Cooperative")
     ) {
-      console.log("Navigating to Dashboard");
-      navigation.navigate("CoopDashboard");
+      const saveDtoken = 
+      {
+        email: email,
+        deviceToken: fcmToken
+      }
+
+      dispatch(saveDeviceToken(saveDtoken));
       setEmail("");
       setPassword("");
       setError("");
+      navigation.navigate("CoopDashboard");
+      
     } else if (
       context?.stateUser?.isAuthenticated &&
       userInfo?.roles &&
       userInfo.roles.includes("Admin")
     ) {
-      console.log("Navigating to Admin Dashboard");
-      navigation.navigate("Admin");
+      const saveDtoken = 
+      {
+        email: email,
+        deviceToken: fcmToken
+      }
+
+      dispatch(saveDeviceToken(saveDtoken));
       setEmail("");
       setPassword("");
       setError("");
+
+      console.log("Navigating to Admin Dashboard");
+      navigation.navigate("Admin");
     } else if (context?.stateUser?.isAuthenticated) {
-      console.log("Navigating to Home");
-      navigation.navigate("Home", { screen: "Home" });
+      const saveDtoken = 
+      {
+        email: email,
+        deviceToken: fcmToken
+      }
+      
+      dispatch(saveDeviceToken(saveDtoken));
       setEmail("");
       setPassword("");
+      setError("");
+      console.log("Navigating to Home");
+      navigation.navigate("Home", { screen: "Home" });
+    } else if (context?.stateUser?.isAuthenticated === false) {
+      setError("Either Email or Password is incorrect");
+      setTimeout(() => {
+        setError("");
+      }, 5000);   
+    } else {
       setError("");
     }
   }, [context.stateUser.isAuthenticated]);
 
   const handleSubmit = () => {
-    // Check if email or password is empty
-    if (email === "" || password === "") {
-      setError("Please fill in the required fields");
-    } else {
-      const user = { email, password };
-      loginUser(user, context.dispatch);
+    setIsLoading(true)
+    try{
+      if (email === "" || password === "") 
+        {
+        setIsLoading(false);
+        setError("Please fill in the required fields");
+      } 
+       else if (!email || !email.includes('@') )
+      {
+        setIsLoading(false);
+        setError("Please provide a valid email address.");
+      }
+      else {
+        const user = { email, password };
+        loginUser(user, context.dispatch);
+        setIsLoading(false);
+      }
+    }catch(error){
+      setError("Login Failed. Please try again.");  
     }
   };
 
@@ -100,6 +193,7 @@ const UserSignIn = () => {
     fetchAllStorage();
   }, []);
 
+ 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>AgriKaani</Text>
@@ -155,8 +249,13 @@ const UserSignIn = () => {
       <TouchableOpacity
         style={styles.buttonEmail}
         onPress={() => handleSubmit()}
+        disabled={isLoading}
       >
-        <Text style={styles.buttonText}>Login</Text>
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Login</Text>
+        )}
       </TouchableOpacity>
 
       <View style={styles.divider}>
