@@ -1,11 +1,11 @@
 import React, {  useContext,  useEffect,  useRef,  useState, } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image,  ScrollView,  Button,  Modal, } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image,  ScrollView,  Button,  Modal, ActivityIndicator, } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { FlatList } from "native-base";
 import { useDispatch, useSelector } from "react-redux";
 import { reverseCode, forwardCode } from "@redux/Actions/locationActions";
 import { registerCoop } from "@redux/Actions/coopActions";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import styles from "@screens/stylesheets/farmRegister";
@@ -18,11 +18,9 @@ const FarmRegistration = ({ navigation }) => {
   const navigate = useNavigation();
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
-  const draggingTimeout = useRef(null);
   const webViewRef = useRef(null);
   const userInfo = context.stateUser?.userProfile?._id;
   const { GeoLoading, location, GeoError } = useSelector((state) => state.Geolocation);
-  const { authentication } = useSelector((state) => state.Coop);
   const [farmName, setFarmName] = useState("");
   const [address, setAddress] = useState("");
   const [myaddress, setMyAddress] = useState("");
@@ -32,16 +30,14 @@ const FarmRegistration = ({ navigation }) => {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [image, setImage] = useState([]);
-  const [coordinates, setCoordinates] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState(null);
-  const [previousLocation, setPreviousLocation] = useState(null);
-  const [mapRegion, setMapRegion] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [token, setToken] = useState("");
-  const [markerCoordinate, setMarkerCoordinate] = useState({ lat: 37.78825, lng: -122.4324, });
+  const [markerCoordinate, setMarkerCoordinate] = useState({  lat: 14.5995,
+    lng: 120.9842, });
   const [mainImage, setMainImage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   //token
   useEffect(() => {
@@ -73,13 +69,6 @@ const FarmRegistration = ({ navigation }) => {
         const { latitude, longitude } = location.coords;
 
         setMarkerCoordinate({ lat: latitude, lng: longitude });
-        setMapRegion({
-          latitude,
-          longitude,
-          latitudeDelta: 0.002,
-          longitudeDelta: 0.002,
-        });
-
         dispatch(reverseCode(latitude, longitude));
       } catch (error) {
         console.error("Error getting Location:", error);
@@ -109,12 +98,6 @@ const FarmRegistration = ({ navigation }) => {
     }
   }, [markerCoordinate]);
 
-  const handleMessage = (event) => {
-    const { lat, lng } = JSON.parse(event.nativeEvent.data);
-    setMarkerCoordinate({ lat, lng });
-    dispatch(reverseCode(lat, lng));
-  };
-
   const handleMarkerDragEnd = (event) => {
     const { lat, lng } = JSON.parse(event.nativeEvent.data);
     setMarkerCoordinate({ lat, lng });
@@ -125,14 +108,6 @@ const FarmRegistration = ({ navigation }) => {
     const aAddress = result;
     const locations = result.position;
     setMarkerCoordinate(locations);
-    setCoordinates(locations);
-    setMapRegion({
-      latitude: locations.lat,
-      longitude: locations.lng,
-      latitudeDelta: 0.002,
-      longitudeDelta: 0.002,
-    });
-    // setErrorMessage(`Selected Location:\nLatitude: ${location.lat}\nLongitude: ${location.lng}`);
     setAddress("");
     setMyAddress(aAddress.address.label);
     setBarangay(aAddress.address.district);
@@ -143,29 +118,6 @@ const FarmRegistration = ({ navigation }) => {
     setModalVisible(false);
   };
 
-
-  // const handleMarkerDrag = (e) => {
-  //   const { latitude, longitude } = e.nativeEvent.coordinate;
-  //   setMarkerCoordinate({ lat: latitude, lng: longitude });
-  //   if (draggingTimeout.current) {
-  //     clearTimeout(draggingTimeout.current);
-  //   }
-  //   draggingTimeout.current = setTimeout(() => {
-  //     setMapRegion({
-  //       latitude,
-  //       longitude,
-  //       latitudeDelta: 0.002,
-  //       longitudeDelta: 0.002,
-  //     });
-  //   }, 2000);
-  // };
-
-
-  // const handleMarkerDragEnd = async (e) => {
-  //   const { latitude, longitude } = e.nativeEvent.coordinate;
-  //   dispatch(reverseCode(latitude, longitude));
-  // };
-  
   const forwardGeoCode = async () => {
     if (address === "") {
       setErrorMessage("Please enter an address to search");
@@ -175,16 +127,6 @@ const FarmRegistration = ({ navigation }) => {
     dispatch(forwardCode(address));
     setErrorMessage("");
   };
-
-  if (GeoError) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text>Error: {GeoError}</Text>
-      </View>
-    );
-  }
-
-  const noLocations = !location || location.length === 0;
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -213,7 +155,9 @@ const deleteImage = (index) => {
 }
 
   const handleRegisterFarm = () => {
-
+    setIsLoading(true);
+    try
+    {
       if(!farmName || !myaddress || !city || !barangay || !postalCode || !image.length) {
         setErrors("Please fill in all fields and select an image");
           return;
@@ -242,7 +186,13 @@ const deleteImage = (index) => {
       setLongitude("");
       setErrors(null);
 
-        navigate.navigate("CoopDashboard");
+      navigate.navigate("CoopDashboard");
+
+    } catch (error) {
+      console.error("Error registering farm: ", error);
+      setErrors("Error registering farm. Please try again.");
+      setIsLoading(false);
+    }
 
   };
 
@@ -316,11 +266,7 @@ const deleteImage = (index) => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Farm Registration</Text>
       </View>
-      {/* <Text>{`Current Location: ${
-        previousLocation
-          ? `Lat: ${previousLocation.latitude}, Long: ${previousLocation.longitude}`
-          : "Locating..."
-      }`}</Text> */}
+
         <View style={styles.mapContainer}>
             <WebView
         ref={webViewRef}
@@ -403,7 +349,7 @@ const deleteImage = (index) => {
           style={styles.registerButton}
           onPress={() => handleRegisterFarm()}
         >
-          <Text style={styles.registerButtonText}>Register Cooperative</Text>
+          {isLoading ? (  <ActivityIndicator size="small" color="#fff" /> ) : (   <Text style={styles.registerButtonText}>Register Cooperative</Text>)}
         </TouchableOpacity>
       </ScrollView>
       <Modal
@@ -427,16 +373,21 @@ const deleteImage = (index) => {
                 style={styles.searchButton}
                 onPress={forwardGeoCode}
               >
-                <Text style={styles.searchButtonText}>🔍</Text>
+              {GeoLoading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.searchButtonText}>🔍</Text>
+                )}
               </TouchableOpacity>
             </View>
             {errorMessage ? (
+                <View style={styles.errorContainer}> 
               <Text style={styles.error}>{errorMessage}</Text>
+              </View>
             ) : null}
 
-            {noLocations ? (
+            {GeoError ? (
               <>
-                <Text>No locations found</Text>
                 <Button title="Close" onPress={() => setModalVisible(false)} />
               </>
             ) : (

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';  // Import the dropdown picker
-import Icon from 'react-native-vector-icons/Feather';  // Feather icons
+import DropDownPicker from 'react-native-dropdown-picker';  
+import Icon from 'react-native-vector-icons/Feather'; 
 
 const FarmerRegistration = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
