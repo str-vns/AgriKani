@@ -21,4 +21,5 @@ module.exports = {
     BLOG: "blog",
     PRODUCTION: "production",
     INVENTORYM: "inventorym",
+    NOTIFICATION: "notification",
 }

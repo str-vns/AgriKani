@@ -4,9 +4,9 @@ module.exports = {
     USERS: "/users",
     USER_ID: "/users/:id",
     SINGLE_USER: "/user/:id",
-
-    RESTORE_ID: "/restore/users/:id", // Restore user route
-    SOFTDELETE_USER_ID: "/users/softdel/:id", // Soft delete user route
+    USER_DEVICE_TOKEN: "/deviceToken",
+    RESTORE_ID: "/restore/users/:id", 
+    SOFTDELETE_USER_ID: "/users/softdel/:id", 
 
     RESTORE_ID: "/restore/users/:id",
     WISH_USER_ID: "/wish/users/:productId/:id",
@@ -35,6 +35,7 @@ module.exports = {
     ADDRESS_ID: "/address/:id",
     FARM: "/farm",
     FARM_ID: "/farm/:id",
+    COOP_USER_ORDERS_ID: "/coop/ordersList/:id",
     COOP_ID_ORDERS: "/coop/orders/:id",
     COOP_ID_UPDATE_ORDERS: "/coop/orders/edit/:id",
     IMAGE_FARM_DELETE: "/farm/image/:id/:imageId",
@@ -65,14 +66,11 @@ module.exports = {
     TYPE: "/type",
     TYPE_ID: "/type/:id",
 
-    
-     // Blog Routes
-     BLOG: "/blog",                // Route to create and get blogs
-     BLOG_ID: "/blog/:id",          // Route to update, delete, and get a single blog
-     RESTORE_BLOG_ID: "/restore/blog/:id",  // Route to restore a deleted blog
+     BLOG: "/blog",             
+     BLOG_ID: "/blog/:id",         
+     RESTORE_BLOG_ID: "/restore/blog/:id", 
      BLOG_USER_ID: "/blog/user/:id", 
 
-     //DASHBOARD DETAILS
      TOTAL_USERS: "/users/count",
      TOTAL_TYPE_USERS:"/users/type",
 
@@ -80,5 +78,12 @@ module.exports = {
      WEEKLY_SALES_REPORT: "/order/weekly",
      MONTHLY_SALES_REPORT: "/order/monthly",
 
+     NOTIFICATION: "/notification",
+     NOTIFICATION_ID: "/notification/:id",
+     NOTIFICATION_READ: "/notification/read/:id",
+     NOTIFICATION_READ_ALL: "/notification/read/all/:id",
+
+
+  
 
 }
