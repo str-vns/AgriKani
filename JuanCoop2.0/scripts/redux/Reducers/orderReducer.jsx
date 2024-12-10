@@ -11,6 +11,9 @@ import {
     ORDER_DELETE_REQUEST,
     ORDER_DELETE_SUCCESS,
     ORDER_DELETE_FAIL,
+    ORDER_COOP_USER_REQUEST,
+    ORDER_COOP_USER_SUCCESS,
+    ORDER_COOP_USER_FAIL,
   } from '../Constants/orderConstants';
   
   const initialState = {
@@ -62,3 +65,19 @@ import {
         return state;
     }
   };  
+
+  export const orderCoopReducer = (state = { order: {} }, action) => {
+    switch (action.type) {
+      case ORDER_COOP_USER_REQUEST:
+        return { orderloading: true, orders: {} };
+  
+      case ORDER_COOP_USER_SUCCESS:
+        return { orderloading: false, orders: action.payload };
+  
+      case ORDER_COOP_USER_FAIL:
+        return { orderloading: false, ordererror: action.payload };
+  
+      default:
+        return state;
+    }
+  }

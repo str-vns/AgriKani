@@ -8,7 +8,7 @@ export default function (state, action) {
             ...state,
             isAuthenticated: !isEmpty(action.payload),
             user: action.payload,
-            userProfile: action.userProfile
+            userProfile: action.userProfile,
         };
         default:
             return state;

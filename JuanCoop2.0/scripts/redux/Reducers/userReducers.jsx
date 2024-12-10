@@ -49,6 +49,10 @@ import {
   GET_USER_COUNT_REQUEST,
   GET_USER_COUNT_SUCCESS,
   GET_USER_COUNT_FAIL,
+
+  SAVE_USER_DEVICE_TOKEN_REQUEST,
+  SAVE_USER_DEVICE_TOKEN_SUCCESS,
+  SAVE_USER_DEVICE_TOKEN_FAIL,
 } from "../Constants/userConstants";
 
 export const RegisterReducer = (state = { user: {} }, action) => {
@@ -249,3 +253,18 @@ export const userCountReducer = (state = { count: 0 }, action) => {
       return state;
   }
 };
+
+export const userDeviceTokenReducer = (state = { deviceToken: "" }, action) => {
+  switch (action.type) {
+    case SAVE_USER_DEVICE_TOKEN_REQUEST:
+      return { ...state, loading: true };
+    case SAVE_USER_DEVICE_TOKEN_SUCCESS:
+      return { loading: false, deviceToken: action.payload };
+    case SAVE_USER_DEVICE_TOKEN_FAIL:
+      return { loading: false, error: action.payload };
+    case CLEAR_ERRORS:
+      return { ...state, error: null };
+    default:
+      return state;
+  }
+}
