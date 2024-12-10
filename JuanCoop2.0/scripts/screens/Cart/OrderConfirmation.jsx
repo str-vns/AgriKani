@@ -82,7 +82,7 @@ const OrderConfirmation = ({ route }) => {
           <Text style={styles.receiptButtonText}>Generate Receipt</Text>
         )}
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("ProductContainer")}>
+      <TouchableOpacity onPress={() => navigation.navigate("Home", { screen: "Home" })}>
         <Text style={styles.backToHome}>Back to Dashboard</Text>
       </TouchableOpacity>
     </View>

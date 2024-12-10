@@ -1,26 +1,29 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAddresses, deleteAddress } from "@src/redux/Actions/addressActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from "@react-navigation/native";
 
 const AddressList = ({ route, navigation }) => {
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
   const { cartItems } = route.params;
-
   const dispatch = useDispatch();
   const addresses = useSelector((state) => state.addresses.data);
   const loading = useSelector((state) => state.addresses.loading);
   const error = useSelector((state) => state.addresses.error);
   const [selectedAddress, setSelectedAddress] = useState(null);
-
-  useEffect(() => {
+console.log("address",addresses)
+useFocusEffect(
+  useCallback(() => {
     if (userId) {
       dispatch(fetchAddresses(userId));
     }
-  }, [dispatch, userId]);
+  },[dispatch, userId])
+)
+
 
   const handleDelete = (id) => {
     Alert.alert(
@@ -40,7 +43,7 @@ const AddressList = ({ route, navigation }) => {
   };
 
   const handleEdit = (address) => {
-    navigation.navigate('AddressForm', { addressData: address, isEdit: true });
+    navigation.navigate('AddressEdit', { addressData: address });
   };
 
   const handleSelectAddress = (address) => {
@@ -72,13 +75,10 @@ const AddressList = ({ route, navigation }) => {
             style={styles.addressContainer}
           >
             <View style={styles.titleRow}>
-              <Text style={styles.addressTitle}>{address.fullName}</Text>
+              <Text style={styles.addressTitle}>{address.address},  {address.barangay}, {address.city}</Text>
               <Ionicons name="location-outline" size={20} color="#f7b900" />
             </View>
-            <Text style={styles.addressText}>Phone: {address.phoneNum}</Text>
-            <Text style={styles.addressText}>
-              {address.address}, {address.barangay}, {address.city}, {address.province}, {address.region}
-            </Text>
+            <Text style={styles.addressText}>Phone: {address.userId?.phoneNum}</Text>
             <Text style={styles.addressText}>Postal Code: {address.postalCode}</Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
