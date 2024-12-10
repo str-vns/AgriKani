@@ -6,8 +6,8 @@ import {
   import { thunk } from "redux-thunk";
   
   import cartItems from "@redux/Reducers/cartItems";
-  import { orderReducer } from "./Reducers/orderReducer";
-  import { OTPReducer, RegisterReducer, userReducer, EditProfileReducer, getUsersReducers, AllUsersReducer } from "@redux/Reducers/userReducers";
+  import { orderReducer, orderCoopReducer } from "./Reducers/orderReducer";
+  import { OTPReducer, RegisterReducer, userReducer, EditProfileReducer, getUsersReducers, AllUsersReducer, userDeviceTokenReducer  } from "@redux/Reducers/userReducers";
   import { reducerProduct, reducerCoop, reducerCoopProduct, reducerCreateProduct, reducerEditProduct, reducerDelResProduct } from "@redux/Reducers/productReducers";
   import { HereMapReducer } from "@redux/Reducers/locationReducers";
   import { coopYReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer } from "@redux/Reducers/coopReducers";
@@ -18,10 +18,11 @@ import {
   import { messageListReducer, sendMessageReducer } from "@redux/Reducers/messageReducers";
   import { commentcreateReducers } from "./Reducers/commentReducers";
   import { reducerBlog, reducerSingleBlog, reducerCreateBlog, reducerEditBlog, reducerDelBlog } from "@redux/Reducers/blogReducer";
-  
+  import { sendNotificationReducers, getNotificationReducers, readNotificationReducers } from "@redux/Reducers/notificationReducers";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
+
   const reducers = combineReducers({
     cartItems: cartItems,
     orders: orderReducer,
@@ -58,6 +59,11 @@ import {
     post: postReducer,
     sales: salesReducer,
     rank: rankedReducer,
+    udeviceToken: userDeviceTokenReducer,
+    sendNotification: sendNotificationReducers,
+    coopOrdering: orderCoopReducer,
+    getNotif: getNotificationReducers,
+    readNotif: readNotificationReducers,
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));
