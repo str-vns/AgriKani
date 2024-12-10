@@ -18,6 +18,7 @@ import Cart from "@src/screens/Cart/UserCart";
 import UserFooter from "@screens/Others/UserFooter";
 import SearchProduct from "@screens/Filter/SearchProduct";
 import CoopDistance from "@screens/User/UserDistance";
+import NotificationList from "@screens/Notification/NotificationList";
 
 const Stack = createStackNavigator();
 
@@ -45,6 +46,12 @@ const HomeNavigation = () => {
           component={Messages}
           options={{ headerShown: true }}
         />
+
+      <Stack.Screen
+        name="NotificationList"
+        component={NotificationList}
+        options={{ headerShown: false }}
+      />
 
         <Stack.Screen
           name="ChatMessages"

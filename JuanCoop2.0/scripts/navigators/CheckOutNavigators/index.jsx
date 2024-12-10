@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 const Stack = createNativeStackNavigator();
 import AddressList from "@src/screens/Cart/AddressList";
 import AddressForm from "@src/screens/Cart/AddressForm";
+import AddressEdit from "@screens/Cart/AddressEdit";
 import Payment from "@src/screens/Cart/UserPayment";
 import Review from "@src/screens/Cart/UserReview";
 import OrderConfirmation from "@src/screens/Cart/OrderConfirmation";
@@ -18,6 +19,11 @@ const Index = () => {
       <Stack.Screen
         name="AddressForm"
         component={AddressForm}
+        options={{ headerShown: true }}
+      />
+      <Stack.Screen
+        name="AddressEdit"
+        component={AddressEdit}
         options={{ headerShown: true }}
       />
       <Stack.Screen
