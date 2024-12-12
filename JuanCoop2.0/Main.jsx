@@ -97,10 +97,10 @@ const Main = () => {
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-          <Stack.Screen name="Reviews" component={ReviewsNavigators} />
           <Stack.Screen name="Address" component={AddressNavigators} />
           <Stack.Screen name="CheckOut" component={CheckOutNavigators} />
           <Stack.Screen name="User" component={UserNavigators} />
+          <Stack.Screen name="Reviews" component={ReviewsNavigators} />
         </Stack.Navigator>
       );
     }
