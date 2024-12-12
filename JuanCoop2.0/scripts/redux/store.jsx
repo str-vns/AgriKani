@@ -19,6 +19,7 @@ import {
   import { commentcreateReducers } from "./Reducers/commentReducers";
   import { reducerBlog, reducerSingleBlog, reducerCreateBlog, reducerEditBlog, reducerDelBlog } from "@redux/Reducers/blogReducer";
   import { sendNotificationReducers, getNotificationReducers, readNotificationReducers } from "@redux/Reducers/notificationReducers";
+  import { inventoryCreateReducer } from "@redux/Reducers/inventoryReducer";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
@@ -64,6 +65,7 @@ import {
     coopOrdering: orderCoopReducer,
     getNotif: getNotificationReducers,
     readNotif: readNotificationReducers,
+    invent: inventoryCreateReducer,
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));
