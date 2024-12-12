@@ -17,6 +17,9 @@ import {
   COOP_UPDATE_ORDERS_FAIL,
   COOP_UPDATE_ORDERS_REQUEST,
   COOP_UPDATE_ORDERS_SUCCESS,
+  COOP_SINGLE_FAIL,
+  COOP_SINGLE_REQUEST,
+  COOP_SINGLE_SUCCESS,
 } from "../Constants/coopConstants";
 
 export const coopYReducer = (state = { coop: {} }, action) => {
@@ -48,12 +51,15 @@ export const coopYReducer = (state = { coop: {} }, action) => {
 export const coopAllReducer = (state = { coops: [] }, action) => {
   switch (action.type) {
     case COOP_ALL_REQUEST:
+      case COOP_SINGLE_REQUEST:
       return { loading: true, coops: [] };
 
     case COOP_ALL_SUCCESS:
+      case COOP_SINGLE_SUCCESS:
       return { loading: false, coops: action.payload };
 
     case COOP_ALL_FAIL:
+      case COOP_SINGLE_FAIL:
       return { loading: false, error: action.payload };
 
     default:
@@ -92,3 +98,4 @@ export const coopOrderUpdateReducer = (state = { order: {} }, action) => {
       return state;
   }
 }
+

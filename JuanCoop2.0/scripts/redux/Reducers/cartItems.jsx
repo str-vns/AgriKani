@@ -8,10 +8,10 @@ import {
   const cartItems = (state = [], action) => {
     switch (action.type) {
       case ADD_TO_CART:
-        const existingItem = state.find(item => item.id === action.payload.id);
+        const existingItem = state.find(item => item.inventoryId === action.payload.inventoryId);
         if (existingItem) {
           return state.map(item =>
-            item.id === action.payload.id
+            item.inventoryId === action.payload.inventoryId
               ? { ...item, quantity: item.quantity + action.payload.quantity }
               : item
           );
@@ -20,14 +20,14 @@ import {
         }
   
       case REMOVE_FROM_CART:
-        return state.filter(cartItem => cartItem.id !== action.payload);
+        return state.filter(cartItem => cartItem.inventoryId !== action.payload);
   
       case CLEAR_CART:
         return [];
   
       case UPDATE_CART_QUANTITY:
         return state.map(item =>
-          item.id === action.payload.id
+          item.inventoryId === action.payload.inventoryId
             ? { ...item, quantity: action.payload.quantity }
             : item
         );

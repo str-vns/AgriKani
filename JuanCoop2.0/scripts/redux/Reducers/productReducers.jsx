@@ -32,6 +32,9 @@ import {
   GET_SINGLE_PRODUCT_FAIL,
   GET_SINGLE_PRODUCT_REQUEST,
   GET_SINGLE_PRODUCT_SUCCESS,
+  PRODUCT_ACTIVE_FAIL,
+  PRODUCT_ACTIVE_REQUEST,
+  PRODUCT_ACTIVE_SUCCESS,
   CLEAR_ERRORS,
 } from "@redux/Constants/productConstants";
 
@@ -98,10 +101,13 @@ export const reducerCoopProduct = (state = { coopProducts: [] }, action) => {
 export const reducerCreateProduct = (state = { product: {} }, action) => {
   switch (action.type) {
     case CREATE_PRODUCT_REQUEST:
+      case PRODUCT_ACTIVE_REQUEST:
       return { ...state, loading: true, product: {} };
     case CREATE_PRODUCT_SUCCESS:
+      case PRODUCT_ACTIVE_SUCCESS:
       return { ...state, loading: false, success: action.payload };
     case CREATE_PRODUCT_FAIL:
+      case PRODUCT_ACTIVE_FAIL:
       return { ...state, loading: false, error: action.payload };
     case CLEAR_ERRORS:
       return {
