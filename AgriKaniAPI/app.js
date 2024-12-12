@@ -23,6 +23,7 @@ const type = require("./routes/type");
 const category = require("./routes/category");
 const blog = require ("./routes/blog");
 const notification = require("./routes/notification");
+const inventory = require("./routes/inventory");
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -46,6 +47,7 @@ app.use(
   type,
   blog,
   notification,
+  inventory,
 );
 
 module.exports = app;
