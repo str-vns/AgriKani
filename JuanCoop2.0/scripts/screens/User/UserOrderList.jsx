@@ -50,7 +50,7 @@ const UserOrderList = () => {
   
   }, [userId, token, dispatch]);
 
-  const handleCancelOrder = (orderId, productId) => {
+  const handleCancelOrder = (orderId, inventortId) => {
 
     setRefresh(true);
     try {
@@ -58,8 +58,9 @@ const UserOrderList = () => {
       const status = 
       {
         orderStatus: "Cancelled",
-        productId: productId
+        inventoryProduct: inventortId,
       }
+
       dispatch(updateOrderStatus(orderId, status,  token));
 
       onRefresh()
@@ -79,10 +80,7 @@ const UserOrderList = () => {
 
   const handleReviewSubmit = (orderId, productId) => {
    
-    navigation.navigate('Reviews', {
-      screen: 'AddReviews',  
-      params: { orderId, productId },
-    });
+    navigation.navigate("Reviews", { screen: "AddReviews", params: { orderId, productId } });
   };
 
   const toggleExpandedOrder = (orderId) => {
@@ -91,6 +89,7 @@ const UserOrderList = () => {
       [orderId]: !prevState[orderId],
     }));
   };
+
 
   const renderItem = ({ item }) => {
     const isExpanded = expandedOrders[item._id];
@@ -107,18 +106,25 @@ const UserOrderList = () => {
       {/* Show the first item in the order */}
       {item.orderItems.slice(0, 1).map((orderItem) => (
         <View key={orderItem._id} style={styles.productCard}>
-          <Image
-            source={{ uri: orderItem.product.image[0]?.url }}
-            style={styles.productImage}
-          />
+         <Image
+  source={
+    orderItem.product.image[0]?.url
+      ? { uri: orderItem.product.image[0]?.url }
+      : require('@assets/img/eggplant.png')
+  }
+  style={styles.productImage}
+/>
 
           <View style={styles.productDetails}>
             <Text style={styles.productName}>{orderItem.product.productName}</Text>
+            <Text style={styles.sizeQuantity}>
+             Size: {orderItem.inventoryProduct.unitName} {orderItem.inventoryProduct.metricUnit}
+            </Text>
             <Text style={styles.productQuantity}>
               Qty: {orderItem.quantity}
             </Text>
             <Text style={styles.productPrice}>
-              ₱{orderItem.product.pricing}
+              ₱{orderItem.inventoryProduct.price}
             </Text>
           </View>
 
@@ -140,7 +146,7 @@ const UserOrderList = () => {
             {orderItem.orderStatus === "Pending" && (
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => handleCancelOrder(item._id, orderItem.product._id)}
+                onPress={() => handleCancelOrder(item._id, orderItem.inventoryProduct._id)}
               >
                 <Icon name="cancel" size={20} color="#fff" />
                 <Text style={styles.buttonText}>Cancel</Text>
@@ -154,17 +160,24 @@ const UserOrderList = () => {
       {isExpanded &&
         item.orderItems.slice(1).map((orderItem) => (
           <View key={orderItem._id} style={styles.productCard}>
-            <Image
-              source={{ uri: orderItem.product.image[0]?.url }}
-              style={styles.productImage}
-            />
+                   <Image
+  source={
+    orderItem.product.image[0]?.url
+      ? { uri: orderItem.product.image[0]?.url }
+      : require('@assets/img/eggplant.png')
+  }
+  style={styles.productImage}
+/>
             <View style={styles.productDetails}>
               <Text style={styles.productName}>{orderItem.product.productName}</Text>
+              <Text style={styles.sizeQuantity}>
+              Size: {orderItem.inventoryProduct.unitName} {orderItem.inventoryProduct.metricUnit}
+            </Text>
               <Text style={styles.productQuantity}>
                 Qty: {orderItem.quantity}
               </Text>
               <Text style={styles.productPrice}>
-                ₱{orderItem.product.pricing}
+                ₱{orderItem.inventoryProduct.price}
               </Text>
             </View>
     
@@ -186,7 +199,7 @@ const UserOrderList = () => {
               {orderItem.orderStatus === "Pending" && (
                 <TouchableOpacity
                   style={[styles.button, styles.cancelButton]}
-                  onPress={() => handleCancelOrder( item._id, orderItem.product._id)}
+                  onPress={() => handleCancelOrder( item._id, orderItem.inventoryProduct._id)}
                 >
                   <Icon name="cancel" size={20} color="#fff" />
                   <Text style={styles.buttonText}>Cancel</Text>
@@ -218,16 +231,22 @@ const UserOrderList = () => {
 
   return (
     <View style={styles.container}>
-      {orders && orders.length > 0 ? (
-        <FlatList
-          data={filteredOrders}
-          keyExtractor={(item) => item._id}
-          renderItem={renderItem}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-        />
-      ) : (
-        <Text style={styles.noOrdersText}>No orders found.</Text>
-      )}
+      {loading ? (
+        
+  <ActivityIndicator />
+) : (
+  filteredOrders && filteredOrders.length > 0 ? (
+    <FlatList
+      data={filteredOrders}
+      keyExtractor={(item) => item._id}
+      renderItem={renderItem}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+    />
+  ) : (
+    <Text style={styles.noOrdersText}>No orders found.</Text>
+  )
+)}
+
 
     </View>
   );
@@ -452,6 +471,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
+  sizeQuantity:{
+    fontSize: 12,
+    color: "#666",
+  }
 });
 
 export default UserOrderList;

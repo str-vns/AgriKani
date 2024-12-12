@@ -12,7 +12,6 @@ import {
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-import Feather from "@expo/vector-icons/Feather";
 import { Picker } from "@react-native-picker/picker";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";

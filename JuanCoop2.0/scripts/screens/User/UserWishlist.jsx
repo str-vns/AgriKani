@@ -24,7 +24,7 @@ const UserWishlist = () => {
   const { user } = useSelector((state) => state.register)
   const Users = useSelector((state) => state.userOnly);
   const userId = context?.stateUser?.userProfile?._id;
-  const productIds = user?.wishlist?.map(item => item.product._id) ;
+  const productIds = user?.wishlist?.map(item => item.product?._id) ;
   const wishlist = user?.wishlist?.map(item => item.product) ;
   // const productId =
   const [token, setToken] = useState("");
@@ -162,7 +162,7 @@ const onRefresh = useCallback(async () => {
         {/* Action Buttons */}
         <View style={styles.actionButtons}>
           {/* Trash Icon (Remove from Wishlist) */}
-          <TouchableOpacity onPress={() => wishlistHaart(item._id)}>
+          <TouchableOpacity onPress={() => wishlistHaart(item?._id)}>
             <Ionicons name="heart" size={28} color="#ff6961"  />
           </TouchableOpacity>
           {/* Cart Icon (Add to Cart) */}
@@ -184,7 +184,7 @@ const onRefresh = useCallback(async () => {
       {/* FlatList to render the wishlist items */}
       <FlatList
         data={wishlist}
-        keyExtractor={(item) => item._id || item.id}
+        keyExtractor={(item) => item?._id || item?.id}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListContent} // Ensure items are scrollable
         showsVerticalScrollIndicator={false} // Hide scroll bar
