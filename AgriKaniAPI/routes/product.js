@@ -67,6 +67,12 @@ const productRoutes = [
     roles: [],
     handler: productController.DeleteProductImage,
   },
+  {
+    method: METHOD.PATCH,
+    path: PATH.PRODUCT_ACTIVE_ID,
+    roles: [],
+    handler: productController.ActiveProduct,
+  }
 ];
 
 productRoutes.forEach((route) => {

@@ -58,6 +58,12 @@ const farmRoutes = [
     path: PATH.COOP_ID_ORDERS,
     roles: [],
     handler: farmController.GetCoopOrders,
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.COOP_ID,
+    roles: [],
+    handler: farmController.GetSingleCoop,
   }
 ];
 
