@@ -26,10 +26,11 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProductCard = (props) => {
+  console.log("ProductCard props: ", props.stock);
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
   // console.log("userId: ", props.user)
-  const { productName, description, image, pricing, _id } = props;
+  const { productName, description, image, pricing, _id, stock } = props;
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [token, setToken] = useState();
@@ -134,7 +135,7 @@ const ProductCard = (props) => {
       )}
 
       <Text style={styles.productName}>{productName}</Text>
-      <Text style={styles.productPrice}>₱ {pricing}</Text>
+      <Text style={styles.productPrice}>₱ {stock[0]?.price}</Text>
       {/* <Text style={styles.productDiscount}>{product.discount}</Text> */}
       {/* <TouchableOpacity style={styles.plusIcon}>
         <Icon name="add" size={14} color="#fff" onPress={handleAddToCart} />

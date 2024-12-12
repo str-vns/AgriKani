@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import { Dimensions } from "react-native"; // For screen width calculations
 import { useDispatch, useSelector } from "react-redux";
 import { getCoop } from "@redux/Actions/productActions";
 import { addToCart } from "@src/redux/Actions/cartActions";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import styles from "@screens/stylesheets/singleProduct";
 
@@ -25,12 +25,21 @@ const SingleProduct = ({ route }) => {
   const SLIDER_WIDTH = Dimensions.get("window").width;
   const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.8); // Adjust the width of each
   const navigation = useNavigation();
+  const [selectedSize, setSelectedSize] = useState(product?.stock[0]);
 
   // Increment quantity with stock check
   const increment = () => {
-    if (quantity < product?.stock) {
+    if(product?.stock.length === 1)
+    {
+       if (quantity < product?.stock[0].quantity) {
       setQuantity(quantity + 1);
     }
+    } else {
+      if( quantity < selectedSize?.quantity){
+        setQuantity(quantity + 1);
+      }
+    }
+   
   };
 
   // Decrement quantity
@@ -41,24 +50,49 @@ const SingleProduct = ({ route }) => {
   };
 
   const handleAddToCart = () => {
-    dispatch(
-      addToCart({
+    if(product?.stock.length === 1){
+     const cartItem ={
+      inventoryId: product.stock[0]._id,
+      id: product._id,
+      productName: product.productName,
+      pricing: product?.stock[0].price,
+      quantity,
+      metricUnit: product.stock[0].metricUnit,
+      unitName: product.stock[0].unitName,
+      coop: product.coop,
+      image: product.image[0]?.url,
+     }
+    dispatch(addToCart(cartItem));
+    } else {
+      const cartItem ={
+        inventoryId: selectedSize?._id,
         id: product._id,
         productName: product.productName,
-        pricing: product.pricing,
+        pricing: selectedSize?.price,
         quantity,
+        metricUnit: selectedSize?.metricUnit,
+        unitName: selectedSize?.unitName,
+        coop: product.coop,
         user: product.user,
         image: product.image[0]?.url,
-      })
-    );
+       }   
+      dispatch(addToCart(cartItem));
+    }
   };
 
-  useEffect(() => {
-    if (product && product.user) {
-      dispatch(getCoop(product.user));
-    }
-  }, [dispatch, product]);
+  useFocusEffect(
+    useCallback(() => {
+      if (product && product.coop?._id) {
+        dispatch(getCoop(product.coop?._id));
+      }
+    },[dispatch, product])
 
+  )
+  const handleSelectSize = (item) => {
+    setSelectedSize(item);
+    setQuantity(1);
+    console.log("Selected Size: ", item);
+  };
   const renderImageItem = ({ item }) => {
     if (!item?.url) {
       console.warn("Image URL is missing: ", item);
@@ -70,7 +104,7 @@ const SingleProduct = ({ route }) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Carousel for Product Images */}
+       
         <View style={styles.imageContainer}>
           <Carousel
             data={product.image || []}
@@ -81,28 +115,75 @@ const SingleProduct = ({ route }) => {
         </View>
 
         <Text style={styles.productName}>{product?.productName}</Text>
-
-        <View style={styles.priceAndQuantity}>
-          <Text style={styles.price}>₱ {product?.pricing}</Text>
-          <View style={styles.quantityControl}>
-            <Text style={styles.stock}>Stock: {product?.stock} kg</Text>
-            <View style={styles.quantityContainer}>
+            { product?.stock.length === 1 ? 
+            
+            (
+              <>
+              <View style={styles.priceAndQuantity}>
+              <Text style={styles.price}>₱ {product?.stock[0].price}</Text>
+              <View style={styles.quantityContainer2}>
+              <Text style={styles.stock}>Stock: {product?.stock[0].quantity} {product?.stock[0].unitName} {product?.stock[0].metricUnit}</Text>
+              < View style={styles.quantityContainer2}>
               <TouchableOpacity
                 onPress={decrement}
-                style={styles.quantityButton}
+                style={styles.quantityButton2}
               >
-                <Text style={styles.quantityButtonText}>-</Text>
+                <Text style={styles.quantityButtonText2}>-</Text>
               </TouchableOpacity>
-              <Text style={styles.quantity}>{quantity}</Text>
+              <Text style={styles.quantity2}>{quantity}</Text>
               <TouchableOpacity
                 onPress={increment}
-                style={styles.quantityButton}
+                style={styles.quantityButton2}
               >
-                <Text style={styles.quantityButtonText}>+</Text>
+                <Text style={styles.quantityButtonText2}>+</Text>
               </TouchableOpacity>
+              </View> 
             </View>
-          </View>
-        </View>
+            </View>
+            </>
+            ) : 
+            (
+              <>
+  <View style={styles.priceAndQuantity}>
+    <Text style={styles.price}>₱ {selectedSize?.price}</Text>
+  </View>
+  <View style={styles.stockContainer}>
+    <Text>Product Size</Text>
+    <ScrollView horizontal={true}>
+    {product?.stock.map((item, index) => {
+        const isSelected = item === selectedSize; 
+        const stockCardStyle = isSelected ? styles.stockCardSelected : styles.stockCard;
+
+        return (
+          <TouchableOpacity
+            key={index}
+            style={stockCardStyle}
+            onPress={() => handleSelectSize(item)} // Call function on press
+          >
+            <Text style={styles.stock}>
+              {item.unitName} {item.metricUnit}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </ScrollView>
+    <View style={styles.StockAndQContainer}>
+      <Text style={styles.stock2}>Stock: {selectedSize?.quantity}</Text>
+      <View style={styles.quantityContainer}>
+      <TouchableOpacity onPress={decrement} style={styles.quantityButton}>
+        <Text style={styles.quantityButtonText}>-</Text>
+      </TouchableOpacity>
+      <Text style={styles.quantity}>{quantity}</Text>
+      <TouchableOpacity onPress={increment} style={styles.quantityButton}>
+        <Text style={styles.quantityButtonText}>+</Text>
+      </TouchableOpacity>
+    </View>
+    </View>
+  </View>
+</>
+            )}
+        
+      
 
         {/* <Text style={styles.productHeading}>Description</Text> */}
 
@@ -115,7 +196,10 @@ const SingleProduct = ({ route }) => {
           <TouchableOpacity
             style={styles.farmerInfo2}
             onPress={() =>
-              navigation.navigate("CooperativeProfile", { coop: coop })
+              navigation.navigate("Home", {
+                screen: "CoopFarmProfile",
+                params: { coop: coop }
+              })
             }
           >
             {coop?.user?.image?.url ? (
@@ -143,7 +227,10 @@ const SingleProduct = ({ route }) => {
             <TouchableOpacity
               style={styles.box}
               onPress={() =>
-                navigation.navigate("CooperativeProfile", { coop: coop })
+                navigation.navigate("Home", {
+                  screen: "CoopFarmProfile",
+                  params: { coop: coop }
+                })
               }
             >
               <Text style={styles.boxText}>View Shop</Text>
