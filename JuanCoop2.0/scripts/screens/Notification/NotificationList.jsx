@@ -57,7 +57,7 @@ const NotificationList = ({ navigation }) => {
   const { notifloading, notification, notiferror } = useSelector((state) => state.getNotif);
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = useState(false);
-  const time = moment(notification?.createdAt).fromNow();
+  const time = moment(notification[0]?.createdAt).fromNow();
 
   useEffect(() => {
     const fetchJwt = async () => {
@@ -125,8 +125,8 @@ const NotificationList = ({ navigation }) => {
             </View>
             <View style={styles.notifTextContainer}>
             <View style={styles.notifHeaderContainer}>
-            <Text style={styles.notificationHeader}>{item.title}</Text>
-           <Text style={styles.timestamp}>{time}</Text>
+            <Text style={styles.notificationHeader} numberOfLines={1} ellipsizeMode="tail" >{item.title}</Text>
+           <Text style={styles.timestamp}>{moment(item?.createdAt).fromNow()}</Text>
            </View>
             <Text style={styles.notificationLine}>{item.content}</Text>
           </View>
