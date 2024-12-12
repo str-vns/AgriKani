@@ -9,7 +9,7 @@ import { clearCart } from "@src/redux/Actions/cartActions";
 const Review = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { cartItems, addressData, paymentMethod } = route.params;
-  console.log(cartItems)
+  console.log("cartitems",cartItems)
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
   const [token, setToken] = useState("");
@@ -54,8 +54,11 @@ const Review = ({ route, navigation }) => {
         product: item.id,
         quantity: item.quantity,
         price: item.pricing,
-        productUser: item.user,
+        coopUser: item.coop,
+        user: item.user,
+        inventoryProduct: item.inventoryId,   
       })),
+      
       shippingAddress: addressData._id,
       paymentMethod,
       totalPrice,
@@ -91,12 +94,13 @@ const Review = ({ route, navigation }) => {
     <View style={styles.container}>
       <FlatList
         data={cartItems}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.inventoryId}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Image source={{ uri: item.image }} style={styles.itemImage} />
             <View style={styles.itemDetails}>
               <Text style={styles.itemName}>{item.productName}</Text>
+              <Text style={styles.itemUnit}>{item.unitName} {item.metricUnit}</Text>
               <Text style={styles.itemText}>Quantity: {item.quantity}</Text>
               <Text style={styles.itemText}>Price: ${item.pricing.toFixed(2)}</Text>
             </View>
@@ -157,6 +161,10 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
+    color: "#777",
+  },
+  itemUnit: {
+    fontSize: 12,
     color: "#777",
   },
   totalContainer: {

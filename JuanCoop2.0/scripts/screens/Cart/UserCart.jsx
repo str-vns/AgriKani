@@ -20,17 +20,18 @@ const Cart = () => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const isLogin = context?.stateUser?.isAuthenticated;
+
   const handleRemoveItem = (item) => {
-    dispatch(removeFromCart(item.id));
+    dispatch(removeFromCart(item.inventoryId));
   };
 
   const increment = (item) => {
-    dispatch(updateCartQuantity(item.id, item.quantity + 1));
+    dispatch(updateCartQuantity(item.inventoryId, item.quantity + 1));
   };
 
   const decrement = (item) => {
     if (item.quantity > 1) {
-      dispatch(updateCartQuantity(item.id, item.quantity - 1));
+      dispatch(updateCartQuantity(item.inventoryId, item.quantity - 1));
     }
   };
 
@@ -52,6 +53,7 @@ const Cart = () => {
         <Image source={{ uri: item.image }} style={styles.itemImage} />
         <View style={styles.itemDetails}>
           <Text style={styles.itemName}>{item.productName}</Text>
+          <Text style={styles.unitName}>{item.unitName} {item.metricUnit}</Text>
           <Text style={styles.itemPrice}>Total: ₱ {totalPrice.toFixed(2)}</Text>
         </View>
         <View style={styles.quantityControl}>
@@ -88,7 +90,7 @@ const Cart = () => {
         <FlatList
           data={cartItems}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.inventoryId.toString()}
         />
       ) : (
         <Text style={styles.emptyCart}>Your cart is empty.</Text>
