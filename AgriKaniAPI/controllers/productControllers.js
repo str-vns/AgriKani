@@ -8,7 +8,7 @@ const { STATUSCODE } = require("../constants/index");
 const orderProcess = require('../process/orderProcess');
 exports.productCreate = [
   upload.array("image"),
-  CheckField(["productName", "description", "pricing", "stock", "image"]),
+  CheckField(["productName", "description", "image"]),
   asyncHandler(async (req, res) => {
     const product = await productProcess.CreateProductProcess(req);
 
@@ -34,7 +34,7 @@ exports.GetAllProduct = asyncHandler(async (req, res, next) => {
 
 exports.UpdateProduct = [
   upload.array("image"),
-  CheckField(["productName", "description", "pricing", "stock", "image"]),
+  CheckField(["productName", "description", "image"]),
   asyncHandler(async (req, res) => {
     const products = await productProcess.UpdateProductInfo(req, req.params.id);
     return SuccessHandler(
@@ -123,6 +123,17 @@ exports.DeleteProductImage = asyncHandler(async (req, res) => {
     product
   );
 });
+
+exports.ActiveProduct = asyncHandler(async (req, res) => {
+  const activeProduct = await productProcess.activeProduct(req.params.id);
+
+  return SuccessHandler(
+    res,
+    `Product has been activated Successfully`,
+    activeProduct
+  );
+});
+
 exports.getRankedProducts = asyncHandler(async (req, res, next) => {
   try {
     const rankedProducts = await orderProcess.getRankedProducts();

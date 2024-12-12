@@ -118,3 +118,15 @@ exports.GetCoopOrders = asyncHandler(async (req, res) => {
         coop
       );
 });
+
+exports.GetSingleCoop = asyncHandler(async (req, res) => {
+  const coop = await farmProcess.coopSingle(req.params.id);
+
+  return coop?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Farm Found"))
+    : SuccessHandler(
+        res,
+        `Cooperative has been fetched Successfully`,
+        coop
+      );
+})
