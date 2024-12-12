@@ -61,36 +61,11 @@ export default StyleSheet.create({
       color: "#333", // Dark text color
       textAlign: "center",
     },
-    quantityContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      marginVertical: 5,
-    },
-    quantityContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      marginVertical: 5,
-    },
-    quantityButton: {
-      backgroundColor: "#fcbf49",
-      width: 40, // Set a fixed size for both width and height
-      height: 40,
-      borderRadius: 20, // This makes the button circular
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    quantityButtonText: {
-      fontSize: 24, // Larger font to make it fit well inside the button
-      fontWeight: "bold",
-      color: "#fff",
-    },
     quantity: {
       fontSize: 16,
-      fontWeight: "bold",
-      color: "#333",
-      marginHorizontal: 10, // Space between buttons and number
+      fontWeight: 'bold',
+      color: '#333',
+      marginHorizontal: 10,
     },
     separator: {
       borderBottomWidth: 1,
@@ -132,24 +107,16 @@ export default StyleSheet.create({
       marginHorizontal: 16,
       marginVertical: 10,
     },
-    priceAndQuantity: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginHorizontal: 16,
-      // marginTop: 8,
-      marginVertical: 10,
-    },
     price: {
       fontSize: 18,
       fontWeight: "bold",
       color: "#e76f51",
+      marginHorizontal: 16,
     },
     stock: {
-      fontSize: 16, // Reduced text size
-      color: "#888",
-      marginHorizontal: 16,
-      marginVertical: 8,
+      fontSize: 14,
+      alignItems: "flex-start",
+      marginHorizontal: 10,
     },
     farmerInfo: {
       flexDirection: "row",
@@ -234,6 +201,7 @@ export default StyleSheet.create({
       borderColor: "#ccc",
       padding: 8,
       borderRadius: 4,
+      
     },
     quantityButtonText: {
       fontSize: 18,
@@ -275,5 +243,71 @@ export default StyleSheet.create({
       color: "#fff",
       fontSize: 16,
       fontWeight: "600",
+    },
+    priceAndQuantity: {
+      flexDirection: 'row', 
+      justifyContent: 'space-between', 
+      alignItems: 'center',
+      marginBottom: 10, 
+    },
+
+    stockContainer: {
+      marginHorizontal: 20,
+      marginVertical: 20,
+    },
+    stockCard: {
+      padding: 20,
+      margin: 5,
+      backgroundColor: '#f2f2f2',
+      borderRadius: 5,
+      paddingHorizontal: 30,
+    },
+    stockCardSelected: {
+      padding: 20,
+      margin: 5,
+      borderRadius: 5,
+      paddingHorizontal: 30,
+      backgroundColor: '#fff7e6', 
+    },
+    stock: {
+      fontSize: 14,
+    },
+    StockAndQContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      marginHorizontal: 10,
+      marginTop: 15,
+    },
+    stock2: {
+      fontSize: 14, // Adjust font size if needed
+    },
+    quantityContainer2: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      marginHorizontal: 10,
+    },
+    quantityButton2: {
+      borderWidth: 1,
+      borderColor: "#ccc",
+      padding: 8,
+      borderRadius: 4,
+      
+    },
+    quantityButtonText2: {
+      fontSize: 18,
+      color: "#333",
+    },
+    quantity2: {
+      fontSize: 16,
+      color: "#333",
+      marginHorizontal: 10,
+    },
+    quantityContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'flex-end',
+      marginHorizontal: 10,
     },
   });

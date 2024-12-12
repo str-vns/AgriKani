@@ -55,6 +55,10 @@ export default StyleSheet.create({
   itemDetails: {
     flex: 1,
   },
+  unitName: {
+    fontSize: 12, 
+    color: "#333",
+  },
   itemName: {
     fontSize: scaleFont(16), 
     fontWeight: "600",
