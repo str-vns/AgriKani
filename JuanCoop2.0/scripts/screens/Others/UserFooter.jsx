@@ -69,10 +69,10 @@ const UserFooter = () => {
 
   const handleNotif = () => {
     {
-      // context?.stateUser?.isAuthenticated
-      //   ? navigation.navigate("Home", { screen: "Notification" })
-      //   : navigation.navigate("RegisterScreen", { screen: "Login" });
-       navigation.navigate("Home", { screen: "NotificationList" })
+      context?.stateUser?.isAuthenticated
+        ? navigation.navigate("Home", { screen: "NotificationList" })
+        : navigation.navigate("RegisterScreen", { screen: "Login" });
+      //  navigation.navigate("Home", { screen: "NotificationList" })
     }
   }
 
