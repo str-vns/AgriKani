@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "../css/styles.js";
@@ -19,7 +20,6 @@ import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { createCoopProducts } from "@redux/Actions/productActions";
-import { getCoopProducts } from "@redux/Actions/productActions";
 
 const ProductCreate = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -38,9 +38,8 @@ const ProductCreate = ({ navigation }) => {
   const [mainImage, setMainImage] = useState("");
   const [modalVisibleCat, setModalVisibleCat] = useState(false);
   const [modalVisibleType, setModalVisibleType] = useState(false);
-  const { loading, categories, error } = useSelector(
-    (state) => state.categories
-  );
+  const [isLoading, setIsLoading] = useState(false);
+  const { loading, categories, error } = useSelector((state) => state.categories);
   const { typeLoading, types, TypeError } = useSelector((state) => state.types);
   const userInfo = context?.stateUser?.userProfile?._id;
   // console.log("Categories",categories)
@@ -113,39 +112,31 @@ const ProductCreate = ({ navigation }) => {
   };
 
   const handleSaveProduct = () => {
-    if (!productName || !description || !stock || !price || !image) {
+    setIsLoading(true);
+    if (!productName || !description || !image) {
       setErrorsMess("Please fill in all fields");
       return;
     }
     const productItem = {
       productName: productName,
       description: description,
-      stock: stock,
       category: selectedCategories.map((category) => category.id),
       type: seletedTypes.map((type) => type.id),
-      price: price,
       image: image,
       user: userInfo,
     };
+
     dispatch(createCoopProducts(productItem, token));
     setTimeout(() => {
       setProductName("");
       setDescription("");
-      setStock("");
-      setPrice("");
       setImage([]);
       setSelectedCategories([]);
       setSeletedTypes([]);
+      setIsLoading(false);
       navigation.navigate("ProductsList");
     }, 5000);
-    console.log("Product added:", {
-      productName,
-      description,
-      stock,
-      maxPurchase,
-      price,
-      image,
-    });
+
   };
 
   return (
@@ -174,15 +165,6 @@ const ProductCreate = ({ navigation }) => {
           placeholder="Enter Product Description"
           value={description}
           onChangeText={setDescription}
-          style={styles.input}
-        />
-
-        <Text style={styles.label}>Stock</Text>
-        <TextInput
-          placeholder="Enter Product Stock"
-          value={stock}
-          keyboardType={"numeric"}
-          onChangeText={setStock}
           style={styles.input}
         />
 
@@ -294,14 +276,6 @@ const ProductCreate = ({ navigation }) => {
           </View>
         </Modal>
 
-        <Text style={styles.label}>Price</Text>
-        <TextInput
-          placeholder="Enter Product Price"
-          value={price}
-          keyboardType={"numeric"}
-          onChangeText={setPrice}
-          style={styles.input}
-        />
 
         <TouchableOpacity onPress={pickImage}>
           <Text style={styled.selectImageButton}>Select Images</Text>
@@ -321,8 +295,9 @@ const ProductCreate = ({ navigation }) => {
           ))}
         </ScrollView>
         {errorsmess ? <Text style={styled.error}>{errorsmess}</Text> : null}
-        <TouchableOpacity style={styles.saveButton} onPress={handleSaveProduct}>
-          <Text style={styles.saveButtonText}>Save Product</Text>
+      
+        <TouchableOpacity style={styles.saveButton} onPress={handleSaveProduct} disabled={isLoading}>
+        {isLoading ? <ActivityIndicator size="small" color="#fff" /> :  <Text style={styles.saveButtonText}>Save Product</Text>}
         </TouchableOpacity>
       </ScrollView>
     </View>

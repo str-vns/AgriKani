@@ -109,12 +109,11 @@ const ProductArchive = ({ navigation }) => {
             )}
           </View>
 
-          {/* Product details */}
           <View style={styles.productDetails}>
             <Text style={styles.productName}>{item.productName}</Text>
             <Text style={styles.productDescription}>{item.description}</Text>
-            <Text style={styles.productStock}>Stock: {item.stock}</Text>
-            <Text style={styles.productPrice}>Price: ${item.pricing}</Text>
+            
+            {/* <Text style={styles.productPrice}>Price: ${item.pricing}</Text> */}
           </View>
 
           {/* Edit button */}

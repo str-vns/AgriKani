@@ -21,6 +21,7 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { updateCoopOrders } from "@redux/Actions/coopActions";
 import { sendNotifications } from "@redux/Actions/notificationActions";
+import { singleCooperative } from "@redux/Actions/coopActions";
 import { useSocket } from '../../../../SocketIo';
 
 const OrderList = ({ navigation }) => {
@@ -30,13 +31,15 @@ const OrderList = ({ navigation }) => {
   const userId = context.stateUser.userProfile?._id;
   const userName = context.stateUser.userProfile?.firstName;
   const {orderloading, orders, ordererror } = useSelector((state) => state.coopOrdering);
+  const { coops }  = useSelector((state) => state.allCoops);
+  
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = React.useState(false);
   const filteredOrders = (Array.isArray(orders) ? orders : []).map((order) => ({
     ...order,
     orderItems: Array.isArray(order.orderItems)
-      ? order.orderItems.filter((item) => item.productUser === userId)
-      : [], 
+      ? order.orderItems.filter((item) => item.coopUser === coops._id)
+      : [],
   })).filter((order) => order.orderItems.length > 0);
 
   useEffect(() => {
@@ -53,6 +56,7 @@ const OrderList = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(()=>{
+      dispatch(singleCooperative(userId, token));
       dispatch(fetchCoopOrders(userId, token))
     },[])
   )
@@ -67,18 +71,19 @@ const OrderList = ({ navigation }) => {
   
   }, [userId, token, dispatch]);
  
-  const handleProcessOrder = (orderId, productId, Items ) => {
+  const handleProcessOrder = (orderId, InvId, Items ) => {
     setRefresh(true);
     try {
     let productNames = []
-
+   
     Items?.orderItems?.forEach(item => {
-      if(item.product?.productName)
-      {
-        productNames.push(item.product?.productName)
+      if (item.product && item.inventoryProduct) {
+        const productInfo = `${item.product.productName} ${item.inventoryProduct.unitName} ${item.inventoryProduct.metricUnit}`;
+        productNames.push(productInfo);
       }
     });
-    const productList = productNames.join(", ")
+
+    const productList = productNames.join(', ');
 
     const notification = {
       title: `Order: ${orderId}`, 
@@ -96,7 +101,7 @@ const OrderList = ({ navigation }) => {
 
       )
       const orderupdateInfo = {
-        productId,
+        InvId,
         orderStatus: "Processing",
       }
 
@@ -113,28 +118,29 @@ const OrderList = ({ navigation }) => {
    
   };
 
-  const handleShippingOrder = (orderId, productId, Items) => {
+  const handleShippingOrder = (orderId, InvId, Items) => {
 
     setRefresh(true);
     try {
       let productNames = []
-
+      
       Items?.orderItems?.forEach(item => {
-        if(item.product?.productName)
-        {
-          productNames.push(item.product?.productName)
+        if (item.product && item.inventoryProduct) {
+          const productInfo = `${item.product.productName} ${item.inventoryProduct.unitName} ${item.inventoryProduct.metricUnit}`;
+          productNames.push(productInfo);
         }
       });
-      const productList = productNames.join(", ")
-  
+
+      const productList = productNames.join(', ');
+      
       const notification = {
-        title: `Order: ${orderId}`, 
+        title: `Order: ${orderId}`,
         content: `Your order ${productList} is now being Shipped.`,
         url: Items?.orderItems[0]?.product?.image[0].url,
         user: Items.user._id,
         senderId: userId
-      }
-  
+      };
+
         socket.emit("sendNotification", {
           senderName: userName,
           receiverName:  Items?.user?._id,
@@ -142,7 +148,7 @@ const OrderList = ({ navigation }) => {
         }
       )
       const orderupdateInfo = {
-        productId,
+        InvId,
         orderStatus: "Shipping",
       }
 
@@ -159,23 +165,24 @@ const OrderList = ({ navigation }) => {
    
   };
 
-  const handleDeliveryOrder = (orderId, productId, Items) => {
+  const handleDeliveryOrder = (orderId, InvId, Items) => {
 
     setRefresh(true);
     try {
       let productNames = []
 
       Items?.orderItems?.forEach(item => {
-        if(item.product?.productName)
-        {
-          productNames.push(item.product?.productName)
+        if (item.product && item.inventoryProduct) {
+          const productInfo = `${item.product.productName} ${item.inventoryProduct.unitName} ${item.inventoryProduct.metricUnit}`;
+          productNames.push(productInfo);
         }
       });
-      const productList = productNames.join(", ")
+
+      const productList = productNames.join(', ');
   
       const notification = {
         title: `Order: ${orderId}`, 
-        content: `Your order ${productList} has been Delivered Enjoy!.`,
+        content: `Your order ${productList} has been Delivered your Product Enjoy!.`,
         url: Items?.orderItems[0]?.product?.image[0].url,
         user: Items.user._id,
         senderId: userId
@@ -189,7 +196,7 @@ const OrderList = ({ navigation }) => {
     )
 
       const orderupdateInfo = {
-        productId,
+        InvId,
         orderStatus: "Delivered",
       }
 
@@ -270,7 +277,7 @@ const OrderList = ({ navigation }) => {
           {orderItem.product?.productName && (
   <Text style={styles.orderItemName}>{orderItem.product.productName}</Text>
 )}
-            <Text style={styles.orderItemName}>{orderItem.productName}</Text>
+            <Text style={styles.orderItemPrice}>Size: {orderItem.inventoryProduct.unitName} {orderItem.inventoryProduct.metricUnit}</Text>
             <Text style={styles.orderItemPrice}>Price: ${orderItem.price}</Text>
             <Text style={styles.orderItemQuantity}>Quantity: {orderItem.quantity}</Text>
 
@@ -304,7 +311,7 @@ const OrderList = ({ navigation }) => {
      item.orderItems
        .flat() 
        .filter((orderItem) => orderItem.orderStatus !== "Cancelled") 
-       .map((orderItem) => orderItem.product._id),
+       .map((orderItem) => orderItem.inventoryProduct._id),
     item
    )
  }
@@ -326,7 +333,7 @@ const OrderList = ({ navigation }) => {
      item.orderItems
        .flat() 
        .filter((orderItem) => orderItem.orderStatus !== "Cancelled") 
-       .map((orderItem) => orderItem.product._id),
+       .map((orderItem) => orderItem.inventoryProduct._id),
     item  
       
    )
@@ -349,7 +356,7 @@ const OrderList = ({ navigation }) => {
      item.orderItems
        .flat() 
        .filter((orderItem) => orderItem.orderStatus !== "Cancelled") 
-       .map((orderItem) => orderItem.product._id),
+       .map((orderItem) => orderItem.inventoryProduct._id),
     item  
    )
  }

@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  StyleSheet,
   Modal
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,7 +18,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { updateCoopProducts, imageDel } from "@src/redux/Actions/productActions";
-
+import styled from "@screens/stylesheets/Product/ProductUpdate";
+import { deleteInventory } from "@redux/Actions/inventoryActions";
 
 const ProductUpdate = (props) => {
   const singleProduct = props.route.params.item;
@@ -40,12 +40,11 @@ const ProductUpdate = (props) => {
   const [mainImage, setMainImage] = useState("");
   const [modalVisibleCat, setModalVisibleCat] = useState(false);
   const [modalVisibleType, setModalVisibleType] = useState(false);
-
   const { categories } = useSelector((state) => state.categories);
   const { types } = useSelector((state) => state.types);
   const userInfo = context?.stateUser?.userProfile?._id;
   const productId = singleProduct?._id;
-
+ 
   useEffect(() => {
     const loadProductData = () => {
       const matchingCats = categories.filter((cat) => singleProduct.category.includes(cat._id));
@@ -63,8 +62,6 @@ const ProductUpdate = (props) => {
     }
     setProductName(singleProduct.productName);
     setDescription(singleProduct.description);
-    setStock(singleProduct.stock.toString());
-    setPrice(singleProduct.pricing.toString());
   }, [singleProduct, categories, types]);
 
   useFocusEffect(
@@ -172,6 +169,20 @@ const ProductUpdate = (props) => {
     }
   };
 
+const handleEditInventory = (item) => {
+ navigation.navigate("inventoryUpdate", { item });
+};
+
+const handleDeleteInventory = (id) => {
+  dispatch(deleteInventory(id, token))
+  navigation.navigate("ProductsList");
+};
+
+const handleCreateProduct = (item) => { 
+   console.log("Create Product");
+   navigation.navigate("inventoryCreate" , { item });
+
+}
   const backButton = () => {
     navigation.navigate("ProductsList");
     setNewImage([])
@@ -206,25 +217,6 @@ const ProductUpdate = (props) => {
           onChangeText={(text) => setDescription(text)}
           style={styles.input}
         />
-
-        <Text style={styles.label}>Stock</Text>
-        <TextInput
-          placeholder="Enter Product Stock"
-          value={stock}
-          name='stock'
-          id='stock'
-          keyboardType={"numeric"}
-          onChangeText={(text) => setStock(text)}
-          style={styles.input}
-        />
-
-        {/* <Text style={styles.label}>Unit of Measurement</Text>
-        <TextInput
-          placeholder="Enter Unit of Measurement"
-          value={unit}
-          onChangeText={setUnit}
-          style={styles.input}
-        /> */}
 
         <Text style={styled.label}>Select Categories</Text>
         <TouchableOpacity
@@ -290,6 +282,41 @@ const ProductUpdate = (props) => {
           </Text>
         </TouchableOpacity>
 
+        <Text style={styled.label}>Inventory</Text>
+        <ScrollView horizontal={true} >
+      {singleProduct?.stock.map((item, index) => (
+        <View key={item._id || index} style={styled.inventoryCard}>
+          <View style={styled.cardContent}>
+         
+            <View style={styled.stockInfo}>
+            <Text style={styled.stockTextLarge} >Public: <Text style={[styles.stockTextSmall,{ color: item.status === "active" ? 'green' : 'gray' }]}> {item.status === "active" ? "Active" : "Inactive"}</Text>
+              </Text>
+              <Text style={styled.stockTextLarge}>
+                Metric: {item.unitName} {item.metricUnit}
+              </Text>
+              <Text style={styled.stockTextSmall}>Price: ₱ {item.price}</Text>
+              <View style={styled.actionButtons}>
+              <TouchableOpacity onPress={() => handleEditInventory(item)}>
+                <Ionicons name="pencil" size={20} color="green" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDeleteInventory(item._id)}>
+                <Ionicons name="trash" size={20} color="red" />
+              </TouchableOpacity>
+            </View>
+            </View>
+          </View>
+        </View>
+      ))}
+      <TouchableOpacity onPress={() => handleCreateProduct(productId)} >
+      <View  style={styled.inventoryCard}>
+          <View style={styled.cardContent}>
+            <View style={styled.stockInfo}>
+            <Ionicons name="add" size={50} color="black" />
+            </View>
+            </View>
+            </View>
+      </TouchableOpacity>
+    </ScrollView>
         <Modal
           transparent={true}
           animationType="slide"
@@ -326,27 +353,18 @@ const ProductUpdate = (props) => {
           </View>
         </Modal>
 
-        <Text style={styles.label}>Price</Text>
-        <TextInput
-          placeholder="Enter Product Price"
-          value={price}
-          keyboardType={"numeric"}
-          onChangeText={(text) => setPrice(text)}
-          style={styles.input}
-        />
-
         <TouchableOpacity onPress={pickImage}>
           <Text style={styled.selectImageButton}>Select Images</Text>
         </TouchableOpacity>
 
         <ScrollView horizontal>
         {image.length > 0 && image.map((imageUri, index) => {
-  const imageId = props.route.params.item.image[index]?._id; // Get the _id corresponding to the current image
+  const imageId = props.route.params.item.image[index]?._id; 
   return (
     <View key={index} style={styled.imageContainer}>
       <Image source={{ uri: imageUri }} style={styled.image} />
       <TouchableOpacity
-        onPress={() => deleteImage(imageId, index)} // Pass the _id and the index to the delete function
+        onPress={() => deleteImage(imageId, index)} 
         style={styled.deleteButton}
       >
         <Ionicons name="close-outline" size={25} color="black" />
@@ -367,101 +385,6 @@ const ProductUpdate = (props) => {
   );
 };
 
-const styled = StyleSheet.create({
-  container: {
-    marginVertical: 10,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  dropdown: {
-    padding: 15,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
-  },
-  dropdownText: {
-    fontSize: 16,
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContainer: {
-    width: "80%",
-    maxHeight: "80%", // Limits height to avoid exceeding screen
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    overflow: "hidden", // Ensures content stays within bounds
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: "#000",
-    borderRadius: 3,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  checkboxTick: {
-    width: 12,
-    height: 12,
-    backgroundColor: "#000",
-  },
-  checkboxLabel: {
-    marginLeft: 10,
-  },
-  closeButton: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: "#007BFF",
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  closeButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  checkboxGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "48%",
-    marginVertical: 5,
-  },
-  selectImageButton: {
-    fontSize: 18,
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  imageContainer: {
-    position: "relative",
-    marginRight: 10,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  deleteButton: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 5,
-  },
-  error: {
-    color: "red",
-  },
-});
+
 
 export default ProductUpdate;

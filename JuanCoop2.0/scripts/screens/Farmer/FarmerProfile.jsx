@@ -52,7 +52,7 @@ const FarmerProfile = (props) => {
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(getCoopProducts(cooperative.user?._id));
+      dispatch(getCoopProducts(cooperative?._id));
     }, [])
   );
 
