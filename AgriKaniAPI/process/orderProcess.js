@@ -4,7 +4,8 @@ const User = require("../models/user");
 const Product = require("../models/product")
 const ErrorHandler = require("../utils/errorHandler");
 const mongoose = require("mongoose");
-
+const Inventory = require("../models/inventoryM");
+const Farm = require("../models/farm");
 // Create a new order
 exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice, user }) => {
   if (!orderItems || orderItems.length === 0) {
@@ -18,22 +19,20 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
 
   // Validate and update stock
   for (const item of orderItems) {
-    const product = await Product.findById(item.product);
+    console.log(item, "Item");
+    const inventory = await Inventory.findById(item.inventoryProduct);
 
-    if (!product) {
-      throw new ErrorHandler(`Product with ID ${item.product} not found`, 404);
+    if (!inventory) {
+      throw new ErrorHandler(`Inventory with ID ${item.product} not found`, 404);
     }
 
-    if (product.stock < item.quantity) {
+    if (inventory.quantity < item.quantity) {
       throw new ErrorHandler(
-        `Insufficient stock for product ${product.productName}. Available stock: ${product.stock}`,
+        `Insufficient stock for product ${inventory.productName}. Available stock: ${inventory.stock}`,
         400
       );
     }
 
-    // Deduct stock
-    product.stock -= item.quantity;
-    await product.save();
   }
 
   const order = new Order({
@@ -48,7 +47,7 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
 };
 
 exports.updateOrderStatusProcess = async (id, req) => {
-  console.log(req.body.productId, "Request body");
+  console.log(id, req.body.inventoryProduct)
 
    if (!['Pending', 'Processing', 'Shipping', 'Delivered', 'Cancelled'].includes(req.body.orderStatus)) {
      throw new ErrorHandler("Invalid status", 400);
@@ -60,17 +59,17 @@ exports.updateOrderStatusProcess = async (id, req) => {
   }
 
   if (req.body.orderStatus === 'Cancelled') {
-    const matchedOrderItem = order.orderItems.find(item => item.product.toString() === req.body.productId);
+    const matchedOrderItem = order.orderItems.find(item => item.inventoryProduct.toString() === req.body.inventoryProduct);
       if (matchedOrderItem.orderStatus !== 'Cancelled') {
         try {
-          const product = await Product.findById(req.body.productId);
+          const inventory = await Inventory.findById(req.body.inventoryProduct);
   
-          if (!product) {
-            console.warn(`Product with ID ${req.body.productId} not found.`);
+          if (!inventory) {
+            console.warn(`Product with ID ${req.body.inventoryProduct} not found.`);
           }
-          product.stock += matchedOrderItem.quantity;
+          // product.stock += matchedOrderItem.quantity;
           order.totalPrice -= matchedOrderItem.price;
-          await product.save();
+          await inventory.save();
         } catch (error) {
           console.error(`Error replenishing stock for product ${item.product}:`, error);
         }
@@ -79,7 +78,7 @@ exports.updateOrderStatusProcess = async (id, req) => {
 
   order.orderItems.forEach((item) => {
   
-    if (item.product.toString() === req.body.productId) {
+    if (item.inventoryProduct.toString() === req.body.inventoryProduct) {
       console.log(item, "Matched Order Item");
   
       if (item.orderStatus !== req.body.orderStatus) {
@@ -97,7 +96,6 @@ exports.updateOrderStatusProcess = async (id, req) => {
 
  return order
 };
-
 
 exports.deleteOrderProcess = async (orderId) => {
   const order = await Order.findById(orderId);
@@ -127,6 +125,7 @@ exports.getOrderById = async (id) => {
     .populate({ path: "user", select: "firstName lastName email image.url" })
     .populate({ path: "orderItems.product", select: "productName pricing price image.url" })
     .populate({ path: "shippingAddress", select: "address city phoneNum" })
+    .populate({ path: "orderItems.inventoryProduct", select: "price metricUnit unitName" })
     .sort({ createdAt: -1 })
     .lean()
     .exec();
@@ -139,7 +138,7 @@ exports.getOrderById = async (id) => {
 };
 
 exports.updateOrderStatusCoop = async (id, req) => {
-  console.log(req.body.productId, "Request body");
+  console.log(req.body.InvId, "Request body");
    console.log(req.body.orderStatus, "Request body");
   if (!['Pending', 'Processing', 'Shipping', 'Delivered', 'Cancelled'].includes(req.body.orderStatus)) {
     throw new ErrorHandler("Invalid status", 400);
@@ -150,27 +149,39 @@ exports.updateOrderStatusCoop = async (id, req) => {
     throw new ErrorHandler("Order not found", 404);
   }
 
-  const products = req.body.productId;
+  const inventorys = req.body.InvId;
   const matchedOrderItems = order.orderItems.filter(item =>
-    products.includes(item.product.toString())
+    inventorys.includes(item.inventoryProduct.toString())
   );
-  
+
   for (const matchedItem of matchedOrderItems) {
     if (matchedItem.orderStatus !== req.body.orderStatus) {
+      const inventory = await Inventory.findById(matchedItem.inventoryProduct);
       const product = await Product.findById(matchedItem.product);
-      
-
-      matchedItem.orderStatus = req.body.orderStatus;
-      product.stock -= matchedItem.quantity;
   
-      if (req.body.orderStatus === 'Delivered') {
-        matchedItem.deliveredAt = Date.now(); 
+      matchedItem.orderStatus = req.body.orderStatus;
+  
+      if (req.body.orderStatus === 'Processing') {
+        inventory.quantity -= matchedItem.quantity;
+        if (inventory.quantity === 0) {
+          inventory.status = 'inactive';
+        }
       }
   
-      await product.save();
+      if (req.body.orderStatus === 'Delivered') {
+        matchedItem.deliveredAt = Date.now();
+      }
+  
+      await inventory.save();
+      const inventoryItems = await Inventory.find({ productId: product._id });
+      const allQuantitiesZero = inventoryItems.every(item => item.quantity === 0);
+  
+      if (allQuantitiesZero) {
+        product.activeAt = "inactive";
+        await product.save();
+      }
     }
   }
-  
 
   await order.save();
 
@@ -181,10 +192,15 @@ exports.getCoopOrderById = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ErrorHandler(`Invalid User ID: ${id}`, 400);
   }
+  const Coopinfo = await Farm.findOne({ user: id });
+  if (!Coopinfo) {
+    throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
+  }
 
-  const orders = await Order.find({ "orderItems.productUser": id })
+  const orders = await Order.find({ "orderItems.coopUser": Coopinfo._id })
     .populate({ path: "user", select: "firstName lastName email image.url" })
-    .populate({ path: "orderItems.product", select: "user productName pricing price image.url", match: { user: id } })
+    .populate({ path: "orderItems.inventoryProduct", select: "metricUnit unitName" })
+    .populate({ path: "orderItems.product", select: "coop productName pricing price image.url", match: { coop: Coopinfo._id } })
     .populate({ path: "shippingAddress", select: "address city phoneNum" })
     .sort({ createdAt: -1 })
     .lean()

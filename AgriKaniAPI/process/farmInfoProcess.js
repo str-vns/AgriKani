@@ -5,7 +5,8 @@ const { cloudinary } = require("../utils/cloudinary");
 const { uploadImageMultiple } = require("../utils/imageCloud")
 const Farm = require("../models/farm")
 const User = require("../models/user")
-const Orders = require("../models/order")
+const Orders = require("../models/order");
+const user = require("../models/user");
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -167,7 +168,7 @@ exports.singleFarm = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Farm ID: ${id}`);
 
-  const singleFarm = await Farm.findOne({ user: id})
+  const singleFarm = await Farm.findById(id)
   .populate({path: "user",select: "firstName lastName email image.url"} ).lean().exec();
 
   if (!singleFarm) throw new ErrorHandler(`Product not exist with ID: ${id}`);
@@ -228,3 +229,16 @@ exports.CoopOrders = async (id) => {
   });
   return orders;
 };
+
+exports.coopSingle = async (id) => {
+  
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+
+  const singleCoop = await Farm.findOne({ user: id })
+  .populate({path: "user",select: "firstName lastName email image.url"} ).lean().exec();
+
+  if (!singleCoop) throw new ErrorHandler(`Product not exist with ID: ${id}`);
+
+  return singleCoop;
+}

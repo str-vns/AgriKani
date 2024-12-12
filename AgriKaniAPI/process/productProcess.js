@@ -1,4 +1,7 @@
 const Product = require("../models/product");
+const Farm = require("../models/farm");
+const Order = require("../models/order");
+const Inventory = require("../models/inventoryM");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
@@ -9,12 +12,13 @@ const { uploadImageMultiple } = require("../utils/imageCloud")
 //create ...
 exports.CreateProductProcess = async (req) => {
   console.log("Received File:", req.files);
-  
-  const stock = req.body.stock
-  if (stock < 1 || stock >200)
-    throw new ErrorHandler("Stock must be between 1 and 200")
+  console.log(req.body.user);  
+  // const stock = req.body.stock
+  // if (stock < 1 || stock >200)
+  //   throw new ErrorHandler("Stock must be between 1 and 200")
  
-
+  const coopId = await Farm.findOne({ user: req.body.user }).lean().exec();
+  
   let image = [];
   if (req.files && Array.isArray(req.files)) {
     image = await uploadImageMultiple(req.files)
@@ -24,7 +28,12 @@ exports.CreateProductProcess = async (req) => {
     throw new ErrorHandler("At least one image is required");
 
   const product = await Product.create({
-    ...req.body,
+    productName: req.body.productName,
+    description: req.body.description,
+    price: req.body.price,
+    category: req.body.category,
+    type: req.body.type,
+    coop: coopId._id,
     image: image,
   });
 
@@ -33,11 +42,13 @@ exports.CreateProductProcess = async (req) => {
 
 //Read ...
 exports.GetAllProdductInfo = async () => {
-  const products = await Product.find({ deletedAt: null }).populate({path: "reviews.user", select: "firstName lastName image.url"})
+  const products = await Product.find({ deletedAt: null, activeAt: 'active' })
+  .populate({path: "reviews.user", select: "firstName lastName image.url"})
+  .populate({path: "stock", select: "quantity metricUnit unitName price status", options: { sort: { createdAt: -1 } }, match: { quantity: { $gt: 0 } }})
+  .populate({path: "coop", select: "user"})
     .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
     .lean()
     .exec();
-
   return products;
 };
 
@@ -103,9 +114,9 @@ exports.DeleteProductInfo = async (id) => {
 
   await Promise.all([
     Product.deleteOne({ _id: id }).lean().exec(),
+    Inventory.deleteMany({ productId: id }).lean().exec(),
+    Order.updateMany({ "orderItems.product": id }, { $pull: { orderItems: { product: id } } }).lean().exec(),
     cloudinary.uploader.destroy(publicIds),
-    // Category.deleteMany({ product: id}).lean().exec(),
-    // Type.deleteMany({ product: id}).lean().exec(),
   ]);
 
   return productExist;
@@ -119,9 +130,10 @@ exports.SoftDeleteProductInfo = async (id) => {
   const productExist = await Product.findOne({ _id: id });
   if (!productExist) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
-  const softDelProduct = await Product.findByIdAndUpdate(
+const softDelProduct = await Product.findByIdAndUpdate(
     id,
     {
+      activeAt: 'inactive',
       deletedAt: Date.now(),
     },
     {
@@ -175,8 +187,13 @@ exports.CoopOnlyProduct = async (id) => {
   console.log("User ID:", id);
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid User ID: ${id}`);
+  
+  const coopId = await Farm.findOne({ user: id }).lean().exec();
 
-  const coopOnlyProduct = await Product.find({ user: id, deletedAt: null }).lean().exec();
+  const coopOnlyProduct = await Product.find({ coop: coopId._id, deletedAt: null })
+  .populate({path: "reviews.user", select: "firstName lastName image.url"})
+  .populate({path: "stock", select: "quantity metricUnit unitName price status"})
+  .lean().exec();
 
   if (!coopOnlyProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
@@ -187,7 +204,9 @@ exports.CoopOnlyArchiveProduct = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid User ID: ${id}`);
 
-  const coopOnlyArchiveProduct = await Product.find({ user: id, deletedAt:  { $ne: null } }).lean().exec();
+  const coopId = await Farm.findOne({ user: id }).lean().exec(); 
+
+  const coopOnlyArchiveProduct = await Product.find({ coop: coopId._id, deletedAt:  { $ne: null } }).lean().exec();
 
   if (!coopOnlyArchiveProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
@@ -218,6 +237,26 @@ exports.deleteImage = async (id, imageId) => {
 
   console.log('Image deleted successfully');
   return { message: 'Image deleted successfully' };
+}
+
+exports.activeProduct = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Product ID: ${id}`);
+
+  const activeProduct = await Product.findByIdAndUpdate(
+    id,
+    {
+      activeAt: 'active',
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .lean()
+    .exec();
+  if (!activeProduct) throw new ErrorHandler(`Product not active with ID ${id}`);
+  return activeProduct;
 }
 
 exports.getRankedProducts = async (req, res, next) => {
