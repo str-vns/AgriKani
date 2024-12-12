@@ -19,6 +19,7 @@ import UserFooter from "@screens/Others/UserFooter";
 import SearchProduct from "@screens/Filter/SearchProduct";
 import CoopDistance from "@screens/User/UserDistance";
 import NotificationList from "@screens/Notification/NotificationList";
+import AddReviews from "@screens/Review/UserAddReview";
 
 const Stack = createStackNavigator();
 
@@ -118,6 +119,14 @@ const HomeNavigation = () => {
           options={{ headerShown: false, tabBarShowLabel: false }}
         />
 
+  <Stack.Screen
+        name="AddReviews"
+        component={AddReviews}
+        options={{
+          headerShown: false, 
+          tabBarShowLabel: false,
+        }}
+      />
       </Stack.Navigator>
       <UserFooter />
     </>

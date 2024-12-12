@@ -6,6 +6,7 @@ import CoopRegistration from "@screens/Farmer/Registration/FarmRegistration";
 import UserOrderList from "@screens/User/UserOrderList";
 import ProfileCoop from "@screens/UserRegis/UserCoopRegistration";
 import EditFarm from "@screens/Farmer/FarmEdit";
+import AddReviews from "@screens/Review/UserAddReview";
 
 const Stack = createNativeStackNavigator();
 
@@ -62,7 +63,14 @@ const UserNavigation = () => {
         component={UserOrderList}
         options={{ headerShown: true }}
       />
-
+      
+       <Stack.Screen
+        name="AddReviews"
+        component={AddReviews}
+        options={{
+          headerShown: false, 
+        }}
+      />
     </Stack.Navigator>
   );
 };

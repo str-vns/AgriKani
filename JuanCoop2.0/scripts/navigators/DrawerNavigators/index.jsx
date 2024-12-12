@@ -7,6 +7,7 @@ import AddressNavigators from "@navigators/AddressNavigators";
 import PostNavigators from "@navigators/PostNavigators";
 import CoopNavigators from "@navigators/CoopNavigators";
 import HomeScreen from "@navigators/Home";
+import ReviewsNavigators from '@navigators/ReviewsNavigators'
 import UserNavigators from "@navigators/UserNavigators";
 import CoopProductNavigators from "@navigators/CoopProductNavigators";
 import MessagesNavigators from "@navigators/MessagesNavigators";
@@ -191,7 +192,14 @@ const Index = () => {
           }}
           component={PostNavigators}
         />
-
+         <Drawer.Screen 
+        name = "Reviews"
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+        component={ReviewsNavigators}
+        />
         <Drawer.Screen
           name="barGraph"
           initialParams={{ screen: "barGraph" }}
