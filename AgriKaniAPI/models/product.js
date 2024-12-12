@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const { RESOURCE } = require("../constants/index");
+const { ref } = require("pdfkit");
 
 
 const productSchema = new mongoose.Schema({
@@ -13,12 +14,12 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please enter the product description!"],
   },
-  stock: {
-    type: Number,
-    required: [true, "Please enter the stock quantity!"],
-    min: [1, "Stock must be at least 1"],
-    max: [200, "Stock cannot exceed 200"],
-  },
+  stock:[
+    {
+       type: mongoose.Schema.ObjectId,
+       ref: RESOURCE.INVENTORYM,
+    }
+  ],
   category: [{
     type: String,
   }],
@@ -70,7 +71,6 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-
       image: [
         {
           public_id: {
@@ -89,10 +89,15 @@ const productSchema = new mongoose.Schema({
       ],
     },
   ],
-  user: {
+  coop: {
     type: mongoose.Schema.ObjectId,
-    ref: "user",
+    ref: RESOURCE.FARMINFO,
     required: true,
+  },
+  activeAt:{
+    type: String,
+    enum: ["active", "inactive"],
+    default: "inactive",
   },
   apporivedAt:{
     type: Date,

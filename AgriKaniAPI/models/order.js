@@ -32,9 +32,14 @@ user: {
                 enum: ['Pending', 'Shipping', 'Delivered', 'Cancelled', 'Processing'],
                 default: 'Pending',
             },
-            productUser: {
+            coopUser: {
                 type: mongoose.Schema.ObjectId,
-                ref: 'user',
+                ref: RESOURCE.FARMINFO,
+                required: true,
+            },
+            inventoryProduct:{
+                type: mongoose.Schema.ObjectId,
+                ref: RESOURCE.INVENTORYM,
                 required: true,
             },
               deliveredAt: {

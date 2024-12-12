@@ -10,8 +10,7 @@ const inventoryMSchema = new mongoose.Schema({
   },
   quantity: {
       type: Number,
-      min: [1, "Stock must be at least 1"],
-      max: [200, "Stock cannot exceed 200"],
+      max: [100, "Stock cannot exceed 100"],
       required: [true, "Please enter the stock quantity!"],
       validate: {
         validator: Number.isFinite,
@@ -20,7 +19,7 @@ const inventoryMSchema = new mongoose.Schema({
   },
   metricUnit: {
     type: String,
-    enum: ["kg", "g", "lb", "oz", "liter", "ml"],
+    enum: ["kg", "g", "lb", "oz", "liter", "ml", "pcs","l"],
     required: [true, "Please enter the metric unit!"],
   },
   unitName: {
@@ -39,7 +38,7 @@ const inventoryMSchema = new mongoose.Schema({
   },
   lowStockThreshold: {
     type: Number,
-    default: 10,
+    default: 5,
     min: [1, "Threshold must be at least 1"],
   },
   status:{

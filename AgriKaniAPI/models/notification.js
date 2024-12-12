@@ -36,7 +36,7 @@ const notificationSchema = new mongoose.Schema({
     readAt:{
         type: Date,
         default: null,
-    }
-})
+    } 
+}, { timestamps: true })
 
 module.exports = mongoose.model(RESOURCE.NOTIFICATION, notificationSchema);
