@@ -102,7 +102,6 @@ export const cancelOrder = (productId, token) => async (dispatch) => {
     }
   };
   
-
 // Action to update the status of an order
 export const updateOrderStatus = (orderId, status, token) => async (dispatch, getState) => {
 

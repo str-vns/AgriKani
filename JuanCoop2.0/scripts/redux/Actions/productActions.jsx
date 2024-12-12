@@ -32,6 +32,9 @@ import {
     GET_SINGLE_PRODUCT_FAIL,
     GET_SINGLE_PRODUCT_REQUEST,
     GET_SINGLE_PRODUCT_SUCCESS,
+    PRODUCT_ACTIVE_FAIL,
+    PRODUCT_ACTIVE_REQUEST,
+    PRODUCT_ACTIVE_SUCCESS,
     CLEAR_ERRORS,
   } from "@redux/Constants/productConstants";
   import baseURL from "@assets/commons/baseurl";
@@ -331,6 +334,22 @@ import {
     }
   }
   
+  export const activeProduct = (productId) => async (dispatch) => {
+    try {
+      dispatch({ type: PRODUCT_ACTIVE_REQUEST });
+  
+      await axios.patch(`${baseURL}products/active/${productId}`);
+      dispatch({
+        type: PRODUCT_ACTIVE_SUCCESS,
+      });
+    } catch (error) {
+      dispatch({
+        type: PRODUCT_ACTIVE_FAIL,
+        payload: error.response.data.message,
+      });
+    }
+  }
+
   export const clearErrors = () => async (dispatch) => {
     dispatch({
       type: CLEAR_ERRORS,

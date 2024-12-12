@@ -17,6 +17,9 @@ import {
     COOP_UPDATE_ORDERS_FAIL,
     COOP_UPDATE_ORDERS_REQUEST,
     COOP_UPDATE_ORDERS_SUCCESS,
+    COOP_SINGLE_FAIL,
+    COOP_SINGLE_REQUEST,
+    COOP_SINGLE_SUCCESS,
   } from "../Constants/coopConstants";
   import axios from "axios";
   import baseURL from "@assets/commons/baseurl";
@@ -195,6 +198,27 @@ import {
     } catch (error) {
       dispatch({
         type: COOP_UPDATE_ORDERS_FAIL,
+        payload: error.response ? error.response.data.message : error.message,
+      });
+    }
+  }
+
+  export const singleCooperative = (coopId, token) => async (dispatch) => {
+    try {
+      dispatch({ type: COOP_SINGLE_REQUEST });
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  
+      const { data } = await axios.get(`${baseURL}coop/${coopId}`, config);
+  
+      dispatch({ type: COOP_SINGLE_SUCCESS, payload: data.details });
+    } catch (error) {
+      dispatch({
+        type: COOP_SINGLE_FAIL,
         payload: error.response ? error.response.data.message : error.message,
       });
     }

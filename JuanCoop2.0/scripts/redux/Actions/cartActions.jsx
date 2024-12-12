@@ -8,7 +8,7 @@ import {
   export const addToCart = (payload) => {
     return {
       type: ADD_TO_CART,
-      payload
+      payload,
     };
   };
   
@@ -25,9 +25,9 @@ import {
     };
   };
   
-  export const updateCartQuantity = (id, quantity) => {
+  export const updateCartQuantity = (inventoryId, quantity) => {
     return {
       type: UPDATE_CART_QUANTITY,
-      payload: { id, quantity },
+      payload: { inventoryId, quantity },
     };
   };  
