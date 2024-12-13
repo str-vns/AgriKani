@@ -45,7 +45,6 @@ const ProductContainer = () => {
   const [coopFilter, setCoopFilter] = useState([]);
   const [wishlist, setWishlist] = useState([]);
 
-  console.log("products", products);
   const searchProduct = (text) => {
     if (!text.trim()) {
       setProductFilter(products);

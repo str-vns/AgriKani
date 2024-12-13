@@ -128,7 +128,7 @@ const UserSignIn = () => {
 
       console.log("Navigating to Admin Dashboard");
       navigation.navigate("Admin");
-    } else if (context?.stateUser?.isAuthenticated) {
+    } else if (context?.stateUser?.isAuthenticated && userInfo.roles.includes("Customer")) {
       const saveDtoken = 
       {
         email: email,
@@ -141,14 +141,7 @@ const UserSignIn = () => {
       setError("");
       console.log("Navigating to Home");
       navigation.navigate("Home", { screen: "Home" });
-    } else if (context?.stateUser?.isAuthenticated === false) {
-      setError("Either Email or Password is incorrect");
-      setTimeout(() => {
-        setError("");
-      }, 5000);   
-    } else {
-      setError("");
-    }
+    } 
   }, [context.stateUser.isAuthenticated]);
 
   const handleSubmit = () => {
@@ -163,12 +156,11 @@ const UserSignIn = () => {
       {
         setIsLoading(false);
         setError("Please provide a valid email address.");
-      }
+      } 
       else {
         const user = { email, password };
         loginUser(user, context.dispatch);
-        setIsLoading(false);
-      }
+      } 
     }catch(error){
       setError("Login Failed. Please try again.");  
     }
@@ -194,7 +186,6 @@ const UserSignIn = () => {
     fetchAllStorage();
   }, []);
 
- 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>AgriKaani</Text>

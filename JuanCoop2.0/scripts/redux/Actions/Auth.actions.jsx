@@ -6,6 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export const SET_CURRENT_USER = "SET_CURRENT_USER"
+export const SET_LOGOUT_USER = "SET_LOGOUT_USER"
 
 export const loginUser = async (user, dispatch) => {
 
@@ -29,15 +30,13 @@ export const loginUser = async (user, dispatch) => {
         if (data && data.details) {
             const token = data.details.accessToken;
             const userInfo = data.details.user;
-            console.log("User info:", userInfo);
 
-            const currentTime = Date.now();
-            await AsyncStorage.setItem("lastLoginTimestamp", currentTime.toString());
             await AsyncStorage.setItem("jwt", token);
             await AsyncStorage.setItem("user", JSON.stringify(userInfo));
 
             const decoded = jwtDecode(token);
-            dispatch(setCurrentUser(decoded, userInfo));
+
+            dispatch(setCurrentUser(decoded, userInfo ));
 
             console.log("User loaded successfully:", data);
             
@@ -78,18 +77,45 @@ export const logoutUser = async (dispatch) => {
         AsyncStorage.removeItem("user")
         await AsyncStorage.clear();
         console.log('AsyncStorage data cleared successfully.');
-
-        // Reset the current user in the Redux store or equivalent state management
-        dispatch(setCurrentUser({}));
-
+        dispatch(setLogoutUser())
     } catch (error) {
         console.error('Error clearing AsyncStorage:', error);
     }
 };
+
 export const setCurrentUser = (decoded, userInfo) => { 
     return {
         type: SET_CURRENT_USER,
         payload: decoded,
-        userProfile: userInfo 
+        userProfile: userInfo,
+        isLoginUser: true,
+        isguest: false,
+        isLoading: false,
     };
 };
+
+export const setLogoutUser = () => {
+    return {
+        type: SET_LOGOUT_USER,
+        payload: {},
+        userProfile: {},
+        isLoginUser: false,
+        isguest: true,
+        isLoading: false,
+    };
+}
+export const isLogin = async (dispatch) => {
+    try {
+        const jwt = await AsyncStorage.getItem("jwt");
+        const user =   await AsyncStorage.getItem("user");
+  
+        if (jwt) {
+            const userInfo = JSON.parse(user);
+            const decoded = jwtDecode(jwt);
+
+            dispatch(setCurrentUser(decoded, userInfo));
+        }
+    } catch (error) {
+        console.error("Error retrieving JWT:", error);
+    }
+}

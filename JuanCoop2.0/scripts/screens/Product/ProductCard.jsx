@@ -26,10 +26,8 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProductCard = (props) => {
-  console.log("ProductCard props: ", props.stock);
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
-  // console.log("userId: ", props.user)
   const { productName, description, image, pricing, _id, stock } = props;
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -106,7 +104,7 @@ const ProductCard = (props) => {
         id: _id,
         productName,
         pricing,
-        quantity: 1, // Set a default quantity of 1 for now
+        quantity: 1, 
         user: user,
         image: image[0]?.url,
       })

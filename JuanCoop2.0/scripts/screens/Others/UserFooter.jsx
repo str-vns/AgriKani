@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   NativeBaseProvider,
   Box,
@@ -10,22 +10,37 @@ import {
   View,
 } from "native-base";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import styles from "@screens/stylesheets/others/notif";
 import { useSocket } from "../../../SocketIo"
-
+import { useDispatch, useSelector } from "react-redux";
+import { singleNotification } from "@redux/Actions/notificationActions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserFooter = () => {
+  const { notifloading, notification, notiferror } = useSelector((state) => state.getNotif);
+  const dispatch = useDispatch();
   const context = useContext(AuthGlobal);
   const navigation = useNavigation();
   const socket = useSocket();
+
+  const userId = context.stateUser?.userProfile?._id;
   const [selected, setSelected] = useState(1);
   const [notif, setNotif] = useState([]);
-  
+  const [token, setToken] = useState(null);
 
-
-
+  useEffect(() => {
+    const fetchJwt = async () => {
+      try {
+        const res = await AsyncStorage.getItem("jwt");
+        setToken(res);
+      } catch (error) {
+        console.error("Error retrieving JWT: ", error);
+      }
+    };
+    fetchJwt();
+  }, []);
 
   useEffect(() => {
     if (socket) {
@@ -39,19 +54,17 @@ const UserFooter = () => {
     }
   }, [socket]);
   
- console.log(notif)
-  // console.log(notif)
+ useFocusEffect(
+    useCallback(() => {
+      dispatch(singleNotification(userId, token));
+      setNotif([]);
+    }, [dispatch, token])
+  );
 
-  // const displayNotif = ({senderName, type}) => {
-  //   let action;
-  
-  //   return(
-  //      <span>
-  //         {senderName} {type}
-  //      </span>
-  //   )
+  const numNotif = notification.filter((notif) => notif.readAt === null).length;
+  const overallNotif = Number(numNotif) + notif.length;
 
-  // }
+  console.log("notif", overallNotif);
   const handleMessage = () => {
     {
       context?.stateUser?.isAuthenticated
@@ -124,11 +137,11 @@ const UserFooter = () => {
             onPress={() => handleNotif()}
           >
             <Center>
-            {notif.length > 0 && (
-        <View style={styles.notifCircle}>
-          <Text style={styles.text}>{notif.length}</Text>
-        </View>
-      )}
+          {(numNotif > 0 || notif.length > 0) && (
+  <View style={styles.notifCircle}>
+    <Text style={styles.text}>{overallNotif}</Text>
+  </View>
+)}
               <Icon
                 mb="1"
                 as={

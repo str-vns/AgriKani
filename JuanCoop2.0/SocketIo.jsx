@@ -8,6 +8,7 @@ const SocketContext = createContext(null);
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     // https://agrikani.onrender.com
+    // http://192.168.50.236:4000
     useEffect(() => {
       // Create a Socket.IO connection
       const socketConnection = io("http://192.168.50.236:4000", {

@@ -134,7 +134,7 @@ const ProductUpdate = (props) => {
   };
 
   const handleUpdateProduct = async () => {
-    if (!productName || !description || !stock || !price || image.length === 0) {
+    if (!productName || !description || image.length === 0) {
       setErrorsMess("Please fill in all fields");
       return;
     }
@@ -154,8 +154,6 @@ const ProductUpdate = (props) => {
       setTimeout(() => {
         setProductName("");
         setDescription("");
-        setStock("");
-        setPrice("");
         setSelectedCategories([]);
         setSelectedTypes([]);
         setErrorsMess("");
@@ -183,6 +181,7 @@ const handleCreateProduct = (item) => {
    navigation.navigate("inventoryCreate" , { item });
 
 }
+
   const backButton = () => {
     navigation.navigate("ProductsList");
     setNewImage([])

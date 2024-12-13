@@ -11,3 +11,4 @@ let baseURL = '';
 export default baseURL;
 
 // https://agrikani.onrender.com/api/v2/
+// http://192.168.50.236:4000/api/v2/

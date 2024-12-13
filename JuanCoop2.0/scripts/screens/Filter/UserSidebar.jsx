@@ -13,7 +13,6 @@ import { ScrollView } from "react-native-gesture-handler";
 
 const UserSidebar = () => {
   const socket = useSocket();
-  console.log("Socket ID:", socket?.id);
   const [activeItem, setActiveItem] = useState(null);
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
@@ -21,11 +20,20 @@ const UserSidebar = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const dispatch = useDispatch();
   const { loading, user, error } = useSelector((state) => state.userOnly);
-  console.log("User:", user);
-  const userslogin = context.stateUser.user.CustomerInfo;
+  const userslogin = context.stateUser?.userProfile || null;;
   const userId = context?.stateUser?.userProfile?._id;
-  const userInfo = context.stateUser.user.CustomerInfo;
-  // console.log("userslogin", userslogin.roles[1]);
+  const [loadings, setLoadings] = useState(true);
+
+     useEffect(() => {
+  
+       const initialize = async () => {
+         await context.dispatch(isLogin(context.dispatch));
+         setLoadings(false);
+       };
+   
+       initialize();
+     }, []);
+
   const userItems = [
     { label: "Home", icon: "home-outline", key: "home" },
     { label: "Profile", icon: "person-outline", key: "profile" },
@@ -154,9 +162,9 @@ const UserSidebar = () => {
       {/* Profile Section */}
       <View style={styles.profileContainer}>
         {context?.stateUser?.isAuthenticated &&
-        userInfo?.roles &&
-        userInfo.roles.includes("Customer") &&
-        userInfo.roles.includes("Cooperative") ? (
+        userslogin?.roles &&
+        userslogin?.roles.includes("Customer") &&
+        userslogin?.roles.includes("Cooperative") ? (
           <>
             <Image
               source={{ uri: user?.image?.url }}
@@ -168,8 +176,8 @@ const UserSidebar = () => {
             <Text style={styles.profileRole}>Cooperative</Text>
           </>
         ) : context?.stateUser?.isAuthenticated &&
-          userInfo?.roles &&
-          userInfo.roles.includes("Customer") ? (
+        userslogin?.roles &&
+          userslogin?.roles.includes("Customer") ? (
           <>
             <Image
               source={{ uri: user?.image?.url }}
@@ -181,8 +189,8 @@ const UserSidebar = () => {
             <Text style={styles.profileRole}>User</Text>
           </>
         ) : context?.stateUser?.isAuthenticated &&
-          userInfo?.roles &&
-          userInfo.roles.includes("Admin") ? (
+        userslogin?.roles &&
+        userslogin?.roles.includes("Admin") ? (
           <Text style={styles.profileRole}>Admin</Text>
         ) : null}
       </View>
@@ -247,6 +255,7 @@ const UserSidebar = () => {
         userslogin?.roles[0] &&
         userslogin?.roles[0]?.includes("Customer") ? (
         <>
+          <ScrollView>
           <View style={styles.menuContainer}>
             {userItems.map((item) => (
               <TouchableOpacity
@@ -275,6 +284,7 @@ const UserSidebar = () => {
               </TouchableOpacity>
             ))}
           </View>
+          </ScrollView>
           <View style={styles.footerContainer}>
             <TouchableOpacity
               style={[styles.menuItem, styles.logoutButton]}

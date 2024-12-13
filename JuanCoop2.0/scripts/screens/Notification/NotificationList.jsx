@@ -16,39 +16,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import moment from 'moment';
 
-const data = [
-  {
-    title: "Amazing Sunset",
-    content:
-      "A beautiful view of the sunset over the mountains, with vibrant colors filling the sky.",
-      time: "2 hours ago",
-  },
-  {
-    title: "City Skyline",
-    content:
-      "The stunning skyline of a modern city at night, illuminated by countless lights.",
-      time: "2 hours ago",
-  },
-  {
-    title: "Ocean Waves",
-    content:
-      "Waves crashing on a beach during a bright sunny day, with the ocean stretching to the horizon.",
-      time: "2 hours ago",
-  },
-  {
-    title: "Forest Path",
-    content:
-      "A serene and tranquil forest path, surrounded by tall trees and a lush green landscape.",
-      time: "2 hours ago",
-  },
-  {
-    title: "Snowy Mountain",
-    content:
-      "A majestic mountain covered in snow, with a clear blue sky and a peaceful atmosphere.",
-    time: "2 hours ago",
-  },
-];
-
 const NotificationList = ({ navigation }) => {
   const navigate = useNavigation()
   const dispatch = useDispatch()
@@ -57,7 +24,6 @@ const NotificationList = ({ navigation }) => {
   const { notifloading, notification, notiferror } = useSelector((state) => state.getNotif);
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = useState(false);
-  const time = moment(notification[0]?.createdAt).fromNow();
 
   useEffect(() => {
     const fetchJwt = async () => {

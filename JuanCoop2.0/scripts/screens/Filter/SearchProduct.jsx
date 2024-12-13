@@ -68,7 +68,7 @@ const SearchProduct = (props) => {
 
     checkLoginStatus();
   }, [user, product?.id]);
-
+  
   const wishlistHaart = async () => {
     if (!isLogin) {
       console.log("Navigating to login");

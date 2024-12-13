@@ -16,7 +16,7 @@ const Dashboard = () => {
 
   const { dailySales, weeklySales, monthlySales } = useSelector((state) => state.sales);
   const [refreshing, setRefreshing] = useState(false);
-
+console.log("Hello",userId)
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);

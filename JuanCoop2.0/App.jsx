@@ -1,51 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NativeBaseProvider } from "native-base";
 import { SocketProvider } from './SocketIo'; 
 import 'react-native-gesture-handler';
 import Auth from "@redux/Store/Auth"
 import { Provider } from 'react-redux';
 import store from '@redux/store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import DrawerNavi from "@navigators/DrawerNavigators"
-import { StatusBar } from 'expo-status-bar';
 import messaging from '@react-native-firebase/messaging';
+import AuthGlobal from "@redux/Store/AuthGlobal";
+import * as SplashScreen from 'expo-splash-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function App() {
-  const ONE_MONTH_IN_MS = 30 * 24 * 60 * 60 * 1000
-  
-  const checkSessionValidity = async () => {
-    const storedTimestamp = await AsyncStorage.getItem('lastLoginTimestamp');
-    if (storedTimestamp) {
-      const lastLoginTime = parseInt(storedTimestamp, 10);
-      const currentTime = Date.now();
-      const timeElapsed = currentTime - lastLoginTime;
+export default function App() {    
+    const [appReady, setAppReady] = useState(false); 
+    const [stateUser, setStateUser] = useState("");
+    const context = useContext(AuthGlobal);
 
-      if (timeElapsed > ONE_MONTH_IN_MS) {
-        await AsyncStorage.clear();
-        Alert.alert('Session expired. Please log in again.');
-      }
+    if(!appReady) {
+      setAppReady(true);
+      SplashScreen.hide()
     }
-  };
-
-  useEffect(() => {
-    checkSessionValidity();
-  }, []);
-
-    // useEffect(() => {
-    //   clearAsyncStorage();
-    // }, []);
-  
-    // const clearAsyncStorage = async () => {
-    //   try {
-    //     await AsyncStorage.clear();
-    //     console.log('AsyncStorage data cleared successfully.');
-    //   } catch (error) {
-    //     console.error('Error clearing AsyncStorage:', error);
-    //   }
-    // };
 
     const requestUserPermission = async () => {
       try {
@@ -113,10 +88,12 @@ export default function App() {
       };
   
       initializeFCM();
-    }, []); 
-  return (
+    }, []);
+  
     
-    <Auth>
+
+  return (
+    <Auth >
       <SocketProvider>
       <Provider store={store}>
         <NativeBaseProvider>
@@ -125,6 +102,7 @@ export default function App() {
             {/* <Main /> */}
           </NavigationContainer>
         </NativeBaseProvider>
+        
       </Provider>
       </SocketProvider>
   </Auth>

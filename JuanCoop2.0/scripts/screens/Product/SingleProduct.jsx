@@ -23,7 +23,7 @@ const SingleProduct = ({ route }) => {
   const dispatch = useDispatch();
   const { coop } = useSelector((state) => state.singleCoop);
   const SLIDER_WIDTH = Dimensions.get("window").width;
-  const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.8); // Adjust the width of each
+  const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.8); 
   const navigation = useNavigation();
   const [selectedSize, setSelectedSize] = useState(product?.stock[0]);
 
@@ -91,8 +91,8 @@ const SingleProduct = ({ route }) => {
   const handleSelectSize = (item) => {
     setSelectedSize(item);
     setQuantity(1);
-    console.log("Selected Size: ", item);
   };
+  
   const renderImageItem = ({ item }) => {
     if (!item?.url) {
       console.warn("Image URL is missing: ", item);
