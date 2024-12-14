@@ -104,7 +104,54 @@ const farmSchema = new mongoose.Schema({
       ],
     },
   ],
-   
+  requirements: {
+    businessPermit: {
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      originalname: {
+        type: String,
+        required: true,
+      },
+    },
+    tinNumber: {
+      type: String,
+      required: true,
+    }, 
+    corCDA:{
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      originalname: {
+        type: String,
+        required: true,
+      },
+    },
+    orgStructure: {
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      originalname: {
+        type: String,
+        required: true,
+      },
+    },
+  },
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "user",

@@ -7,28 +7,34 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE } = require("../constants/index");
 
 exports.CreateFarm = [
-    upload.array("image"), 
-    CheckField([
-        "farmName",
-        "city",
-        "barangay",
-        "address",
-        "postalCode",
-        "latitude",
-        "image",
-        "longitude",
-        "user",
-      ]),
-    asyncHandler(async (req, res) => {
-      const farm = await farmProcess.CreateFarmProcess(req);
-     
-      return SuccessHandler(
-        res,
-        `Farm: ${farm?.farmName} has been created successfully`,
-        farm
-      );
-    }),
-  ];
+  upload.fields([
+    { name: "image", maxCount: 10 },
+    { name: "businessPermit", maxCount: 1 },
+    { name: "corCDA", maxCount: 1 },
+    { name: "orgStructure", maxCount: 1 },
+  ]),
+  CheckField([
+    "farmName",
+    "city",
+    "barangay",
+    "address",
+    "postalCode",
+    "latitude",
+    "longitude",
+    "user",
+    "tinNumber",
+  ]),
+
+  asyncHandler(async (req, res) => {
+    const farm = await farmProcess.CreateFarmProcess(req);
+
+    return SuccessHandler(
+      res,
+      `Farm: ${farm?.farmName} has been created successfully`,
+      farm
+    );
+  }),
+];
 
 exports.GetAllFarm = asyncHandler(async (req, res, next) => {
   const farm = await farmProcess.GetAllFarm();
@@ -38,12 +44,17 @@ exports.GetAllFarm = asyncHandler(async (req, res, next) => {
     : SuccessHandler(res, `All Farm has been fetched Successfully`, farm);
 });
 
+exports.GetCoopAllFetch = asyncHandler(async (req, res, next) => {
+  const coop = await farmProcess.GetAllofCoop();
+
+  return coop?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Farm Found"))
+    : SuccessHandler(res, `All Cooperative has been fetched Successfully`, coop);
+})
+
 exports.UpdateFarm = [
-    upload.array("image"), 
-    CheckField([
-        "farmName",
-        "image",
-      ]),
+  upload.array("image"),
+  CheckField(["farmName", "image"]),
   asyncHandler(async (req, res) => {
     const farm = await farmProcess.UpdateFarmInfo(req, req.params.id);
     return SuccessHandler(
@@ -100,11 +111,7 @@ exports.DeleteFarmImage = asyncHandler(async (req, res) => {
     req.params.imageId
   );
 
-  return SuccessHandler(
-    res,
-    `Farm Image has been deleted Successfully`,
-    farm
-  );
+  return SuccessHandler(res, `Farm Image has been deleted Successfully`, farm);
 });
 
 exports.GetCoopOrders = asyncHandler(async (req, res) => {
@@ -124,9 +131,7 @@ exports.GetSingleCoop = asyncHandler(async (req, res) => {
 
   return coop?.length === STATUSCODE.ZERO
     ? next(new ErrorHandler("No Farm Found"))
-    : SuccessHandler(
-        res,
-        `Cooperative has been fetched Successfully`,
-        coop
-      );
-})
+    : SuccessHandler(res, `Cooperative has been fetched Successfully`, coop);
+});
+
+

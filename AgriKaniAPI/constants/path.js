@@ -49,6 +49,7 @@ module.exports = {
   IMAGE_FARM_DELETE: "/farm/image/:id/:imageId",
   RESTORE_FARM_ID: "/restore/farm/:id",
   COOP_ID: "/coop/:id",
+  COOP: "/coop",
   //Comment
   COMMENT: "/products/comment",
 
@@ -109,4 +110,8 @@ module.exports = {
   INVENTORY_ID: "/inventory/:id",
   INVENTORY_ACTIVE_ID: "/inventory/active/:id",
   INVENTORY_INACTIVE_ID: "/inventory/inactive/:id",
+
+  //Test
+  TEST_ID: "/test/:id",
+  TEST: "/test",
 };

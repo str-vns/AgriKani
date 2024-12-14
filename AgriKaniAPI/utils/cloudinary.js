@@ -29,15 +29,27 @@ const storage = new CloudinaryStorage({
         params: (req, file) => {
             const fileName = file.originalname.replace(/\.[^/.]+$/, "");
             const uniqueSuffix = getCurrentDate() + "-" + uuidv4();
-            return{
-                folder: RESOURCE.IMAGES,
-                transformation: [
-                    { width: DEFAULT_WITDH, height: DEFAULT_HEIGHT, crop: LIMIT },
-                ],
-                public_id: `${fileName}-${uniqueSuffix}`,
-            };
+
+            if(file.fieldname === "image"){
+                return{
+                    folder: RESOURCE.IMAGES,
+                    transformation: [
+                        { width: DEFAULT_WITDH, height: DEFAULT_HEIGHT, crop: LIMIT },
+                    ],
+                    public_id: `${fileName}-${uniqueSuffix}`,
+                };
+            } else {
+                return{
+                folder: RESOURCE.FILES,
+                    resource_type: "auto",
+                    public_id: `${fileName}-${uniqueSuffix}`,
+                };
+            }
+            
         },
     });
+
+
 
 const upload = multer ({storage: storage})
 module.exports = {cloudinary, upload}

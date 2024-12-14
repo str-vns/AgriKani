@@ -64,7 +64,13 @@ const farmRoutes = [
     path: PATH.COOP_ID,
     roles: [],
     handler: farmController.GetSingleCoop,
-  }
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.COOP,
+    roles: [],
+    handler: farmController.GetCoopAllFetch,
+  },
 ];
 
 farmRoutes.forEach((route) => {
