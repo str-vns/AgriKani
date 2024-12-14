@@ -18,7 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Cooplist = ({ navigation }) => {
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
-  const { loading, coops, error } = useSelector((state) => state.allCoops);
+  const { loading, coops, error } = useSelector((state) => state.allofCoops);
 
   const [token, setToken] = useState(null);
 

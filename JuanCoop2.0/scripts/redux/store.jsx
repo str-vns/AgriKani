@@ -48,7 +48,7 @@ import {
     sendMessages: sendMessageReducer,
     createComment: commentcreateReducers, 
     allUsers: AllUsersReducer,
-    allCoops: coopAllReducer,
+    allofCoops: coopAllReducer,
     allBlogs: reducerBlog, 
     singleBlog: reducerSingleBlog, 
     createBlog: reducerCreateBlog, 

@@ -31,7 +31,7 @@ const OrderList = ({ navigation }) => {
   const userId = context.stateUser.userProfile?._id;
   const userName = context.stateUser.userProfile?.firstName;
   const {orderloading, orders, ordererror } = useSelector((state) => state.coopOrdering);
-  const { coops }  = useSelector((state) => state.allCoops);
+  const { coops }  = useSelector((state) => state.allofCoops);
   
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = React.useState(false);

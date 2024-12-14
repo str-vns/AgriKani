@@ -56,7 +56,7 @@ export const registeruser = (userData) => async (dispatch) => {
   try {
     dispatch({ type: REGISTER_USER_REQUEST });
 
-    const newImageUri = "file:///" + regi?.image.split("file:/").join("")
+    // formData.append("user", coop?.user);
     const formData = new FormData();
 
     formData.append("firstName", regi?.firstName);

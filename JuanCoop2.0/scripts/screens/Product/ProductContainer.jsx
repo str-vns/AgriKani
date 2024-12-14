@@ -28,7 +28,7 @@ import UserFooter from "../Others/UserFooter";
 
 const ProductContainer = () => {
   const { products, error } = useSelector((state) => state.allProducts);
-  const { coops } = useSelector((state) => state.allCoops); 
+  const { coops } = useSelector((state) => state.allofCoops); 
   const { categories } = useSelector((state) => state.categories);
   const dispatch = useDispatch();
   const navigation = useNavigation();

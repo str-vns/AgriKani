@@ -20,18 +20,23 @@ import {
     COOP_SINGLE_FAIL,
     COOP_SINGLE_REQUEST,
     COOP_SINGLE_SUCCESS,
+    COOP_MATCH_FAIL,
+    COOP_MATCH_REQUEST,
+    COOP_MATCH_SUCCESS,
   } from "../Constants/coopConstants";
   import axios from "axios";
   import baseURL from "@assets/commons/baseurl";
   import mime from "mime";
   
   export const registerCoop = (coop, token) => async (dispatch) => {
-         console.log("coop", coop.image);
+         console.log("coop", coop);
     try {
       dispatch({ type: COOP_REGISTER_REQUEST });
-  
+      const newBusi = "file:///" + coop?.businessPermit.split("file:/").join("")
+      const newCorCDA = "file:///" + coop?.corCDA.split("file:/").join("")
+      const newOrg = "file:///" + coop?.orgStructures.split("file:/").join("")
       const formData = new FormData();
-  
+      
       formData.append("farmName", coop?.farmName);
       formData.append("address", coop?.address);
       formData.append("barangay", coop?.barangay);
@@ -40,6 +45,7 @@ import {
       formData.append("latitude", coop?.latitude);
       formData.append("longitude", coop?.longitude);
       formData.append("user", coop?.user);
+      formData.append("tinNumber", coop?.tinNumber);
       coop?.image.forEach((imageUri) => {
           const newImageUri = "file:///" + imageUri.split("file:/").join("");
           formData.append("image", {
@@ -49,13 +55,36 @@ import {
           });
       });
       
+      formData.append("businessPermit",
+        {
+            uri: newBusi,
+            type: mime.getType(newBusi),
+            name: newBusi.split("/").pop()
+        })
+
+      formData.append("corCDA",
+        {
+            uri: newCorCDA,
+            type: mime.getType(newCorCDA),
+            name: newCorCDA.split("/").pop()
+        }
+      )
+        
+      formData.append("orgStructure",
+        {
+            uri: newOrg,
+            type: mime.getType(newOrg),
+            name: newOrg.split("/").pop()
+        }
+      )
       const config = {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
+
       };
-  
+     
       const { data } = await axios.post(`${baseURL}farm`, formData, config);
       
           dispatch({ type: COOP_REGISTER_SUCCESS, payload: data.details });
@@ -219,6 +248,27 @@ import {
     } catch (error) {
       dispatch({
         type: COOP_SINGLE_FAIL,
+        payload: error.response ? error.response.data.message : error.message,
+      });
+    }
+  }
+
+  export const matchCooperative = (token) => async (dispatch) => {
+    try {
+      dispatch({ type: COOP_MATCH_REQUEST });
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+  
+      const { data } = await axios.get(`${baseURL}coop`, config);
+  
+      dispatch({ type: COOP_MATCH_SUCCESS, payload: data.details });
+    } catch (error) {
+      dispatch({
+        type: COOP_MATCH_FAIL,
         payload: error.response ? error.response.data.message : error.message,
       });
     }

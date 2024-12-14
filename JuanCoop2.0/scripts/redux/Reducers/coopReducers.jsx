@@ -20,6 +20,9 @@ import {
   COOP_SINGLE_FAIL,
   COOP_SINGLE_REQUEST,
   COOP_SINGLE_SUCCESS,
+  COOP_MATCH_FAIL,
+  COOP_MATCH_REQUEST,
+  COOP_MATCH_SUCCESS,
 } from "../Constants/coopConstants";
 
 export const coopYReducer = (state = { coop: {} }, action) => {
@@ -51,21 +54,24 @@ export const coopYReducer = (state = { coop: {} }, action) => {
 export const coopAllReducer = (state = { coops: [] }, action) => {
   switch (action.type) {
     case COOP_ALL_REQUEST:
-      case COOP_SINGLE_REQUEST:
+    case COOP_SINGLE_REQUEST:
+    case COOP_MATCH_REQUEST:
       return { loading: true, coops: [] };
 
     case COOP_ALL_SUCCESS:
-      case COOP_SINGLE_SUCCESS:
+    case COOP_SINGLE_SUCCESS:
+    case COOP_MATCH_SUCCESS:
       return { loading: false, coops: action.payload };
 
     case COOP_ALL_FAIL:
-      case COOP_SINGLE_FAIL:
+    case COOP_SINGLE_FAIL:
+    case COOP_MATCH_FAIL:
       return { loading: false, error: action.payload };
 
     default:
       return state;
   }
-}
+};
 
 export const coopOrderReducer = (state = { orders: [] }, action) => {
   switch (action.type) {
@@ -81,7 +87,7 @@ export const coopOrderReducer = (state = { orders: [] }, action) => {
     default:
       return state;
   }
-}
+};
 
 export const coopOrderUpdateReducer = (state = { order: {} }, action) => {
   switch (action.type) {
@@ -97,5 +103,4 @@ export const coopOrderUpdateReducer = (state = { order: {} }, action) => {
     default:
       return state;
   }
-}
-
+};

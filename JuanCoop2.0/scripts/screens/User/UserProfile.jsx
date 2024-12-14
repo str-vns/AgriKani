@@ -14,25 +14,25 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux';
-import { Profileuser } from '@redux/Actions/userActions';
 import AuthGlobal from "@redux/Store/AuthGlobal";
+import { matchCooperative } from "@redux/Actions/coopActions";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserProfile = () => {
-
-
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { loading, user, error } = useSelector((state) => state.userOnly)
+  const { coops } = useSelector((state) => state.allofCoops);
   const userId = context?.stateUser?.userProfile?._id;
   const [token, setToken] = useState();
   const [loadings, setLoadings] = useState(true);
   const [errors, setErrors] = useState(null);
   const userInfo = context.stateUser.user.CustomerInfo
+  const filterUser = coops?.filter((coop) => coop.user._id === userId);
+  console.log("coops", filterUser)
   // console.log("token: ", token)
  
   // useEffect(() => {
@@ -62,6 +62,26 @@ const UserProfile = () => {
   //   fetchUserData();
   // }, [userId, dispatch]);
   
+  useEffect(() => {
+    const fetchJwt = async () => {
+      try {
+        const res = await AsyncStorage.getItem("jwt");
+        setToken(res);
+      } catch (error) {
+        console.error("Error retrieving JWT: ", error);
+      }
+    };
+
+    fetchJwt();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(matchCooperative(token));
+    }, [dispatch])
+  )
+
+ 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -140,11 +160,11 @@ const UserProfile = () => {
     <TouchableOpacity onPress={() => navigation.navigate('EditFarm')}>
     <Text>Edit Your Farm</Text>
   </TouchableOpacity>
-  ) : (
-    <TouchableOpacity onPress={() => navigation.navigate('ProfileCoop')}>
-      <Text>ARE you Part of Coop? Register here!</Text>
-    </TouchableOpacity>
-)}
+  ) : filterUser?.length !== 0 ? (
+  null
+) :  (<TouchableOpacity onPress={() => navigation.navigate('ProfileCoop')}>
+<Text>ARE you Part of Coop? Register here!</Text>
+</TouchableOpacity>)}
 
           {/* Modal */}
           {/* <Modal

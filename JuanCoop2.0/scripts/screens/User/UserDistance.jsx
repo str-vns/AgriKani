@@ -13,7 +13,7 @@ import { View } from 'native-base';
 import { Button, Image, Text, TouchableOpacity } from 'react-native';
 
 const UserDistance = () => {
-    const { coops } = useSelector((state) => state.allCoops);
+    const { coops } = useSelector((state) => state.allofCoops);
     const markerCon = MarkerIcon
     const context = useContext(AuthGlobal);
     const webViewRef = useRef(null)
@@ -24,7 +24,7 @@ const UserDistance = () => {
     const [markerCoordinate, setMarkerCoordinate] = useState({ lat: 37.78825, lng: -122.4324, });
     const [coopsMarker, setCoopsMarker] = useState(null);
     const [coopId, setCoopId] = useState(null);
-    const filterCoops = coops.filter((coop) => coop._id === coopId);
+    const filterCoops = coops?.filter((coop) => coop._id === coopId);
    console.log("FilterCoops", filterCoops)
     //token 
     useEffect(() => {

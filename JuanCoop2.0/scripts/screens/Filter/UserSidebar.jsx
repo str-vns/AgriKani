@@ -20,19 +20,18 @@ const UserSidebar = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const dispatch = useDispatch();
   const { loading, user, error } = useSelector((state) => state.userOnly);
-  const userslogin = context.stateUser?.userProfile || null;;
+  const userslogin = context.stateUser?.userProfile || null;
   const userId = context?.stateUser?.userProfile?._id;
   const [loadings, setLoadings] = useState(true);
 
-     useEffect(() => {
-  
-       const initialize = async () => {
-         await context.dispatch(isLogin(context.dispatch));
-         setLoadings(false);
-       };
-   
-       initialize();
-     }, []);
+  useEffect(() => {
+    const initialize = async () => {
+      await context.dispatch(isLogin(context.dispatch));
+      setLoadings(false);
+    };
+
+    initialize();
+  }, []);
 
   const userItems = [
     { label: "Home", icon: "home-outline", key: "home" },
@@ -95,6 +94,8 @@ const UserSidebar = () => {
       navigation.navigate("UserOrderList");
     } else if (key === "CoopDistance") {
       navigation.navigate("Home", { screen: "CoopDistance" });
+    } else if (key === "notifications"){
+      navigation.navigate("Home", { screen: "NotificationList" })
     }
   };
 
@@ -176,7 +177,7 @@ const UserSidebar = () => {
             <Text style={styles.profileRole}>Cooperative</Text>
           </>
         ) : context?.stateUser?.isAuthenticated &&
-        userslogin?.roles &&
+          userslogin?.roles &&
           userslogin?.roles.includes("Customer") ? (
           <>
             <Image
@@ -189,8 +190,8 @@ const UserSidebar = () => {
             <Text style={styles.profileRole}>User</Text>
           </>
         ) : context?.stateUser?.isAuthenticated &&
-        userslogin?.roles &&
-        userslogin?.roles.includes("Admin") ? (
+          userslogin?.roles &&
+          userslogin?.roles.includes("Admin") ? (
           <Text style={styles.profileRole}>Admin</Text>
         ) : null}
       </View>
@@ -256,34 +257,34 @@ const UserSidebar = () => {
         userslogin?.roles[0]?.includes("Customer") ? (
         <>
           <ScrollView>
-          <View style={styles.menuContainer}>
-            {userItems.map((item) => (
-              <TouchableOpacity
-                key={item.key}
-                style={[
-                  styles.menuItem,
-                  activeItem === item.key
-                    ? { backgroundColor: "#fef8e5" }
-                    : null,
-                ]}
-                onPress={() => handlePress(item.key)}
-              >
-                <Ionicons
-                  name={item.icon}
-                  size={24}
-                  color={activeItem === item.key ? "#000" : "#666"}
-                />
-                <Text
+            <View style={styles.menuContainer}>
+              {userItems.map((item) => (
+                <TouchableOpacity
+                  key={item.key}
                   style={[
-                    styles.menuLabel,
-                    activeItem === item.key ? styles.activeLabel : null,
+                    styles.menuItem,
+                    activeItem === item.key
+                      ? { backgroundColor: "#fef8e5" }
+                      : null,
                   ]}
+                  onPress={() => handlePress(item.key)}
                 >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                  <Ionicons
+                    name={item.icon}
+                    size={24}
+                    color={activeItem === item.key ? "#000" : "#666"}
+                  />
+                  <Text
+                    style={[
+                      styles.menuLabel,
+                      activeItem === item.key ? styles.activeLabel : null,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </ScrollView>
           <View style={styles.footerContainer}>
             <TouchableOpacity

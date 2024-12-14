@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { FlatList } from "native-base";
 import { useDispatch, useSelector } from "react-redux";
 import { reverseCode, forwardCode } from "@redux/Actions/locationActions";
-import { registerCoop } from "@redux/Actions/coopActions";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
@@ -175,7 +174,7 @@ const deleteImage = (index) => {
         user: userInfo,
       }
 
-      dispatch(registerCoop(coopRegistration, token));
+      // dispatch(registerCoop(coopRegistration, token));
       setFarmName("");
       setMyAddress("");
       setCity("");
@@ -186,7 +185,7 @@ const deleteImage = (index) => {
       setLongitude("");
       setErrors(null);
 
-      navigate.navigate("CoopDashboard");
+      navigate.navigate("Requirements", { registration: coopRegistration });
 
     } catch (error) {
       console.error("Error registering farm: ", error);
@@ -347,6 +346,7 @@ const deleteImage = (index) => {
 
         <TouchableOpacity
           style={styles.registerButton}
+          disabled={isLoading}
           onPress={() => handleRegisterFarm()}
         >
           {isLoading ? (  <ActivityIndicator size="small" color="#fff" /> ) : (   <Text style={styles.registerButtonText}>Register Cooperative</Text>)}

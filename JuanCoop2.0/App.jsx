@@ -10,12 +10,10 @@ import DrawerNavi from "@navigators/DrawerNavigators"
 import messaging from '@react-native-firebase/messaging';
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import * as SplashScreen from 'expo-splash-screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function App() {    
     const [appReady, setAppReady] = useState(false); 
-    const [stateUser, setStateUser] = useState("");
-    const context = useContext(AuthGlobal);
 
     if(!appReady) {
       setAppReady(true);
@@ -90,8 +88,6 @@ export default function App() {
       initializeFCM();
     }, []);
   
-    
-
   return (
     <Auth >
       <SocketProvider>

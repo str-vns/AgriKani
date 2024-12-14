@@ -108,6 +108,7 @@ const UserSignIn = () => {
       setEmail("");
       setPassword("");
       setError("");
+      setIsLoading(false)
       navigation.navigate("CoopDashboard");
       
     } else if (
@@ -125,7 +126,7 @@ const UserSignIn = () => {
       setEmail("");
       setPassword("");
       setError("");
-
+      setIsLoading(false)
       console.log("Navigating to Admin Dashboard");
       navigation.navigate("Admin");
     } else if (context?.stateUser?.isAuthenticated && userInfo.roles.includes("Customer")) {
@@ -139,9 +140,12 @@ const UserSignIn = () => {
       setEmail("");
       setPassword("");
       setError("");
+      setIsLoading(false)
       console.log("Navigating to Home");
       navigation.navigate("Home", { screen: "Home" });
-    } 
+    } else{
+      setIsLoading(false)
+    }
   }, [context.stateUser.isAuthenticated]);
 
   const handleSubmit = () => {

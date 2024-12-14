@@ -7,7 +7,7 @@ import UserOrderList from "@screens/User/UserOrderList";
 import ProfileCoop from "@screens/UserRegis/UserCoopRegistration";
 import EditFarm from "@screens/Farmer/FarmEdit";
 import AddReviews from "@screens/Review/UserAddReview";
-
+import Requirements from "@screens/Farmer/Registration/RequirementsRegistration"
 const Stack = createNativeStackNavigator();
 
 const UserNavigation = () => {
@@ -48,7 +48,14 @@ const UserNavigation = () => {
           tabBarShowLabel: false,
         }}
       />
-
+      <Stack.Screen
+        name="Requirements"
+        component={Requirements}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false
+        }}
+        />
       <Stack.Screen
         name="EditFarm"
         options={{
