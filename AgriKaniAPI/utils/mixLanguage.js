@@ -5,9 +5,17 @@ var sentiment = new Sentiment();
 
 sentiment.registerLanguage('fil', filLanguage);
 
+function preprocessText(text) {
+    const words = text.toLowerCase().split(/\s+/);
+    const uniqueWords = [...new Set(words)];
+    return uniqueWords.join(' ');
+}
+
+
 function analyzeMixedLanguage(text) {
-    var resultFil = sentiment.analyze(text, { language: 'fil' });
-    var resultEng = sentiment.analyze(text);
+    const normalizedText = preprocessText(text);
+    var resultFil = sentiment.analyze(normalizedText, { language: 'fil' });
+    var resultEng = sentiment.analyze(normalizedText);
 
     const combinedScore = resultFil.score + resultEng.score;
 

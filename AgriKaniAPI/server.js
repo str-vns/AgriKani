@@ -31,5 +31,3 @@ mongoose.connection.on("error", (err) => {
 });
 
 
-// var result = analyzeMixedLanguage('tanga ka, BOBO PA, pero Mabait ka But its fine' )
-// console.log(result)

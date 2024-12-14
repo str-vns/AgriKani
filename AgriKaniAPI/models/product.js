@@ -52,6 +52,14 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  sentiment: {
+    type: String,
+    default: "neutral",
+  },
+  sentimentOverall: {
+    type: Number,
+    default: 0,
+  },
   reviews: [
     {
       user: {
@@ -70,6 +78,10 @@ const productSchema = new mongoose.Schema({
       comment: {
         type: String,
         required: true,
+      },
+      sentimentScore:{
+        type: Number,
+        default: 0,
       },
       image: [
         {
