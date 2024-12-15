@@ -11,16 +11,16 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { inactiveCooperative } from "@redux/Actions/coopActions";
+import { allCoops } from "@redux/Actions/coopActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Cooplist = () => {
+const CooplistActive = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const { loading, coops, error } = useSelector((state) => state.allofCoops);
-  const [selectedTab, setSelectedTab] = useState("Not_Approved");
+  const [selectedTab, setSelectedTab] = useState("Approved");
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Cooplist = () => {
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(inactiveCooperative(token));
+      dispatch(allCoops(token));
       return () => {
         console.log("Cleaning up on screen unfocus...");
       };
@@ -49,7 +49,7 @@ const Cooplist = () => {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      dispatch(inactiveCooperative(token));
+      dispatch(allCoops(token));
     } catch (err) {
       console.error("Error refreshing users:", err);
     } finally {
@@ -77,7 +77,7 @@ const Cooplist = () => {
             selectedTab === "Not_Approved" && styles.activeTab,
           ]}
           onPress={() => {
-            setSelectedTab("Not_Approved");
+            navigation.navigate("CoopList");
           }}
         >
           <Text
@@ -95,7 +95,7 @@ const Cooplist = () => {
             selectedTab === "Approved" && styles.activeTab,
           ]}
           onPress={() => {
-            navigation.navigate("CoopActive");
+            setSelectedTab("Approved");
           }}
         >
           <Text
@@ -108,7 +108,6 @@ const Cooplist = () => {
           </Text>
         </TouchableOpacity>
       </View>
-
       {/* Content */}
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
@@ -156,4 +155,4 @@ const Cooplist = () => {
   );
 };
 
-export default Cooplist;
+export default CooplistActive;
