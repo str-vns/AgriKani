@@ -34,6 +34,8 @@ import BlogCard from "@src/screens/admin/Blog/BlogCard";
 import CoopLists from "@screens/admin/Coop/Cooplist";
 import UserList from "@src/screens/admin/User/UserList";
 import barGraph from "@src/screens/admin/rankProduct";
+import CoopActive from "@src/screens/admin/Coop/CooplistActive";
+import CoopDetails from "@src/screens/admin/Coop/CoopDetails";
 
 global.__reanimatedWorkletInit = () => {};
 
@@ -216,6 +218,26 @@ const Index = () => {
             tabBarShowLabel: false,
           }}
         />
+
+
+        <Drawer.Screen
+          name="CoopActive"
+          component={CoopActive}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
+        />
+
+        <Drawer.Screen
+          name="CoopDetails"
+          component={CoopDetails}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
+        />
+
           <Drawer.Screen
           name="barGraph"
           component={barGraph}
