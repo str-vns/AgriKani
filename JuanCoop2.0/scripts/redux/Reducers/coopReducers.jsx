@@ -23,6 +23,15 @@ import {
   COOP_MATCH_FAIL,
   COOP_MATCH_REQUEST,
   COOP_MATCH_SUCCESS,
+  INACTIVE_COOP_REQUEST,
+  INACTIVE_COOP_SUCCESS,
+  INACTIVE_COOP_FAIL,
+  COOP_ACTIVE_FAIL,
+  COOP_ACTIVE_REQUEST,
+  COOP_ACTIVE_SUCCESS,
+  COOP_DELETE_FAIL,
+  COOP_DELETE_REQUEST,
+  COOP_DELETE_SUCCESS,
 } from "../Constants/coopConstants";
 
 export const coopYReducer = (state = { coop: {} }, action) => {
@@ -55,17 +64,20 @@ export const coopAllReducer = (state = { coops: [] }, action) => {
   switch (action.type) {
     case COOP_ALL_REQUEST:
     case COOP_SINGLE_REQUEST:
-    case COOP_MATCH_REQUEST:
+    case COOP_MATCH_REQUEST: 
+    case INACTIVE_COOP_REQUEST:
       return { loading: true, coops: [] };
 
     case COOP_ALL_SUCCESS:
     case COOP_SINGLE_SUCCESS:
     case COOP_MATCH_SUCCESS:
+    case INACTIVE_COOP_SUCCESS:
       return { loading: false, coops: action.payload };
 
     case COOP_ALL_FAIL:
     case COOP_SINGLE_FAIL:
     case COOP_MATCH_FAIL:
+    case INACTIVE_COOP_FAIL:
       return { loading: false, error: action.payload };
 
     default:
@@ -104,3 +116,22 @@ export const coopOrderUpdateReducer = (state = { order: {} }, action) => {
       return state;
   }
 };
+
+export const coopActiveReducer = (state = { coop: {} }, action) => {
+  switch (action.type) {
+    case COOP_ACTIVE_REQUEST:
+      case COOP_DELETE_REQUEST:
+      return { loading: true, coop: {} };
+
+    case COOP_ACTIVE_SUCCESS:
+      case COOP_DELETE_SUCCESS:
+      return { loading: false, success: action.payload };
+
+    case COOP_ACTIVE_FAIL:
+      case COOP_DELETE_FAIL:
+      return { loading: false, error: action.payload };
+
+    default:
+      return state;
+  }
+}
