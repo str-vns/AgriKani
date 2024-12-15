@@ -50,6 +50,11 @@ module.exports = {
   RESTORE_FARM_ID: "/restore/farm/:id",
   COOP_ID: "/coop/:id",
   COOP: "/coop",
+  COOP_INACTIVE: "/no-approve/coop",
+  COOP_ACTIVE: "/yes-approve/coop/:id",
+  COOP_DISAPPROVE: "/disapprove/coop/:id",
+
+
   //Comment
   COMMENT: "/products/comment",
 
