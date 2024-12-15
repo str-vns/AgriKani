@@ -3,11 +3,8 @@ const ErrorHandler = require("../utils/errorHandler");
 const SuccessHandler = require("../utils/successHandler");
 const orderProcess = require("../process/orderProcess");
 const { STATUSCODE } = require("../constants/index");
-const generateReceiptPDF = require("../utils/pdfreceipts");
-const sendEmailWithAttachment = require("../utils/emailreceipts");
 const Order = require("../models/order");
-const path = require("path");
-const fs = require("fs");
+
 
 // Create a new order
 exports.createOrder = asyncHandler(async (req, res, next) => {
@@ -32,49 +29,6 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     if (!populatedOrder) {
       return next(new ErrorHandler("Order not found after creation", 404));
     }
-
-    // Generate receipt
-    const receiptFolder = path.join(__dirname, "../receipts");
-    if (!fs.existsSync(receiptFolder)) {
-      fs.mkdirSync(receiptFolder);
-    }
-    const receiptPath = path.join(receiptFolder, `${createdOrder._id}.pdf`);
-    await generateReceiptPDF(populatedOrder, receiptPath);
-
-    // Send receipt via email
-    const userEmail = populatedOrder.user.email;
-    const emailSubject = `Receipt for Order #${populatedOrder._id}`;
-    const emailHtml = `
-      <p>Dear ${populatedOrder.user.firstName},</p>
-      <p>Thank you for your purchase! Please find your order receipt attached.</p>
-      <h4>Order Details:</h4>
-      <p>
-        <strong>Order ID:</strong> ${populatedOrder._id}<br>
-        <strong>Total Price:</strong> ₱${populatedOrder.totalPrice}<br>
-        <strong>Payment Method:</strong> ${populatedOrder.paymentMethod}<br>
-        <strong>Shipping Address:</strong><br>
-        ${populatedOrder.shippingAddress.fullName}<br>
-        ${populatedOrder.shippingAddress.address}, ${populatedOrder.shippingAddress.city}, 
-        ${populatedOrder.shippingAddress.postalCode}<br>
-        <strong>Phone:</strong> ${populatedOrder.shippingAddress.phoneNum}
-      </p>
-      <h4>Products Ordered:</h4>
-      <ul>
-        ${populatedOrder.orderItems
-          .map(
-            (item) => `        
-          <li>
-            ${item.product.productName} - Quantity: ${item.quantity} - Unit Price: ₱${item.product.pricing}
-          </li>`
-          )
-          .join("")}
-      </ul>
-      <p>We appreciate your business and hope to serve you again soon!</p>
-    `;
-    
-    // Send email with the generated receipt and the email content
-    await sendEmailWithAttachment(userEmail, emailSubject, "", receiptPath, emailHtml);
-
     return SuccessHandler(res, "Order created and receipt sent successfully", createdOrder);
   } catch (error) {
     return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));

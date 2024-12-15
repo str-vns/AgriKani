@@ -44,6 +44,14 @@ exports.GetAllFarm = asyncHandler(async (req, res, next) => {
     : SuccessHandler(res, `All Farm has been fetched Successfully`, farm);
 });
 
+exports.GetNoApproveCoops = asyncHandler(async (req, res, next) => {
+  const farm = await farmProcess.GetAllInactiveCoop();
+
+  return farm?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Farm Found"))
+    : SuccessHandler(res, `All Inactive Cooperative has been fetched Successfully`, farm);
+})
+
 exports.GetCoopAllFetch = asyncHandler(async (req, res, next) => {
   const coop = await farmProcess.GetAllofCoop();
 
@@ -134,4 +142,22 @@ exports.GetSingleCoop = asyncHandler(async (req, res) => {
     : SuccessHandler(res, `Cooperative has been fetched Successfully`, coop);
 });
 
+exports.ApproveCooperative = asyncHandler(async (req, res) => {
+  const coop = await farmProcess.ApproveCoop(req.params.id, req);
 
+  return SuccessHandler(
+    res,
+    `Cooperative has been Approved Successfully`,
+    coop
+  );
+});
+
+exports.DisapproveCooperative = asyncHandler(async (req, res) => {
+  const coop = await farmProcess.DisapproveCoop(req.params.id);
+
+  return SuccessHandler(
+    res,
+    `Cooperative has been Disapproved Successfully`,
+    coop
+  );
+});
