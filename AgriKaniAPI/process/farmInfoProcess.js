@@ -2,13 +2,11 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const { cloudinary } = require("../utils/cloudinary");
-const {
-  uploadImageMultiple,
-  uploadFileSingle,
-} = require("../utils/imageCloud");
+const { uploadImageMultiple, uploadFileSingle } = require("../utils/imageCloud");
 const Farm = require("../models/farm");
 const User = require("../models/user");
 const Orders = require("../models/order");
+const { sendEmail } = require("../utils/sendMail");
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -64,6 +62,16 @@ exports.GetAllFarm = async () => {
 
   return farm;
 };
+
+exports.GetAllInactiveCoop= async () => {
+  const farm = await Farm.find({approvedAt: null})
+    .populate({ path: "user", select: "firstName lastName email image.url" })
+    .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
+    .lean()
+    .exec();
+
+  return farm;
+}
 
 exports.GetAllofCoop = async () => {
   const farm = await Farm.find()
@@ -271,3 +279,233 @@ exports.coopSingle = async (id) => {
 
   return singleCoop;
 };
+
+exports.ApproveCoop = async (id, req) => {
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+    }
+
+    const coopExist = await Farm.findById(id)
+    .populate({ path: "user", select: "firstName lastName email image.url" }).lean().exec()
+
+    const email = coopExist.user.email;
+    const mailOptions = {
+      to: email,
+      subject: "Registration Cooperative Approved",
+      html: `
+      <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>AgriKaAni OTP Verification</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f4f4f4;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 20px auto;
+                    padding: 30px;
+                    background-color: #ffffff;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                    text-align: center;
+                }
+                h1 {
+                    color: #333;
+                    font-size: 28px;
+                    margin-bottom: 10px;
+                }
+                p {
+                    color: #555;
+                    line-height: 1.5;
+                    margin-bottom: 20px;
+                }
+                .otp {
+                    display: inline-block;
+                    padding: 15px 30px;
+                    font-size: 32px;
+                    font-weight: bold;
+                    color: #fff;
+                    background-color: #f7b900;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    margin: 10px 0;
+                }
+                .logo {
+                    margin-bottom: 20px;
+                }
+                .footer {
+                    margin-top: 20px;
+                    font-size: 12px;
+                    color: #aaa;
+                    text-align: center;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+               <div class="logo" style="text-align: center;">
+    <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1734251324/images/voxnhndpnquj24onbmhf.png" 
+         alt="AgriKaAni Logo" 
+         style="max-width: 10%; height: auto; display: block; margin: 0 auto;"/>
+    <p class="text" style="margin-top: 0px; font-size: 16px; font-weight: bold; color: #333;">
+        Juan Coop
+    </p>
+</div>
+                 <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1734251327/images/vuybhnzdnysq50jw3mrk.png" alt="AgriKaAni Logo" style="max-width: 25%; height: auto;" />
+                <h4>Hi! ${coopExist.user.firstName}, ${coopExist.user.lastName}<h4>
+                <h1>Your Registration for Cooperative is Success!</h1>
+                <p>Now you can sell your own product</p>
+                <p>Thank you for using our service!</p>
+            </div>
+            <div class="footer">
+                <p>This email was sent from AgriKaAni. &copy; ${new Date().getFullYear()}</p>
+            </div>
+        </body>
+        </html>
+      `,
+    };
+  
+    await sendEmail(mailOptions);
+  
+
+    const coopUpdate = await Farm.findByIdAndUpdate(
+      id,
+      {
+        approvedAt: Date.now(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).lean()
+      .exec();
+  
+    if (!coopUpdate) {
+      throw new ErrorHandler(`Coop not updated with ID ${id}`);
+    }
+  
+    // Update User Roles
+    const user = await User.findById(req.body.userId).exec();
+    if (!user) {
+      throw new ErrorHandler("User not found");
+    }
+  
+    if (!user.roles.includes(ROLE.COOPERATIVE)) {
+      user.roles.push(ROLE.COOPERATIVE);
+      await user.save();
+    }
+  
+    return coopUpdate;
+  
+  } catch (error) {
+    console.error("An error occurred:", error.message);
+    throw new ErrorHandler(error.message || "An unexpected error occurred");
+  }
+}
+
+exports.DisapproveCoop = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+
+  const coopExist = await Farm.findById(id)
+  .populate({ path: "user", select: "firstName lastName email image.url" }).lean().exec()
+
+  const email = coopExist.user.email;
+  const mailOptions = {
+    to: email,
+    subject: "Registration Cooperative Not Approved",
+    html: `
+    <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>AgriKaAni OTP Verification</title>
+          <style>
+              body {
+                  font-family: Arial, sans-serif;
+                  margin: 0;
+                  padding: 0;
+                  background-color: #f4f4f4;
+              }
+              .container {
+                  max-width: 600px;
+                  margin: 20px auto;
+                  padding: 30px;
+                  background-color: #ffffff;
+                  border-radius: 8px;
+                  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                  text-align: center;
+              }
+              h1 {
+                  color: #333;
+                  font-size: 28px;
+                  margin-bottom: 10px;
+              }
+              p {
+                  color: #555;
+                  line-height: 1.5;
+                  margin-bottom: 20px;
+              }
+              .otp {
+                  display: inline-block;
+                  padding: 15px 30px;
+                  font-size: 32px;
+                  font-weight: bold;
+                  color: #fff;
+                  background-color: #f7b900;
+                  border-radius: 5px;
+                  text-decoration: none;
+                  margin: 10px 0;
+              }
+              .logo {
+                  margin-bottom: 20px;
+              }
+              .footer {
+                  margin-top: 20px;
+                  font-size: 12px;
+                  color: #aaa;
+                  text-align: center;
+              }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+             <div class="logo" style="text-align: center;">
+  <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1734251324/images/voxnhndpnquj24onbmhf.png" 
+       alt="AgriKaAni Logo" 
+       style="max-width: 10%; height: auto; display: block; margin: 0 auto;"/>
+  <p class="text" style="margin-top: 0px; font-size: 16px; font-weight: bold; color: #333;">
+      Juan Coop
+  </p>
+</div>
+               <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1734260381/images/olwhjvr5dvjhrgbwrcsa.png" alt="AgriKaAni Logo" style="max-width: 25%; height: auto;" />
+              <h4>Hi! ${coopExist.user.firstName}, ${coopExist.user.lastName}<h4>
+              <h1>Your Registration for Cooperative is Not Approved!</h1>
+              <p>The information you provided was incomplete, did not meet the required criteria</p>
+              <p>Thank you for using our service!</p>
+          </div>
+          <div class="footer">
+              <p>This email was sent from AgriKaAni. &copy; ${new Date().getFullYear()}</p>
+          </div>
+      </body>
+      </html>
+    `,
+  };
+
+  await sendEmail(mailOptions);
+
+  const coopUpdate = await Farm.findByIdAndDelete
+  (id).lean()
+  .exec();
+  if (!coopUpdate) throw new ErrorHandler(`Coop not Update with ID ${id}`);
+  return coopUpdate;
+}

@@ -99,9 +99,14 @@ async function sendVerificationEmail(email, otp) {
         </head>
         <body>
             <div class="container">
-                <div class="logo">
-                    <img src="https://asset.cloudinary.com/dchupxpjw/64e083eda3c1804c7591c1318ec21ed2" alt="AgriKaAni Logo" style="max-width: 100%; height: auto;"/>
-                </div>
+                 <div class="logo" style="text-align: center;">
+    <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1734251324/images/voxnhndpnquj24onbmhf.png" 
+         alt="AgriKaAni Logo" 
+         style="max-width: 10%; height: auto; display: block; margin: 0 auto;"/>
+    <p class="text" style="margin-top: 0px; font-size: 16px; font-weight: bold; color: #333;">
+        Juan Coop
+    </p>
+</div>
                 <h1>Welcome to AgriKaAni!</h1>
                 <p>Your OTP code is:</p>
                 <p><span class="otp">${otp}</span></p>

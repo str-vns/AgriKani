@@ -6,6 +6,11 @@ const ErrorHandler = require("../utils/errorHandler");
 const mongoose = require("mongoose");
 const Inventory = require("../models/inventoryM");
 const Farm = require("../models/farm");
+const generateReceiptPDF = require("../utils/pdfreceipts");
+const sendEmailWithAttachment = require("../utils/emailreceipts");
+const path = require("path");
+const fs = require("fs");
+
 // Create a new order
 exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice, user }) => {
   if (!orderItems || orderItems.length === 0) {
@@ -138,31 +143,78 @@ exports.getOrderById = async (id) => {
 };
 
 exports.updateOrderStatusCoop = async (id, req) => {
-  console.log(req.body.InvId, "Request body");
-   console.log(req.body.orderStatus, "Request body");
   if (!['Pending', 'Processing', 'Shipping', 'Delivered', 'Cancelled'].includes(req.body.orderStatus)) {
     throw new ErrorHandler("Invalid status", 400);
   }
 
-  const order = await Order.findById(id);
+  const order = await Order.findById(id)
+  .populate({ path: "orderItems.inventoryProduct", select: "metricUnit unitName price" })
+  .populate({ path: "orderItems.product", select: "coop productName image.url" })
+  .populate({ path: "shippingAddress", select: "address city postalCode" })
+  .populate({ path: "user", select: "firstName lastName email phoneNum" })
   if (!order) {
     throw new ErrorHandler("Order not found", 404);
   }
 
   const inventorys = req.body.InvId;
   const matchedOrderItems = order.orderItems.filter(item =>
-    inventorys.includes(item.inventoryProduct.toString())
+    inventorys.includes(item.inventoryProduct?._id?.toString())
   );
 
   for (const matchedItem of matchedOrderItems) {
+   
     if (matchedItem.orderStatus !== req.body.orderStatus) {
       const inventory = await Inventory.findById(matchedItem.inventoryProduct);
-      const product = await Product.findById(matchedItem.product);
-  
+      const product = await Product.findById(matchedItem.product._id);
+
       matchedItem.orderStatus = req.body.orderStatus;
   
       if (req.body.orderStatus === 'Processing') {
         inventory.quantity -= matchedItem.quantity;
+
+    const totalPrice = order.orderItems.reduce((acc, item) => acc + item.quantity * item.inventoryProduct.price, 0);
+           // Generate receipt
+    const receiptFolder = path.join(__dirname, "../receipts");
+    if (!fs.existsSync(receiptFolder)) {
+      fs.mkdirSync(receiptFolder);
+    }
+    const receiptPath = path.join(receiptFolder, `${order._id}.pdf`);
+    await generateReceiptPDF(order, receiptPath);
+   
+    // Send receipt via email
+    const userEmail = order.user.email;
+    const emailSubject = `Receipt for Order #${order._id}`;
+    const emailHtml = `
+  <p>Dear ${order.user.firstName},</p>
+  <p>Thank you for your purchase! Please find your order receipt attached.</p>
+  <h4>Order Details:</h4>
+  <p>
+    <strong>Order ID:</strong> ${order._id}<br>
+    <strong>Total Price:</strong> ₱${totalPrice}<br>
+    <strong>Payment Method:</strong> ${order.paymentMethod}<br>
+    <strong>Shipping Address:</strong><br>
+    ${order.user.firstName} ${order.user.lastName}<br>
+    ${order.shippingAddress.address}, ${order.shippingAddress.city}, 
+    ${order.shippingAddress.postalCode}<br>
+    <strong>Phone:</strong> ${order.user.phoneNum}
+  </p>
+  <h4>Products Ordered:</h4>
+  <ul>
+    ${order.orderItems
+      .map(
+        (item) => `        
+        <li>
+          ${item.product.productName} - Quantity: ${item.quantity} - Unit Price: ₱${item.inventoryProduct.price}
+        </li>`
+      )
+      .join("")}
+  </ul>
+  <h4>Total Purchase: ₱${totalPrice}</h4>
+  <p>We appreciate your business and hope to serve you again soon!</p>
+`;
+    
+    await sendEmailWithAttachment(userEmail, emailSubject, "", receiptPath, emailHtml);
+
         if (inventory.quantity === 0) {
           inventory.status = 'inactive';
         }
