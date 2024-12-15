@@ -10,7 +10,7 @@ import {
   import { OTPReducer, RegisterReducer, userReducer, EditProfileReducer, getUsersReducers, AllUsersReducer, userDeviceTokenReducer  } from "@redux/Reducers/userReducers";
   import { reducerProduct, reducerCoop, reducerCoopProduct, reducerCreateProduct, reducerEditProduct, reducerDelResProduct } from "@redux/Reducers/productReducers";
   import { HereMapReducer } from "@redux/Reducers/locationReducers";
-  import { coopYReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer } from "@redux/Reducers/coopReducers";
+  import { coopYReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
   import { addressReducer } from "@redux/Reducers/addressReducer";
   import { typeListReducer } from "@redux/Reducers/typeReducers";
   import { categoryListReducer } from "@redux/Reducers/categoryReducers";
@@ -66,6 +66,7 @@ import {
     getNotif: getNotificationReducers,
     readNotif: readNotificationReducers,
     invent: inventoryCreateReducer,
+    coopActive: coopActiveReducer
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));
