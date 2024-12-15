@@ -71,6 +71,24 @@ const farmRoutes = [
     roles: [],
     handler: farmController.GetCoopAllFetch,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.COOP_INACTIVE,
+    roles: [],
+    handler: farmController.GetNoApproveCoops,
+  },
+  {
+    method: METHOD.PATCH,
+    path: PATH.COOP_ACTIVE,
+    roles: [],
+    handler: farmController.ApproveCooperative,
+  },
+  {
+    method: METHOD.DELETE,
+    path: PATH.COOP_DISAPPROVE,
+    roles: [],
+    handler: farmController.DisapproveCooperative,
+  },
 ];
 
 farmRoutes.forEach((route) => {
