@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingTop: 40,
+        paddingTop: 15,
         paddingBottom: 15,
         backgroundColor: '#fff',
         borderBottomWidth: 1,
@@ -769,6 +769,47 @@ initiativesContainer: {
     marginBottom: 15,
     backgroundColor: '#f9f9f9',
   },
+
+  bannerContainer: {
+    padding: 10,
+    backgroundColor: '#ffe6e6',
+    borderRadius: 8,
+    marginHorizontal: 10,
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  
+  bannerText: {
+    fontWeight: 'bold',
+    color: '#d9534f',
+    marginRight: 5,
+  },
+  
+  productText: {
+    color: '#d9534f',
+    textAlign: 'center', 
+    marginRight: 5,
+  },
+  
+  productContainer: {
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  
+  centeredContent: {
+    flex: 1, 
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  stockText: {
+    color: '#d9534f',
+    textAlign: 'center', 
+  }
+
 });
 
 export default styles;

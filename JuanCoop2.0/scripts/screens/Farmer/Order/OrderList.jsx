@@ -90,7 +90,6 @@ const OrderList = ({ navigation }) => {
       content: `Your order ${productList} is now being processed.`,
       url: Items?.orderItems[0]?.product?.image[0].url,
       user: Items.user._id,
-      senderId: userId
     }
 
       socket.emit("sendNotification", {
@@ -138,7 +137,6 @@ const OrderList = ({ navigation }) => {
         content: `Your order ${productList} is now being Shipped.`,
         url: Items?.orderItems[0]?.product?.image[0].url,
         user: Items.user._id,
-        senderId: userId
       };
 
         socket.emit("sendNotification", {
@@ -185,7 +183,6 @@ const OrderList = ({ navigation }) => {
         content: `Your order ${productList} has been Delivered your Product Enjoy!.`,
         url: Items?.orderItems[0]?.product?.image[0].url,
         user: Items.user._id,
-        senderId: userId
       }
 
       socket.emit("sendNotification", {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from '../css/styles';  // Importing your shared styles
 
 const CommunityForum = ({ navigation }) => {
@@ -40,6 +40,7 @@ const CommunityForum = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      
       <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
           <Ionicons name="menu-outline" size={24} color="black" />

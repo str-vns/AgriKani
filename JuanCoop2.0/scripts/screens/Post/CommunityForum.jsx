@@ -50,6 +50,15 @@ const CommunityForum = ({ navigation }) => {
   }
 
   return (
+    <View > 
+       <View style={styles.header2}>
+                        <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
+                          <Ionicons name="menu" size={34} color="black" />
+                        </TouchableOpacity>
+                
+                        <Text style={styles.headerTitle2}>Profile</Text>
+                      </View>
+
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Community Forum</Text>
@@ -127,6 +136,7 @@ const CommunityForum = ({ navigation }) => {
           </View>
         ))}
     </ScrollView>
+    </View>
   );
 };
 
@@ -283,6 +293,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  header2: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    elevation: 3,
+},
+headerTitle2: {
+    fontSize: 22,
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'center',
+    color: '#333',
+},
 });
 
 export default CommunityForum;

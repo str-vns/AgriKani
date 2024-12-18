@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { conversationList } from '@redux/Actions/converstationActions';
 import { getUsers } from '@redux/Actions/userActions';
 import { useSocket } from '../../../SocketIo';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const UserChatlist = () => {
   const dispatch = useDispatch();
@@ -145,6 +146,13 @@ const UserChatlist = () => {
 
   return (
     <View style={styles.container}>
+       <View style={styles.header}>
+        <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={34} color="black" />
+        </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>Message</Text>
+      </View>
       <FlatList
         ref={scrollRef}
         data={users} 
@@ -234,6 +242,24 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 12,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    elevation: 3,
+},
+headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'center',
+    color: '#333',
+},
 });
 
 export default UserChatlist;

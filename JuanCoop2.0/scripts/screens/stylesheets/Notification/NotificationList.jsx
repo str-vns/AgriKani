@@ -6,7 +6,10 @@ export default StyleSheet.create({
         flex: 1,
         marginBottom: 90,
     },
-
+     containerCooP :{
+      backgroundColor: "#fffee9",
+      flex: 1,
+     },
   header: {
     flexDirection: "row",
     alignItems: "center",

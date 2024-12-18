@@ -9,14 +9,14 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { singleNotification, readAllNotifications, readNotification } from "@redux/Actions/notificationActions";
-import styles from "../stylesheets/Notification/NotificationList";
+import styles from "../../stylesheets/Notification/NotificationList";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import moment from 'moment';
 
-const NotificationList = ({ navigation }) => {
+const FarmerNotification = ({ navigation }) => {
   const navigate = useNavigation()
   const dispatch = useDispatch()
   const context = useContext(AuthGlobal);
@@ -59,7 +59,7 @@ const NotificationList = ({ navigation }) => {
   const handleRead = async(id) => {
     try {
       dispatch(readNotification(id, token));
-      navigate.navigate("User", { screen: "UserOrderList" });
+      navigate.navigate( "ProductsList" );
       onRefresh()
     } catch (error) {
       console.error("Error marking as read: ", error);
@@ -142,4 +142,4 @@ const NotificationList = ({ navigation }) => {
   );
 };
 
-export default NotificationList;
+export default FarmerNotification;

@@ -19,6 +19,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { matchCooperative } from "@redux/Actions/coopActions";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 const UserProfile = () => {
   const context = useContext(AuthGlobal);
@@ -31,7 +33,9 @@ const UserProfile = () => {
   const [loadings, setLoadings] = useState(true);
   const [errors, setErrors] = useState(null);
   const userInfo = context.stateUser.user.CustomerInfo
-  const filterUser = coops?.filter((coop) => coop.user._id === userId);
+  const filterUser = Array.isArray(coops)
+  ? coops.filter((coop) => coop?.user?._id === userId)
+  : [];
   console.log("coops", filterUser)
   // console.log("token: ", token)
  
@@ -83,11 +87,20 @@ const UserProfile = () => {
 
  
   return (
+  
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
+          <View style={styles.header}>
+                  <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
+                    <Ionicons name="menu" size={34} color="black" />
+                  </TouchableOpacity>
+          
+                  <Text style={styles.headerTitle}>Profile</Text>
+                </View>
+
         <ScrollView contentContainerStyle={styles.container}>
         {context?.stateUser?.isAuthenticated &&
   userInfo?.roles &&
@@ -186,6 +199,7 @@ const UserProfile = () => {
         </ScrollView>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
+  
   );
 };
 
@@ -194,7 +208,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingVertical: 20,
   },
   profileSection: {
     alignItems: 'center',
@@ -256,6 +270,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    elevation: 3,
+},
+headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'center',
+    color: '#333',
+},
 });
 
 export default UserProfile;

@@ -53,6 +53,7 @@ const UserSidebar = () => {
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Product", icon: "cube-outline", key: "product" },
+    { label: "Notifications", icon: "notifications-outline", key: "notifications",},
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
     {
       label: "Product Archive",
@@ -129,6 +130,8 @@ const UserSidebar = () => {
       navigation.navigate("CommunityForum");
     } else if (key === "orders") {
       navigation.navigate("OrderList");
+    } else if (key === "notifications"){
+      navigation.navigate( "FNotificationList" )
     }
     // Add other navigation conditions for different items
   };
