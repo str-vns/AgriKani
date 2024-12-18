@@ -3,7 +3,6 @@ const ErrorHandler = require("../utils/errorHandler");
 const SuccessHandler = require("../utils/successHandler");
 const orderProcess = require("../process/orderProcess");
 const { STATUSCODE } = require("../constants/index");
-const Order = require("../models/order");
 
 
 // Create a new order
@@ -20,15 +19,15 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     });
 
     // Populate the order with user, product, and address details
-    const populatedOrder = await Order.findById(createdOrder._id)
-      .populate({ path: "user", select: "firstName lastName email" })
-      .populate({ path: "orderItems.product", select: "productName pricing" })
-      .populate({ path: "shippingAddress", select: "fullName phoneNum address city postalCode" })
-      .lean();
+    // const populatedOrder = await Order.findById(createdOrder._id)
+    //   .populate({ path: "user", select: "firstName lastName email" })
+    //   .populate({ path: "orderItems.product", select: "productName pricing" })
+    //   .populate({ path: "shippingAddress", select: "fullName phoneNum address city postalCode" })
+    //   .lean();
 
-    if (!populatedOrder) {
-      return next(new ErrorHandler("Order not found after creation", 404));
-    }
+    // if (!populatedOrder) {
+    //   return next(new ErrorHandler("Order not found after creation", 404));
+    // }
     return SuccessHandler(res, "Order created and receipt sent successfully", createdOrder);
   } catch (error) {
     return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
