@@ -1,4 +1,3 @@
-const { CONVERSATION, CATEGORY, TYPE, ORDER } = require("./resource");
 
 module.exports = {
   //User
@@ -115,6 +114,12 @@ module.exports = {
   INVENTORY_ID: "/inventory/:id",
   INVENTORY_ACTIVE_ID: "/inventory/active/:id",
   INVENTORY_INACTIVE_ID: "/inventory/inactive/:id",
+
+  //member
+  MEMBER: "/member",
+  MEMBER_ID: "/member/:id",
+  MEMBER_APPROVED_ID: "/member/approved/:id",
+  MEMBER_DISAPPROVED_ID: "/member/disapproved/:id",
 
   //Test
   TEST_ID: "/test/:id",

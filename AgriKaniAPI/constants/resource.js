@@ -1,3 +1,5 @@
+
+
 module.exports = {
     USER: "user",
     PRODUCT: "product",
@@ -23,4 +25,5 @@ module.exports = {
     INVENTORYM: "inventorym",
     NOTIFICATION: "notification",
     FILES: "files",
+    MEMBER: "member",
 }

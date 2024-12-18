@@ -4,4 +4,5 @@ module.exports = {
     COOPERATIVE: "Cooperative",
     FARMER: "Farmer",
     RIDER: "Rider",
+    MEMBER: "Member",
 } 
