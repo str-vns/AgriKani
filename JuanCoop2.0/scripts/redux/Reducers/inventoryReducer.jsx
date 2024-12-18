@@ -11,6 +11,9 @@ import {
     INVENTORY_ACTIVE_REQUEST,
     INVENTORY_ACTIVE_SUCCESS,
     INVENTORY_ACTIVE_FAIL,
+    SINGLE_INVENTORY_FAIL,
+    SINGLE_INVENTORY_REQUEST,
+    SINGLE_INVENTORY_SUCCESS,
 } from "@redux/Constants/inventoryConstants";
 
 export const inventoryCreateReducer = (state = {}, action) => {
@@ -31,6 +34,22 @@ export const inventoryCreateReducer = (state = {}, action) => {
             case INVENTORY_UPDATE_FAIL:
                 case INVENTORY_DELETE_FAIL: 
                     case INVENTORY_ACTIVE_FAIL:
+            return { Invloading: false, Inverror: action.payload };
+
+        default:
+            return state;
+    }
+}
+
+export const singleInventoryReducer = (state = {}, action) => {
+    switch (action.type) {
+        case SINGLE_INVENTORY_REQUEST:
+            return { Invloading: true };
+
+        case SINGLE_INVENTORY_SUCCESS:
+            return { Invloading: false, Invsuccess: action.payload };
+
+        case SINGLE_INVENTORY_FAIL:
             return { Invloading: false, Inverror: action.payload };
 
         default:
