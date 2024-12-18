@@ -15,15 +15,9 @@ const notificationSchema = new mongoose.Schema({
     },
     url: 
     {
-      type: String,
-      required: true
+      type: String
     },
     user: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'user',
-        required: true,
-    },
-    senderId: {
         type: mongoose.Schema.ObjectId,
         ref: 'user',
         required: true,
