@@ -22,9 +22,11 @@ const productSchema = new mongoose.Schema({
   ],
   category: [{
     type: String,
+    ref: RESOURCE.CATEGORYS,
   }],
   type: [{
     type: String,
+    ref: RESOURCE.TYPE,
   }],
   image: [{
     public_id: {

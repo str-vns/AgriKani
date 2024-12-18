@@ -5,7 +5,7 @@ const { RESOURCE } = require("../constants/index");
 const typeSchema = new mongoose.Schema({
   typeName: {
     type: String,
-    required: [true, "Please enter your Category!"],
+    required: [true, "Please enter your Type!"],
     maxLength: [100, "Your name cannot exceed 100 characters!"],
   },
   deletedAt: {
