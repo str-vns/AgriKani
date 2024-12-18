@@ -3,6 +3,8 @@ const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const Inventory = require("../models/inventoryM");
 const Product = require("../models/product");
+const Farm = require("../models/farm");
+const product = require("../models/product");
 //create ...
 exports.CreateInventoryProcess = async (req) => {
     if (!mongoose.Types.ObjectId.isValid(req.body.productId))
@@ -70,16 +72,35 @@ exports.GetAllInventoryInfo = async () => {
 
 //Single ...
 exports.GetSingleInventory = async (id) => {
-    const inventory = await Inventory.findById({ productId: id })
+    if (!mongoose.Types.ObjectId.isValid(id))
+        throw new ErrorHandler(`Invalid Inventory ID: ${id}`);
+
+    const farm = await Farm.findOne({ user: id });
+
+    if (farm) {
+        const products = await Product.find({ coop: farm._id }).lean().exec();
+
+        console.log(products, "All Products related to the farm");
+        
+        // Fetch inventories for the stock items of those products
+        const inventories = await Inventory.find({
+          _id: { $in: products.map((product) => product.stock).flat() },  
+          quantity: 0
+        })
+        .populate({
+          path: "productId",
+          select: "productName",
+        })
         .lean()
         .exec();
-
-    if (!inventory) {
-        throw new ErrorHandler(STATUSCODE.NOT_FOUND, "Inventory not found");
+        
+        console.log(inventories, "Inventories related to the products");
+    
+      return inventories;
+    } else {
+      console.log("Farm not found");
     }
-
-    return inventory;
-};
+}
 
 //Update ...
 exports.UpdateInventoryInfo = async (req, id) => {

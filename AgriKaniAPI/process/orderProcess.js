@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Order = require("../models/order");
+const Notification = require("../models/notification");
 const User = require("../models/user");
 const Product = require("../models/product")
 const ErrorHandler = require("../utils/errorHandler");
@@ -10,6 +11,7 @@ const generateReceiptPDF = require("../utils/pdfreceipts");
 const sendEmailWithAttachment = require("../utils/emailreceipts");
 const path = require("path");
 const fs = require("fs");
+const { coopSingle } = require("./farmInfoProcess");
 
 // Create a new order
 exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice, user }) => {
@@ -151,7 +153,7 @@ exports.updateOrderStatusCoop = async (id, req) => {
   .populate({ path: "orderItems.inventoryProduct", select: "metricUnit unitName price" })
   .populate({ path: "orderItems.product", select: "coop productName image.url" })
   .populate({ path: "shippingAddress", select: "address city postalCode" })
-  .populate({ path: "user", select: "firstName lastName email phoneNum" })
+  .populate({ path: "user", select: "firstName lastName email phoneNum deviceToken" })
   if (!order) {
     throw new ErrorHandler("Order not found", 404);
   }
@@ -160,20 +162,23 @@ exports.updateOrderStatusCoop = async (id, req) => {
   const matchedOrderItems = order.orderItems.filter(item =>
     inventorys.includes(item.inventoryProduct?._id?.toString())
   );
+  
+
 
   for (const matchedItem of matchedOrderItems) {
    
     if (matchedItem.orderStatus !== req.body.orderStatus) {
       const inventory = await Inventory.findById(matchedItem.inventoryProduct);
       const product = await Product.findById(matchedItem.product._id);
-
+      const farm = await Farm.findById(product.coop);
+   
+    
       matchedItem.orderStatus = req.body.orderStatus;
-  
+    
       if (req.body.orderStatus === 'Processing') {
         inventory.quantity -= matchedItem.quantity;
 
     const totalPrice = order.orderItems.reduce((acc, item) => acc + item.quantity * item.inventoryProduct.price, 0);
-           // Generate receipt
     const receiptFolder = path.join(__dirname, "../receipts");
     if (!fs.existsSync(receiptFolder)) {
       fs.mkdirSync(receiptFolder);
@@ -215,8 +220,16 @@ exports.updateOrderStatusCoop = async (id, req) => {
     
     await sendEmailWithAttachment(userEmail, emailSubject, "", receiptPath, emailHtml);
 
+   
         if (inventory.quantity === 0) {
           inventory.status = 'inactive';
+       await Notification.create({
+        title: "Product Out of Stock",
+        content: `Inventory ${product.productName}, ${inventory.unitName} ${inventory.metricUnit}  is out of stock`,
+        user: farm?.user,
+        type: "error",
+
+      });
         }
       }
   

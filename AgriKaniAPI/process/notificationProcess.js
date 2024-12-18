@@ -87,7 +87,6 @@ exports.GetAllNotificationInfo = async () => {
 exports.GetSingleNotification = async (id) => {
   const notification = await Notification.find({ user: id })
     .populate({ path: "user", select: "firstName lastName email image.url phoneNum" })
-    .populate({ path: "senderId", select: "firstName lastName email image.url phoneNum" })
     .sort({ createdAt: -1 })
     .lean()
     .exec();
