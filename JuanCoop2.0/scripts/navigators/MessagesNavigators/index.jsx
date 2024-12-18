@@ -12,7 +12,7 @@ const Index = () => {
       <Stack.Screen
         name="Messages"
         component={Messages}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
     <Stack.Screen
         name="ChatMessages"

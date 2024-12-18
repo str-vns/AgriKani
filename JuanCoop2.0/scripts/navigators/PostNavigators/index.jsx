@@ -27,7 +27,7 @@ const Index = () => {
       <Stack.Screen
         name="CommunityForum"
         component={CommunityForum}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
