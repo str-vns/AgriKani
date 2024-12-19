@@ -124,4 +124,11 @@ module.exports = {
   //Test
   TEST_ID: "/test/:id",
   TEST: "/test",
+
+  //member
+  MEMBER: "/member",
+  MEMBER_ID: "/member/:id",
+  MEMBER_APPROVED_ID: "/member/approved/:id",
+  MEMBER_DISAPPROVED_ID: "/member/disapproved/:id",
+  
 };
