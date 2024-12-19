@@ -4,7 +4,7 @@ const { default: mongoose } = require("mongoose");
 const Inventory = require("../models/inventoryM");
 const Product = require("../models/product");
 const Farm = require("../models/farm");
-const product = require("../models/product");
+const Order = require("../models/order"); 
 //create ...
 exports.CreateInventoryProcess = async (req) => {
     if (!mongoose.Types.ObjectId.isValid(req.body.productId))
@@ -140,7 +140,7 @@ exports.DeleteInventoryInfo = async (id) => {
     await Promise.all([
         Inventory.deleteOne({ _id: id }).lean().exec(),
         Product.updateMany({ $pull: { stock: id } }).lean().exec(),
-          
+        Order.updateMany({ $pull: { "OrderItems.inventoryProduct": id } }).lean().exec(),
       ]);
     return inventoryExist;
 }
