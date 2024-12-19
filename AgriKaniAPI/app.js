@@ -24,6 +24,7 @@ const category = require("./routes/category");
 const blog = require ("./routes/blog");
 const notification = require("./routes/notification");
 const inventory = require("./routes/inventory");
+const member = require("./routes/member");
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -48,6 +49,7 @@ app.use(
   blog,
   notification,
   inventory,
+  member
 );
 
 module.exports = app;
