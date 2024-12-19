@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { singleNotification } from "@redux/Actions/notificationActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+
 const UserFooter = () => {
   const { notifloading, notification, notiferror } = useSelector((state) => state.getNotif);
   const dispatch = useDispatch();
@@ -80,14 +81,18 @@ const UserFooter = () => {
     }
   };
 
-  const handleNotif = () => {
-    {
-      context?.stateUser?.isAuthenticated
-        ? navigation.navigate("Home", { screen: "NotificationList" })
-        : navigation.navigate("RegisterScreen", { screen: "Login" });
-      //  navigation.navigate("Home", { screen: "NotificationList" })
+ const notifNavigate = () => {
+    setNotif([]);
+    navigation.navigate("Home", { screen: "NotificationList" });
+};
+
+const handleNotif = () => {
+    if (context?.stateUser?.isAuthenticated) {
+        notifNavigate();
+    } else {
+        navigation.navigate("RegisterScreen", { screen: "Login" });
     }
-  }
+};
 
   return (
     <Box width="100%" alignSelf="center" flexDirection="column">
