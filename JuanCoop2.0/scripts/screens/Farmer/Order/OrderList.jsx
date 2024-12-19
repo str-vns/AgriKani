@@ -32,9 +32,9 @@ const OrderList = ({ navigation }) => {
   const userName = context.stateUser.userProfile?.firstName;
   const {orderloading, orders, ordererror } = useSelector((state) => state.coopOrdering);
   const { coops }  = useSelector((state) => state.allofCoops);
-  
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const filteredOrders = (Array.isArray(orders) ? orders : []).map((order) => ({
     ...order,
     orderItems: Array.isArray(order.orderItems)
@@ -72,6 +72,7 @@ const OrderList = ({ navigation }) => {
   }, [userId, token, dispatch]);
  
   const handleProcessOrder = (orderId, InvId, Items ) => {
+    setLoading(true);
     setRefresh(true);
     try {
     let productNames = []
@@ -107,6 +108,7 @@ const OrderList = ({ navigation }) => {
       dispatch(sendNotifications(notification , token))
       dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
       setRefresh(false);
+      setLoading(true);
       onRefresh()
    } catch (error) {
      console.error("Error deleting or refreshing orders:", error);
@@ -118,7 +120,7 @@ const OrderList = ({ navigation }) => {
   };
 
   const handleShippingOrder = (orderId, InvId, Items) => {
-
+    setLoading(true);
     setRefresh(true);
     try {
       let productNames = []
@@ -159,12 +161,13 @@ const OrderList = ({ navigation }) => {
    } finally {
 
      setRefresh(false);
+     setLoading(false);
    }
    
   };
 
   const handleDeliveryOrder = (orderId, InvId, Items) => {
-
+    setLoading(true);
     setRefresh(true);
     try {
       let productNames = []
@@ -206,10 +209,12 @@ const OrderList = ({ navigation }) => {
    } finally {
 
      setRefresh(false);
+     setLoading(false);
    }
    
   }; 
 
+  
   const getStatusColor = (status) => {
     switch (status) {
       case 'Pending':
@@ -274,7 +279,7 @@ const OrderList = ({ navigation }) => {
           {orderItem.product?.productName && (
   <Text style={styles.orderItemName}>{orderItem.product.productName}</Text>
 )}
-            <Text style={styles.orderItemPrice}>Size: {orderItem.inventoryProduct.unitName} {orderItem.inventoryProduct.metricUnit}</Text>
+            <Text style={styles.orderItemPrice}>Size: {orderItem.inventoryProduct?.unitName} {orderItem.inventoryProduct?.metricUnit}</Text>
             <Text style={styles.orderItemPrice}>Price: ${orderItem.price}</Text>
             <Text style={styles.orderItemQuantity}>Quantity: {orderItem.quantity}</Text>
 
@@ -302,6 +307,7 @@ const OrderList = ({ navigation }) => {
       (item?.orderItems?.flat().some((orderItem) => orderItem.orderStatus === "Pending"))) && (
  <TouchableOpacity
  style={[styles.button, styles.reviewButton]}
+ disabled={loading}
  onPress={() =>
    handleProcessOrder(
      item._id,
@@ -324,6 +330,7 @@ const OrderList = ({ navigation }) => {
       (item?.orderItems?.flat().some((orderItem) => orderItem.orderStatus === "Processing"))) && (
  <TouchableOpacity
  style={[styles.button, styles.ShippingButton]}
+ disabled={loading}
  onPress={() =>
   handleShippingOrder(
      item._id,
@@ -347,6 +354,7 @@ const OrderList = ({ navigation }) => {
       (item?.orderItems?.flat().some((orderItem) => orderItem.orderStatus === "Shipping"))) && (
  <TouchableOpacity
  style={[styles.button, styles.DeliveredButton]}
+ disabled={loading}
  onPress={() =>
   handleDeliveryOrder(
      item._id,
