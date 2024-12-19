@@ -3,9 +3,21 @@ const validator = require("validator");
 const { RESOURCE } = require("../constants/index");
 
 const memberSchema = new mongoose.Schema({
-    user: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: RESOURCE.USER,
+        required: true,
+    },
+    address:{
+        type: String,
+        required: true,
+    },
+    barangay: {
+        type: String,
+        required: true,
+    },
+    city: {
+        type: String,
         required: true,
     },
     barangayClearance: {
@@ -35,6 +47,11 @@ const memberSchema = new mongoose.Schema({
             type: String,
             required: true,
         },
+    },
+    coopId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: RESOURCE.COOP,
+        required: true,
     },
     approvedAt:
     {
