@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { ActivityIndicator, Alert, BackHandler, StyleSheet, StyleSheets, View } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -18,15 +18,144 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isLogin } from "@redux/Actions/Auth.actions";
 import { Box, Pressable, VStack, Text, HStack, Divider, Icon, } from "native-base";
-  
+import messaging from '@react-native-firebase/messaging';
+import * as Notification from 'expo-notifications';
+
 const Stack = createStackNavigator();
+
+Notification.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 const Main = () => {
   const context = useContext(AuthGlobal);
   const navigation = useNavigation(); 
   const UserRoles = context.stateUser?.userProfile || null;
  const [loading, setLoading] = useState(true);
- 
+ const lastNotificationId = useRef(null)
+ const requestNotificationPermission = async () => {
+  // Check existing permission status
+  const { status: existingStatus } = await Notification.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  // Request permission if not already granted
+  if (existingStatus !== 'granted') {
+    const { status } = await Notification.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  // Return true if permission is granted
+  if (finalStatus === 'granted') {
+    console.log("Notification permission granted.");
+
+    try {
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      
+      if (enabled) {
+        console.log("Authorization status:", authStatus);
+      } else {
+        console.log("Permission not granted");
+      }
+      return enabled;
+    } catch (error) {
+      console.error("Error requesting permission:", error);
+      return false;
+    }
+
+
+  } else {
+    console.log("Notification permission denied.");
+    return false;
+  }
+};
+
+console.log("messaging", messaging().onMessage);
+
+useEffect(() => {
+  const initializeFCM = async () => {
+    const permissionGranted = await requestNotificationPermission();
+    if (permissionGranted) {
+      try {
+        const FCMtoken = await messaging().getToken();
+        console.log("FCM Token:", FCMtoken);
+      } catch (error) {
+        console.error("Error getting FCM token:", error);
+      }
+    } else {
+      console.log("No permission granted");
+    }
+
+    // Handle notifications when the app is opened from a quit state
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage) => {
+        if (remoteMessage) {
+          console.log("Notification caused app to open from quit state:", remoteMessage.notification);
+        }
+      });
+
+    // Handle notifications when the app is opened from the background
+    const unsubscribeOnOpened = messaging().onNotificationOpenedApp((remoteMessage) => {
+      console.log("Notification caused app to open from background state:", remoteMessage.notification);
+    });
+
+    // Handle background notifications
+    const unsubscribeBackground = messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+      console.log("Message handled in the background:", remoteMessage);
+    });
+
+    // // Avoid notifications for specific user roles
+    // // if (!(UserRoles?.roles.includes("Customer") && UserRoles?.roles.includes("Cooperative"))) {
+    //   const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage) => {
+    //     // console.log("Notification received while app is in the foreground:", remoteMessage.notification);
+    // })
+
+    return () => {
+      unsubscribeOnMessage();
+      unsubscribeOnOpened();
+      unsubscribeBackground(); 
+    };
+  };
+
+  initializeFCM();
+}, []);
+
+if(!(UserRoles?.roles.includes("Customer") && UserRoles?.roles.includes("Cooperative"))){
+useEffect(() => {
+
+  const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage) => {
+    console.log("Notification received while app is in the foreground:", remoteMessage.notification);
+
+    const { title, body, android } = remoteMessage.notification;
+    console.log("Title:", title);
+    console.log("Body:", body);
+    console.log("Image URL:", android?.imageUrl);
+ Notification.scheduleNotificationAsync({
+  content: {
+    title: title,
+    body: body,
+    sound: true,
+  },
+  trigger: null, 
+});
+   
+  });
+
+  return () => {
+    unsubscribeOnMessage();
+    console.log("Unsubscribed from onMessage listener");
+  };
+}, []);
+}
+
+
    useEffect(() => {
 
      const initialize = async () => {
