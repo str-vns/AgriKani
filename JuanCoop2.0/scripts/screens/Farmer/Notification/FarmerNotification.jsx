@@ -56,10 +56,17 @@ const FarmerNotification = ({ navigation }) => {
   
   }, [userId, token, dispatch]);
 
-  const handleRead = async(id) => {
+  const handleRead = async(id, type) => {
     try {
       dispatch(readNotification(id, token));
+      if(type === "order") {
+        navigate.navigate( "OrderList" );
+      } else if(type === "product") {
       navigate.navigate( "ProductsList" );
+      } else if (type === "members") {
+        navigate.navigate( "MemberList" );
+      }
+      
       onRefresh()
     } catch (error) {
       console.error("Error marking as read: ", error);
@@ -80,7 +87,7 @@ const FarmerNotification = ({ navigation }) => {
       <View style={styles.notificationsContainer}>
          <TouchableOpacity
       style={[styles.notificationSection, item.readAt !== null ? styles.readNotification : styles.unreadNotification]}
-      onPress={() => handleRead(item._id)}
+      onPress={() => handleRead(item._id, item.type)}
     >
           <View style={styles.notifDetails}>
           <View style={styles.notifImageContainer}>
