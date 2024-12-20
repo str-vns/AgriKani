@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Image,
   ScrollView,
   Modal,
@@ -37,6 +36,17 @@ const UserRegistration = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [errors, setErrors] = useState("");
   const dispatch = useDispatch();
+
+     useEffect(() => {
+          (async () => {
+            const cameraStatus = await Camera.requestCameraPermissionsAsync();
+            setHasCameraPermission(cameraStatus.status === "granted");
+  
+            const cameraRollStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            setHasCameraPermission(cameraRollStatus.status === "granted");
+  
+          })();
+        }, []);
 
   const register = () => {
     const registration = {
@@ -83,7 +93,7 @@ const UserRegistration = () => {
     setLaunchCamera(false);
   
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
@@ -93,7 +103,6 @@ const UserRegistration = () => {
       const selectedImageUri = result.assets[0].uri; 
       setImage(selectedImageUri);
       setMainImage(selectedImageUri);
-      setImagePreview(selectedImageUri); 
       setModalVisible(false);
     }
   };
@@ -120,26 +129,6 @@ const UserRegistration = () => {
     } else {
       console.log("No image captured or selection canceled.");
     }
-  };
-
-  useEffect(() => {
-    (async () => {
-      const cameraStatus = await Camera.requestCameraPermissionsAsync();
-      setHasCameraPermission(cameraStatus.status === "granted");
-    })();
-  });
-
-  const handleSignInPress = () => {
-    setImage(null);
-    setMainImage(null);
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPhoneNumber("");
-    setAge("");
-    setPassword("");
-    setGender(null);
-    navigation.navigate("Login");
   };
 
   return (
