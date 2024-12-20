@@ -22,10 +22,14 @@ const notificationSchema = new mongoose.Schema({
         ref: 'user',
         required: true,
     },
+    type: {
+        type: String,
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: 2592000,
+        expires: 1209600,
     },
     readAt:{
         type: Date,

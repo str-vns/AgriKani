@@ -50,7 +50,7 @@ const memberSchema = new mongoose.Schema({
     },
     coopId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: RESOURCE.COOP,
+        ref: RESOURCE.FARMINFO,
         required: true,
     },
     approvedAt:
