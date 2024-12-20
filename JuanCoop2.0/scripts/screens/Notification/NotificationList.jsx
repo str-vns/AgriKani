@@ -20,9 +20,9 @@ const NotificationList = ({ navigation }) => {
   const navigate = useNavigation()
   const dispatch = useDispatch()
   const context = useContext(AuthGlobal);
-  const userId = context.stateUser.userProfile?._id;
-  const roles = context.stateUser.userProfile.roles; 
-  const userRole = roles.includes("Cooperative") && roles.includes("Customer") ? styles.containerCooP : styles.container;
+  const userId = context.stateUser?.userProfile?._id;
+  const roles = context.stateUser?.userProfile?.roles; 
+  const userRole = roles?.includes("Cooperative") && roles?.includes("Customer") ? styles.containerCooP : styles.container;
   const { notifloading, notification, notiferror } = useSelector((state) => state.getNotif);
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = useState(false);
@@ -56,10 +56,16 @@ const NotificationList = ({ navigation }) => {
   
   }, [userId, token, dispatch]);
 
-  const handleRead = async(id) => {
+  const handleRead = async(id, type) => {
+
     try {
       dispatch(readNotification(id, token));
-      navigate.navigate("User", { screen: "UserOrderList" });
+      if (type === "order")
+      {
+        navigate.navigate("User", { screen: "UserOrderList" });
+    
+      }
+      
       onRefresh()
     } catch (error) {
       console.error("Error marking as read: ", error);
@@ -80,7 +86,7 @@ const NotificationList = ({ navigation }) => {
       <View style={styles.notificationsContainer}>
          <TouchableOpacity
       style={[styles.notificationSection, item.readAt !== null ? styles.readNotification : styles.unreadNotification]}
-      onPress={() => handleRead(item._id)}
+      onPress={() => handleRead(item._id, item.type)}
     >
           <View style={styles.notifDetails}>
           <View style={styles.notifImageContainer}>

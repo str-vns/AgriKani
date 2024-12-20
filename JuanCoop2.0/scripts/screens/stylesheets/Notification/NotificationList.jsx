@@ -4,7 +4,7 @@ export default StyleSheet.create({
     container: {
         backgroundColor: "#fffee9",
         flex: 1,
-        marginBottom: 90,
+        marginBottom: 60,
     },
      containerCooP :{
       backgroundColor: "#fffee9",

@@ -57,7 +57,7 @@ const UserPostScreen = () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType,
       allowsMultipleSelection: true, // iOS only
       quality: 1, // Adjust image quality
     });

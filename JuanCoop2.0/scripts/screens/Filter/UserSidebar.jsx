@@ -38,32 +38,28 @@ const UserSidebar = () => {
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Address", icon: "location-outline", key: "address" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
-    {
-      label: "Notifications",
-      icon: "notifications-outline",
-      key: "notifications",
-    },
+    { label: "Notifications",  icon: "notifications-outline", key: "notifications", },
     { label: "Directions", icon: "navigate-outline", key: "CoopDistance" },
+    context.stateUser?.userProfile?.roles?.includes("Customer") && 
+    context.stateUser?.userProfile?.roles?.includes("Member") ? 
+    { label: "Community Forum", icon: "create-outline", key: "Forum" } : null,
     { label: "Track Order", icon: "location-outline", key: "track-order" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     { label: "About Us", icon: "information-circle-outline", key: "about-us" },
-  ];
+  ].filter(item => item !== null);
 
   const CoopItems = [
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Product", icon: "cube-outline", key: "product" },
-    { label: "Notifications", icon: "notifications-outline", key: "notifications",},
+    { label: "Orders", icon: "clipboard-outline", key: "orders" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
-    {
-      label: "Product Archive",
-      icon: "archive-outline",
-      key: "productArchive",
-    },
+    { label: "Notifications", icon: "notifications-outline", key: "notifications" },
+    { label: "Members", icon: "people-outline", key: "members" },
     { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Community Forum", icon: "create-outline", key: "Forum" },
-    { label: "Orders", icon: "clipboard-outline", key: "orders" },
-  ];
+    { label: "Product Archive", icon: "archive-outline", key: "productArchive" },
+  ]
 
   const AdminItems = [
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
@@ -97,6 +93,8 @@ const UserSidebar = () => {
       navigation.navigate("Home", { screen: "CoopDistance" });
     } else if (key === "notifications"){
       navigation.navigate("Home", { screen: "NotificationList" })
+    } else if (key === "Forum") {
+      navigation.navigate("CommunityForum");
     }
   };
 
@@ -132,7 +130,11 @@ const UserSidebar = () => {
       navigation.navigate("OrderList");
     } else if (key === "notifications"){
       navigation.navigate( "FNotificationList" )
-    }
+    } else if (key === "members"){
+      navigation.navigate( "MemberList" )
+    } 
+    
+
     // Add other navigation conditions for different items
   };
 

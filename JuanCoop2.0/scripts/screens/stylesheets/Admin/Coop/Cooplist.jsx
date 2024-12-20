@@ -1,6 +1,7 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
+var { width, height } = Dimensions.get("window");
 export default StyleSheet.create({
     container: {
         flex: 1,
@@ -201,6 +202,7 @@ export default StyleSheet.create({
       marginTop: 20,
       marginLeft: 20,
       marginRight: 20,
+      marginBottom: 20
     },
     approvedButton: {
       backgroundColor: "#FFA500",
@@ -220,5 +222,48 @@ export default StyleSheet.create({
         color: "#FF0000",
         marginBottom: 5,
     },
+    imageContainer: {
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    imageLook: {
+        width: 300,
+        height: 200,
+        borderRadius: 10,
+    },
+    requirement: {
+        fontSize: 14,
+        color: "#444",
+        marginBottom: 5,
+        fontWeight: "bold",
+        textAlign: "center",
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+
+    },
+    closeButton: {
+      position: 'absolute',
+      top: 20,
+      right: 20,
+      backgroundColor: '#fff',
+      padding: 10,
+      borderRadius: 20,
+    },
+    closeText: {
+      color: '#000',
+      fontWeight: 'bold',
+    },
+    imageShow:{
+      width: "100%",
+      height: "80%",
+      borderRadius: 10,
+    }
 
 })
