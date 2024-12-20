@@ -14,7 +14,7 @@ admin.initializeApp({
 
 //create ...
 exports.CreateNotification = async (req) => {
-  console.log("Received File:", req.body);
+  console.log("Received File:", req.body.fcmToken);
   if (!mongoose.Types.ObjectId.isValid(req.body.user))
     throw new ErrorHandler(`Invalid User ID: ${req.body.user}`);
 
@@ -23,8 +23,10 @@ exports.CreateNotification = async (req) => {
   if (!singleUser) {
     throw new ErrorHandler(STATUSCODE.NOT_FOUND, "User not found");
   }
- 
-  const registrationTokens = singleUser.deviceToken;
+  
+  const filterToken = singleUser.deviceToken.filter((token) => token !== req.body.fcmToken);
+  console.log("User Device Token:", filterToken);
+  const registrationTokens = filterToken;
   const message = {
     data: {
       key1: 'value1',

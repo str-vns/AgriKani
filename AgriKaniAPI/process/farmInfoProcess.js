@@ -392,7 +392,7 @@ exports.ApproveCoop = async (id, req) => {
       throw new ErrorHandler(`Coop not updated with ID ${id}`);
     }
   
-    // Update User Roles
+ 
     const user = await User.findById(req.body.userId).exec();
     if (!user) {
       throw new ErrorHandler("User not found");
@@ -503,9 +503,17 @@ exports.DisapproveCoop = async (id) => {
 
   await sendEmail(mailOptions);
 
-  const coopUpdate = await Farm.findByIdAndDelete
-  (id).lean()
-  .exec();
+    const publicIds = coopExist.requirements.businessPermit.public_id;
+    const publicIds2 = coopExist.requirements.corCDA.public_id;
+    const publicIds3 = coopExist.requirements.orgStructure.public_id;
+  
+          await Promise.all([
+            Farm.deleteOne({ _id: id }).lean().exec(),
+            cloudinary.uploader.destroy(publicIds),
+            cloudinary.uploader.destroy(publicIds2),
+            cloudinary.uploader.destroy(publicIds3),
+          ]);
+
   if (!coopUpdate) throw new ErrorHandler(`Coop not Update with ID ${id}`);
   return coopUpdate;
 }

@@ -227,7 +227,7 @@ exports.updateOrderStatusCoop = async (id, req) => {
         title: "Product Out of Stock",
         content: `Inventory ${product.productName}, ${inventory.unitName} ${inventory.metricUnit}  is out of stock`,
         user: farm?.user,
-        type: "error",
+        type: "product",
 
       });
         }
