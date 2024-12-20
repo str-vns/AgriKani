@@ -39,6 +39,25 @@ exports.GetMember = asyncHandler(async (req, res, next) => {
     }
 );
 
+exports.GetMemberList = asyncHandler(async (req, res, next) => {
+
+    const member = await memberProcess.GetMemberListProcess(req.params.id, req);
+
+    return member?.length === STATUSCODE.ZERO
+        ? next(new ErrorHandler("No Member Found"))
+        : SuccessHandler(res, `Member has been fetched Successfully`, member);
+    }
+);
+
+exports.GetMemberListInactive = asyncHandler(async (req, res, next) => {
+    const member = await memberProcess.GetMemberListInactiveProcess(req.params.id, req);
+
+    return member?.length === STATUSCODE.ZERO
+        ? next(new ErrorHandler("No Member Found"))
+        : SuccessHandler(res, `Member has been fetched Successfully`, member);
+    }
+);
+
 exports.UpdateMember = [
     upload.fields([
         { name: "barangayClearance", maxCount: 1 },
@@ -83,8 +102,8 @@ exports.SingleMember = asyncHandler(async (req, res, next) => {
 );
 
 exports.ApprovedMember = asyncHandler(async (req, res, next) => {
-    const member = await memberProcess.ApproveMemberProcess(id);
-    
+    const member = await memberProcess.ApproveMemberProcess(req.params.id, req);
+     
     return member?.length === STATUSCODE.ZERO
         ? next(new ErrorHandler("No Member Found"))
         : SuccessHandler(res, `Member has been fetched Successfully`, member);
@@ -92,7 +111,7 @@ exports.ApprovedMember = asyncHandler(async (req, res, next) => {
 );
 
 exports.DisapprovedMember = asyncHandler(async (req, res, next) => {
-    const member = await memberProcess.DisapproveMemberProcess(id);
+    const member = await memberProcess.DisapproveMemberProcess(req.params.id, req);
     
     return member?.length === STATUSCODE.ZERO
         ? next(new ErrorHandler("No Member Found"))
