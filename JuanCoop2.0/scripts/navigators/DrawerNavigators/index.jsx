@@ -161,6 +161,18 @@ const context = useContext(AuthGlobal);
           options={{ headerShown: false, tabBarShowLabel: false }}
           component={AdminNavigators}
         />
+        <Drawer.Screen 
+          name="MemberList"
+          initialParams={{ screen: "MemberList" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={CoopNavigators}
+        />
+        <Drawer.Screen
+          name="FNotificationList"
+          initialParams={{ screen: "FNotificationList" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={CoopNavigators}
+        />
       </Drawer.Navigator>
     </Box>
   );

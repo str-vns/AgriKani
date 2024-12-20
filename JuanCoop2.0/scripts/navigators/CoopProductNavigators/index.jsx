@@ -6,7 +6,6 @@ import productEdit from "@screens/Farmer/Product/ProductUpdate";
 import productArchive from "@screens/Farmer/Product/ProductArchive";
 import inventoryCreate from "@screens/Farmer/Inventory/InventoryCreate";
 import inventoryUpdate from "@screens/Farmer/Inventory/InventoryUpdate";
-import FNotificationList from "@screens/Farmer/Notification/FarmerNotification";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -60,11 +59,8 @@ const Index = () => {
             tabBarShowLabel: false,
           }}
         />
-        <Stack.Screen
-        name="FNotificationList"
-        component={FNotificationList}
-        options={{ headerShown: false,  tabBarShowLabel: false }}
-      />
+     
+
     </Stack.Navigator>
   );
 };
