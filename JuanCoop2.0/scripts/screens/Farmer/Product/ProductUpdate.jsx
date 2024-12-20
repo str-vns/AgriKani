@@ -85,7 +85,7 @@ const ProductUpdate = (props) => {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaType,
       allowsEditing: true, 
       aspect: [4, 3],
       quality: 1,

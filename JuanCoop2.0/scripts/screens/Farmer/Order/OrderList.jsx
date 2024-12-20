@@ -23,6 +23,7 @@ import { updateCoopOrders } from "@redux/Actions/coopActions";
 import { sendNotifications } from "@redux/Actions/notificationActions";
 import { singleCooperative } from "@redux/Actions/coopActions";
 import { useSocket } from '../../../../SocketIo';
+import messaging from '@react-native-firebase/messaging';
 
 const OrderList = ({ navigation }) => {
   const dispatch = useDispatch()
@@ -33,6 +34,7 @@ const OrderList = ({ navigation }) => {
   const {orderloading, orders, ordererror } = useSelector((state) => state.coopOrdering);
   const { coops }  = useSelector((state) => state.allofCoops);
   const [token, setToken] = useState(null);
+  const [fcmToken, setFcmToken] = useState(null);
   const [refresh, setRefresh] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const filteredOrders = (Array.isArray(orders) ? orders : []).map((order) => ({
@@ -40,12 +42,14 @@ const OrderList = ({ navigation }) => {
     orderItems: Array.isArray(order.orderItems)
       ? order.orderItems.filter((item) => item.coopUser === coops._id)
       : [],
-  })).filter((order) => order.orderItems.length > 0);
+  })).filter((order) => order.orderItems?.length > 0);
 
   useEffect(() => {
     const fetchJwt = async () => {
       try {
         const res = await AsyncStorage.getItem("jwt");
+        const fcmToken = await messaging().getToken();
+        setFcmToken(fcmToken);
         setToken(res);
       } catch (error) {
         console.error("Error retrieving JWT: ", error);
@@ -91,6 +95,8 @@ const OrderList = ({ navigation }) => {
       content: `Your order ${productList} is now being processed.`,
       url: Items?.orderItems[0]?.product?.image[0].url,
       user: Items.user._id,
+      fcmToken: fcmToken,
+      type: "order",
     }
 
       socket.emit("sendNotification", {
@@ -139,6 +145,8 @@ const OrderList = ({ navigation }) => {
         content: `Your order ${productList} is now being Shipped.`,
         url: Items?.orderItems[0]?.product?.image[0].url,
         user: Items.user._id,
+        fcmToken: fcmToken,
+        type: "order",
       };
 
         socket.emit("sendNotification", {
@@ -186,6 +194,8 @@ const OrderList = ({ navigation }) => {
         content: `Your order ${productList} has been Delivered your Product Enjoy!.`,
         url: Items?.orderItems[0]?.product?.image[0].url,
         user: Items.user._id,
+        fcmToken: fcmToken,
+        type: "order",
       }
 
       socket.emit("sendNotification", {
@@ -394,7 +404,7 @@ const OrderList = ({ navigation }) => {
   <ActivityIndicator size="large" color="black" style={styles.loader} />
 ) : (
   <>
-    {filteredOrders && filteredOrders.length > 0 ? (
+    {filteredOrders && filteredOrders?.length > 0 ? (
       <FlatList
         data={filteredOrders}
         keyExtractor={(item) => item._id}  

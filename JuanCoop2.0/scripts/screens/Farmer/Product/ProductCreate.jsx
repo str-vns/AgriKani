@@ -67,7 +67,7 @@ const ProductCreate = ({ navigation }) => {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaType,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -182,7 +182,7 @@ const ProductCreate = ({ navigation }) => {
           style={styled.dropdown}
         >
           <Text style={styled.dropdownText}>
-            {selectedCategories.length > 0
+            {selectedCategories?.length > 0
               ? selectedCategories.map((category) => category.name).join(", ")
               : "Select Categories"}
           </Text>
@@ -234,7 +234,7 @@ const ProductCreate = ({ navigation }) => {
           style={styled.dropdown}
         >
           <Text style={styled.dropdownText}>
-            {seletedTypes.length > 0
+            {seletedTypes?.length > 0
               ? seletedTypes.map((type) => type.name).join(", ")
               : "Select Types"}
           </Text>
