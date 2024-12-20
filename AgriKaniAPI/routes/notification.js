@@ -3,7 +3,6 @@ const router = express.Router();
 const notificationController = require("../controllers/notificationControllers");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
 const { METHOD, PATH, ROLE } = require("../constants/index");
-const { path } = require("pdfkit");
 
 const notificationRoutes = [
 {

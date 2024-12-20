@@ -48,6 +48,18 @@ const memberRoutes = [
         path: PATH.MEMBER_DISAPPROVED_ID,
         roles: [],
         handler: memberControllers.DisapprovedMember,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.MEMBERLIST,
+        roles: [],
+        handler: memberControllers.GetMemberList,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.MEMBER_INACTIVE,
+        roles: [],
+        handler: memberControllers.GetMemberListInactive,
     }
 ];
 
@@ -55,3 +67,5 @@ memberRoutes.forEach((route) => {
     const { method, path, roles = [], handler } = route;
     router[method](path, authorizeRoles(...roles), handler);
 });
+
+module.exports = router;
