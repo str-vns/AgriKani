@@ -307,8 +307,7 @@ export const inactiveCooperative = (token) => async (dispatch) => {
   }
 };
 
-export const activeCooperative =
-  (coopId, userId, token) => async (dispatch) => {
+export const activeCooperative = (coopId, userId, token) => async (dispatch) => {
     try {
       dispatch({ type: COOP_ACTIVE_REQUEST });
 
