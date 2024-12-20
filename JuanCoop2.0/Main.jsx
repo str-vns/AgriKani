@@ -34,11 +34,11 @@ Notification.setNotificationHandler({
 const Main = () => {
   const context = useContext(AuthGlobal);
   const navigation = useNavigation(); 
-  const UserRoles = context.stateUser?.userProfile || null;
+  const UserRoles = context?.stateUser?.userProfile || null;
  const [loading, setLoading] = useState(true);
- const lastNotificationId = useRef(null)
+
  const requestNotificationPermission = async () => {
-  // Check existing permission status
+
   const { status: existingStatus } = await Notification.getPermissionsAsync();
   let finalStatus = existingStatus;
 
@@ -127,7 +127,7 @@ useEffect(() => {
   initializeFCM();
 }, []);
 
-if(!(UserRoles?.roles.includes("Customer") && UserRoles?.roles.includes("Cooperative"))){
+
 useEffect(() => {
 
   const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage) => {
@@ -153,7 +153,7 @@ useEffect(() => {
     console.log("Unsubscribed from onMessage listener");
   };
 }, []);
-}
+
 
 
    useEffect(() => {
@@ -202,7 +202,7 @@ useEffect(() => {
     }, [navigation])
   );
 
-  if(context.stateUser.isLoading === false){
+  if(context.stateUser?.isLoading === false){
     <View style={styles.loaderContainer}>
      <ActivityIndicator size="large" color="#0000ff" />
      <Text>Loading...</Text>
@@ -246,13 +246,16 @@ useEffect(() => {
       return (
         <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Home" component={HomeScreen} />
-          
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-        
           <Stack.Screen name="Address" component={AddressNavigators} />
           <Stack.Screen name="CheckOut" component={CheckOutNavigators} />
           <Stack.Screen name="User" component={UserNavigators} />
           <Stack.Screen name="Reviews" component={ReviewsNavigators} />
+          {context?.stateUser?.isAuthenticated && UserRoles?.roles.includes("Customer") &&
+          UserRoles?.roles.includes("Member") && 
+          ( <Stack.Screen name="Post" component={PostNavigators} />)}
+
+          
         </Stack.Navigator>
       );
     } 
