@@ -20,6 +20,7 @@ import {
   import { reducerBlog, reducerSingleBlog, reducerCreateBlog, reducerEditBlog, reducerDelBlog } from "@redux/Reducers/blogReducer";
   import { sendNotificationReducers, getNotificationReducers, readNotificationReducers } from "@redux/Reducers/notificationReducers";
   import { inventoryCreateReducer, singleInventoryReducer } from "@redux/Reducers/inventoryReducer";
+  import { memberListReducer, memberApiReducer } from "@redux/Reducers/memberReducer";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
@@ -67,7 +68,10 @@ import {
     readNotif: readNotificationReducers,
     invent: inventoryCreateReducer,
     coopActive: coopActiveReducer,
-    sinvent: singleInventoryReducer
+    sinvent: singleInventoryReducer,
+    memberList: memberListReducer,
+    memberApi: memberApiReducer
+
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));
