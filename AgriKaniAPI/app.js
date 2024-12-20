@@ -49,7 +49,7 @@ app.use(
   blog,
   notification,
   inventory,
-  member
+  member,
 );
 
 module.exports = app;
