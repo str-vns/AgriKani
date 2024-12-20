@@ -118,13 +118,13 @@ const UserOrderList = () => {
           <View style={styles.productDetails}>
             <Text style={styles.productName}>{orderItem.product.productName}</Text>
             <Text style={styles.sizeQuantity}>
-             Size: {orderItem.inventoryProduct.unitName} {orderItem.inventoryProduct.metricUnit}
+             Size: {orderItem?.inventoryProduct?.unitName} {orderItem?.inventoryProduct?.metricUnit}
             </Text>
             <Text style={styles.productQuantity}>
               Qty: {orderItem.quantity}
             </Text>
             <Text style={styles.productPrice}>
-              ₱{orderItem.inventoryProduct.price}
+              ₱{orderItem?.inventoryProduct?.price}
             </Text>
           </View>
 

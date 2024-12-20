@@ -20,7 +20,7 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import { matchCooperative } from "@redux/Actions/coopActions";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import { memberAllList } from '@redux/Actions/memberActions';
 
 const UserProfile = () => {
   const context = useContext(AuthGlobal);
@@ -28,6 +28,7 @@ const UserProfile = () => {
   const navigation = useNavigation();
   const { loading, user, error } = useSelector((state) => state.userOnly)
   const { coops } = useSelector((state) => state.allofCoops);
+  const { members } = useSelector((state) => state.memberList);
   const userId = context?.stateUser?.userProfile?._id;
   const [token, setToken] = useState();
   const [loadings, setLoadings] = useState(true);
@@ -36,7 +37,10 @@ const UserProfile = () => {
   const filterUser = Array.isArray(coops)
   ? coops.filter((coop) => coop?.user?._id === userId)
   : [];
-  console.log("coops", filterUser)
+  const filterMember2 = Array.isArray(members)
+  ? members.filter((member) => member?.userId?._id === userId)
+  : [];
+  console.log("members: ", filterMember2)
   // console.log("token: ", token)
  
   // useEffect(() => {
@@ -82,6 +86,7 @@ const UserProfile = () => {
   useFocusEffect(
     useCallback(() => {
       dispatch(matchCooperative(token));
+      dispatch(memberAllList(token));
     }, [dispatch])
   )
 
@@ -175,27 +180,20 @@ const UserProfile = () => {
   </TouchableOpacity>
   ) : filterUser?.length !== 0 ? (
   null
-) :  (<TouchableOpacity onPress={() => navigation.navigate('ProfileCoop')}>
+) :  (
+  <View>
+<TouchableOpacity onPress={() => navigation.navigate('ProfileCoop')}>
 <Text>ARE you Part of Coop? Register here!</Text>
-</TouchableOpacity>)}
+</TouchableOpacity>
+{filterMember2?.length !== 0 ? null : ( <Text> Join Member
+<TouchableOpacity onPress={() => navigation.navigate('MembersRegistration')}>
+ 
+<Text>Register here!</Text>
+</TouchableOpacity>
+</Text>)}
 
-          {/* Modal */}
-          {/* <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-              setModalVisible(!modalVisible);
-            }}
-          >
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>Save changes?</Text>
-              <View style={styles.modalButtons}>
-                <Button title="Save" onPress={handleSaveChanges} color="#f7b900" />
-                <Button title="Cancel" onPress={() => setModalVisible(false)} />
-              </View>
-            </View>
-          </Modal> */}
+</View>
+)}
         </ScrollView>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
