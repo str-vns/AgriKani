@@ -1,38 +1,37 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { NativeBaseProvider } from "native-base";
-import { SocketProvider } from './SocketIo'; 
-import 'react-native-gesture-handler';
-import Auth from "@redux/Store/Auth"
-import { Provider } from 'react-redux';
-import store from '@redux/store';
-import DrawerNavi from "@navigators/DrawerNavigators"
-import messaging from '@react-native-firebase/messaging';
-import AuthGlobal from "@redux/Store/AuthGlobal";
-import * as SplashScreen from 'expo-splash-screen';
+import { SocketProvider } from "./SocketIo";
+import { WeatherProvider } from "./CurrentWeather";
+import "react-native-gesture-handler";
+import Auth from "@redux/Store/Auth";
+import { Provider } from "react-redux";
+import store from "@redux/store";
+import DrawerNavi from "@navigators/DrawerNavigators";
+import * as SplashScreen from "expo-splash-screen";
 
+export default function App() {
+  const [appReady, setAppReady] = useState(false);
 
-export default function App() {    
-    const [appReady, setAppReady] = useState(false); 
-
-    if(!appReady) {
-      setAppReady(true);
-      SplashScreen.hide()
-    }
+  if (!appReady) {
+    setAppReady(true);
+    SplashScreen.hide();
+  }
 
   return (
-    <Auth >
+    <Auth>
       <SocketProvider>
-      <Provider store={store}>
-        <NativeBaseProvider>
-          <NavigationContainer>
-            <DrawerNavi/>
-            {/* <Main /> */}
-          </NavigationContainer>
-        </NativeBaseProvider>
-        
-      </Provider>
+        <WeatherProvider>
+          <Provider store={store}>
+            <NativeBaseProvider>
+              <NavigationContainer>
+                <DrawerNavi />
+                {/* <Main /> */}
+              </NavigationContainer>
+            </NativeBaseProvider>
+          </Provider>
+        </WeatherProvider>
       </SocketProvider>
-  </Auth>
+    </Auth>
   );
 }
