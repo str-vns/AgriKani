@@ -808,8 +808,107 @@ initiativesContainer: {
   stockText: {
     color: '#d9534f',
     textAlign: 'center', 
-  }
-
+  },
+  weatherContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    padding: 10,
+  },
+  weatherTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+  },
+  weatherBox: {
+    width: "100%",
+    height: 200, 
+    borderRadius: 10,
+    overflow: "hidden", 
+    position: "relative", 
+  },
+  backgroundImage: {
+    position: "absolute", 
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    borderRadius: 10, 
+  },
+  cloudImage: {
+    position: "absolute",
+    top: 40,
+    right: 20, 
+    width: 100, 
+    height: 100,
+    
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.2)", 
+  },
+  weatherText: {
+    fontSize: 16,
+    color: "white", 
+    marginBottom: 10,
+  },
+  dailyWeatherContainer: {
+    width: 120, 
+    height: 120, 
+    marginHorizontal: 5,
+    marginVertical: 10,
+    borderRadius: 10,
+    overflow: "hidden",
+    backgroundColor: "#4A90E2", 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dailyWeatherBox: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  dailyOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  dailyWeatherDate: {
+    fontSize: 14, 
+    color: "white",
+    marginBottom: 5, 
+    fontWeight: 'bold',
+  },
+  dailyWeatherCloudImage: {
+    width: 40, 
+    height: 40,
+    marginBottom: 10, 
+  },
+  dailyWeatherText: {
+    fontSize: 14,
+    color: "white",
+    marginBottom: 5, 
+  },
+  dailyWeatherTempText: {
+    fontSize: 16, 
+    color: "white",
+    fontWeight: 'bold',
+  },  backgroundImageDaily: {
+    position: "absolute", 
+    padding: 10,
+    borderRadius: 10, 
+  },
 });
+
 
 export default styles;

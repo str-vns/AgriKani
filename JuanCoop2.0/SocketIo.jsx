@@ -10,7 +10,7 @@ export const SocketProvider = ({ children }) => {
     // https://agrikani.onrender.com
     // http://192.168.50.236:4000
     useEffect(() => {
-      // Create a Socket.IO connection
+
       const socketConnection = io("http://192.168.50.236:4000", {
         transports: ["websocket"],
         cors: {
@@ -22,7 +22,6 @@ export const SocketProvider = ({ children }) => {
         },
       });
   
-      // Set the socket connection
       setSocket(socketConnection);
   
       socketConnection.on("connect", () => {

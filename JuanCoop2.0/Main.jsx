@@ -76,7 +76,6 @@ const Main = () => {
   }
 };
 
-console.log("messaging", messaging().onMessage);
 
 useEffect(() => {
   const initializeFCM = async () => {
@@ -92,7 +91,6 @@ useEffect(() => {
       console.log("No permission granted");
     }
 
-    // Handle notifications when the app is opened from a quit state
     messaging()
       .getInitialNotification()
       .then((remoteMessage) => {
@@ -101,24 +99,15 @@ useEffect(() => {
         }
       });
 
-    // Handle notifications when the app is opened from the background
     const unsubscribeOnOpened = messaging().onNotificationOpenedApp((remoteMessage) => {
       console.log("Notification caused app to open from background state:", remoteMessage.notification);
     });
 
-    // Handle background notifications
     const unsubscribeBackground = messaging().setBackgroundMessageHandler(async (remoteMessage) => {
       console.log("Message handled in the background:", remoteMessage);
     });
 
-    // // Avoid notifications for specific user roles
-    // // if (!(UserRoles?.roles.includes("Customer") && UserRoles?.roles.includes("Cooperative"))) {
-    //   const unsubscribeOnMessage = messaging().onMessage(async (remoteMessage) => {
-    //     // console.log("Notification received while app is in the foreground:", remoteMessage.notification);
-    // })
-
     return () => {
-      unsubscribeOnMessage();
       unsubscribeOnOpened();
       unsubscribeBackground(); 
     };
