@@ -1,17 +1,27 @@
 require("dotenv").config({ path: "./config/.env" });
-const app = require("./app")
+const app = require("./app");
 const mongoose = require("mongoose");
 const connectDB = require("./config/db");
-const PORT = process.env.PORT || 4000 ;
+const nodeCron = require("node-cron");
+const PORT = process.env.PORT || 4000;
 const { logger, logEvents } = require("./middleware/logger");
-const { STATUSCODE } = require("./constants/index");
-const { analyzeMixedLanguage } = require("./utils/mixLanguage")
 const { server } = require("./sokIo");
+const WeatherService = require("./services/weatherService");
 
 connectDB();
 app.use(logger);
 
 mongoose.connection.once("open", () => {
+  console.log("Connected to MongoDB");
+
+  nodeCron.schedule("0 7 * * *", async () => {
+    try {
+      console.log("Checking weather notifications...");
+      await WeatherService.checkWeatherNotification();
+    } catch (error) {
+      console.error("Error in WeatherService:", error);
+    }
+  });
 
   server.listen(PORT, () => {
     console.log(`Server is running and connected to MongoDB on ${mongoose.connection.host}:${PORT}`);
@@ -23,11 +33,9 @@ mongoose.connection.once("open", () => {
 });
 
 mongoose.connection.on("error", (err) => {
-  console.log(`${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`);
+  console.error(`Database connection error: ${err.message}`);
   logEvents(
-    `${err.no}: ${err.code}\t${err.syscall}\t${err.hostname}`,
+    `Database connection error: ${err.message}`,
     "mongoLog.log"
   );
 });
-
-
