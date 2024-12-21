@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.9",
     "bad-words": "^3.0.4",
     "bcrypt": "^5.1.0",
     "cloudinary": "^1.21.0",
@@ -31,6 +32,7 @@
     "mongoose-sequence": "^5.3.1",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "node-cron": "^3.0.3",
     "nodemailer": "^6.9.16",
     "nodemailer-smtp-transport": "^2.4.2",
     "otp-generator": "^4.0.1",
