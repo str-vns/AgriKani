@@ -31,10 +31,10 @@ exports.LoginUser = async (email, password) => {
 };
 
 //Logout ...
-exports.LogoutUser = async (cookies, res) => {
+exports.LogoutUser = (cookies, res) => {
   return new Promise((resolve, reject) => {
     !cookies?.jwt
-      ? reject(new ErrorHandler("No Token Found"))
+      ? reject(new Error("You are not logged in"))
       : (blacklistedTokens.push(cookies.jwt),
         res.clearCookie(RESOURCE.JWT, {
           httpOnly: true,
@@ -42,6 +42,7 @@ exports.LogoutUser = async (cookies, res) => {
           sameSite: RESOURCE.NONE,
         }),
         resolve());
+        console.log("User Successfully Logout");
   });
 };
 

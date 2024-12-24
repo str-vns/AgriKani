@@ -305,6 +305,7 @@ exports.GetTotalUserCount = async () => {
   const count = await User.countDocuments();
   return count;
 };
+
 exports.getUserTypeCount = async () => {
   return await User.aggregate([
     { $unwind: "$roles" },  // Unwind the roles array to count each role separately

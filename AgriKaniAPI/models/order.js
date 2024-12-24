@@ -42,9 +42,11 @@ user: {
                 ref: RESOURCE.INVENTORYM,
                 required: true,
             },
-              deliveredAt: {
-                type: Date
-            },
+            deliveryId: {
+                type: mongoose.Schema.ObjectId,
+                ref: RESOURCE.DELIVERY,
+                required: false,
+            }
         },
     ],
     shippingAddress: {

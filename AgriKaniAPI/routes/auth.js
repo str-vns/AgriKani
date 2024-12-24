@@ -12,7 +12,7 @@ const authRoutes = [
     handler: authController.login,
   },
   {
-    method: METHOD.POST,
+    method: METHOD.GET,
     path: PATH.LOGOUT,
     middleware: [],
     handler: authController.logout,

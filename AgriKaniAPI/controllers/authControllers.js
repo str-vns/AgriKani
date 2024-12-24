@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const logProcess = require("../process/Login_Logout/logProcess");
 const token = require("../utils/token");
 const SuccessHandler = require("../utils/successHandler");
-const cookieParser = require("cookie-parser");
+
 //login
 exports.login = [
   FieldMonitor(["email", "password"]),
@@ -28,8 +28,9 @@ exports.login = [
 ];
 
 exports.logout = asyncHandler(async (req, res) => {
-  const cookies = await logProcess.LogoutUser(req.cookies, res);
 
+  const cookies = await logProcess.LogoutUser(req.cookies, res);
+           
   return SuccessHandler(res, "User Successfully Logout", cookies);
 });
 

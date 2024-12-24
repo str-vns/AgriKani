@@ -1,5 +1,3 @@
-
-
 module.exports = {
     USER: "user",
     PRODUCT: "product",
@@ -26,4 +24,6 @@ module.exports = {
     NOTIFICATION: "notification",
     FILES: "files",
     MEMBER: "member",
+    DELIVERY: "delivery",
+    DRIVER: "driver",
 }

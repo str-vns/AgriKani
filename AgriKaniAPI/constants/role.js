@@ -3,6 +3,6 @@ module.exports = {
     CUSTOMER: "Customer",
     COOPERATIVE: "Cooperative",
     FARMER: "Farmer",
-    RIDER: "Rider",
+    Driver: "Driver",
     MEMBER: "Member",
 } 

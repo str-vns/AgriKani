@@ -65,6 +65,11 @@ const handleSocketConnections = (io) => {
       io.emit("getUsers", users); 
     });
 
+    socket.on('updateLocation', (data) => {
+       console.log(`Server received updateLocation event with data: ${data}`);
+       socket.broadcast.emit('locationUpdate', data);
+    })
+
     socket.on("disconnect", () => {
       console.log(`User disconnected with socketId: ${socket.id}`);
       removeUser(socket.id);  

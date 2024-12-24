@@ -133,4 +133,15 @@ module.exports = {
   MEMBER_APPROVED_ID: "/member/approved/:id",
   MEMBER_DISAPPROVED_ID: "/member/disapproved/:id",
   
+  //Delivery
+  DELIVERY: "/delivery",
+  DELIVERY_ID: "/delivery/:id",
+
+  //Driver
+  DRIVER: "/driver",
+  DRIVER_ID: "/driver/:id",
+  DRIVER_DISAPPROVED: "/driver/disapproved",
+  DRIVER_APPROVED_ID: "/driver/approved/:id",
+  DRIVER_DISAPPROVED_ID: "/driver/disapproved/:id",
+
 };
