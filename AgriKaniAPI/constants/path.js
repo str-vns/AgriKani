@@ -143,5 +143,5 @@ module.exports = {
   DRIVER_DISAPPROVED: "/driver/disapproved",
   DRIVER_APPROVED_ID: "/driver/approved/:id",
   DRIVER_DISAPPROVED_ID: "/driver/disapproved/:id",
-
+  DRIVER_COOP_ID: "/driver/coop/:id",
 };
