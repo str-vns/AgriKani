@@ -111,13 +111,9 @@ const MemberActive = () => {
       {/* Content */}
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Error: {error}</Text>
-        </View>
-      ) : members?.length === 0 ? (
+      ) : members?.length === 0 || error ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No cooperative found.</Text>
+          <Text style={styles.emptyText}>No Members found.</Text>
         </View>
       ) : (
         <FlatList

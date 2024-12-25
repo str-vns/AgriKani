@@ -111,13 +111,9 @@ const Memberlist = () => {
       {/* Content */}
       {loading ? (
   <ActivityIndicator size="large" color="blue" style={styles.loader} />
-) : error ? (
-  <View style={styles.errorContainer}>
-    <Text style={styles.errorText}>Error: {error}</Text>
-  </View>
-) : members && members.length === 0 ? (
+) : members && members.length === 0 || error ? (
   <View style={styles.emptyContainer}>
-    <Text style={styles.emptyText}>No members found.</Text>
+    <Text style={styles.emptyText}>No Members found.</Text>
   </View>
 ) : (
   <FlatList
