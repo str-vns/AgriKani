@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
 const orders = {
   December: [
@@ -41,6 +43,7 @@ const OrderItem = ({ order }) => (
 );
 
 const Section = ({ title, data }) => {
+
   const [expanded, setExpanded] = useState(false);
   const [showAssignedOnly, setShowAssignedOnly] = useState(false);
 
@@ -77,11 +80,21 @@ const Section = ({ title, data }) => {
 };
 
 const AssignFile = () => {
+  const navigation = useNavigation()
   return (
+    <View style={styles.containerNo}>
+    <View style={styles.header}>
+    <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
+      <Ionicons name="menu" size={34} color="black" />
+    </TouchableOpacity>
+    <Text style={styles.headerTitle}>History</Text>
+  </View>
     <View style={styles.container}>
+     
       {Object.keys(orders).map((month) => (
         <Section key={month} title={month} data={orders[month]} />
       ))}
+    </View>
     </View>
   );
 };
@@ -91,7 +104,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 16,
+    
   },
+  containerNo: {
+    flexGrow: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    elevation: 3,
+},
+headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'center',
+    color: '#333',
+},
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

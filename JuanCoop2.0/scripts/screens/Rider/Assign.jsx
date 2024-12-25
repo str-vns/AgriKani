@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 const Assign = () => {
+  const navigation = useNavigation();
   const [orders, setOrders] = useState([
     { id: '1', orderId: 'order#12345678', status: 'Assigned' },
     { id: '2', orderId: 'order#12345678', status: 'Already Assigned' },
@@ -51,7 +53,15 @@ const Assign = () => {
   };
 
   return (
+    <View style={styles.containerNo}>
+         <View style={styles.header}>
+          <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
+            <Ionicons name="menu" size={34} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Assigned</Text>
+        </View>
     <View style={styles.container}>
+    
       <View style={styles.riderInfo}>
         <Image
           source={{
@@ -71,6 +81,7 @@ const Assign = () => {
         renderItem={renderOrder}
       />
     </View>
+    </View>
   );
 };
 
@@ -80,6 +91,28 @@ const styles = StyleSheet.create({
       padding: 20,
       backgroundColor: '#f9f9f9',
     },
+    containerNo: {
+      flexGrow: 1,
+      backgroundColor: '#FFFFFF',
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingTop: 15,
+      paddingBottom: 15,
+      backgroundColor: '#fff',
+      borderBottomWidth: 1,
+      borderBottomColor: '#ddd',
+      elevation: 3,
+  },
+  headerTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      flex: 1,
+      textAlign: 'center',
+      color: '#333',
+  },
     riderInfo: {
       flexDirection: 'row',
       alignItems: 'center',

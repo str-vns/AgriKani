@@ -19,6 +19,7 @@ import messaging from "@react-native-firebase/messaging";
 import { saveDeviceToken } from "@redux/Actions/userActions";
 import { useDispatch } from "react-redux";
 
+
 const UserSignIn = () => {
   const dispatch = useDispatch();
   const socket = useSocket();
@@ -171,9 +172,11 @@ const UserSignIn = () => {
       } else {
         const user = { email, password };
         loginUser(user, context.dispatch);
-      }
-    } catch (error) {
-      setError("Login Failed. Please try again.");
+        setIsLoading(false);
+      } 
+    }catch(error){
+      setIsLoading(false);
+      setError("Login Failed. Please try again.");  
     }
   };
 

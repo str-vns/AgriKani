@@ -1,40 +1,118 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { createDriver, clearErrors } from "@redux/Actions/driverActions";
+import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Error from "@shared/Error";
+import { OTPregister } from "@redux/Actions/userActions";
 
-
-const Otp = () => {
-
+const Otp = (props) => {
+  const registration = props.route.params;
+  const navigation = useNavigation();
+  const dispatch = useDispatch()
+  const inputRefs = useRef([])
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const { loading, error } = useSelector((state) => state.driverApi);
+  const [errors, setErrors] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [token, setToken] = useState(null);
 
-  const handleInputChange = (value, index) => {
+  useEffect(() => {
+    const fetchJwt = async () => {
+      try {
+        const res = await AsyncStorage.getItem("jwt");
+        setToken(res);
+      } catch (error) {
+        console.error("Error retrieving JWT: ", error);
+      }
+    };
+    fetchJwt();
+  }, [dispatch]);
+
+  const handleChange = (value, index) => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
-    // Auto-focus to next input if value is entered
     if (value && index < otp.length - 1) {
-      inputs[index + 1].focus();
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
-  const inputs = [];
-  const handleSubmit = () => {
-    const otpCode = otp.join("");
-    if (otpCode.length === 6) {
-      Alert.alert("OTP Submitted", `Your OTP code is: ${otpCode}`);
-    } else {
-      Alert.alert("Error", "Please enter all 6 digits of the OTP.");
+  const handleKeyPress = (index, event) => {
+    if (event.nativeEvent.key === 'Backspace') {
+      if (otp[index] === '') {
+        if (index > 0) {
+          inputRefs.current[index - 1]?.focus();
+        }
+      } else {
+        const newOtp = [...otp];
+        newOtp[index] = '';
+        setOtp(newOtp);
+      }
     }
   };
-const navigation = useNavigation();
+
+  const Resend = () => {
+      setIsDisabled(true);
+      setTimer(7 * 60);
+      dispatch(OTPregister({ email: registration.riderRegister.email }));
+  }
+
+  useEffect(() => {
+    let interval;
+    if (isDisabled && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000); 
+    }
+
+    if (timer === 0) {
+      setIsDisabled(false);
+      clearInterval(interval);
+    }
+
+    return () => clearInterval(interval);
+  }, [isDisabled, timer])
+
+  const handleVerify = () => {
+    const otpString = otp.join('');
+    
+    if (otpString.length < 6) {
+      setErrors("Please fill the OTP");
+    }
+    
+    if (error) {
+      setErrors("Wrong OTP entered. Please try again!");
+  
+      setTimeout(() => {
+        dispatch(clearErrors());
+        setErrors(""); 
+      }, 1000); 
+    }
+
+    const registerInfo = {
+      otp: otpString,
+      ...registration,  
+    };
+   
+    dispatch(createDriver(registerInfo, token));
+
+    setOtp(["", "", "", "", "", ""]);
+    Alert.alert("Driver created successfully! Please Wait for Admin Approval");
+    navigation.navigate("Riderlist");
+  };
+ 
+
   return (
     <View style={styles.container}>
 
@@ -48,24 +126,32 @@ const navigation = useNavigation();
             key={index}
             style={styles.otpInput}
             value={digit}
-            onChangeText={(value) => handleInputChange(value, index)}
+            onChangeText={(value) => handleChange(value, index)}
+            onKeyPress={(event) => handleKeyPress(index, event)}
             keyboardType="numeric"
             maxLength={1}
-            ref={(ref) => (inputs[index] = ref)}
+            ref={(ref) => inputRefs.current[index] = ref}
           />
         ))}
       </View>
 
+      
       <View style={styles.resendContainer}>
         <Text style={styles.resendText}>Didn’t receive code?</Text>
-        <TouchableOpacity>
-          <Text style={styles.resendButton}>Resend again</Text>
+        <TouchableOpacity   onPress={Resend}
+        disabled={isDisabled}  >
+          <Text style={styles.resendButton}>{isDisabled
+            ? `Resend available in ${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}`
+            : "Resend again"}</Text>
         </TouchableOpacity>
       </View>
 
+      {errors ? <Error message={errors} /> : null}
       <TouchableOpacity style={styles.verifyButton} 
-       onPress={() => navigation.navigate("Deliveries")}>
-        <Text style={styles.verifyText}>Verify</Text>
+       onPress={handleVerify} >
+          {loading ? (<ActivityIndicator size="small" color="#fff" /> )
+                : 
+                (<Text style={styles.verifyText}>Verify</Text>)}
       </TouchableOpacity>
     </View>
   );

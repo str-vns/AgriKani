@@ -1,46 +1,174 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
-} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text,  TextInput, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Platform, Modal, ActivityIndicator} from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import styles from "@screens/stylesheets/Rider/Register";
+import Ionicons  from "react-native-vector-icons/Ionicons";
+import AuthGlobal from "@redux/Store/AuthGlobal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import messaging from '@react-native-firebase/messaging';
+import * as ImagePicker from "expo-image-picker";
+import { Camera } from "expo-camera";
+import { Picker } from "@react-native-picker/picker";
+import { useDispatch } from "react-redux";
+import { OTPregister } from "@redux/Actions/userActions";
 
 const Register = () => {
+    const dispatch = useDispatch();
     const navigation = useNavigation();
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phoneNumber: "",
-    email: "",
-    street: "",
-    city: "",
-    password: "",
-  });
+    const context = useContext(AuthGlobal);
+    const userId = context.stateUser?.userProfile?._id;
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [age, setAge] = useState("");
+    const [phoneNum, setPhoneNum] = useState("");
+    const [gender, setGender] = useState("");
+    const [image, setImage] = useState(null);
+    const [driversLicenseImage, setDriversLicenseImage] = useState(null);
+    const [mainLisence, setMainLisence] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [mainImage, setMainImage] = useState(null);
+    const [modalVisible2, setModalVisible2] = useState(false);
+    const [hasCameraPermission, setHasCameraPermission] = useState(null);
+    const [launchCamera, setLaunchCamera] = useState(false);
+    const [loadings, setLoadings] = useState(false);
+    const [errors, setErrors] = useState(null);
 
-  const handleInputChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
 
-  const handleCancel = () => {
-    setFormData({
-      fullName: "",
-      phoneNumber: "",
-      email: "",
-      street: "",
-      city: "",
-      password: "",
+    useEffect(() => {
+        (async () => {
+          const cameraStatus = await Camera.requestCameraPermissionsAsync();
+          setHasCameraPermission(cameraStatus.status === "granted");
+    
+          const cameraRollStatus =
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+          setHasCameraPermission(cameraRollStatus.status === "granted");
+        })();
+      }, []); 
+
+ const addImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
+
+    if (!result.canceled) {
+      const selectedImageUri = result.assets[0].uri;
+      setImage(selectedImageUri);
+      setMainImage(selectedImageUri);
+      setModalVisible(false);
+    }
   };
 
-  const handleSave = () => {
-    Alert.alert("Saved Data", JSON.stringify(formData, null, 2));
+  const addLicense = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const selectedImageUri = result.assets[0].uri;
+      setDriversLicenseImage(selectedImageUri);
+      setMainLisence(selectedImageUri);
+      setModalVisible2(false);
+    }
   };
+
+  const takeImage = async () => {
+    setLaunchCamera(true);
+
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraPermission.status !== "granted") {
+      console.log("Camera permission not granted");
+      return;
+    }
+
+    let result = await ImagePicker.launchCameraAsync({
+      aspect: [4, 3],
+      quality: 0.1,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const imageUri = result.assets[0].uri;
+      setImage(imageUri);
+      setMainImage(imageUri);
+      setModalVisible(false);
+    } else {
+      console.log("No image captured or selection canceled.");
+    }
+  };
+
+  const takeLicense = async () => {
+    setLaunchCamera(true);
+
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraPermission.status !== "granted") {
+      console.log("Camera permission not granted");
+      return;
+    }
+
+    let result = await ImagePicker.launchCameraAsync({
+      aspect: [4, 3],
+      quality: 0.1,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const imageUri = result.assets[0].uri;
+      setDriversLicenseImage(imageUri);
+      setMainLisence(imageUri);
+      setModalVisible2(false);
+    } else {
+      console.log("No image captured or selection canceled.");
+    }
+  };
+
+  const handleCancel = async () => {
+    setFirstName("");
+    setLastName("");
+    setAge("");
+    setGender("");
+    setPhoneNum("");
+    setEmail("");
+    setPassword("");
+    setMainLisence(null);
+    setMainImage(null);
+    setModalVisible(false);
+    setModalVisible2(false);
+    navigation.goBack();
+  }
+
+  const handleSave = async () => {
+ 
+    setLoadings(true);
+    if (!firstName || !lastName || !age || !phoneNum || !email || !password || !image || !driversLicenseImage || !gender ) {
+      setErrors("All fields are required.");
+      setLoadings(false);
+      return;
+    }
+
+    dispatch(OTPregister({ email }));
+    const riderRegister = {
+      firstName: firstName,
+      lastName: lastName,
+      age: age,
+      phoneNum: phoneNum,
+      gender: gender,
+      image: image,
+      driversLicenseImage: driversLicenseImage,
+      email: email,
+      password: password,
+      user: userId,  
+    }
+
+ 
+    navigation.navigate("OtpRider", { riderRegister });
+    setLoadings(false);
+  }
 
   return (
     
@@ -53,9 +181,17 @@ const Register = () => {
        
         {/* Profile Picture */}
         <View style={styles.profileContainer}>
-          <View style={styles.profileImage}></View>
-          <TouchableOpacity>
-            <Text style={styles.uploadText}>Upload Photo</Text>
+          <View >
+          { mainImage ? (
+            <Image source={{ uri: mainImage }} style={styles.profileImage}/>
+          ) : (
+             <Ionicons name="person-circle-outline" size={100} color="#878787" />
+          )}
+           
+           
+          </View>
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Text style={styles.uploadText} >Upload Photo</Text>
           </TouchableOpacity>
         </View>
 
@@ -63,148 +199,198 @@ const Register = () => {
         <View style={styles.form}>
           <TextInput
             style={styles.input}
-            placeholder="Full Name"
-            value={formData.fullName}
-            onChangeText={(value) => handleInputChange("fullName", value)}
+            placeholder="First Name"
+            value={firstName}
+            onChangeText={(text) => setFirstName(text)}
           />
+
+        <TextInput
+            style={styles.input}
+            placeholder="Last Name"
+            value={lastName}
+            onChangeText={(text) => setLastName(text)}
+          />
+
+          <TextInput
+            placeholder="Enter age"
+                    style={styles.input}
+                    keyboardType="numeric"
+                    maxLength={3}
+                    value={age}
+                    onChangeText={setAge}
+                />
+
+           <View style={styles.genderContainer}>
+                    <Picker
+                      selectedValue={gender}
+                      onValueChange={(itemValue) => setGender(itemValue)}
+                      style={styles.pickerStyle}
+                    >
+                      <Picker.Item label="Select Gender" value="" enabled={false}  />
+                      <Picker.Item label="Male" value="male"  />
+                      <Picker.Item label="Female" value="female"  />
+                      <Picker.Item label="Prefer Not To Say" value="prefer not to say" />
+                    </Picker>
+                  </View>
+
           <TextInput
             style={styles.input}
             placeholder="Phone Number"
             keyboardType="numeric"
-            value={formData.phoneNumber}
-            onChangeText={(value) => handleInputChange("phoneNumber", value)}
+            value={phoneNum}
+            onChangeText={(text) => setPhoneNum(text)}
           />
+
           <TextInput
             style={styles.input}
             placeholder="Email"
             keyboardType="email-address"
-            value={formData.email}
-            onChangeText={(value) => handleInputChange("email", value)}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Street"
-            value={formData.street}
-            onChangeText={(value) => handleInputChange("street", value)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="City"
-            value={formData.city}
-            onChangeText={(value) => handleInputChange("city", value)}
-          />
+
           <TextInput
             style={styles.input}
             placeholder="Enter Your Password"
             secureTextEntry
-            value={formData.password}
-            onChangeText={(value) => handleInputChange("password", value)}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
           />
-        </View>
-      </ScrollView>
+         
+      </View>
 
-      {/* Buttons */}
+        <Text style={styles.imageText}>Drivers License</Text>
+                <ScrollView
+                  horizontal={true}
+                  contentContainerStyle={styles.imageButton}
+                >
+                  <TouchableOpacity onPress={() => setModalVisible2(true)}>
+        
+                          {mainLisence ? (
+                            <Image source={{ uri: mainLisence }} style={styles.image} />
+                          ) : (
+                            <View style={styles.ImageCard}>
+                      <View style={styles.cardContent}>
+                        <View style={styles.imageInfo}>
+                            <Ionicons name="camera-outline" size={50} color="black" />
+                            </View>
+                      </View>
+                    </View>
+                          )}
+                     
+                  </TouchableOpacity>
+                </ScrollView>
+                {errors && <Text style={styles.errorText}>{errors}</Text>}
+      </ScrollView>
+  
+    
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
           <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton} 
-        onPress={() => navigation.navigate("Otp")}>
-          <Text style={styles.saveText}>Save</Text>
+        onPress={() => handleSave()}
+        disabled={loadings}>
+          {loadings ? ( <ActivityIndicator size={"small"} color="#fff" /> ) : ( <Text style={styles.saveText}>Save</Text> )}
+  
         </TouchableOpacity>
       </View>
+
+      {/* image */}
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalText}>
+                      Choose an option to get a image:
+                    </Text>
+                    <View style={styles.buttonRow}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setModalVisible(false);
+                          takeImage();
+                        }}
+                        title="Take Picture"
+                        variant={"ghost"}
+                      >
+                        <Ionicons name="camera-outline" style={{ fontSize: 30 }} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setModalVisible(false);
+                          addImage();
+                        }}
+                        title="Add Image"
+                        variant={"ghost"}
+                      >
+                        <Ionicons name="image-outline" style={{ fontSize: 30 }} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => setModalVisible(false)}
+                        title="Cancel"
+                        variant={"ghost"}
+                        style={{ marginTop: 5.5 }}
+                      >
+                        <Text>CANCEL</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+      
+              {/* License */}
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible2}
+                onRequestClose={() => setModalVisible2(false)}
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalText}>
+                      Choose an option to get a image:
+                    </Text>
+                    <View style={styles.buttonRow}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setModalVisible2(false);
+                          takeLicense();
+                        }}
+                        title="Take Picture"
+                        variant={"ghost"}
+                      >
+                        <Ionicons name="camera-outline" style={{ fontSize: 30 }} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setModalVisible2(false);
+                          addLicense();
+                        }}
+                        title="Add Image"
+                        variant={"ghost"}
+                      >
+                        <Ionicons name="image-outline" style={{ fontSize: 30 }} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => setModalVisible2(false)}
+                        title="Cancel"
+                        variant={"ghost"}
+                        style={{ marginTop: 5.5 }}
+                      >
+                        <Text>CANCEL</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+
     </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 100, // Ensures scrollable content doesn't overlap buttons
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  backButton: {
-    marginRight: 10,
-  },
-  backText: {
-    fontSize: 16,
-    color: "#007bff",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
-  },
-  profileContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "#ddd",
-    marginBottom: 10,
-  },
-  uploadText: {
-    fontSize: 16,
-    color: "#007bff",
-  },
-  form: {
-    marginBottom: 20,
-  },
-  input: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: "#f9f9f9",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 20,
-    borderTopWidth: 1,
-    borderColor: "#ddd",
-    backgroundColor: "#fff",
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-  },
-  cancelButton: {
-    borderWidth: 1,
-    borderColor: "#f39c12",
-    borderRadius: 5,
-    padding: 10,
-    flex: 0.45,
-  },
-  cancelText: {
-    textAlign: "center",
-    color: "#f39c12",
-    fontSize: 16,
-  },
-  saveButton: {
-    backgroundColor: "#f39c12",
-    borderRadius: 5,
-    padding: 10,
-    flex: 0.45,
-  },
-  saveText: {
-    textAlign: "center",
-    color: "#fff",
-    fontSize: 16,
-  },
-});
 
 export default Register;
