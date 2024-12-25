@@ -41,7 +41,7 @@ exports.getDriverDisapprove = asyncHandler(async (req, res, next) => {
 });
 
 exports.getDriverId = asyncHandler(async (req, res, next) => {
-  const driver = await DriverProcess.getDriverIdProcess(req.params.id);
+  const driver = await DriverProcess.getDriverByIdProcess(req.params.id);
   return driver
     ? SuccessHandler(res, `Driver has been fetched Successfully`, driver)
     : next(new ErrorHandler("No Driver Found"));
@@ -66,4 +66,11 @@ exports.deleteDriver = asyncHandler(async (req, res, next) => {
   return driver
     ? SuccessHandler(res, `Driver has been deleted Successfully`, driver)
     : next(new ErrorHandler("No Driver Found"));
+});
+
+exports.getCoopDriver = asyncHandler(async (req, res, next) => {
+  const drivers = await DriverProcess.getCoopDriverProcess(req.params.id);
+  return drivers?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Driver Found"))
+    : SuccessHandler(res, `All Cooperative Drivers has been fetched Successfully`, drivers);
 });
