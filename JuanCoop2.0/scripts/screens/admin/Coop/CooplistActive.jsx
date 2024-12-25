@@ -111,11 +111,7 @@ const CooplistActive = () => {
       {/* Content */}
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Error: {error}</Text>
-        </View>
-      ) : coops?.length === 0 ? (
+      ) : coops?.length === 0 || error ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No cooperative found.</Text>
         </View>
