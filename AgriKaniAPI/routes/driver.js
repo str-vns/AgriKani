@@ -48,6 +48,12 @@ const driverRoutes = [
         roles: [],
         handler: driverController.deleteDriver,
     },
+    {
+        method: METHOD.GET,
+        path: PATH.DRIVER_COOP_ID,
+        roles: [],
+        handler: driverController.getCoopDriver,
+    }
 ];
 
 

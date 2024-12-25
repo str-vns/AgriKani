@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Driver = require("../models/driver");
+const Farm = require("../models/farm");
 const Otp = require("../models/otp");
 const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
@@ -10,7 +11,6 @@ const { cloudinary } = require("../utils/cloudinary");
 const { sendEmail } = require("../utils/sendMail");
 
 exports.registerDriverProcess = async (req) => {
-
   try {
     const duplicateEmail = await User.findOne({ email: req.body.email })
       .collation({ locale: "en" })
@@ -43,7 +43,10 @@ exports.registerDriverProcess = async (req) => {
     if (!response) {
       throw new ErrorHandler("Otp is not Valid or Email is not Match");
     }
-  
+    
+    const coopExist = await Farm.findOne({ user: req.body.user }).lean().exec();
+    if (!coopExist) throw new ErrorHandler("Coop not exist");
+    
     let images = {};
   
     if (req.files.image) {
@@ -56,6 +59,7 @@ exports.registerDriverProcess = async (req) => {
     if (req.files.driversLicenseImage) {
       driversLicenseImages = await uploadImageSingle(req.files.driversLicenseImage[0]);
     }
+
     if (!driversLicenseImages) throw new ErrorHandler("At least one image is required");
  
     const gender = req.body.gender ? req.body.gender : GENDER.PNTS;
@@ -66,6 +70,7 @@ exports.registerDriverProcess = async (req) => {
       gender: gender,
       image: images,
       driversLicenseImage: driversLicenseImages,
+      coopId: coopExist._id,  
     });
   
     return driver;
@@ -76,17 +81,27 @@ exports.registerDriverProcess = async (req) => {
   };
 
 exports.getDriverProcess = async () => {
-    const driver = await Driver.find({ approvedAt: { $ne: null } }).lean().exec();
+    const driver = await Driver.find({ approvedAt: { $ne: null } })
+    .populate("coopId")
+    .lean().exec();
     return driver;
 };
 
 exports.getDriverDisapproveProcess = async () => {
-    const driver = await Driver.find({ approvedAt: null }).lean().exec();
+    const driver = await Driver.find({ approvedAt: null })
+    .populate("coopId")
+    .lean().exec();
     return driver;
 }
    
 exports.getDriverByIdProcess = async (id) => {
-    const driver = await Driver.findById(id).lean().exec();
+    if (!mongoose.Types.ObjectId.isValid(id))
+        throw new ErrorHandler(`Invalid Cooperative ID: ${id}`);
+
+    const coopExist = await Farm.findOne({ user: id }).lean().exec();
+    if (!coopExist) throw new ErrorHandler("Coop not exist"); 
+
+    const driver = await Driver.find({ coopId: coopExist._id }).lean().exec();
     return driver;
 };
 
@@ -99,6 +114,8 @@ exports.approveDriverProcess = async (id) => {
   if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
 
   driver.approvedAt = new Date();
+
+  const role = ROLE.DRIVER;
 
     const newUser = await User.create({
       email: driver.email,
@@ -113,7 +130,7 @@ exports.approveDriverProcess = async (id) => {
       },
       phoneNum: driver.phoneNum,
       gender: driver.gender,
-      roles: ROLE.DRIVER,
+      roles: role,
     });
 
     driver.userId = newUser._id;
@@ -204,6 +221,13 @@ exports.approveDriverProcess = async (id) => {
       
       await sendEmail(mailOptions);
      
+    return driver;
+};
+
+exports.getCoopDriverProcess = async (id) => {
+    const driver = await Driver.find({ coopId: id, approvedAt: { $ne: null } })
+    .lean().exec(); 
+
     return driver;
 };
 
