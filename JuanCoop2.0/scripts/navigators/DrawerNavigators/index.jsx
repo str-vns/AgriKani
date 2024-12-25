@@ -152,6 +152,14 @@ const context = useContext(AuthGlobal);
           options={{ headerShown: false, tabBarShowLabel: false }}
           component={PostNavigators}
         />
+
+        <Drawer.Screen
+          name="DriverList"
+          initialParams={{ screen: "DriverList" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={AdminNavigators}
+        />
+        
         <Drawer.Screen
           name="Reviews"
           options={{ headerShown: false, tabBarShowLabel: false }}
@@ -176,8 +184,8 @@ const context = useContext(AuthGlobal);
           component={CoopNavigators}
         />
         <Drawer.Screen
-          name="Start"
-          initialParams={{ screen: "Start" }}
+          name="Riderlist"
+          initialParams={{ screen: "Riderlist" }}
           options={{ headerShown: false, tabBarShowLabel: false }}
           component={RiderNavigators}
         />

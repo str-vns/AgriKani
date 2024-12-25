@@ -26,48 +26,48 @@ const RiderNavigators = () => {
       <Stack.Screen
         name="Deliveries"
         component={Deliveries}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Details"
         component={Details}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Location"
         component={Location}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Dropoff"
         component={Dropoff}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Riderlist"
         component={Riderlist}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Assign"
         component={Assign}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="History"
         component={History}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
 
       <Stack.Screen
         name="Register"
         component={Register}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
         <Stack.Screen
-        name="Otp"
+        name="OtpRider"
         component={Otp}
-        options={{ headerShown: true }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
