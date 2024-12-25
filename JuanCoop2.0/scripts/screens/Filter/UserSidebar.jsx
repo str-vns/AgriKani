@@ -55,17 +55,20 @@ const UserSidebar = () => {
     { label: "Orders", icon: "clipboard-outline", key: "orders" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
     { label: "Notifications", icon: "notifications-outline", key: "notifications" },
+    { label: "Rider", icon: "bicycle-outline", key: "rider" },
     { label: "Members", icon: "people-outline", key: "members" },
     { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Community Forum", icon: "create-outline", key: "Forum" },
     { label: "Product Archive", icon: "archive-outline", key: "productArchive" },
+   
   ]
 
   const AdminItems = [
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
     { label: "User", icon: "person-circle-outline", key: "user" }, //
     { label: "Cooperative", icon: "storefront-outline", key: "coop" },
-    { label: "News", icon: "newspaper-outline", key: "news" }, //how to declare this
+    { label: "Driver", icon: "car-outline", key: "driver" },
+    { label: "News", icon: "newspaper-outline", key: "news" }, 
     { label: "Community", icon: "people-outline", key: "community" },
   ];
 
@@ -132,7 +135,9 @@ const UserSidebar = () => {
       navigation.navigate( "FNotificationList" )
     } else if (key === "members"){
       navigation.navigate( "MemberList" )
-    } 
+    } else if (key === "rider"){
+      navigation.navigate( "Riderlist" )
+    }
     
 
     // Add other navigation conditions for different items
@@ -141,7 +146,6 @@ const UserSidebar = () => {
   const AdminPress = (key) => {
     setActiveItem(key);
 
-    // Navigate to the appropriate screen
     if (key === "dashboard") {
       navigation.navigate("AdminDashboards");
     } else if (key === "user") {
@@ -150,6 +154,8 @@ const UserSidebar = () => {
       navigation.navigate("CoopList");
     } else if (key === "news") {
       navigation.navigate("BlogList");
+    } else if (key === "driver") {
+      navigation.navigate("DriverList");
     } else if (key === "community") {
       navigation.navigate("PostList");
     } else if (key === "barGraph") {
