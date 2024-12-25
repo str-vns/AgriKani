@@ -21,6 +21,7 @@ import {
   import { sendNotificationReducers, getNotificationReducers, readNotificationReducers } from "@redux/Reducers/notificationReducers";
   import { inventoryCreateReducer, singleInventoryReducer } from "@redux/Reducers/inventoryReducer";
   import { memberListReducer, memberApiReducer } from "@redux/Reducers/memberReducer";
+  import { driverApiReducer, driverListReducer } from "@redux/Reducers/driverReducer";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
@@ -70,8 +71,9 @@ import {
     coopActive: coopActiveReducer,
     sinvent: singleInventoryReducer,
     memberList: memberListReducer,
-    memberApi: memberApiReducer
-
+    memberApi: memberApiReducer,
+    driverApi: driverApiReducer,
+    driverList: driverListReducer
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));
