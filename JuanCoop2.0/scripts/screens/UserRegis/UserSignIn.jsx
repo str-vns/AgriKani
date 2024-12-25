@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -8,7 +15,7 @@ import Error from "@shared/Error";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSocket } from "../../../SocketIo";
 import styles from "@screens/stylesheets/UserRegis/UserSignIn";
-import messaging from '@react-native-firebase/messaging';
+import messaging from "@react-native-firebase/messaging";
 import { saveDeviceToken } from "@redux/Actions/userActions";
 import { useDispatch } from "react-redux";
 
@@ -51,45 +58,50 @@ const UserSignIn = () => {
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-      if (enabled) {
-        console.log("Authorization status:", authStatus)
-      }
-  }
+    if (enabled) {
+      console.log("Authorization status:", authStatus);
+    }
+  };
 
   useEffect(() => {
-    if(requestUserPermission())
-    {
+    if (requestUserPermission()) {
       messaging()
-      .getToken()
-      .then(token => {
-        setFcmToken(token);
-      })
+        .getToken()
+        .then((token) => {
+          setFcmToken(token);
+        });
     } else {
-      console.log("No permission granted", authStatus)
+      console.log("No permission granted", authStatus);
     }
-    
+
     messaging()
-    .getInitialNotification()
-    .then(async (remoteMessage) => {
-      if (remoteMessage) {
-        console.log("Notification caused app to open from quit state:", remoteMessage.notification);
-      }
-    })
+      .getInitialNotification()
+      .then(async (remoteMessage) => {
+        if (remoteMessage) {
+          console.log(
+            "Notification caused app to open from quit state:",
+            remoteMessage.notification
+          );
+        }
+      });
 
     messaging().onNotificationOpenedApp((remoteMessage) => {
-      console.log("Notification caused app to open from background state:", remoteMessage.notification);
-    })
+      console.log(
+        "Notification caused app to open from background state:",
+        remoteMessage.notification
+      );
+    });
 
     messaging().setBackgroundMessageHandler(async (remoteMessage) => {
       console.log("Message handled in the background:", remoteMessage);
-    })
+    });
 
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
       Alert.alert("A new FCM message arrived!", JSON.stringify(remoteMessage));
-    })
+    });
 
     return unsubscribe;
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (
@@ -98,75 +110,70 @@ const UserSignIn = () => {
       userInfo.roles.includes("Customer") &&
       userInfo.roles.includes("Cooperative")
     ) {
-      const saveDtoken = 
-      {
+      const saveDtoken = {
         email: email,
-        deviceToken: fcmToken
-      }
+        deviceToken: fcmToken,
+      };
 
       dispatch(saveDeviceToken(saveDtoken));
       setEmail("");
       setPassword("");
       setError("");
-      setIsLoading(false)
+      setIsLoading(false);
       navigation.navigate("CoopDashboard");
-      
     } else if (
       context?.stateUser?.isAuthenticated &&
       userInfo?.roles &&
       userInfo.roles.includes("Admin")
     ) {
-      const saveDtoken = 
-      {
+      const saveDtoken = {
         email: email,
-        deviceToken: fcmToken
-      }
+        deviceToken: fcmToken,
+      };
 
       dispatch(saveDeviceToken(saveDtoken));
       setEmail("");
       setPassword("");
       setError("");
-      setIsLoading(false)
+      setIsLoading(false);
       console.log("Navigating to Admin Dashboard");
       navigation.navigate("Admin");
-    } else if (context?.stateUser?.isAuthenticated && userInfo.roles.includes("Customer")) {
-      const saveDtoken = 
-      {
+    } else if (
+      context?.stateUser?.isAuthenticated &&
+      userInfo.roles.includes("Customer")
+    ) {
+      const saveDtoken = {
         email: email,
-        deviceToken: fcmToken
-      }
-      
+        deviceToken: fcmToken,
+      };
+
       dispatch(saveDeviceToken(saveDtoken));
       setEmail("");
       setPassword("");
       setError("");
-      setIsLoading(false)
+      setIsLoading(false);
       console.log("Navigating to Home");
       navigation.navigate("Home", { screen: "Home" });
-    } else{
-      setIsLoading(false)
+    } else {
+      setIsLoading(false);
     }
   }, [context.stateUser.isAuthenticated]);
 
   const handleSubmit = () => {
-    setIsLoading(true)
-    try{
-      if (email === "" || password === "") 
-        {
+    setIsLoading(true);
+    try {
+      if (email === "" || password === "") {
         setIsLoading(false);
         setError("Please fill in the required fields");
-      } 
-       else if (!email || !email.includes('@') )
-      {
+      } else if (!email || !email.includes("@")) {
         setIsLoading(false);
         setError("Please provide a valid email address.");
-      } 
-      else {
+      } else {
         const user = { email, password };
         loginUser(user, context.dispatch);
-      } 
-    }catch(error){
-      setError("Login Failed. Please try again.");  
+      }
+    } catch (error) {
+      setError("Login Failed. Please try again.");
     }
   };
 
@@ -231,6 +238,7 @@ const UserSignIn = () => {
           />
         </TouchableOpacity>
       </View>
+
       {/* <Text style={styles.agreement}>
         Forgot Password?{" "}
         <Text
@@ -279,15 +287,23 @@ const UserSignIn = () => {
           Sign Up
         </Text>
       </Text>
-
       <Text style={styles.agreement}>
+        If you are a rider,{" "}
+        <Text
+          style={styles.linkText}
+          onPress={() => navigation.navigate("Start")}
+        >
+          Sign In here
+        </Text>
+      </Text>
+      {/* <Text style={styles.agreement}>
         <Text
           style={styles.linkText}
           // onPress={() => navigation.navigate("Register")}
         >
           Forgot Your Password?
         </Text>
-      </Text>
+      </Text> */}
     </View>
   );
 };

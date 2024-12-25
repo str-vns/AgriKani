@@ -12,6 +12,8 @@ import UserNavigators from "@navigators/UserNavigators";
 import CoopProductNavigators from "@navigators/CoopProductNavigators";
 import MessagesNavigators from "@navigators/MessagesNavigators";
 import BlogNavigators from "@navigators/BlogNavigators"
+import RiderNavigators from "@navigators/RiderNavigators"
+
 import Main from "../../../Main";
 import Sidebar from "@src/screens/Filter/UserSidebar";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -173,6 +175,18 @@ const context = useContext(AuthGlobal);
           options={{ headerShown: false, tabBarShowLabel: false }}
           component={CoopNavigators}
         />
+        <Drawer.Screen
+          name="Start"
+          initialParams={{ screen: "Start" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={RiderNavigators}
+        />
+        {/* <Drawer.Screen
+          name="Deliveries"
+          initialParams={{ screen: "Deliveries" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={RiderNavigators}
+        /> */}
       </Drawer.Navigator>
     </Box>
   );
