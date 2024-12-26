@@ -83,6 +83,15 @@ exports.updateOrderStatusCoop = asyncHandler(async (req, res, next) => {
   }
 });
 
+exports.getShippedOrders = asyncHandler(async (req, res, next) => {
+  try {
+    const shippedOrders = await orderProcess.getShippedOrdersProcess(req.params.id);
+    return SuccessHandler(res, "Shipped orders fetched successfully", shippedOrders);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+  }
+});
+
 exports.getReceipt = asyncHandler(async (req, res, next) => {
   const { orderId } = req.params;
   const receiptPath = path.join(__dirname, `../receipts/${orderId}.pdf`);
