@@ -19,6 +19,16 @@ const deliverySchema = new mongoose.Schema({
             ref: RESOURCE.PRODUCT,
             required: true,
         }, 
+        quantity: {
+            type: Number,
+            required: true,
+            min: [1, "Quantity must be at least 1"],
+          },
+         inventoryProduct: {
+                type: mongoose.Schema.ObjectId,
+                ref: RESOURCE.INVENTORYM,
+                required: true,
+              },
     }],
     userId: {
         type: mongoose.Schema.ObjectId,
@@ -37,7 +47,7 @@ const deliverySchema = new mongoose.Schema({
     },
     status: { 
         type: String, 
-        enum: ["pending", "delivered", "cancelled", "failed"],
+        enum: ["pending", "delivering", "cancelled", "re-deliver", "failed", "delivered"],
         default: "pending"
      },
      assignedTo: {
