@@ -274,6 +274,43 @@ exports.getCoopOrderById = async (id) => {
   if (!orders || orders.length === 0) {
     throw new ErrorHandler(`No orders found for user ID: ${id}`, 404);
   }
+  console.log(Coopinfo._id, "Coopinfo")
+
+  const filteredOrders = orders.map(order => {
+    const filteredItems = order.orderItems.filter(item => 
+        item.coopUser.toString() === Coopinfo._id.toString()
+    );
+    return {
+        ...order,
+        orderItems: filteredItems
+    };
+}).filter(order => order.orderItems.length > 0);
+  
+ console.log(filteredOrders, "Filtered Orders")
+  return filteredOrders;
+}
+
+exports.getShippedOrdersProcess = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ErrorHandler(`Invalid User ID: ${id}`, 400);
+  }
+  const Coopinfo = await Farm.findOne({ user: id });
+  if (!Coopinfo) {
+    throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
+  }
+
+  const orders = await Order.find({ "orderItems.coopUser": Coopinfo._id, "orderItems.orderStatus": "Shipping" })
+    .populate({ path: "user", select: "firstName lastName email image.url" })
+    .populate({ path: "orderItems.inventoryProduct", select: "metricUnit unitName" })
+    .populate({ path: "orderItems.product", select: "coop productName pricing price image.url", match: { coop: Coopinfo._id } })
+    .populate({ path: "shippingAddress", select: "address city phoneNum" })
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
+
+  if (!orders || orders.length === 0) {
+    throw new ErrorHandler(`No orders found for user ID: ${id}`, 404);
+  }
 
   const filteredOrders = orders.filter(order =>
     order.orderItems.every(item => item.productUser !== id)
@@ -432,4 +469,5 @@ exports.getMonthlySalesReport = async () => {
     },
   ]);
 };
+
 
