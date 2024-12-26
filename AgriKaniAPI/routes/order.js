@@ -45,8 +45,14 @@ const orderRoutes = [
     path: PATH.COOP_USER_ORDERS_ID,
     roles: [],
     handler: orderController.GetOrderCoop,
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.COOP_SHIPPING,
+    roles: [],
+    handler: orderController.getShippedOrders,
   }
-];
+]; 
 
 orderRoutes.forEach((route) => {
   const { method, path, roles = [], handler } = route;

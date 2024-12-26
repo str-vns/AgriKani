@@ -3,7 +3,6 @@ const router = express.Router();
 const memberControllers = require("../controllers/memberControllers");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
 const { METHOD, PATH, ROLE } = require("../constants/index");
-const { path } = require("pdfkit");
 
 
 const memberRoutes = [
