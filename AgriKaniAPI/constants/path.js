@@ -52,7 +52,7 @@ module.exports = {
   COOP_INACTIVE: "/no-approve/coop",
   COOP_ACTIVE: "/yes-approve/coop/:id",
   COOP_DISAPPROVE: "/disapprove/coop/:id",
-
+  COOP_SHIPPING: "/coop/shipping/:id",
 
   //Comment
   COMMENT: "/products/comment",
@@ -136,6 +136,9 @@ module.exports = {
   //Delivery
   DELIVERY: "/delivery",
   DELIVERY_ID: "/delivery/:id",
+  DELIVERY_TRACK_ID: "/delivery/track/:id",
+  DELIVERY_DRIVER_ID: "/delivery/driver/:id",
+  DELIVERY_QR_CODE: "/delivery/qr/:id",
 
   //Driver
   DRIVER: "/driver",
