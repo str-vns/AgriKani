@@ -1,13 +1,13 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // You can use any icon library
-import { useFocusEffect, useNavigation } from "@react-navigation/native"; // Hook to access navigation
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, Image } from "react-native";
+import styles from "@screens/stylesheets/Filter/UserSidebar"
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native"; 
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { logoutUser } from "@redux/Actions/Auth.actions";
 import { useDispatch, useSelector } from "react-redux";
 import { getProduct } from "@redux/Actions/productActions";
-import { getBlog } from "@redux/Actions/blogActions";
 import { useSocket } from "@SocketIo";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -16,13 +16,10 @@ const UserSidebar = () => {
   const [activeItem, setActiveItem] = useState(null);
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
-  const [token, setToken] = useState();
-  const [onlineUsers, setOnlineUsers] = useState([]);
   const dispatch = useDispatch();
-  const { loading, user, error } = useSelector((state) => state.userOnly);
+  const { user } = useSelector((state) => state.userOnly);
   const userslogin = context.stateUser?.userProfile || null;
-  const userId = context?.stateUser?.userProfile?._id;
-  const [loadings, setLoadings] = useState(true);
+  const [ setLoadings ] = useState(true);
 
   useEffect(() => {
     const initialize = async () => {
@@ -55,7 +52,7 @@ const UserSidebar = () => {
     { label: "Orders", icon: "clipboard-outline", key: "orders" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
     { label: "Notifications", icon: "notifications-outline", key: "notifications" },
-    { label: "Rider", icon: "bicycle-outline", key: "rider" },
+    { label: "Rider", icon: "car-outline", key: "rider" },
     { label: "Members", icon: "people-outline", key: "members" },
     { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Community Forum", icon: "create-outline", key: "Forum" },
@@ -78,6 +75,12 @@ const UserSidebar = () => {
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     { label: "About Us", icon: "information-circle-outline", key: "about-us" },
   ];
+
+  const DriverItems = [
+    { label: "Deliveries", icon: "cube-outline", key: "deliveries" },
+    { label: "Profile", icon: "person-outline", key: "profile" },
+    { label: "History", icon: "time-outline", key: "history" },
+  ]
 
   const handlePress = (key) => {
     setActiveItem(key);
@@ -163,6 +166,18 @@ const UserSidebar = () => {
     }
   };
 
+  const DriverPress = (key) => {
+    setActiveItem(key);
+
+    if (key === "deliveries") {
+      navigation.navigate("Deliveries");
+    } else if (key === "profile") {
+      navigation.navigate("Profile");
+    } else if (key === "history") {
+      navigation.navigate("History");
+    }
+  }
+
   const handleLogoutSocket = () => {
     console.log(`Client emitting removeUser with socket.id: ${socket?.id}`);
     socket.emit("removeUser", socket?.id);
@@ -171,7 +186,6 @@ const UserSidebar = () => {
 
   return (
     <View style={styles.container}>
-      {/* Profile Section */}
       <View style={styles.profileContainer}>
         {context?.stateUser?.isAuthenticated &&
         userslogin?.roles &&
@@ -204,12 +218,23 @@ const UserSidebar = () => {
           userslogin?.roles &&
           userslogin?.roles.includes("Admin") ? (
           <Text style={styles.profileRole}>Admin</Text>
-        ) : null}
+        ) : 
+        context?.stateUser?.isAuthenticated &&
+        userslogin?.roles &&
+        userslogin?.roles.includes("Driver") ? (
+        <>
+          <Image
+            source={{ uri: user?.image?.url }}
+            style={styles.profileImage}
+          />
+          <Text style={styles.profileName}>
+            {user?.firstName} {user?.lastName}
+          </Text>
+          <Text style={styles.profileRole}>Driver</Text>
+        </>
+      ) : null}
       </View>
 
-      {/* Menu Section */}
-
-      {/* Logout Button */}
       {context?.stateUser &&
       context?.stateUser?.isAuthenticated &&
       userslogin?.roles[0] &&
@@ -360,7 +385,55 @@ const UserSidebar = () => {
             </TouchableOpacity>
           </View>
         </>
-      ) : (
+      ) : context?.stateUser &&
+      context?.stateUser?.isAuthenticated &&
+      userslogin?.roles[0] &&
+      userslogin?.roles[0]?.includes("Driver") ? (
+      <>
+        <View style={styles.menuContainer}>
+          {DriverItems.map((item) => (
+            <TouchableOpacity
+              key={item.key}
+              style={[
+                styles.menuItem,
+                activeItem === item.key
+                  ? { backgroundColor: "#fef8e5" }
+                  : null,
+              ]}
+              onPress={() => DriverPress(item.key)}
+            >
+              <Ionicons
+                name={item.icon}
+                size={24}
+                color={activeItem === item.key ? "#000" : "#666"}
+              />
+              <Text
+                style={[
+                  styles.menuLabel,
+                  activeItem === item.key ? styles.activeLabel : null,
+                ]}
+              >
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={styles.footerContainer}>
+          <TouchableOpacity
+            style={[styles.menuItem, styles.logoutButton]}
+            onPress={() => {
+              handleLogoutSocket();
+              AsyncStorage.removeItem("jwt"), logoutUser(context.dispatch);
+              navigation.navigate("Home");
+              dispatch(getProduct());
+            }}
+          >
+            <Ionicons name="log-out-outline" size={24} color="#fff" />
+            <Text style={styles.logoutLabel}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </>
+    ) : (
         <>
           <View style={styles.menuContainer}>
             {NoItems.map((item) => (
@@ -407,68 +480,5 @@ const UserSidebar = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "space-between",
-  },
-  profileContainer: {
-    alignItems: "center",
-    paddingVertical: 20,
-  },
-  profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 10,
-  },
-  profileName: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  profileRole: {
-    fontSize: 14,
-    color: "#666",
-  },
-  menuContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  menuLabel: {
-    fontSize: 16,
-    color: "#666",
-    marginLeft: 15,
-  },
-  activeLabel: {
-    color: "#000", // Make the text black when active
-  },
-  footerContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-  logoutButton: {
-    backgroundColor: "#f7b900",
-    paddingVertical: 15,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logoutLabel: {
-    fontSize: 16,
-    color: "#fff",
-    marginLeft: 15,
-  },
-});
 
 export default UserSidebar;
