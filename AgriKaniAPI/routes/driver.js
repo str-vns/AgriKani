@@ -53,6 +53,12 @@ const driverRoutes = [
         path: PATH.DRIVER_COOP_ID,
         roles: [],
         handler: driverController.getCoopDriver,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.DRIVER_COOP_ONLY_APPROVED_ID,
+        roles: [],
+        handler: driverController.getDriverByIdApprove,
     }
 ];
 

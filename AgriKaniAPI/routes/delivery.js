@@ -35,6 +35,42 @@ const deliveryRoutes = [
         roles: [],
         handler: deliveryControllers.qrCodeDelivered,
     },
+    {
+        method: METHOD.GET,
+        path: PATH.DELIVERY_HISTORY_ID,
+        roles: [],
+        handler: deliveryControllers.getDeliveryHistory,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.DELIVERY_COMPLETE_ID,
+        roles: [],
+        handler: deliveryControllers.getDeliveryCompleted,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.COOP_DELIVERY,
+        roles: [],
+        handler: deliveryControllers.getDeliveryCoopDriver,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.COOP_DELIVERY_HISTORY_ID,
+        roles: [],
+        handler: deliveryControllers.getDeliveryCoopHistory,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.DRIVER_DELIVERY_THIS_MONTH,
+        roles: [],
+        handler: deliveryControllers.getDeliveryThisMonth,
+    },
+    {
+        method: METHOD.DELETE,
+        path: PATH.DELIVERY_ID,
+        roles: [],
+        handler: deliveryControllers.removeDelivery,
+    }
 ];
 
 deliveryRoutes.forEach((route) => {

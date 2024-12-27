@@ -55,7 +55,7 @@ const userRoutes = [
   {
     method: METHOD.GET,
     path: PATH.USER_ID,
-    roles: [ROLE.ADMIN, ROLE.CUSTOMER, ROLE.FARMER],
+    roles: [ROLE.ADMIN, ROLE.CUSTOMER, ROLE.FARMER, ROLE.DRIVER],
     middleware: [verifyJWT],
     handler: userController.UserProfile,
   },
