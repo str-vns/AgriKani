@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { ActivityIndicator, Alert, BackHandler, StyleSheet, StyleSheets, View } from "react-native";
+import { ActivityIndicator, Alert, BackHandler, StyleSheet, View } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import HomeScreen from "@navigators/Home";
 import RegisterScreen from "@navigators/SignInNavigators";
@@ -14,10 +14,10 @@ import UserNavigators from "@navigators/UserNavigators";
 import CoopProductNavigators from "@navigators/CoopProductNavigators";
 import MessagesNavigators from "@navigators/MessagesNavigators";
 import BlogNavigators from "@navigators/BlogNavigators";
+import RiderNavigators from "@navigators/RiderNavigators";
 import AuthGlobal from "@redux/Store/AuthGlobal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isLogin } from "@redux/Actions/Auth.actions";
-import { Box, Pressable, VStack, Text, HStack, Divider, Icon, } from "native-base";
+import { Text } from "native-base";
 import messaging from '@react-native-firebase/messaging';
 import * as Notification from 'expo-notifications';
 
@@ -217,6 +217,7 @@ useEffect(() => {
           <Stack.Screen name="Post" component={PostNavigators} />
           <Stack.Screen name="Messaging" component={MessagesNavigators} />
           <Stack.Screen name="Blog" component={BlogNavigators} />
+          <Stack.Screen name="Rider" component={RiderNavigators} />
         </Stack.Navigator>
       );
     } else if (
@@ -229,6 +230,20 @@ useEffect(() => {
           screenOptions={{ headerShown: false }}
         >
           <Stack.Screen name="Admin" component={AdminNavigators} />
+        </Stack.Navigator>
+      );
+    } else if (
+      context?.stateUser?.isAuthenticated &&
+      UserRoles?.roles.includes("Driver")
+    ) {
+      return (
+        <Stack.Navigator
+          initialRouteName="Rider" 
+          screenOptions={{ headerShown: false }}
+        >
+           <Stack.Screen name="Rider" component={RiderNavigators} />
+            <Stack.Screen name="User" component={UserNavigators} />
+           
         </Stack.Navigator>
       );
     } else  {
