@@ -26,6 +26,7 @@ const Riderlist = () => {
   const { loading, drivers, error } = useSelector((state) => state.driverList);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
+  const [activeTab, setActiveTab] = useState("Rider");
 
   useEffect(() => {
     const fetchJwt = async () => {
@@ -111,13 +112,9 @@ const Riderlist = () => {
         </Text>
         {item.approvedAt ? (
           <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.historyButton}
-          onPress={() => navigation.navigate("History")}>
-            <Text style={styles.historyButtonText}>View History</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.assignButton}
-           onPress={() => navigation.navigate("Assign")}>
-            <Text style={styles.assignButtonText}>Assign</Text>
+           onPress={() => navigation.navigate("Assign", { driver: item })}>
+            <Text style={styles.assignButtonText}>Assigned</Text>
           </TouchableOpacity>
           </View>
           ) : null}
@@ -129,14 +126,14 @@ const Riderlist = () => {
   return (
 
     <View style={styles.container}>
-  <View style={styles.header}>
+  <View style={styles.header2}>
     <TouchableOpacity
       style={styles.drawerButton}
       onPress={() => navigation.openDrawer()}
     >
       <Ionicons name="menu" size={34} color="black" />
     </TouchableOpacity>
-    <Text style={styles.headerTitle}>Rider List</Text>
+    <Text style={styles.headerTitle2}>Rider List</Text>
 
     <TouchableOpacity
       style={styles.headerButton}
@@ -149,6 +146,42 @@ const Riderlist = () => {
     </TouchableOpacity>
   </View>
   
+    <View style={styles.header}>
+           <TouchableOpacity
+             style={[
+               styles.tabButton,
+               activeTab === "Assign" && styles.activeTab,
+             ]}
+             onPress={() => navigation.navigate("AssignList")}
+           >
+             <Text
+               style={[
+                 styles.tabText,
+                 activeTab === "Assign" && styles.activeTabText,
+               ]}
+             >
+               Assign
+             </Text>
+           </TouchableOpacity>
+           <TouchableOpacity
+             style={[
+               styles.tabButton,
+               activeTab === "Rider" && styles.activeTab,
+             ]}
+             onPress={() => setActiveTab("Rider")}
+           >
+             <Text
+               style={[
+                 styles.tabText,
+                 activeTab === "Rider" && styles.activeTabText,
+               ]}
+             >
+               Rider
+             </Text>
+           </TouchableOpacity>
+         </View>
+
+
  { loading ? 
  (<ActivityIndicator size="large" color="#0000ff" />) : drivers?.length === 0 || error ? (
          <View style={styles.emptyContainer}>
@@ -157,7 +190,7 @@ const Riderlist = () => {
  ) : (
    <FlatList
    data={drivers}
-   keyExtractor={(item) => item.id}
+   keyExtractor={(item) => item._id}
    renderItem={renderItem}
     refreshControl={
                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -178,7 +211,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
 
   },
-  header: {
+  header2: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -189,13 +222,38 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
     elevation: 3,
 },
-headerTitle: {
+headerTitle2: {
     fontSize: 22,
     fontWeight: '700',
     flex: 1,
     textAlign: 'center',
     color: '#333',
 },
+header: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 10,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "#ddd",
+  },
+activeTab: {
+    borderBottomColor: "#FFC107",
+  },
+  tabText: {
+    fontSize: 16,
+    color: "#666",
+  },
+  activeTabText: {
+    color: "#FFC107",
+    fontWeight: "bold",
+  },
   drawerButton: {
     marginRight: 10,
 },

@@ -12,7 +12,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { Profileuser } from "@redux/Actions/userActions";
-import { getDeliveryDriver } from "@redux/Actions/deliveryActions";
+import { getCompletedDelivery } from "@redux/Actions/deliveryActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -21,8 +21,8 @@ const Deliveries = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const userId = context?.stateUser?.userProfile?._id;
-  const { Deliveryloading, deliveries, Deliveryerror } = useSelector( state => state.deliveryList);
-  const [activeTab, setActiveTab] = useState("Deliveries");
+  const { Deliveryloading, delivery, Deliveryerror } = useSelector( state => state.deliveryComplete);
+  const [activeTab, setActiveTab] = useState("Completed");
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
@@ -37,7 +37,7 @@ const Deliveries = () => {
             setToken(res);
             if (userId) {
               dispatch(Profileuser(userId, res));
-              dispatch(getDeliveryDriver(userId, res));
+              dispatch(getCompletedDelivery(userId, res));
             } else {
               setErrors('User ID is missing.');
             }
@@ -50,8 +50,6 @@ const Deliveries = () => {
         } finally {
           setLoading(false);
         }
-  
-        fetchUserData();
       };
   
       fetchData();
@@ -61,7 +59,7 @@ const Deliveries = () => {
     const onRefresh = useCallback(async () => {
       setRefreshing(true);
       try {
-        dispatch(getDeliveryDriver(userId, token));
+        dispatch(getCompletedDelivery(userId, token));
       } catch (err) {
         console.error("Error refreshing users:", err);
       } finally {
@@ -98,29 +96,8 @@ const Deliveries = () => {
       <View style={styles.orderInfo}>
         <Text style={styles.name}>{item.userId.firstName} {item.userId.lastName}</Text>
         <Text style={styles.orderNumber}>Order # {item.orderId._id}</Text>
-        <Text>Status:  <Text style={[styles.status, { color: getStatusColor(item.status) }]}>
-        {capitalizeFirstLetter(item.status)}
-  </Text>
-</Text>
       </View>
-      {activeTab === "Completed" ? (
-        <Text style={styles.status}>{item.status}</Text>
-      ) : (
-        <View style={styles.actions}>
-          <TouchableOpacity style={styles.deliverButton}
-           onPress={() => navigation.navigate("Location")}
-          >
-            <Text style={styles.buttonText}>Deliver now</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.detailsButton}
-            onPress={() => navigation.navigate("Details", { deliveryId: item})}
-          >
-            <Text style={styles.detailsText}>View Details</Text>
-          </TouchableOpacity>
-          
-        </View>
-      )}
+        <Text style={[styles.status, { color: getStatusColor(item.status) }]}>{capitalizeFirstLetter(item.status)}</Text>
     </View>
   );
 
@@ -135,14 +112,14 @@ const Deliveries = () => {
           </TouchableOpacity>
           <Text style={styles.headerTitle2}>Delivery List</Text>
         </View>
+        
       <View style={styles.header}>
         <TouchableOpacity
           style={[
             styles.tabButton,
             activeTab === "Deliveries" && styles.activeTab,
           ]}
-          onPress={() => setActiveTab("Deliveries")}
-
+          onPress={() => navigation.navigate("Deliveries")}
         >
           <Text
             style={[
@@ -158,7 +135,7 @@ const Deliveries = () => {
             styles.tabButton,
             activeTab === "Completed" && styles.activeTab,
           ]}
-          onPress={() => navigation.navigate("Completed")}
+          onPress={() => setActiveTab("Completed")}
         >
           <Text
             style={[
@@ -173,13 +150,13 @@ const Deliveries = () => {
 
        {Deliveryloading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : deliveries && deliveries.length === 0 || Deliveryerror ? (
+      ) : delivery && delivery.length === 0 || Deliveryerror ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No Deliveries found.</Text>
+          <Text style={styles.emptyText}>No Deliveries Complete found.</Text>
         </View>
       ) : (
         <FlatList
-          data={deliveries}
+          data={delivery}
           keyExtractor={(item) => item._id}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -277,15 +254,15 @@ drawerButton: {
     fontWeight: "bold",
   },
   actions: {
-    flexDirection: "column", // Stack buttons vertically
-    alignItems: "flex-end", // Align buttons to the right
+    flexDirection: "column",
+    alignItems: "flex-end", 
   },
   deliverButton: {
     backgroundColor: "#FFC107",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 5,
-    marginBottom: 10, // Add space between buttons
+    marginBottom: 10, 
   },
   buttonText: {
     color: "#fff",
