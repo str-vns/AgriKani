@@ -274,7 +274,6 @@ exports.getCoopOrderById = async (id) => {
   if (!orders || orders.length === 0) {
     throw new ErrorHandler(`No orders found for user ID: ${id}`, 404);
   }
-  console.log(Coopinfo._id, "Coopinfo")
 
   const filteredOrders = orders.map(order => {
     const filteredItems = order.orderItems.filter(item => 
@@ -286,7 +285,6 @@ exports.getCoopOrderById = async (id) => {
     };
 }).filter(order => order.orderItems.length > 0);
   
- console.log(filteredOrders, "Filtered Orders")
   return filteredOrders;
 }
 
@@ -300,7 +298,7 @@ exports.getShippedOrdersProcess = async (id) => {
   }
 
   const orders = await Order.find({ "orderItems.coopUser": Coopinfo._id, "orderItems.orderStatus": "Shipping" })
-    .populate({ path: "user", select: "firstName lastName email image.url" })
+    .populate({ path: "user", select: "firstName lastName email image.url phoneNum" })
     .populate({ path: "orderItems.inventoryProduct", select: "metricUnit unitName" })
     .populate({ path: "orderItems.product", select: "coop productName pricing price image.url", match: { coop: Coopinfo._id } })
     .populate({ path: "shippingAddress", select: "address city phoneNum" })
@@ -312,10 +310,16 @@ exports.getShippedOrdersProcess = async (id) => {
     throw new ErrorHandler(`No orders found for user ID: ${id}`, 404);
   }
 
-  const filteredOrders = orders.filter(order =>
-    order.orderItems.every(item => item.productUser !== id)
-  );
-
+ const filteredOrders = orders.map(order => {
+    const filteredItems = order.orderItems.filter(item => 
+        item.coopUser.toString() === Coopinfo._id.toString()
+    );
+    return {
+        ...order,
+        orderItems: filteredItems
+    };
+}).filter(order => order.orderItems.length > 0);
+  
   return filteredOrders;
 }
 

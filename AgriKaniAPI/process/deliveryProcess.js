@@ -1,11 +1,11 @@
 const Coop = require("../models/farm");
-const Address = require("../models/address");
 const Delivery = require("../models/delivery");
 const Order = require("../models/order");
 const Driver = require("../models/driver");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
+const moment = require("moment");
 
 const startOfDay = new Date();
 startOfDay.setHours(0, 0, 0, 0); 
@@ -46,11 +46,12 @@ exports.createDeliveryProcess = async (req) => {
     const delivery = await Delivery.create({
         orderId: orderid._id,
         coopId: coopid._id,
-         orderItems: filteredItems.map(item => ({
+        orderItems: filteredItems.map(item => ({
         product: item.product,
         quantity: item.quantity, 
         inventoryProduct: item.inventoryProduct,
     })),
+        shippingAddress: filteredOrder.shippingAddress._id,
         userId: filteredOrder.user._id,
         deliveryLocation: {
             Latitude: filteredOrder.shippingAddress.latitude,
@@ -96,10 +97,68 @@ exports.getDeliveryDriverProcess = async (id) => {
   
     const deliveries = await Delivery.find({
         assignedTo: drivers._id,
-        createdAt: { $gte: startOfDay, $lte: endOfDay }
-      }).lean().exec();
-
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
+        status: { $ne: "delivered" }
+      })
+      .populate("orderId", "totalPrice paymentMethod")
+      .populate("coopId")
+      .populate("userId", "firstName lastName email image.url phoneNum")
+      .populate("orderItems.product", "productName pricing price image.url ")
+      .populate("orderItems.inventoryProduct", "metricUnit unitName")
+      .populate("shippingAddress", "address city barangay")
+      .populate("assignedTo", "firstName lastName email image.url") 
+      .lean().exec();
+    
     return deliveries;
+}
+
+exports.getDeliveryCompletedProcess = async(id) => {
+    const drivers = await Driver.findOne({ userId: id }).lean().exec();
+    if (!drivers) throw new ErrorHandler(`Driver not found with ID: ${id}`);
+
+    const deliveries = await Delivery.find({
+        assignedTo: drivers._id,
+        status: "delivered",
+        createdAt: { $gte: startOfDay, $lte: endOfDay }
+      })
+      .populate("orderId", "totalPrice paymentMethod")
+      .populate("coopId")
+      .populate("userId", "firstName lastName email image.url phoneNum")
+      .populate("orderItems.product", "productName pricing price image.url ")
+      .populate("orderItems.inventoryProduct", "metricUnit unitName")
+      .populate("shippingAddress", "address city barangay")
+      .populate("assignedTo", "firstName lastName email image.url")
+      .lean().exec();
+    
+    return deliveries;
+}
+
+exports.getDeliveryHistoryProcess = async (id) => {
+    const drivers = await Driver.findOne({ userId: id }).lean().exec();
+    if (!drivers) throw new ErrorHandler(`Driver not found with ID: ${id}`);
+  
+    const deliveries = await Delivery.find({
+      assignedTo: drivers._id,
+    })
+      .lean()
+      .exec();
+  
+    return deliveries;
+  };
+
+exports.getDeliveryCoopHistoryProcess = async (id) => {
+
+    const coop = await Coop.findOne({ user: id }).lean().exec();
+    if (!coop) throw new ErrorHandler(`Coop not found with ID: ${id}`);
+
+    const deliveries = await Delivery.find({
+        coopId: coop._id,
+        createdAt: { $gte: startOfDay, $lte: endOfDay }
+    })
+    .lean()
+    .exec();
+
+    return deliveries
 }
 
 exports.UpdateDeliveryStatusProcess = async (id, req) => {
@@ -111,6 +170,16 @@ exports.UpdateDeliveryStatusProcess = async (id, req) => {
     if (!delivery) throw new ErrorHandler(`Delivery not found with ID: ${id}`);
 
     return delivery;
+}
+
+exports.getDeliveryCoopDriverProcess = async (id) => {
+    const coop = await Coop.findOne({ user: id }).lean().exec();
+    if (!coop) throw new ErrorHandler(`Coop not found with ID: ${id}`);
+
+    const drivers = await Delivery.find({ coopId: coop._id }).lean().exec();
+    if (!drivers) throw new ErrorHandler(`Driver not found with ID: ${id}`);
+
+    return drivers;
 }
 
 exports.qrCodeDeliveredProcess = async (id) => {
@@ -137,3 +206,37 @@ exports.qrCodeDeliveredProcess = async (id) => {
     return delivery;
 
 }
+
+exports.getDeliveryThisMonthProcess = async (id) => {
+
+    const deliveries = await Delivery.find({
+        assignedTo: id,
+        createdAt: { $gte: startOfDay, $lte: endOfDay }
+    })
+    .populate("assignedTo", "firstName lastName image.url")
+    .lean()
+    .exec();
+
+    return deliveries
+}
+
+exports.removeDeliveryProcess = async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id))
+        throw new ErrorHandler(`Invalid Delviery ID: ${id}`);
+
+    const deliveryExist = await Delivery.findById(id).lean().exec();
+    if (!deliveryExist) throw new ErrorHandler(`Delviery not exist with ID: ${id}`);
+
+    try {
+        await Promise.all([
+         Delivery.deleteOne({ _id: id }).lean().exec(),
+        ]);
+    
+  
+        return deliveryExist;
+      } catch (error) {
+
+        throw new ErrorHandler('An error occurred while removing the delivery process');
+      }
+}
+

@@ -447,3 +447,14 @@ return driver;
     throw new ErrorHandler(error.message);
 }
 }
+
+exports.getDriverByIdApproveProcess = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+      throw new ErrorHandler(`Invalid Cooperative ID: ${id}`);
+
+  const coopExist = await Farm.findOne({ user: id }).lean().exec();
+  if (!coopExist) throw new ErrorHandler("Coop not exist"); 
+
+  const driver = await Driver.find({ coopId: coopExist._id, approvedAt: { $ne: null }}).lean().exec();
+  return driver;
+};
