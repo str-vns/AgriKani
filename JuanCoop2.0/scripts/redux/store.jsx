@@ -6,7 +6,7 @@ import {
   import { thunk } from "redux-thunk";
   
   import cartItems from "@redux/Reducers/cartItems";
-  import { orderReducer, orderCoopReducer } from "./Reducers/orderReducer";
+  import { orderReducer, orderCoopReducer, orderShippedReducer, historyDeliveryCoopReducer } from "./Reducers/orderReducer";
   import { OTPReducer, RegisterReducer, userReducer, EditProfileReducer, getUsersReducers, AllUsersReducer, userDeviceTokenReducer  } from "@redux/Reducers/userReducers";
   import { reducerProduct, reducerCoop, reducerCoopProduct, reducerCreateProduct, reducerEditProduct, reducerDelResProduct } from "@redux/Reducers/productReducers";
   import { HereMapReducer } from "@redux/Reducers/locationReducers";
@@ -21,10 +21,12 @@ import {
   import { sendNotificationReducers, getNotificationReducers, readNotificationReducers } from "@redux/Reducers/notificationReducers";
   import { inventoryCreateReducer, singleInventoryReducer } from "@redux/Reducers/inventoryReducer";
   import { memberListReducer, memberApiReducer } from "@redux/Reducers/memberReducer";
-  import { driverApiReducer, driverListReducer } from "@redux/Reducers/driverReducer";
+  import { driverApiReducer, driverListReducer, onlyApprovedDriverReducer } from "@redux/Reducers/driverReducer";
+  import { deliveryListReducer, deliveryApiReducer, deliveryCompleteReducer } from "@redux/Reducers/deliveryReducers";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
+
 
   const reducers = combineReducers({
     cartItems: cartItems,
@@ -73,7 +75,13 @@ import {
     memberList: memberListReducer,
     memberApi: memberApiReducer,
     driverApi: driverApiReducer,
-    driverList: driverListReducer
+    driverList: driverListReducer,
+    deliveryList: deliveryListReducer,
+    deliveryComplete: deliveryCompleteReducer,
+    orderShipped: orderShippedReducer,
+    deliveredhistory: historyDeliveryCoopReducer,
+    onlyApprovedDriver: onlyApprovedDriverReducer,
+    deliveryApi: deliveryApiReducer,
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));
