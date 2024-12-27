@@ -35,6 +35,11 @@ const deliverySchema = new mongoose.Schema({
         ref: RESOURCE.USER,
         required: true,
     },
+    shippingAddress: {
+        type: mongoose.Schema.ObjectId,
+        ref: RESOURCE.ADDRESS,
+        required: true,
+    },
     deliveryLocation: {
         Latitude: {
             type: String,
@@ -52,7 +57,7 @@ const deliverySchema = new mongoose.Schema({
      },
      assignedTo: {
         type: mongoose.Schema.ObjectId,
-        ref: RESOURCE.USER,
+        ref: RESOURCE.DRIVER,
         required: true,
     },
     deliveredAt: {
@@ -66,6 +71,7 @@ const deliverySchema = new mongoose.Schema({
         type: Date,
         default: Date.now(),
     },
+    
 })
 
 module.exports = mongoose.model(RESOURCE.DELIVERY, deliverySchema);
