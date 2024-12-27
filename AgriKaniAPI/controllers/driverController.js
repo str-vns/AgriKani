@@ -74,3 +74,10 @@ exports.getCoopDriver = asyncHandler(async (req, res, next) => {
     ? next(new ErrorHandler("No Driver Found"))
     : SuccessHandler(res, `All Cooperative Drivers has been fetched Successfully`, drivers);
 });
+
+exports.getDriverByIdApprove = asyncHandler(async (req, res, next) => {
+  const driver = await DriverProcess.getDriverByIdApproveProcess(req.params.id);
+  return driver
+    ? SuccessHandler(res, `Driver has been fetched Successfully`, driver)
+    : next(new ErrorHandler("No Driver Found"));
+});
