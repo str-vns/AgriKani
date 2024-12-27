@@ -20,6 +20,9 @@ import {
     DELETE_DRIVER_REQUEST,
     DELETE_DRIVER_SUCCESS,
     DELETE_DRIVER_FAIL,
+    ONLY_APPROVED_DRIVER_REQUEST,
+    ONLY_APPROVED_DRIVER_SUCCESS,
+    ONLY_APPROVED_DRIVER_FAIL,
     CLEAR_ERRORS,
 } from "../Constants/driverConstants";
 
@@ -67,3 +70,19 @@ export const driverListReducer = (state = { drivers: [] }, action) => {
             return state;
     }
 }
+
+export const onlyApprovedDriverReducer = (state = { drivers: [] }, action) => {
+    switch( action.type ) {
+        case ONLY_APPROVED_DRIVER_REQUEST:
+            return { driloading: true, drivers: [] };
+        case ONLY_APPROVED_DRIVER_SUCCESS:
+            return { driloading: false, drivers: action.payload };
+        case ONLY_APPROVED_DRIVER_FAIL:
+            return { driloading: false, drierror: action.payload };
+        case CLEAR_ERRORS:
+            return { ...state, error: null };
+        default:
+            return state;
+    }
+}
+
