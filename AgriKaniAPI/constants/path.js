@@ -52,7 +52,9 @@ module.exports = {
   COOP_INACTIVE: "/no-approve/coop",
   COOP_ACTIVE: "/yes-approve/coop/:id",
   COOP_DISAPPROVE: "/disapprove/coop/:id",
-  COOP_SHIPPING: "/coop/shipping/:id",
+  COOP_SHIPPING: "/orders/shipping/:id",
+  COOP_DELIVERY: "/orders/delivery/:id",
+  COOP_DELIVERY_HISTORY_ID: "/orders/delivery/history/:id",
 
   //Comment
   COMMENT: "/products/comment",
@@ -139,6 +141,8 @@ module.exports = {
   DELIVERY_TRACK_ID: "/delivery/track/:id",
   DELIVERY_DRIVER_ID: "/delivery/driver/:id",
   DELIVERY_QR_CODE: "/delivery/qr/:id",
+  DELIVERY_HISTORY_ID: "/delivery/history/:id",
+  DELIVERY_COMPLETE_ID: "/delivery/complete/:id",
 
   //Driver
   DRIVER: "/driver",
@@ -147,4 +151,6 @@ module.exports = {
   DRIVER_APPROVED_ID: "/driver/approved/:id",
   DRIVER_DISAPPROVED_ID: "/driver/disapproved/:id",
   DRIVER_COOP_ID: "/driver/coop/:id",
+  DRIVER_COOP_ONLY_APPROVED_ID: "/driver/coop/approved/:id",
+  DRIVER_DELIVERY_THIS_MONTH: "/driver/delivery/month/:id",
 };
