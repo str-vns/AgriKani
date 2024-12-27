@@ -189,12 +189,26 @@ const context = useContext(AuthGlobal);
           options={{ headerShown: false, tabBarShowLabel: false }}
           component={RiderNavigators}
         />
-        {/* <Drawer.Screen
+        <Drawer.Screen
           name="Deliveries"
           initialParams={{ screen: "Deliveries" }}
           options={{ headerShown: false, tabBarShowLabel: false }}
           component={RiderNavigators}
-        /> */}
+        />
+        <Drawer.Screen
+          name="History"
+          initialParams={{ screen: "History" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={RiderNavigators}
+        />
+
+        <Drawer.Screen
+          name="AssignList"
+          initialParams={{ screen: "AssignList" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={CoopNavigators}
+        />
+
       </Drawer.Navigator>
     </Box>
   );

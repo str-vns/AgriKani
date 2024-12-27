@@ -6,6 +6,9 @@ import FNotificationList from "@screens/Farmer/Notification/FarmerNotification";
 import MemberList from "@screens/Farmer/Member/MemberList";
 import MemberActive from "@screens/Farmer/Member/MemberActive";
 import MemberSingle from "@screens/Farmer/Member/MemberSingle";
+import AssignList from "@screens/Farmer/Assign/AssignList";
+import HistoryCoop from "@src/screens/Rider/HistoryCoop";
+import AssingDetails from "@screens/Farmer/Assign/AssignDetails";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -58,6 +61,28 @@ const Index = () => {
         }}
         component={MemberSingle}
       />
+
+      <Stack.Screen
+        name="AssignList"
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+        component={AssignList}
+      />
+
+        <Stack.Screen
+              name="HistoryCoop"
+              component={HistoryCoop}
+              options={{ headerShown: false }}
+            />
+
+      <Stack.Screen
+          name="AssingDetails"
+          component={AssingDetails}
+          options={{ headerShown: false }}
+        />
+
     </Stack.Navigator>
   );
 };
