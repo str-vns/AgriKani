@@ -20,6 +20,9 @@ import {
     DELETE_DRIVER_REQUEST,
     DELETE_DRIVER_SUCCESS,
     DELETE_DRIVER_FAIL,
+    ONLY_APPROVED_DRIVER_REQUEST,
+    ONLY_APPROVED_DRIVER_SUCCESS,
+    ONLY_APPROVED_DRIVER_FAIL,
     CLEAR_ERRORS,
 } from "../Constants/driverConstants";
 import axios from "axios";
@@ -174,6 +177,24 @@ export const singleDriver = (driverId, token) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: SINGLE_DRIVER_FAIL,
+            payload: error.response ? error.response.data : error.message,
+        });
+    }
+}
+
+export const approveDriverOnly = (driverId, token) => async (dispatch) => {
+    try {
+        dispatch({ type: ONLY_APPROVED_DRIVER_REQUEST });
+        const { data } = await axios.get(`${baseURL}driver/coop/approved/${driverId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        dispatch({ type: ONLY_APPROVED_DRIVER_SUCCESS, payload: data.details });
+    } catch (error) {
+        dispatch({
+            type: ONLY_APPROVED_DRIVER_FAIL,
             payload: error.response ? error.response.data : error.message,
         });
     }

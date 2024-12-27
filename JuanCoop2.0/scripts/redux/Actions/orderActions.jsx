@@ -14,7 +14,13 @@ import {
   ORDER_DELETE_FAIL,
   ORDER_COOP_USER_REQUEST,
   ORDER_COOP_USER_SUCCESS,
-  ORDER_COOP_USER_FAIL
+  ORDER_COOP_USER_FAIL,
+  SHIPPED_ORDER_FAIL,
+  SHIPPED_ORDER_REQUEST,
+  SHIPPED_ORDER_SUCCESS,
+  HISTORY_DELIVERY_COOP_REQUEST,
+  HISTORY_DELIVERY_COOP_SUCCESS,
+  HISTORY_DELIVERY_COOP_FAIL
 } from '../Constants/orderConstants';
 import baseURL from '@assets/commons/baseurl';
 
@@ -176,5 +182,58 @@ export const fetchCoopOrders = (coopId, token) => async (dispatch) => {
       type: ORDER_COOP_USER_FAIL,
       payload: error.response ? error.response.data.message : error.message,
     });
+  }
+}
+
+export const shippedOrder = (orderId, token) => async (dispatch) => {
+  try {
+    dispatch({ type: SHIPPED_ORDER_REQUEST });
+  
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.get(`${baseURL}orders/shipping/${orderId}`, config);
+
+    dispatch({ type: SHIPPED_ORDER_SUCCESS, payload: data.details });
+
+  } catch (error) {
+
+    dispatch({
+      type: SHIPPED_ORDER_FAIL,
+      payload: error.response ? error.response.data.message : error.message,
+    });
+
+    console.error("Error shipping order ", error);
+  }
+}
+
+export const historyDeliveryCoop = (coopId, token) => async (dispatch) => {
+
+  console.log(token)
+
+  try {
+    dispatch({ type: HISTORY_DELIVERY_COOP_REQUEST });
+  
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.get(`${baseURL}orders/delivery/history/${coopId}`, config);
+   
+    dispatch({ type: HISTORY_DELIVERY_COOP_SUCCESS, payload: data.details });
+
+  } catch (error) {
+    
+    dispatch({
+      type: HISTORY_DELIVERY_COOP_FAIL,
+      payload: error.response ? error.response.data.message : error.message,
+    });
+
+    console.error("Error getting delivery history ", error);
   }
 }
