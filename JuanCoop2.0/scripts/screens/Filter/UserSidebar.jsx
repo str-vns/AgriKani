@@ -67,6 +67,9 @@ const UserSidebar = () => {
     { label: "Driver", icon: "car-outline", key: "driver" },
     { label: "News", icon: "newspaper-outline", key: "news" }, 
     { label: "Community", icon: "people-outline", key: "community" },
+    { label: "Categories", icon: "list-outline", key: "category" },
+    { label: "Types", icon: "layers-outline", key: "types" },
+    
   ];
 
   const NoItems = [
@@ -163,6 +166,10 @@ const UserSidebar = () => {
       navigation.navigate("PostList");
     } else if (key === "barGraph") {
       navigation.navigate("barGraph");
+    }else if (key === "category") {
+      navigation.navigate("CategoryList");
+    }else if (key === "types") {
+      navigation.navigate("TypeList");
     }
   };
 

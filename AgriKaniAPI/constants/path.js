@@ -86,6 +86,8 @@ module.exports = {
   //Category
   CATEGORY: "/category",
   CATEGORY_ID: "/category/:id",
+  CATEGORY_EDIT: "/category/edit/:id",
+  CATEGORY_DELETE: "/category/delete/:id",
 
   //Type
   TYPE: "/type",

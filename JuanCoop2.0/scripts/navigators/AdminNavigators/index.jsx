@@ -23,7 +23,12 @@ import CoopDetails from "@screens/admin/Coop/CoopDetails";
 import DriverList from "@screens/admin/Driver/DriverList";
 import DriverDetails from "@screens/admin/Driver/DriverDetails";
 import DriverActive from "@screens/admin/Driver/DriverActive";
-
+import CategoryList from "@screens/admin/Category/CategoryList";
+import CategoryCreate from "@screens/admin/Category/CategoryCreate";
+import CategoryUpdate from "@screens/admin/Category/CategoryUpdate";
+import TypeList from "@screens/admin/Types/TypeList";
+import TypeCreate from "@screens/admin/Types/TypeCreate";
+import TypeUpdate from "@screens/admin/Types/TypeUpdate";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -91,6 +96,33 @@ const Index = () => {
         <Stack.Screen
           name="barGraph"
           component={barGraph}
+        />
+
+        <Stack.Screen
+          name="CategoryList"
+          component={CategoryList}
+        />
+          <Stack.Screen
+          name="CategoryCreate"
+          component={CategoryCreate}
+        />
+        <Stack.Screen
+          name="CategoryUpdate"
+          component={CategoryUpdate}
+        />
+
+        <Stack.Screen
+          name="TypeList"
+          component={TypeList}
+        />
+
+        <Stack.Screen
+          name="TypeCreate"
+          component={TypeCreate}
+        />
+         <Stack.Screen
+          name="TypeUpdate"
+          component={TypeUpdate}
         />
       </Stack.Navigator>
     </Box>
