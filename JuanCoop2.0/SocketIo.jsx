@@ -11,7 +11,7 @@ export const SocketProvider = ({ children }) => {
     // http://192.168.50.236:4000
     useEffect(() => {
 
-      const socketConnection = io("http://192.168.50.236:4000", {
+      const socketConnection = io("http://192.168.50.222:4000", {
         transports: ["websocket"],
         cors: {
           origin: [

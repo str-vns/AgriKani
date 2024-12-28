@@ -20,7 +20,7 @@ const UserMessage = ({ messages, own }) => {
   
   const messageText = messages?.decryptedText || messages?.text;
   const images = messages?.image && Array.isArray(messages.image) 
-    ? messages.image.map(item => ({ url: item.url || item }))  // handle if item is a string URL or an object with `url` key
+    ? messages.image.map(item => ({ url: item.url || item })) 
     : [];
 
   return (

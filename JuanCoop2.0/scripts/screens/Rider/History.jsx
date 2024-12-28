@@ -4,7 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getHistoryDelivery } from "@redux/Actions/deliveryActions";
 import AuthGlobal from '@redux/Store/AuthGlobal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux';
 
 const statusColors = {
@@ -66,9 +66,12 @@ const AssignFile = () => {
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const navigation = useNavigation()
-  const { Deliveryloading, deliveries, Deliveryerror } = useSelector( state => state.deliveryList);
+  const { Deliveryloading, history, Deliveryerror } = useSelector( state => state.deliveryHistory);
   const userId = context?.stateUser?.userProfile?._id;
-  
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState(null);
+
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
@@ -78,7 +81,6 @@ const AssignFile = () => {
           if (res) {
             setToken(res);
             if (userId) {
-              dispatch(Profileuser(userId, res));
               dispatch(getHistoryDelivery(userId, res));
             } else {
               setErrors('User ID is missing.');
@@ -101,9 +103,7 @@ const AssignFile = () => {
   const groupOrdersByMonth = (orders) => {
     const grouped = orders.reduce((acc, order) => {
       const createdAt = order.createdAt ? new Date(order.createdAt) : new Date();
-      console.log("createdAt", createdAt);
       const month = createdAt.toLocaleString('default', { month: 'long' });
-      console.log("month", month);
       const year = createdAt.getFullYear();
       const monthYear = `${month} ${year}`;
 
@@ -111,26 +111,39 @@ const AssignFile = () => {
       acc[monthYear].push(order);
       return acc;
     }, {});
-
     return grouped;
   };
 
-  const groupedDeliveries = groupOrdersByMonth(deliveries);
+  const groupedDeliveries = history?.length > 0 ? groupOrdersByMonth(history) : {};
 
   return (
-    <View style={styles.containerNo}>
-    <View style={styles.header}>
-    <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
-      <Ionicons name="menu" size={34} color="black" />
-    </TouchableOpacity>
-    <Text style={styles.headerTitle}>History</Text>
-  </View>
-    <View style={styles.container}>
-    {Object.keys(groupedDeliveries).map((month) => (
-        <Section key={month} title={month} data={groupedDeliveries[month]} />
-      ))}
-    </View>
-    </View>
+      <View style={styles.containerNo}>
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
+              <Ionicons name="menu" size={34} color="black" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>History</Text>
+          </View>
+        <View style={styles.container}>
+          
+          {Deliveryloading ? (
+            <Text>Loading...</Text>
+          ) : history?.length > 0 ? (
+            Object.keys(groupedDeliveries).map((month) => (
+              <Section key={month} title={month} data={groupedDeliveries[month]} />
+            ))
+          ) : (
+            <View style={styles.noHistoryContainer}>
+              <Text style={styles.noHistoryText}>No history available.</Text>
+            </View>
+          )}
+          {Deliveryerror && (
+            <Text style={{ color: 'red', textAlign: 'center' }}>
+              Error fetching history: {historyerror}
+            </Text>
+          )}
+        </View>
+        </View>
   );
 };
 

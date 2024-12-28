@@ -22,6 +22,7 @@ const Assign = (props) => {
   const { Deliveryloading, deliveries, Deliveryerror } = useSelector((state) => state.deliveryList);
   const [token , setToken] = useState(null)
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   useFocusEffect(
     useCallback(() => {

@@ -6,9 +6,12 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import {  updateDeliveryStatus } from "@redux/Actions/deliveryActions";
+
 const Details = (props) => {
   const deliveryDetails = props.route.params.deliveryId;
   const navigation = useNavigation();
@@ -19,6 +22,28 @@ const Details = (props) => {
   }));
 
   console.log("deliveryDetails", orderItems);
+
+   const deliveryNow = (item) => {
+        Alert.alert("Delivery", "Are you sure you want to deliver this item?", [
+          {
+            text: "No",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          {
+            text: "Yes",
+            onPress: () => {
+              console.log("Deliver Pressed");
+              if(deliveryDetails.status === "pending") {
+                          dispatch(updateDeliveryStatus(item._id, "delivering", token));
+                          navigation.navigate("Dropoff",  { deliveryItem: item})
+              } else {
+                  navigation.navigate("Dropoff",  { deliveryItem: item})
+                }
+            },
+          },
+        ]);
+        }
 
   const getPaymentMethodDisplay = (method) => {
     return method === "COD" ? "Cash on Delivery" : method;
@@ -87,7 +112,7 @@ const Details = (props) => {
      { deliveryDetails?.status === "delivered"  ? 
      null :  <TouchableOpacity
     style={styles.deliverButton}
-    onPress={() => navigation.navigate("Location")}
+    onPress={() => deliveryNow(deliveryDetails)}
   >
     <Text style={styles.buttonText}>Deliver now</Text>
   </TouchableOpacity>}

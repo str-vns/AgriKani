@@ -139,6 +139,32 @@ export const getCompletedDelivery = (deliveryId, token) => async (dispatch) => {
 }
 
 export const updateDeliveryStatus = (deliveryId, status, token) => async (dispatch) => {
+   console.log("updateDeliveryStatus", deliveryId, status);
+    try {
+        dispatch({
+            type: UPDATE_DELIVERY_STATUS_REQUEST,
+        });
+
+        const response = await axios.patch(`${baseURL}delivery/${deliveryId}`, { status }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        dispatch({
+            type: UPDATE_DELIVERY_STATUS_SUCCESS,
+            payload: response.data.details,
+        });
+
+    }
+    catch (error) {
+        dispatch({
+            type: UPDATE_DELIVERY_STATUS_FAIL,
+            payload: error.response.data,
+        });
+        console.error("Error updating delivery status:", error);
+    }
+
 }
 
 

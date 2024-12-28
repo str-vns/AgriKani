@@ -22,7 +22,7 @@ import {
   import { inventoryCreateReducer, singleInventoryReducer } from "@redux/Reducers/inventoryReducer";
   import { memberListReducer, memberApiReducer } from "@redux/Reducers/memberReducer";
   import { driverApiReducer, driverListReducer, onlyApprovedDriverReducer } from "@redux/Reducers/driverReducer";
-  import { deliveryListReducer, deliveryApiReducer, deliveryCompleteReducer } from "@redux/Reducers/deliveryReducers";
+  import { deliveryListReducer, deliveryApiReducer, deliveryCompleteReducer, deliveryHistoryReducer } from "@redux/Reducers/deliveryReducers";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
@@ -82,6 +82,7 @@ import {
     deliveredhistory: historyDeliveryCoopReducer,
     onlyApprovedDriver: onlyApprovedDriverReducer,
     deliveryApi: deliveryApiReducer,
+    deliveryHistory: deliveryHistoryReducer,
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));

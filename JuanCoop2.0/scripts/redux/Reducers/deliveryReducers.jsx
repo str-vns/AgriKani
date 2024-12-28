@@ -35,19 +35,16 @@ export const deliveryListReducer = (state = { deliveries: [] }, action) => {
     switch( action.type ) {
         case GET_DELIVERY_DRIVER_FAIL:
         case GET_DELIVERY_TRACKING_FAIL:
-        case HISTORY_DELIVERY_FAIL:
         case DELIVERY_LIST_FAIL:
         case THIS_MONTH_DELIVERY_FAIL:
             return { Deliveryloading: false, Deliveryerror: action.payload, deliveries: [] };
         case GET_DELIVERY_DRIVER_REQUEST:
         case GET_DELIVERY_TRACKING_REQUEST:
-        case HISTORY_DELIVERY_REQUEST:
         case DELIVERY_LIST_REQUEST:
         case THIS_MONTH_DELIVERY_REQUEST:
             return { Deliveryloading: true, deliveries: [] };
         case GET_DELIVERY_DRIVER_SUCCESS:
         case GET_DELIVERY_TRACKING_SUCCESS:
-        case HISTORY_DELIVERY_SUCCESS:
         case DELIVERY_LIST_SUCCESS:
         case THIS_MONTH_DELIVERY_SUCCESS:
             return { Deliveryloading: false, deliveries: action.payload };
@@ -90,6 +87,19 @@ export const deliveryCompleteReducer = (state = { delivery: [] }, action) => {
             return { Deliveryloading: true };
         case COMPLETED_DELIVERY_SUCCESS:
             return { Deliveryloading: false, delivery: action.payload };
+        default:
+            return state;
+    }
+}
+
+export const deliveryHistoryReducer = (state = { history: [] }, action) => {
+    switch( action.type ) {
+        case HISTORY_DELIVERY_FAIL:
+            return { Deliveryloading: false, Deliveryerror: action.payload };
+        case HISTORY_DELIVERY_REQUEST:
+            return { Deliveryloading: true };
+        case HISTORY_DELIVERY_SUCCESS:
+            return { Deliveryloading: false, history: action.payload };
         default:
             return state;
     }

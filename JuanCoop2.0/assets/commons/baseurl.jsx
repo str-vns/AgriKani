@@ -4,7 +4,7 @@ console.log(config.BASE_ADDRESS, "config");
 let baseURL = '';
 
 {Platform.OS === 'android' || Platform.OS === 'ios'
-? baseURL = `http://192.168.50.236:4000/api/v2/`
+? baseURL = `http://192.168.50.222:4000/api/v2/`
 : baseURL = `${config.BASE_ADDRESS_1}`
 }
 

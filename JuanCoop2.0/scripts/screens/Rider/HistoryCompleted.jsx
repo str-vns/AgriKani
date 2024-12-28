@@ -26,6 +26,7 @@ const Deliveries = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
+  const [errors, setErrors] = useState(null);
 
   useFocusEffect(
     useCallback(() => {

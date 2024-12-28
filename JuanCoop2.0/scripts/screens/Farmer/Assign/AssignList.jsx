@@ -25,6 +25,7 @@ const AssignList = () => {
   const { deliveries } = useSelector(state => state.deliveryList);
   const [activeTab, setActiveTab] = useState("Assign");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
   const checkIfDelivered = (orderItems) => {

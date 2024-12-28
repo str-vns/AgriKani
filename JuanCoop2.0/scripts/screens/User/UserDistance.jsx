@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import MarkerIcon from "@assets/img/MarkerIcon.png";
 import { View } from 'native-base';
-import { Button, Image, Text, TouchableOpacity } from 'react-native';
+import { Image, Text, TouchableOpacity } from 'react-native';
 
 const UserDistance = () => {
     const { coops } = useSelector((state) => state.allofCoops);

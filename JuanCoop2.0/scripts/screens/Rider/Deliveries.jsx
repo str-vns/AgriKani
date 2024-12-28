@@ -12,9 +12,11 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { Profileuser } from "@redux/Actions/userActions";
-import { getDeliveryDriver } from "@redux/Actions/deliveryActions";
+import { getDeliveryDriver, updateDeliveryStatus } from "@redux/Actions/deliveryActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from 'expo-location'
+import { Alert } from "react-native";
 
 const Deliveries = () => {
   const context = useContext(AuthGlobal);
@@ -24,12 +26,45 @@ const Deliveries = () => {
   const { Deliveryloading, deliveries, Deliveryerror } = useSelector( state => state.deliveryList);
   const [activeTab, setActiveTab] = useState("Deliveries");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
+  const [markerCoordinate, setMarkerCoordinate] = useState(null);
+ 
 
+useEffect(() => {
+       const getCurrentLocation = async () => {
+              let { status } = await Location.requestForegroundPermissionsAsync();
+              if (status !== "granted") {
+                alert("Permission to access location was denied");
+                return;
+              }
+        
+              try {
+                const location = await Location.getCurrentPositionAsync({
+                  accuracy: Location.Accuracy.High,
+                  timeInterval: 3000, 
+                  distanceInterval: 3, 
+                }); 
+          
+                const { latitude, longitude } = location.coords;
+                setMarkerCoordinate({ lat: latitude, lng: longitude });
+              } catch (error) {
+                console.error("Error getting Location:", error);
+              }
+            };
+           
+            getCurrentLocation();
+  }, []);
+  
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
+        if (!markerCoordinate) {
+          console.warn("Marker coordinate is not set yet.");
+          return; 
+        }
+  
         setLoading(true);
         try {
           const res = await AsyncStorage.getItem("jwt");
@@ -37,7 +72,13 @@ const Deliveries = () => {
             setToken(res);
             if (userId) {
               dispatch(Profileuser(userId, res));
-              dispatch(getDeliveryDriver(userId, res));
+  
+              const mark = {
+                latitude: markerCoordinate.lat,
+                longitude: markerCoordinate.lng,
+              };
+  
+              dispatch(getDeliveryDriver(userId, mark, res));
             } else {
               setErrors('User ID is missing.');
             }
@@ -50,12 +91,10 @@ const Deliveries = () => {
         } finally {
           setLoading(false);
         }
-  
-        fetchUserData();
       };
   
       fetchData();
-    }, [userId, dispatch])
+    }, [userId, dispatch, markerCoordinate])
   );
   
     const onRefresh = useCallback(async () => {
@@ -93,6 +132,28 @@ const Deliveries = () => {
       return text.charAt(0).toUpperCase() + text.slice(1);
     };
 
+    const deliveryNow = (item) => {
+      Alert.alert("Delivery", "Are you sure you want to deliver this item?", [
+        {
+          text: "No",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => {
+            console.log("Deliver Pressed");
+            if(item.status === "pending") {
+            dispatch(updateDeliveryStatus(item._id, "delivering", token));
+            navigation.navigate("Dropoff",  { deliveryItem: item})
+            } else {
+              navigation.navigate("Dropoff",  { deliveryItem: item})
+            }
+          },
+        },
+      ]);
+      }
+
   const renderOrderItem = ({ item }) => (
     <View style={styles.orderCard}>
       <View style={styles.orderInfo}>
@@ -108,7 +169,7 @@ const Deliveries = () => {
       ) : (
         <View style={styles.actions}>
           <TouchableOpacity style={styles.deliverButton}
-           onPress={() => navigation.navigate("Location")}
+           onPress={() => deliveryNow(item)}
           >
             <Text style={styles.buttonText}>Deliver now</Text>
           </TouchableOpacity>
