@@ -19,6 +19,29 @@ exports.categorieCreate = [
   }),
 ];
 
+exports.GetSingleCategory = asyncHandler(async (req, res, next) => {
+  const categoryId = req.params.id; // Retrieve the category ID from the request parameters
+
+  try {
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Category fetched successfully',
+      details: category,
+    });
+  } catch (err) {
+    return next(new ErrorHandler('Error fetching category', 500, err));
+  }
+});
+
 exports.GetAllCategories = asyncHandler(async (req, res, next) => {
   const category = await categoryProcess.GetCategory()
 
@@ -32,7 +55,8 @@ exports.GetAllCategories = asyncHandler(async (req, res, next) => {
 });
 
 exports.UpdateCategories = [
-  upload.array("image"),
+  // upload.array("image"),
+  upload.single("image"), 
   CheckField(["categoryName", "image"]),
   asyncHandler(async (req, res) => {
     const category = await categoryProcess.UpdateCategory(req, req.params.id);

@@ -12,8 +12,8 @@ import {
   import { HereMapReducer } from "@redux/Reducers/locationReducers";
   import { coopYReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
   import { addressReducer } from "@redux/Reducers/addressReducer";
-  import { typeListReducer } from "@redux/Reducers/typeReducers";
-  import { categoryListReducer } from "@redux/Reducers/categoryReducers";
+  import { typeListReducer,typeCreateReducer,typeUpdateReducer,typeDeleteReducer } from "@redux/Reducers/typeReducers";
+  import { categoryListReducer,categoryCreateReducer,categoryEditReducer,categoryDeleteReducer} from "@redux/Reducers/categoryReducers";
   import { conversationListReducer, conversationCreateReducer } from "@redux/Reducers/conversationReducers";
   import { messageListReducer, sendMessageReducer } from "@redux/Reducers/messageReducers";
   import { commentcreateReducers } from "./Reducers/commentReducers";
@@ -42,7 +42,13 @@ import {
     CoopProduct: reducerCoopProduct,
     addresses: addressReducer,
     types: typeListReducer,
+    typesCreate: typeCreateReducer,
+    typesUpdate: typeUpdateReducer,
+    typesDelete: typeDeleteReducer,
     categories: categoryListReducer,
+    createCategories:categoryCreateReducer,
+    updateCategories: categoryEditReducer,
+    deleteCategories:categoryDeleteReducer,
     createProduct: reducerCreateProduct,
     UpdateProduct: reducerEditProduct,
     ResDelProduct: reducerDelResProduct,
