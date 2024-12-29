@@ -20,7 +20,6 @@ const LocationDetails = (props) => {
   const navigation = useNavigation();
   const [markerCoordinate, setMarkerCoordinate] = useState({ lat: 37.78825, lng: -122.4324, });
   const [deliveryMarker, setDeliveryMarker] = useState(null);
-  
   useEffect(() => {
     const getCurrentLocation = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -33,14 +32,16 @@ const LocationDetails = (props) => {
         {
           accuracy: Location.Accuracy.High,
           timeInterval: 3000, 
-          distanceInterval: 3, 
+          distanceInterval: 1, 
         },
         (location) => {
           const { latitude, longitude } = location.coords;
           setMarkerCoordinate({ lat: latitude, lng: longitude });
 
-          socket.emit('deliveryLocationUpdate', { lat: latitude, lng: longitude });
+          socket.emit('deliveryLocationUpdate', { lat: latitude, lng: longitude, status: deliverInfo.status,
+             receiverId: deliverInfo.userId._id, senderId: deliverInfo.assignedTo.userId, deliveryId: deliverInfo._id });
         }
+
       );
       return () => {
         locationSubscription.remove();
@@ -89,7 +90,7 @@ const LocationDetails = (props) => {
 
       const deliveryLocation = deliverInfo?.deliveryLocation || { Latitude: 0, Longitude: 0 };
 
-      const map = L.map('map').setView([markerCoordinate.lat, markerCoordinate.lng], 12);
+      const map = L.map('map').setView([markerCoordinate.lat, markerCoordinate.lng], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -103,10 +104,9 @@ const LocationDetails = (props) => {
         ],
         show: false,
         showAlternatives: true,
-         routeWhileDragging: true,
         routeProfile: 2 ,
         collapsible: true,
-         routeWhileDragging: false,
+        routeWhileDragging: false,
         lineOptions: {
           styles: [{ color: 'blue', opacity: 0.8, weight: 5 }]
         },
@@ -149,7 +149,7 @@ const LocationDetails = (props) => {
             <Text style={styles.driverName}>
               {deliverInfo?.assignedTo?.firstName} {deliverInfo?.assignedTo?.lastName}
             </Text>
-            <Text style={styles.driverDetails}>4-door (Green SUV)</Text>
+            {/* <Text style={styles.driverDetails}>4-door (Green SUV)</Text> */}
             <Text style={styles.driverPhone}>0902-867-711</Text>
           </View>
         </View>

@@ -17,11 +17,13 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from 'expo-location'
 import { Alert } from "react-native";
+import { useSocket } from "@SocketIo";
 
 const Deliveries = () => {
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const socket = useSocket();
   const userId = context?.stateUser?.userProfile?._id;
   const { Deliveryloading, deliveries, Deliveryerror } = useSelector( state => state.deliveryList);
   const [activeTab, setActiveTab] = useState("Deliveries");
@@ -30,8 +32,9 @@ const Deliveries = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
   const [markerCoordinate, setMarkerCoordinate] = useState(null);
- 
+   const [onlineUsers, setOnlineUsers] = useState([]);
 
+   console.log(userId)
 useEffect(() => {
        const getCurrentLocation = async () => {
               let { status } = await Location.requestForegroundPermissionsAsync();
@@ -97,6 +100,33 @@ useEffect(() => {
     }, [userId, dispatch, markerCoordinate])
   );
   
+  useEffect(() => {
+    if (!socket) {
+      console.warn("Socket is not initialized.");
+      return;
+    }
+  
+
+      if (userId) {
+        socket.emit("addUser", userId);
+      } else {
+        console.warn("User ID is missing.");
+      }
+    
+  
+    socket.on("getUsers", (users) => {
+      const onlineUsers = users.filter(
+        (user) => user.online && user.userId !== null
+      );
+      console.log("Online users: ", onlineUsers);
+      setOnlineUsers(onlineUsers);
+    });
+  
+    return () => {
+      socket.off("getUsers");
+    };
+  }, [socket, userId]);
+
     const onRefresh = useCallback(async () => {
       setRefreshing(true);
       try {
