@@ -11,12 +11,13 @@ import { singleInventory } from '@redux/Actions/inventoryActions'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux';
 import { useWeather } from '../../../CurrentWeather';
-
+import { useSocket } from "../../../SocketIo";
 
 const FarmerDashboard = () => {
   const weather = useWeather();
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const socket = useSocket();
   const { coopProducts } = useSelector((state) => state.CoopProduct);
   const { Invsuccess } = useSelector((state) => state.sinvent);
   const screenWidth = Dimensions.get('window').width;
@@ -25,9 +26,36 @@ const FarmerDashboard = () => {
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dailyWeather, setDailyWeather] = useState(null);
   const InventoryInfo = Invsuccess?.details;
+
+   useEffect(() => {
+    if (!socket) {
+      console.warn("Socket is not initialized.");
+      return;
+    }
+  
+
+      if (userId) {
+        socket.emit("addUser", userId);
+      } else {
+        console.warn("User ID is missing.");
+      }
+    
+        socket.on("getUsers", (users) => {
+          const onlineUsers = users.filter(
+            (user) => user.online && user.userId !== null
+          );
+    
+          setOnlineUsers(onlineUsers);
+        });
+    
+        return () => {
+          socket.off("getUsers");
+        };
+      }, [socket, userId]);
 
   const weatherIcons = {
     'a01d': require('../../../assets/weather/a01d.png'),
