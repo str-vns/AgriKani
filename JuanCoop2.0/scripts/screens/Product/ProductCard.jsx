@@ -24,6 +24,7 @@ import { Profileuser } from "@redux/Actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSocket } from "../../../SocketIo";
 
 const ProductCard = (props) => {
   const context = useContext(AuthGlobal);
@@ -31,11 +32,13 @@ const ProductCard = (props) => {
   const { productName, description, image, pricing, _id, stock } = props;
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const socket = useSocket();
   const [token, setToken] = useState();
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
   const [wishlist, setWishlist] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const { user, error } = useSelector((state) => state.userOnly);
 
   const productId = _id;
@@ -53,6 +56,31 @@ const ProductCard = (props) => {
 
     fetchJwt();
   }, []);
+
+   useEffect(() => {
+    if (!socket) {
+      console.warn("Socket is not initialized.");
+      return;
+    }
+  
+
+      if (userId) {
+        socket.emit("addUser", userId);
+      } else {
+        console.warn("User ID is missing.");
+      }
+  
+      socket.on("getUsers", (users) => {
+        const onlineUsers = users.filter(
+          (user) => user.online && user.userId !== null
+        );
+        setOnlineUsers(onlineUsers);
+      });
+  
+      return () => {
+        socket.off("getUsers");
+      };
+    }, [socket, userId]);
 
   useFocusEffect(
     useCallback(() => {
