@@ -43,7 +43,6 @@ const UserSignIn = () => {
       const onlineUsers = users.filter(
         (user) => user.online && user.userId !== null
       );
-      console.log("Filtered online users:", onlineUsers);
 
       setOnlineUsers(onlineUsers);
     });

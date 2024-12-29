@@ -141,8 +141,17 @@ const UserOrderList = () => {
                 <Text style={styles.buttonText}>Review</Text>
               </TouchableOpacity>
             )}
-    
-            {/* Show the "Cancel" button for pending items */}
+
+         {orderItem.orderStatus === "Shipping" && (
+              <TouchableOpacity
+                style={[styles.button, styles.reviewButton]}
+                onPress={() => navigation.navigate("UserTracking", { trackId: orderItem.deliveryId })}
+              >
+                <Icon name="rate-review" size={20} color="#fff" />
+                <Text style={styles.buttonText}>Track</Text>
+              </TouchableOpacity>
+            )}
+        
             {orderItem.orderStatus === "Pending" && (
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
@@ -195,7 +204,17 @@ const UserOrderList = () => {
                 </TouchableOpacity>
               )}
     
-              {/* Show the "Cancel" button for pending items */}
+    {orderItem.orderStatus === "Shipping" && (
+              <TouchableOpacity
+                style={[styles.button, styles.reviewButton]}
+                onPress={() => navigation.navigate("UserTracking", { trackId: orderItem.deliveryId })}
+              >
+                <Icon name="rate-review" size={20} color="#fff" />
+                <Text style={styles.buttonText}>Track</Text>
+              </TouchableOpacity>
+            )}
+
+
               {orderItem.orderStatus === "Pending" && (
                 <TouchableOpacity
                   style={[styles.button, styles.cancelButton]}
