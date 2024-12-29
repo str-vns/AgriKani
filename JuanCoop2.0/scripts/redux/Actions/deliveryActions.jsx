@@ -59,6 +59,30 @@ export const createDelivery = (deliveryData, token) => async (dispatch) => {
 }
 
 export const getDeliveryTracking = (deliveryId, token) => async (dispatch) => {
+
+    try {
+        dispatch({
+            type: GET_DELIVERY_TRACKING_REQUEST,
+        });
+
+        const response = await axios.get(`${baseURL}delivery/track/${deliveryId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        dispatch({
+            type: GET_DELIVERY_TRACKING_SUCCESS,
+            payload: response.data.details,
+        });
+
+    } catch (error) {
+        dispatch({
+            type: GET_DELIVERY_TRACKING_FAIL,
+            payload: error.response.data,
+        });
+        console.error("Error getting delivery tracking:", error);
+    }
 }
 
 export const getDeliveryDriver = (deliveryId, token) => async (dispatch) => {
