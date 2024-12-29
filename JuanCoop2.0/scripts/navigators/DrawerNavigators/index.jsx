@@ -20,7 +20,6 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isLogin } from "@redux/Actions/Auth.actions";
 import { ActivityIndicator } from "react-native";
-
 global.__reanimatedWorkletInit = () => {};
 
 const Drawer = createDrawerNavigator();

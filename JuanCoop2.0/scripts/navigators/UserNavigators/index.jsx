@@ -9,6 +9,7 @@ import EditFarm from "@screens/Farmer/FarmEdit";
 import AddReviews from "@screens/Review/UserAddReview";
 import Requirements from "@screens/Farmer/Registration/RequirementsRegistration";
 import MembersRegistration from "@screens/UserRegis/MemberRegistration";
+import UserTracking from "@screens/User/UserTracking";
 const Stack = createNativeStackNavigator();
 
 const UserNavigation = () => {
@@ -89,6 +90,15 @@ const UserNavigation = () => {
           headerShown: false,
         }}
       />
+
+      <Stack.Screen
+        name="UserTracking"
+        component={UserTracking}
+        options={{
+          headerShown: false,
+        }}
+      />
+      
     </Stack.Navigator>
   );
 };
