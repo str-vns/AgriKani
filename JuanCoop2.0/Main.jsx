@@ -145,7 +145,7 @@ useEffect(() => {
 
 
 
-   useEffect(() => {
+  useEffect(() => {
 
      const initialize = async () => {
        await context.dispatch(isLogin(context.dispatch));
