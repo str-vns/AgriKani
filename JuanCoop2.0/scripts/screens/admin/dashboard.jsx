@@ -7,16 +7,43 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Profileuser } from "@redux/Actions/userActions";
-
+import { useSocket } from "../../../SocketIo";
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation(); 
   const context = useContext(AuthGlobal);
+  const socket = useSocket();
   const userId = context?.stateUser?.userProfile?._id;
-
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const { dailySales, weeklySales, monthlySales } = useSelector((state) => state.sales);
   const [refreshing, setRefreshing] = useState(false);
-console.log("Hello",userId)
+
+   useEffect(() => {
+    if (!socket) {
+      console.warn("Socket is not initialized.");
+      return;
+    }
+  
+
+      if (userId) {
+        socket.emit("addUser", userId);
+      } else {
+        console.warn("User ID is missing.");
+      }
+    
+        socket.on("getUsers", (users) => {
+          const onlineUsers = users.filter(
+            (user) => user.online && user.userId !== null
+          );
+    
+          setOnlineUsers(onlineUsers);
+        });
+    
+        return () => {
+          socket.off("getUsers");
+        };
+      }, [socket, userId]);
+
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
