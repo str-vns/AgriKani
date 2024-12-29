@@ -80,7 +80,15 @@ exports.getDeliveryTrackingProcess = async (id) => {
     if (!mongoose.Types.ObjectId.isValid(id))
         throw new ErrorHandler(`Invalid Order ID: ${id}`);
 
-    const deliveries = await Delivery.findById(id).lean().exec();
+    const deliveries = await Delivery.findById(id)
+    .populate("orderId", "totalPrice paymentMethod")
+    .populate("coopId")
+    .populate("userId", "firstName lastName email image.url phoneNum")
+    .populate("orderItems.product", "productName pricing price image.url ")
+    .populate("orderItems.inventoryProduct", "metricUnit unitName")
+    .populate("shippingAddress", "address city barangay")
+    .populate("assignedTo", "firstName lastName email image.url userId phoneNum") 
+    .lean().exec();
     if (!deliveries) throw new ErrorHandler(`Delivery not found with ID: ${id}`);
 
     return deliveries;
@@ -106,7 +114,7 @@ exports.getDeliveryDriverProcess = async (id) => {
       .populate("orderItems.product", "productName pricing price image.url ")
       .populate("orderItems.inventoryProduct", "metricUnit unitName")
       .populate("shippingAddress", "address city barangay")
-      .populate("assignedTo", "firstName lastName email image.url") 
+      .populate("assignedTo", "firstName lastName email image.url userId") 
       .lean().exec();
     
     return deliveries;
