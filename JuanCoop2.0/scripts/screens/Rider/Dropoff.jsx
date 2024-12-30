@@ -11,15 +11,42 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Location from 'expo-location'
 import { WebView } from 'react-native-webview';
 import { useSocket } from "../../../SocketIo";
-
+import { updateDeliveryStatus } from "@redux/Actions/deliveryActions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
 const LocationDetails = (props) => {
   const webViewRef = useRef(null)
   const socket = useSocket();
+  const dispatch = useDispatch();
   const deliverInfo = props.route.params.deliveryItem;
   const Locate = deliverInfo?.deliveryLocation;
   const navigation = useNavigation();
   const [markerCoordinate, setMarkerCoordinate] = useState({ lat: 37.78825, lng: -122.4324, });
   const [deliveryMarker, setDeliveryMarker] = useState(null);
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    const fetchJwt = async () => {
+      try {
+        const res = await AsyncStorage.getItem("jwt");
+        setToken(res);
+      } catch (error) {
+        console.error("Error retrieving JWT: ", error);
+      }
+    };
+    fetchJwt();
+  },[])
+
+  const failedDelivery = () => {
+    dispatch(updateDeliveryStatus(deliverInfo._id, "failed" , token))
+    navigation.navigate("Deliveries");
+  };
+
+  const reDeliver = () => {
+    dispatch(updateDeliveryStatus(deliverInfo._id, "pending" , token))
+    navigation.navigate("Deliveries");
+  };
+
   useEffect(() => {
     const getCurrentLocation = async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -147,23 +174,25 @@ const LocationDetails = (props) => {
           <Ionicons name="person-circle-outline" size={40} color="#333" />
           <View style={styles.driverTextContainer}>
             <Text style={styles.driverName}>
-              {deliverInfo?.assignedTo?.firstName} {deliverInfo?.assignedTo?.lastName}
+              {deliverInfo?.userId?.firstName} {deliverInfo?.userId?.lastName}
             </Text>
             {/* <Text style={styles.driverDetails}>4-door (Green SUV)</Text> */}
-            <Text style={styles.driverPhone}>0902-867-711</Text>
+            <Text style={styles.driverPhone}>Order# {deliverInfo?.orderId?._id}</Text>
           </View>
         </View>
         <View style={styles.actionsContainer}>
           <TouchableOpacity
             style={styles.dropOffButton}
-            onPress={() => navigation.navigate("Riderlist")}
+            onPress={ () => failedDelivery() }
           >
             <Text style={styles.buttonText}>Failed</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.dropOffButton}>
+          <TouchableOpacity style={styles.dropOffButton}
+            onPress={ () => reDeliver() }>
             <Text style={styles.buttonText}>Re-deliver</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.dropOffButton}>
+          <TouchableOpacity style={styles.dropOffButton} 
+          onPress={() => navigation.navigate("QrScan", { deliveryId: deliverInfo })}>
             <Text style={styles.buttonText}>Delivered</Text>
           </TouchableOpacity>
         </View>

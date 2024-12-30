@@ -358,7 +358,7 @@ const OrderList = ({ navigation }) => {
 </TouchableOpacity>
 )}
 
-{
+{/* {
   item?.orderItems?.length > 0 && (
     (item?.orderItems?.flat().every((orderItem) => orderItem.orderStatus === "Shipping")) ||
       (item?.orderItems?.flat().some((orderItem) => orderItem.orderStatus === "Shipping"))) && (
@@ -379,7 +379,7 @@ const OrderList = ({ navigation }) => {
  <Icon name="rate-review" size={20} color="#fff" />
  <Text style={[styles.buttonText, { color: 'white' }]}> Delivery </Text>
 </TouchableOpacity>
-)}
+)} */}
 
 </View>
           </View>

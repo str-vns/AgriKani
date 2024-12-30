@@ -24,9 +24,8 @@ const UserTracking = (props) => {
   const trackInfo = props.route.params.trackId;
   const { Deliveryloading ,deliveries, Deliveryerror } = useSelector((state) => state.deliveryList);
   const [markerCoordinate, setMarkerCoordinate] = useState({ lat: 37.78825, lng: -122.4324, });
-  console.log(markerCoordinate)
   const [arrivedData, setArrivedData] = useState({});
-
+ 
 
   console.log("Delivery Info:", deliveries?.deliveryLocation);
    useFocusEffect(
@@ -61,86 +60,133 @@ const UserTracking = (props) => {
            }
   }, [markerCoordinate, arrivedData, deliveries]);
 
+let mapHtml;
 
-  const mapHtml = `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title>Leaflet Map</title>  
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.1/dist/leaflet-routing-machine.css" />
-    <script src="./lrm-esri.js"></script>
-    <style>
-      body { margin: 0; padding: 0; }
-      #map { width: 100%; height: 100vh; }
-    </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <script>
-      // Initial locations
-      let markerCoordinate = { lat: ${markerCoordinate.lat}, lng: ${markerCoordinate.lng} }; // Example for user's location
-      const deliverInfo = {
-        deliveryLocation: { Latitude: ${arrivedData?.latitude}, Longitude: ${arrivedData?.longitude} },
-      };
-      const deliveryLocation = deliverInfo?.deliveryLocation || { Latitude: 0, Longitude: 0 };
+if (deliveries.status === "delivering") {
+  mapHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        <title>Leaflet Map</title>  
 
-      // Initialize map
-      const map = L.map('map').setView([markerCoordinate.lat, markerCoordinate.lng], 15);
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" rel="stylesheet">
+        <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.1/dist/leaflet-routing-machine.css" />
+        <script src="./lrm-esri.js"></script>
+        <style>
+          body { margin: 0; padding: 0; }
+          #map { width: 100%; height: 100vh; }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+        <script>
+          // Initial locations
+          let markerCoordinate = { lat: ${markerCoordinate.lat}, lng: ${markerCoordinate.lng} }; // Example for user's location
+          const deliverInfo = {
+            deliveryLocation: { Latitude: ${arrivedData?.latitude || 0}, Longitude: ${arrivedData?.longitude || 0} },
+          };
+          const deliveryLocation = deliverInfo?.deliveryLocation || { Latitude: 0, Longitude: 0 };
 
-      // Add tile layer
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+          // Initialize map
+          const map = L.map('map').setView([markerCoordinate.lat, markerCoordinate.lng], 15);
 
-      // Add user and delivery markers
-      const userMarker = L.marker([markerCoordinate.lat, markerCoordinate.lng]).addTo(map);
-      const deliveryMarker = L.marker([deliveryLocation.Latitude, deliveryLocation.Longitude]).addTo(map);
+          // Add tile layer
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
 
-      // Initialize route control
-      const routeControl = L.Routing.control({
-        waypoints: [
-          L.latLng(markerCoordinate.lat, markerCoordinate.lng),
-          L.latLng(deliveryLocation.Latitude, deliveryLocation.Longitude),
-        ],
-        lineOptions: {
-          styles: [{ color: 'blue', opacity: 0.8, weight: 5 }],
-        },
-        altLineOptions: {
-          styles: [{ color: 'red', opacity: 0.8, weight: 2 }],
-        },
-        routeWhileDragging: false,
-        showAlternatives: true,
-        collapsible: true,
-        position: 'bottomleft',
-        show: false,
-        useZoomParameter: true,
-      }).addTo(map);
+          // Add user and delivery markers
+          const userMarker = L.marker([markerCoordinate.lat, markerCoordinate.lng]).addTo(map);
+          const deliveryMarker = L.marker([deliveryLocation.Latitude, deliveryLocation.Longitude]).addTo(map);
 
-      // Function to update driver location
-      function updateDriverLocation(newLat, newLng) {
-        // Update marker position
-        markerCoordinate = { lat: newLat, lng: newLng };
-        userMarker.setLatLng([newLat, newLng]);
+          // Initialize route control
+          const routeControl = L.Routing.control({
+            waypoints: [
+              L.latLng(markerCoordinate.lat, markerCoordinate.lng),
+              L.latLng(deliveryLocation.Latitude, deliveryLocation.Longitude),
+            ],
+            lineOptions: {
+              styles: [{ color: 'blue', opacity: 0.8, weight: 5 }],
+            },
+            altLineOptions: {
+              styles: [{ color: 'red', opacity: 0.8, weight: 2 }],
+            },
+            routeWhileDragging: false,
+            showAlternatives: true,
+            collapsible: true,
+            position: 'bottomleft',
+            show: false,
+            useZoomParameter: true,
+          }).addTo(map);
 
-        // Update route
-        routeControl.setWaypoints([
-          L.latLng(markerCoordinate.lat, markerCoordinate.lng),
-          L.latLng(deliveryLocation.Latitude, deliveryLocation.Longitude),
-        ]);
-      }
+          // Function to update driver location
+          function updateDriverLocation(newLat, newLng) {
+            // Update marker position
+            markerCoordinate = { lat: newLat, lng: newLng };
+            userMarker.setLatLng([newLat, newLng]);
 
-   
-    </script>
-  </body>
-</html>
-  `
+            // Update route
+            routeControl.setWaypoints([
+              L.latLng(markerCoordinate.lat, markerCoordinate.lng),
+              L.latLng(deliveryLocation.Latitude, deliveryLocation.Longitude),
+            ]);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+} else {
+  mapHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        <title>Leaflet Map</title>  
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" rel="stylesheet">
+        <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.1/dist/leaflet-routing-machine.css" />
+        <script src="./lrm-esri.js"></script>
+        <style>
+          body { margin: 0; padding: 0; }
+          #map { width: 100%; height: 100vh; }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+        <script>
+          // Initial locations
+          let markerCoordinate = { lat: ${markerCoordinate.lat}, lng: ${markerCoordinate.lng} }; // Example for user's location
+          const deliverInfo = {
+            deliveryLocation: { Latitude: ${arrivedData?.latitude || 0}, Longitude: ${arrivedData?.longitude || 0} },
+          };
+          const deliveryLocation = deliverInfo?.deliveryLocation || { Latitude: 0, Longitude: 0 };
+
+          // Initialize map
+          const map = L.map('map').setView([markerCoordinate.lat, markerCoordinate.lng], 15);
+
+          // Add tile layer
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }).addTo(map);
+
+          // Add user and delivery markers
+          const userMarker = L.marker([markerCoordinate.lat, markerCoordinate.lng]).addTo(map);
+          const deliveryMarker = L.marker([deliveryLocation.Latitude, deliveryLocation.Longitude]).addTo(map);
+        </script>
+      </body>
+    </html>
+  `;
+}
+  
   const handleWebViewMessage = (event) => {
     const { data } = event.nativeEvent;
     try {
@@ -211,7 +257,8 @@ const getStatusColor = (status) => {
             </View>
           </View>
           <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.dropOffButton}>
+            <TouchableOpacity style={styles.dropOffButton}
+              onPress={() => navigation.navigate("QrGenerate", { deliveryId: deliveries   })}>
               <Text style={styles.buttonText}>QR</Text>
             </TouchableOpacity>
           </View>
