@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 4000;
 const { logger, logEvents } = require("./middleware/logger");
 const { server } = require("./sokIo");
 const WeatherService = require("./services/weatherService");
+const DeliveryFailed = require("./services/deliveriesFailedService");
 
 connectDB();
 app.use(logger);
@@ -20,6 +21,15 @@ mongoose.connection.once("open", () => {
       await WeatherService.checkWeatherNotification();
     } catch (error) {
       console.error("Error in WeatherService:", error);
+    }
+  });
+
+  nodeCron.schedule("30 20 * * *", async () => {
+    try {
+      console.log("Checking failed deliveries...");
+      await DeliveryFailed.failedAllDeliveries();
+    } catch (error) {
+      console.error("Error in DeliveryFailedService:", error);
     }
   });
 
