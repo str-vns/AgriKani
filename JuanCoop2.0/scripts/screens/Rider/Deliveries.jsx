@@ -194,9 +194,7 @@ useEffect(() => {
   </Text>
 </Text>
       </View>
-      {activeTab === "Completed" ? (
-        <Text style={styles.status}>{item.status}</Text>
-      ) : (
+      {item.status === "failed" ? null : (
         <View style={styles.actions}>
           <TouchableOpacity style={styles.deliverButton}
            onPress={() => deliveryNow(item)}
