@@ -10,6 +10,7 @@ import AddReviews from "@screens/Review/UserAddReview";
 import Requirements from "@screens/Farmer/Registration/RequirementsRegistration";
 import MembersRegistration from "@screens/UserRegis/MemberRegistration";
 import UserTracking from "@screens/User/UserTracking";
+import QrGenerate from "@screens/User/QrGenerate";
 const Stack = createNativeStackNavigator();
 
 const UserNavigation = () => {
@@ -99,6 +100,14 @@ const UserNavigation = () => {
         }}
       />
       
+      <Stack.Screen
+        name="QrGenerate"
+        component={QrGenerate}
+        options={{
+          headerShown: false,
+        }}
+      />
+
     </Stack.Navigator>
   );
 };

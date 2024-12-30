@@ -9,7 +9,7 @@ import Riderlist from "@src/screens/Rider/Riderlist";
 import History from "@src/screens/Rider/History";
 import Assign from "@src/screens/Rider/Assign";
 import Completed from "@src/screens/Rider/HistoryCompleted";
-import HistoryCoop from "@src/screens/Rider/HistoryCoop";
+import QrScan from "@src/screens/Rider/QrScan";
 // Coop part for rider
 import Register from "@src/screens/Rider/Register";
 import Otp from "@src/screens/Rider/Otp";
@@ -68,6 +68,11 @@ const RiderNavigators = () => {
       <Stack.Screen
         name="Completed"
         component={Completed}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="QrScan"
+        component={QrScan}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
