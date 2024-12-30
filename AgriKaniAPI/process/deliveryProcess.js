@@ -175,6 +175,24 @@ exports.UpdateDeliveryStatusProcess = async (id, req) => {
 
     const delivery = await Delivery.findByIdAndUpdate
     (id, { status: req.body.status }, { new: true }).lean().exec();
+
+    if ( req.body.status === "delivered") {
+        await Order.findByIdAndUpdate(delivery.orderId, {
+            "orderItems.$[elem].orderStatus": "Delivered",
+        }, 
+        {
+            new: true,
+            runValidators: true,
+            arrayFilters: 
+            [ {
+                "elem.deliveryId" : id
+            }]
+        }).lean().exec();
+
+        await Delivery.findByIdAndUpdate(id, { deliveredAt: Date.now() }).lean().exec();
+
+    }
+
     if (!delivery) throw new ErrorHandler(`Delivery not found with ID: ${id}`);
 
     return delivery;
