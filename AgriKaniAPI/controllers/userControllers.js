@@ -145,3 +145,23 @@ exports.getUserTypeCount = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
   }
 });
+
+exports.getCheckEmail = asyncHandler(async (req, res) => {
+  const email = await userProcess.checkEmail(req);
+
+  return email === STATUSCODE.ZERO
+    ? res.status(200).json({ message: "Email is not registered" })
+    : SuccessHandler(res, `Email is registered`, email);
+});
+
+exports.getOtpForgotPassword = asyncHandler(async (req, res) => {
+  const otp = await userProcess.otpForgotPassword(req);
+
+  return SuccessHandler(res, `OTP Correct`, otp);
+});
+
+exports.resetPassword = asyncHandler(async (req, res) => {
+  const reset = await userProcess.resetforgotPassword(req);
+
+  return SuccessHandler(res, `Password Reset Successfully`, reset);
+});

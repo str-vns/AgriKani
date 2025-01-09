@@ -10,6 +10,9 @@ module.exports = {
   RESTORE_ID: "/restore/users/:id",
   WISH_USER_ID: "/wish/users/:productId/:id",
   WISH_ID: "/wish/:id",
+  CHECK_EMAIL: "/check-email",
+  OTP_FORGOT_PASSWORD: "/otp-forgot-password",
+  RESET_PASSWORD: "/reset-password",
 
   //Auth
   LOGIN: "/signin",

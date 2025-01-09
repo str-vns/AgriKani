@@ -76,7 +76,25 @@ const userRoutes = [
     path: PATH.WISH_ID,
     roles: [],
     handler: userController.UsersWish
-  }
+  },
+  {
+    method: METHOD.POST,
+    path: PATH.CHECK_EMAIL,
+    roles: [],
+    handler: userController.getCheckEmail,
+  },
+  {
+    method: method.POST,
+    path: path.OTP_FORGOT_PASSWORD,
+    roles: [],
+    handler: userController.getOtpForgotPassword,
+  },
+  {
+    method: method.POST,
+    path: path.RESET_PASSWORD,
+    roles: [],
+    handler: userController.resetPassword,
+  },
 ];
 
 userRoutes.forEach((route) => {

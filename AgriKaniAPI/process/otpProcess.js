@@ -11,7 +11,7 @@ exports.sendOTP = async (req) => {
     .lean()
     .exec();
 
-  if (duplicateEmail) throw new ErrorHandler("Email is already Registered");
+  // if (duplicateEmail) throw new ErrorHandler("Email is already Registered");
 
   let otp = otpGenerator.generate(6, {
     upperCaseAlphabets: false,

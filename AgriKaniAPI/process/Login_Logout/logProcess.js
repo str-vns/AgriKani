@@ -53,16 +53,35 @@ exports.getBlacklistedTokens = () => {
 
 //Save Device Token ...
 exports.saveDeviceToken = async (req) => {
-  const user = await User.findOne({ email: req.body.email, }).exec();
-  const deviceToken = req.body.deviceToken;
-  if (!deviceToken) throw new ErrorHandler("Device Token is required");
+  try {
+    const { email, deviceToken } = req.body;
 
-  if (!user.deviceToken.includes(deviceToken)){
+    if (!email) {
+      throw new ErrorHandler("Email is required");
+    }
+
+    if (!deviceToken) {
+      throw new ErrorHandler("Device Token is required");
+    }
+
+    const user = await User.findOne({ email }).exec();
+    if (!user) {
+      throw new ErrorHandler("User not found");
+    }
+
+    if (user.deviceToken?.includes(deviceToken)) {
+      console.log("Device Token Already Exists");
+      return "Device Token Already Exists";
+    }
+
+    user.deviceToken = user.deviceToken || []; 
     user.deviceToken.push(deviceToken);
+
     await user.save();
     console.log("Device Token Saved");
-  } else {
-    console.log("Device Token Already Exists");
-    return "Device Token Already Exists";
+    return "Device Token Saved";
+  } catch (error) {
+    console.error("Error saving device token:", error.message);
+    throw error;
   }
-}
+};

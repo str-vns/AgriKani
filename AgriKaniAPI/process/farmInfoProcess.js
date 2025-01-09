@@ -12,11 +12,11 @@ const { sendEmail } = require("../utils/sendMail");
 //create ...
 exports.CreateFarmProcess = async (req) => {
   console.log(req.body);
-  const duplicateFarm = await Farm.findOne({ farmName: req.body.farmName })
-    .collation({ locale: "en" })
-    .lean()
-    .exec();
-  if (duplicateFarm) throw new ErrorHandler("Farm Name is already exist");
+  // const duplicateFarm = await Farm.findOne({ farmName: req.body.farmName })
+  //   .collation({ locale: "en" })
+  //   .lean()
+  //   .exec();
+  // if (duplicateFarm) throw new ErrorHandler("Farm Name is already exist");
 
   const user = await User.findById(req.body.user).exec();
   if (!user) throw new ErrorHandler("User not found");

@@ -5,9 +5,10 @@ const Otp = require("../models/otp");
 const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
-const { default: mongoose } = require("mongoose");
+const { default: mongoose, trusted } = require("mongoose");
 const { uploadImageSingle } = require("../utils/imageCloud");
 const { cloudinary } = require("../utils/cloudinary");
+const uuid = require("uuid");
 const blacklistedTokens = [];
 // NOTE Three DOTS MEANS OK IN COMMENT
 
@@ -331,4 +332,86 @@ exports.getUserTypeCount = async () => {
   ]);
 };
 
+exports.checkEmail = async (req) => {
+  const duplicateEmail = await User.findOne({ email: req.body.email })
+    .collation({ locale: "en" })
+    .lean()
+    .exec();
 
+  if (duplicateEmail) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+exports.otpForgotPassword = async (req) => {
+  try {
+    const response = await Otp.findOne({
+      email: req.body.email,
+      otp: req.body.otp,
+    })
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+
+    if (!response) {
+      throw new ErrorHandler("OTP is not valid or email does not match", 400);
+    }
+
+    const resetToken = uuid.v4();
+
+    const user = await User.findOne({ email: req.body.email }).exec();
+    if (!user) {
+      throw new ErrorHandler("User not found", 404);
+    }
+
+    await User.findByIdAndUpdate(
+      user._id,
+      {
+        resetToken: resetToken,
+        resetTokenUsed: false,
+      },
+      { new: true }
+    );
+
+    return resetToken;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+exports.resetforgotPassword = async (req) => {
+ console.log(req.body.resetToken)
+  const user = await User.findOne({
+    email: req.body.email,
+    resetToken: req.body.resetToken,
+  });
+
+  if (!user) {
+    throw new ErrorHandler("User not found with this email");
+  }
+
+  if (req.body.newPassword !== req.body.confirmPassword) {
+    throw new ErrorHandler("Password does not match");
+  }
+
+  if (user.resetTokenUsed) {
+    throw new ErrorHandler("Reset token has been used");
+  }
+
+  const hashedPassowrd = await bcrypt.hash(
+    req.body.newPassword,
+    Number(process.env.SALT)
+  )
+
+  await User.findByIdAndUpdate(user._id, {
+    password: hashedPassowrd,
+    resetTokenUsed: true,
+  });
+
+   return `Password has been reset successfully for user with email ${req.body.email}`;
+}
+
+  
