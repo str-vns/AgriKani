@@ -1,16 +1,52 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { resetPassword } from '@redux/Actions/userActions';
+import { useDispatch,useSelector } from 'react-redux';
+import { useNavigation } from "@react-navigation/native";
+import Error from "@shared/Error";
 
-const NewPassword = () => {
+const NewPassword = (props) => {
+  const navigation = useNavigation()
+  const dispatch = useDispatch()
+  const {otps, loading } = useSelector(state => state.otpForgot);
+  const email = props.route.params.email;
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
 
   const handleSave = () => {
-    if (newPassword === confirmPassword) {
-      // Logic for saving the new password
-      alert('Password changed successfully!');
+    if (!newPassword || !confirmPassword) {
+      setError('Please fill in all fields.');
+      setTimeout(() =>{
+        setError("");
+      }, 5000)
+    } else if (newPassword.length < 8 || confirmPassword.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      setTimeout(() =>{
+        setError("");
+      }, 5000)
+    } else if ((!/[0-9]/.test(newPassword) || !/[a-zA-Z]/.test(newPassword) )){
+      setError("Password must contain at least one number, one letter ");
+      setTimeout(() =>{
+        setError("");
+      }, 5000)
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)){
+      setError("Password must contain at least one special character");
+      setTimeout(() =>{
+        setError("");
+      }, 5000)
+    } else if (newPassword === confirmPassword) {
+      const data = {
+        newPassword,
+        confirmPassword,
+        email,
+        resetToken: otps.details,
+      }
+
+      dispatch(resetPassword(data));
+      navigation.navigate("RegisterScreen", { screen: "Login" });
     } else {
-      alert('Passwords do not match. Please try again.');
+      setError('Passwords do not match. Please try again.');
     }
   };
 
@@ -40,6 +76,7 @@ const NewPassword = () => {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
+        {error ? <Error message={error} /> : null}
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>

@@ -41,15 +41,21 @@ import {
   SAVE_USER_DEVICE_TOKEN_REQUEST,
   SAVE_USER_DEVICE_TOKEN_SUCCESS,
   SAVE_USER_DEVICE_TOKEN_FAIL,
-
+  CHECK_EMAIL_REQUEST,
+  CHECK_EMAIL_SUCCESS,
+  CHECK_EMAIL_FAIL,
+  OTP_FORGOT_PASSWORD_REQUEST,  
+  OTP_FORGOT_PASSWORD_SUCCESS,
+  OTP_FORGOT_PASSWORD_FAIL,
+  RESET_PASSWORD_REQUEST,
+  RESET_PASSWORD_SUCCESS,
+  RESET_PASSWORD_FAIL,
 } from "../Constants/userConstants";
 import baseURL from "@assets/commons/baseurl";
 import Toast from "react-native-toast-message";
 import mime from "mime";
-import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCallback, useContext, useState, } from "react";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+
 
 export const registeruser = (userData) => async (dispatch) => {
   const regi = userData.registration
@@ -58,7 +64,7 @@ export const registeruser = (userData) => async (dispatch) => {
 
     // formData.append("user", coop?.user);
     const formData = new FormData();
-
+    const newImageUri = "file:///" + regi?.image.split("file:/").join("");
     formData.append("firstName", regi?.firstName);
     formData.append("lastName", regi?.lastName);
     formData.append("age", regi?.age);
@@ -119,6 +125,7 @@ export const registeruser = (userData) => async (dispatch) => {
     console.log("Error from Register", errorMessage);
   }
 };
+
 export const OTPregister = (OtpData) => async (dispatch) => {
   try {
     dispatch({ type: OTP_USER_REQUEST });
@@ -168,6 +175,7 @@ export const OTPregister = (OtpData) => async (dispatch) => {
     );
   }
 };
+
 export const Profileuser = (userDataId, token) => async (dispatch) => {
    console.log("userDataId", userDataId);
   try {
@@ -199,6 +207,7 @@ export const Profileuser = (userDataId, token) => async (dispatch) => {
   }
   
 }
+
 export const ProfileEdit = (userDataId, token, userData) => async (dispatch) => {
   
   console.log("userData", userData.image);
@@ -258,6 +267,7 @@ export const ProfileEdit = (userDataId, token, userData) => async (dispatch) => 
     });
 }
 };
+
 export const WishlistUser = (productId, userId, token) => async (dispatch) => {
 
   try {
@@ -291,6 +301,7 @@ export const WishlistUser = (productId, userId, token) => async (dispatch) => {
     console.log("Error from WishlistUser:", errorMessage);
   }
 };
+
 export const getWishlist = (userId, token) => async (dispatch) => {
   try {
     dispatch({ type: WISHLIST_REQUEST });
@@ -321,6 +332,7 @@ export const getWishlist = (userId, token) => async (dispatch) => {
     console.log("Error from getWishlist", errorMessage);
   }
 }
+
 export const getUsers = (userIds, token) => async (dispatch) => {
   try {
     dispatch({ type: USER_MESSAGE_REQUEST });
@@ -355,6 +367,7 @@ export const getUsers = (userIds, token) => async (dispatch) => {
     console.log("Error from getUsers", errorMessage); 
   }
 };
+
 export const getAllUsers = (token) => async (dispatch) => {
   try {
     dispatch({ type: GET_ALL_USERS_REQUEST });
@@ -385,6 +398,7 @@ export const getAllUsers = (token) => async (dispatch) => {
     console.log("Error from getAllUsers", errorMessage);
   }
 };
+
 export const deleteUser = (id) => async (dispatch) => {
   try {
     dispatch({ type: USER_DELETE_REQUEST });
@@ -405,6 +419,7 @@ export const deleteUser = (id) => async (dispatch) => {
     return Promise.reject(error); // Indicate failure
   }
 };
+
 export const softDeleteUser = (id) => async (dispatch) => {
   try {
     dispatch({ type: USER_SOFTDELETE_REQUEST });
@@ -442,6 +457,7 @@ export const softDeleteUser = (id) => async (dispatch) => {
     });
   }
 };
+
 export const restoreUser = (id) => async (dispatch) => {
   try {
     dispatch({ type: USER_RESTORE_REQUEST });
@@ -475,6 +491,7 @@ export const restoreUser = (id) => async (dispatch) => {
     });
   }
 };
+
 export const countUsers = (token) => async (dispatch) => {
   try {
     dispatch({ type: COUNT_USER_REQUEST });
@@ -521,6 +538,7 @@ export const countUsers = (token) => async (dispatch) => {
 };
 
 export const saveDeviceToken = (saveDtoken) => async (dispatch) => {
+
   try {
     dispatch({ type: SAVE_USER_DEVICE_TOKEN_REQUEST });
 
@@ -551,6 +569,75 @@ export const saveDeviceToken = (saveDtoken) => async (dispatch) => {
   }
 };
 
+export const checkEmail = (email) => async (dispatch) => {
+
+  try {
+
+    dispatch({ type: CHECK_EMAIL_REQUEST });
+
+    const { data } = await axios.post(`${baseURL}check-email`, email);
+    console.log("Data from checkEmail:", data);
+    dispatch({
+      type: CHECK_EMAIL_SUCCESS,
+      payload: data.details,
+    });
+  }
+  catch (error)  {
+    console.log("Error from checkEmail:", error);
+    dispatch({
+      type: CHECK_EMAIL_FAIL,
+      payload: error.response && error.response.data
+        ? error.response.data.details.message
+        : error.message,
+    });
+  }
+};
+
+export const otpForgotPassword = (email) => async (dispatch) => {
+ 
+  try {
+    dispatch({ type: OTP_FORGOT_PASSWORD_REQUEST });
+
+    const { data } = await axios.post(`${baseURL}otp-forgot-password`, email);
+    dispatch({
+      type: OTP_FORGOT_PASSWORD_SUCCESS,
+      payload: data,
+    });
+    
+  } catch (error) {
+    console.log("Error from otpForgotPassword:", error.message);
+    dispatch({
+      type: OTP_FORGOT_PASSWORD_FAIL,
+      payload: error.response && error.response.data
+        ? error.response.data.message
+        : error.message,
+    });
+  }
+}
+
+export const resetPassword = (passwordData) => async (dispatch) => {
+  console.log("Password Data", passwordData)
+  try {
+    dispatch({ type: RESET_PASSWORD_REQUEST });
+
+    const { data } = await axios.post(`${baseURL}reset-password`, passwordData);
+    console.log("Data from resetPassword:", data);
+    dispatch({
+      type: RESET_PASSWORD_SUCCESS,
+      payload: data.details,
+    });
+  }
+  catch (error) {
+    console.log("Error from resetPassword:", error.message);
+    dispatch({
+      type: RESET_PASSWORD_FAIL,
+      payload: error.response && error.response.data
+        ? error.response.data.message
+        : error.message,
+    });
+  }
+}
+
 export const clearRegister = () => async (dispatch) => {
   dispatch({
     type: CLEAR_REGISTER,
@@ -563,3 +650,4 @@ export const clearErrors = () => async (dispatch) => {
 
 	})
 }
+

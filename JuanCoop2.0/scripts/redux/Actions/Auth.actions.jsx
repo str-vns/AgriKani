@@ -21,7 +21,7 @@ export const loginUser = async (user, dispatch) => {
         });
 
         if (!response.ok) {
-            throw new Error('Login failed');
+            throw new Error('Your email or password is incorrect. Please try again.');
            
         }
 
@@ -47,14 +47,7 @@ export const loginUser = async (user, dispatch) => {
         console.error('Login error:', err);
         
         dispatch(setCurrentUser({}, err.message));
-        Toast.show({
-            topOffset: 60,
-            type: "error",
-            text1: "Please provide correct credentials",
-            text2: ""
-        });
-
-        logoutUser(dispatch);
+  
     }
 };
 

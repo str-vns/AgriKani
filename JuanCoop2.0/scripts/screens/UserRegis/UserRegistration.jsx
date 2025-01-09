@@ -14,20 +14,23 @@ import { useNavigation } from "@react-navigation/native";
 import { Picker } from "@react-native-picker/picker";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
-import { useDispatch } from "react-redux";
-import { OTPregister } from "@redux/Actions/userActions";
+import { useDispatch, useSelector } from "react-redux";
+import { OTPregister, checkEmail } from "@redux/Actions/userActions";
 import styles from "@screens/stylesheets/UserRegis/UserRegistration";
 
 const UserRegistration = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { isEmailAvailable } = useSelector((state) => state.checkDuplication)
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("09");
   const [age, setAge] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordVisible, setPasswordVisible] = useState(false);
+  const [isPasswordVisible2, setPasswordVisible2] = useState(false);
   const [gender, setGender] = useState(null);
   const [image, setImage] = useState(null);
   const [mainImage, setMainImage] = useState("");
@@ -35,7 +38,6 @@ const UserRegistration = () => {
   const [launchCamera, setLaunchCamera] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [errors, setErrors] = useState("");
-  const dispatch = useDispatch();
 
      useEffect(() => {
           (async () => {
@@ -49,6 +51,7 @@ const UserRegistration = () => {
         }, []);
 
   const register = () => {
+    dispatch(checkEmail({ email }));
     const registration = {
       firstName: firstName,
       lastName: lastName,
@@ -72,21 +75,64 @@ const UserRegistration = () => {
     ) {
       setErrors("Please fill in the required fields");
       return;
-    }
-
+    } else if (isEmailAvailable === true) {
+      setErrors("Email already exists");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    }  else if ( age < 18 ) {
+      setErrors("You must be 18 years or older to register");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else if ( age > 164 ) {
+      setErrors("Invalid age");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    }  else if ( phoneNumber.length < 11 ) {
+      setErrors("Invalid phone number");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else if ( password !== confirmPassword){
+      setErrors("Passwords do not match");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    }  else if ( password.length < 8){
+      setErrors("Password must be at least 8 characters");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else if ((!/[0-9]/.test(password) || !/[a-zA-Z]/.test(password) )){
+      setErrors("Password must contain at least one number, one letter ");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)){
+      setErrors("Password must contain at least one special character");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else {
     dispatch(OTPregister({ email }));
 
     setFirstName("");
     setLastName("");
     setEmail("");
-    setPhoneNumber("");
+    setPhoneNumber("09");
     setAge("");
     setPassword("");
     setConfirmPassword("");
     setGender(null);
     setImage(null);
     setMainImage("");
+    setPasswordVisible(false);
+    setPasswordVisible2(false);
     navigation.navigate("OTP", { registration });
+    }
+      
   };
 
   const addimage = async () => {
@@ -128,6 +174,14 @@ const UserRegistration = () => {
       console.log(imageUri);
     } else {
       console.log("No image captured or selection canceled.");
+    }
+  };
+  
+  const handleChangeText = (text) => {
+    if (text.startsWith("09")) {
+      setPhoneNumber(text);
+    } else {
+      setPhoneNumber("09");
     }
   };
 
@@ -239,8 +293,9 @@ const UserRegistration = () => {
           placeholder="Phone Number"
           style={styles.input}
           keyboardType="phone-pad"
-          onChangeText={setPhoneNumber}
+          onChangeText={handleChangeText}
           value={phoneNumber}
+          maxLength={11}
         />
 
         <View style={styles.genderContainer}>
@@ -275,6 +330,28 @@ const UserRegistration = () => {
             />
           </TouchableOpacity>
         </View>
+
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Confirm Password"
+            style={styles.passwordInput}
+            secureTextEntry={!isPasswordVisible2}
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
+          />
+
+          <TouchableOpacity
+            style={styles.toggleButton}
+            onPress={() => setPasswordVisible2(!isPasswordVisible2)}
+          >
+            <Ionicons
+              name={isPasswordVisible2 ? "eye-off" : "eye"}
+              size={24}
+              color="#333"
+            />
+          </TouchableOpacity>
+        </View>
+
         {errors && typeof errors === "string" ? (
           <Text style={styles.errorText}>{errors}</Text>
         ) : null}

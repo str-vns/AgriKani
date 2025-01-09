@@ -9,20 +9,22 @@ import messaging from '@react-native-firebase/messaging';
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 import { Picker } from "@react-native-picker/picker";
-import { useDispatch } from "react-redux";
-import { OTPregister } from "@redux/Actions/userActions";
+import { useDispatch, useSelector } from "react-redux";
+import { OTPregister, checkEmail } from "@redux/Actions/userActions";
 
 const Register = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const context = useContext(AuthGlobal);
     const userId = context.stateUser?.userProfile?._id;
+    const { isEmailAvailable } = useSelector((state) => state.checkDuplication)
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [age, setAge] = useState("");
-    const [phoneNum, setPhoneNum] = useState("");
+    const [phoneNum, setPhoneNum] = useState("09");
     const [gender, setGender] = useState("");
     const [image, setImage] = useState(null);
     const [driversLicenseImage, setDriversLicenseImage] = useState(null);
@@ -143,32 +145,80 @@ const Register = () => {
   }
 
   const handleSave = async () => {
- 
     setLoadings(true);
+    dispatch(checkEmail({ email }));
     if (!firstName || !lastName || !age || !phoneNum || !email || !password || !image || !driversLicenseImage || !gender ) {
       setErrors("All fields are required.");
       setLoadings(false);
       return;
+    }  else if (isEmailAvailable === true) {
+      setErrors("Email already exists");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    }  else if ( age < 18 ) {
+      setErrors("You must be 18 years or older to register");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else if ( age > 164 ) {
+      setErrors("Invalid age");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    }  else if ( phoneNum.length < 11 ) {
+      setErrors("Invalid phone number");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else if ( password !== confirmPassword){
+      setErrors("Passwords do not match");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    }  else if ( password.length < 8){
+      setErrors("Password must be at least 8 characters");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else if ((!/[0-9]/.test(password) || !/[a-zA-Z]/.test(password) )){
+      setErrors("Password must contain at least one number, one letter ");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)){
+      setErrors("Password must contain at least one special character");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } else {
+      dispatch(OTPregister({ email }));
+      const riderRegister = {
+        firstName: firstName,
+        lastName: lastName,
+        age: age,
+        phoneNum: phoneNum,
+        gender: gender,
+        image: image,
+        driversLicenseImage: driversLicenseImage,
+        email: email,
+        password: password,
+        user: userId,  
+      }
+  
+   
+      navigation.navigate("OtpRider", { riderRegister });
+      setLoadings(false);
     }
-
-    dispatch(OTPregister({ email }));
-    const riderRegister = {
-      firstName: firstName,
-      lastName: lastName,
-      age: age,
-      phoneNum: phoneNum,
-      gender: gender,
-      image: image,
-      driversLicenseImage: driversLicenseImage,
-      email: email,
-      password: password,
-      user: userId,  
-    }
-
- 
-    navigation.navigate("OtpRider", { riderRegister });
-    setLoadings(false);
   }
+
+  const handleChangeText = (text) => {
+    if (text.startsWith("09")) {
+      setPhoneNum(text);
+    } else {
+      setPhoneNum("09");
+    }
+  };
 
   return (
     
@@ -238,7 +288,8 @@ const Register = () => {
             placeholder="Phone Number"
             keyboardType="numeric"
             value={phoneNum}
-            onChangeText={(text) => setPhoneNum(text)}
+            onChangeText={handleChangeText}
+            maxLength={11}
           />
 
           <TextInput
@@ -257,6 +308,13 @@ const Register = () => {
             onChangeText={(text) => setPassword(text)}
           />
          
+         <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
+          />
       </View>
 
         <Text style={styles.imageText}>Drivers License</Text>

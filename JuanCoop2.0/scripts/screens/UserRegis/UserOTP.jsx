@@ -6,10 +6,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import Toast from 'react-native-toast-message';
 import Error from "@shared/Error";
 import { loginUser } from "@redux/Actions/Auth.actions";
-import { OTPregister, clearErrors, clearRegister, registeruser } from "@redux/Actions/userActions";
+import { OTPregister, clearErrors, clearRegister, registeruser, saveDeviceToken } from "@redux/Actions/userActions";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import AuthGlobal from "@redux/Store/AuthGlobal";
-
+import messaging from "@react-native-firebase/messaging";
 
 const UserOTP = (props) => {
   const { route } = props;
@@ -23,7 +23,14 @@ const UserOTP = (props) => {
   const [errors, setErrors] = useState("");
   const [timer, setTimer] = useState(0); 
   const [isDisabled, setIsDisabled] = useState(false);
+  const [fcmToken, setFcmToken] = useState(""); 
   const context = useContext(AuthGlobal)
+
+  useEffect(() => {
+    messaging().getToken().then((token) => {
+      setFcmToken(token);
+    });
+  },[])
 
   const handleChange = (value, index) => {
     const newOtp = [...otp];
@@ -60,7 +67,6 @@ const UserOTP = (props) => {
 
   };
   
-
   const handleKeyPress = (index, event) => {
     if (event.nativeEvent.key === 'Backspace') {
       if (otp[index] === '') {
@@ -88,6 +94,11 @@ const UserOTP = (props) => {
     console.log("Is Authenticated: ", isAuthenticated);
   
     if (isAuthenticated && user?.email && user?.password) {
+      const saveDtoken = {
+        email: user.email,
+        deviceToken: fcmToken,
+      };
+      dispatch(saveDeviceToken(saveDtoken));
       const userCredentials = { email: user.email, password: registration.registration.password };
       console.log("Attempting auto login with: ", userCredentials);
       loginUser(userCredentials, context.dispatch);

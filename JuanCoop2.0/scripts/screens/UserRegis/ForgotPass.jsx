@@ -8,15 +8,19 @@ import {
   Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { OTPregister } from "@redux/Actions/userActions";
 
 const ForgotPass = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
 
   const handleSend = () => {
     if (email) {
-      // Logic for sending the verification code
+      dispatch(OTPregister({ email }));
       alert(`Verification code sent to ${email}`);
+      navigation.navigate("Email", { email });
     } else {
       alert("Please enter your email address.");
     }
@@ -44,7 +48,7 @@ const ForgotPass = () => {
       />
       <TouchableOpacity
         style={styles.sendButton}
-        onPress={() => navigation.navigate("Email")}
+        onPress={() => handleSend()}
       >
         <Text style={styles.sendButtonText}>Send</Text>
       </TouchableOpacity>

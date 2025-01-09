@@ -53,6 +53,18 @@ import {
   SAVE_USER_DEVICE_TOKEN_REQUEST,
   SAVE_USER_DEVICE_TOKEN_SUCCESS,
   SAVE_USER_DEVICE_TOKEN_FAIL,
+
+  CHECK_EMAIL_REQUEST,
+  CHECK_EMAIL_SUCCESS,
+  CHECK_EMAIL_FAIL,
+
+  OTP_FORGOT_PASSWORD_REQUEST,  
+  OTP_FORGOT_PASSWORD_SUCCESS,
+  OTP_FORGOT_PASSWORD_FAIL,
+
+  RESET_PASSWORD_REQUEST,
+  RESET_PASSWORD_SUCCESS,
+  RESET_PASSWORD_FAIL,
 } from "../Constants/userConstants";
 
 export const RegisterReducer = (state = { user: {} }, action) => {
@@ -262,6 +274,39 @@ export const userDeviceTokenReducer = (state = { deviceToken: "" }, action) => {
       return { loading: false, deviceToken: action.payload };
     case SAVE_USER_DEVICE_TOKEN_FAIL:
       return { loading: false, error: action.payload };
+    case CLEAR_ERRORS:
+      return { ...state, error: null };
+    default:
+      return state;
+  }
+}
+
+export const checkEmailReducer = (state = { isEmailAvailable: false }, action) => {
+  switch (action.type) {
+    case CHECK_EMAIL_REQUEST:
+      return { ...state, loading: true };
+    case CHECK_EMAIL_SUCCESS:
+      return { loading: false, isEmailAvailable: action.payload };
+    case CHECK_EMAIL_FAIL:
+      return { loading: false, error: action.payload };
+    case CLEAR_ERRORS:
+      return { ...state, error: null };
+    default:
+      return state;
+  }
+}
+
+export const otpForgotPasswordReducer = (state = { otp: {} }, action) => {
+  switch (action.type) {
+    case OTP_FORGOT_PASSWORD_REQUEST:
+      case RESET_PASSWORD_REQUEST:
+      return { loading: true, otps: {} };
+    case OTP_FORGOT_PASSWORD_SUCCESS:
+      case RESET_PASSWORD_SUCCESS:
+      return { loading: false, otps: action.payload };
+    case OTP_FORGOT_PASSWORD_FAIL:
+      case RESET_PASSWORD_FAIL:
+      return { loading: false, error: true, otps: action.payload };
     case CLEAR_ERRORS:
       return { ...state, error: null };
     default:

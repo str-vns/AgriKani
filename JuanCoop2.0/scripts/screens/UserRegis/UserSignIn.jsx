@@ -154,7 +154,25 @@ const UserSignIn = () => {
       setIsLoading(false);
       console.log("Navigating to Home");
       navigation.navigate("Home", { screen: "Home" });
-    } else {
+    } else if (
+      context?.stateUser?.isAuthenticated &&
+      userInfo.roles.includes("Driver")
+    ) {
+      const saveDtoken = {
+        email: email,
+        deviceToken: fcmToken,
+      };
+
+      dispatch(saveDeviceToken(saveDtoken));
+      setEmail("");
+      setPassword("");
+      setError("");
+      setIsLoading(false);
+      console.log("Navigating to Home");
+      navigation.navigate("Deliveries");
+    }
+    else {
+      setError(context?.stateUser?.userProfile);  
       setIsLoading(false);
     }
   }, [context.stateUser.isAuthenticated]);
@@ -175,7 +193,6 @@ const UserSignIn = () => {
       } 
     }catch(error){
       setIsLoading(false);
-      setError("Login Failed. Please try again.");  
     }
   };
 
