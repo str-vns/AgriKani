@@ -240,17 +240,17 @@ const UserSignIn = () => {
           />
         </TouchableOpacity>
       </View>
+  
 
-      {/* <Text style={styles.agreement}>
-        Forgot Password?{" "}
+      <Text>
         <Text
           style={styles.linkText}
-          onPress={() => navigation.navigate("Registration")}
+          onPress={() => navigation.navigate("ForgotPass")}
         >
-          Click here
+          forgot Password?
         </Text>
       </Text>
-       */}
+      
       {error ? <Error message={error} /> : null}
       <TouchableOpacity
         style={styles.buttonEmail}
@@ -287,15 +287,6 @@ const UserSignIn = () => {
           onPress={() => navigation.navigate("Register")}
         >
           Sign Up
-        </Text>
-      </Text>
-      <Text style={styles.agreement}>
-        If you are a rider,{" "}
-        <Text
-          style={styles.linkText}
-          onPress={() => navigation.navigate("Start")}
-        >
-          Sign In here
         </Text>
       </Text>
       {/* <Text style={styles.agreement}>

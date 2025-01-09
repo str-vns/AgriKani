@@ -105,6 +105,7 @@ export default StyleSheet.create({
     },
     linkText: {
       color: "#007bff",
+      textAlign: "center",
     },
   });
   
