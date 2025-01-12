@@ -15,7 +15,6 @@ exports.login = [
 
     const setCookie = token.setAccessTokenCookie(accessTokenMaxAge);
     setCookie(res, accessToken);
-
     SuccessHandler(
       res,
       `User ${user?.firstName} ${user?.lastName} successfully login`,
@@ -28,7 +27,7 @@ exports.login = [
 ];
 
 exports.logout = asyncHandler(async (req, res) => {
-
+  console.log(req.cookies);
   const cookies = await logProcess.LogoutUser(req.cookies, res);
            
   return SuccessHandler(res, "User Successfully Logout", cookies);
