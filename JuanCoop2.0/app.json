@@ -31,6 +31,12 @@
       "expo-router",
       "@react-native-firebase/app",
       [
+        "@rnmapbox/maps",
+        {
+            "MAPBOX_DOWNLOADS_TOKEN" : "pk.eyJ1Ijoic3RlYjExIiwiYSI6ImNtM3p0cXY1NzI3YTkybG9tdzExZHZwbjgifQ.9pINyIob5rl4EOc4474T4w"   
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {
@@ -55,15 +61,18 @@
     "extra": {
       "router": {
         "origin": false
+      }, 
+      "eas": {
+        "projectId": "2f131683-026c-437f-b5fe-9bb0e74ecdbc"
       },
       "MAP_API_1": "xBcXiGGSv1JriJwgNR96IHzOFiQ9RhVIDdFqtHBWzHU",
       "BASE_ADDRESS": "http://192.168.50.223:4000/api/v2/",
       "BASE_ADDRESS_1": "http://192.168.50.236:4000/api/v2/",
       "ALT_BASE_ADDRESS": "http://192.168.20.250:4000/api/v2/",
       "SOCKET_ADDRESS": "http://localhost:8900",
-      "eas": {
-        "projectId": "2f131683-026c-437f-b5fe-9bb0e74ecdbc"
-      }
+      "MAPBOX_API_KEY": "pk.eyJ1Ijoic3RlYjExIiwiYSI6ImNtM3p0cXY1NzI3YTkybG9tdzExZHZwbjgifQ.9pINyIob5rl4EOc4474T4w"
+
     }
   }
 }
+
