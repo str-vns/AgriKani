@@ -77,7 +77,7 @@ const handleSocketConnections = (io) => {
       if (user && user.socketId) {
         console.log(`Emitting to user with socketId: ${user.socketId}`);
       io.emit('updateDeliveryLocation', data.lng, data.lat);
-      io.to(user.socketId).emit('getDeliveryLocation', { latitude: data.lat, longitude: data.lng, senderId: data.senderId, deliveryId: data.deliveryId, status: data.status });
+      io.to(user.socketId).emit('getDeliveryLocation', { latitude: data.lat, longitude: data.lng, senderId: data.senderId, deliveryId: data.deliveryId, status: data.status, currentRoute: data.currentRoute });
       } else {
       console.error(`User with receiverId ${data.userId} not found or doesn't have a valid socketId.`);
       }
