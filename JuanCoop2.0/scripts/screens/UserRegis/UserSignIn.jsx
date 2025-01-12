@@ -37,20 +37,32 @@ const UserSignIn = () => {
   const user = context?.stateUser?.userProfile;
 
   useEffect(() => {
-    socket.emit("addUser", user?._id);
 
+    if (!user?._id) {
+      console.warn("User ID is missing.");
+      return; 
+    }
+  
+    if (!socket) {
+      console.warn("Socket is not initialized.");
+      return; 
+    }
+  
+    socket.emit("addUser", user._id);
+  
     socket.on("getUsers", (users) => {
       const onlineUsers = users.filter(
         (user) => user.online && user.userId !== null
       );
-
+  
       setOnlineUsers(onlineUsers);
     });
-
+  
     return () => {
       socket.off("getUsers");
     };
   }, [socket, user?._id]);
+
 
   const requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
@@ -172,10 +184,19 @@ const UserSignIn = () => {
       navigation.navigate("Deliveries");
     }
     else {
-      setError(context?.stateUser?.userProfile);  
-      setIsLoading(false);
+      setError(
+        context?.stateUser?.userProfile &&
+        (typeof context.stateUser.userProfile === "string" ||
+          (typeof context.stateUser.userProfile === "object" &&
+           Object.keys(context.stateUser.userProfile).length > 0))
+          ? typeof context.stateUser.userProfile === "string"
+            ? context.stateUser.userProfile
+            : JSON.stringify(context.stateUser.userProfile)
+          : null 
+      );
+    setIsLoading(false);
     }
-  }, [context.stateUser.isAuthenticated]);
+  }, [context?.stateUser?.isAuthenticated]);
 
   const handleSubmit = () => {
     setIsLoading(true);

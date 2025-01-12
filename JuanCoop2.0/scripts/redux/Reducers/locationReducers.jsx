@@ -5,6 +5,9 @@ import {
   FORWARD_GEOCODE_FAIL,
   FORWARD_GEOCODE_REQUEST,
   FORWARD_GEOCODE_SUCCESS,
+  FETCH_ROUTE_REQUEST,
+  FETCH_ROUTE_SUCCESS,
+  FETCH_ROUTE_FAIL,
 } from "../Constants/locationConstants";
 
 export const HereMapReducer = (state = { location: {} }, action) => {
@@ -22,3 +25,17 @@ export const HereMapReducer = (state = { location: {} }, action) => {
       return state;
   }
 };
+
+
+export const MapBoxRouteReducer = (state = { route: {} }, action) => {
+  switch (action.type) {
+    case FETCH_ROUTE_REQUEST:
+      return { RouteLoading: true, routes: {} };
+    case FETCH_ROUTE_SUCCESS:
+      return { RouteLoading: false, routes: action.payload };
+    case FETCH_ROUTE_FAIL:
+      return { RouteLoading: false, RouteError: action.payload };
+    default:
+      return state;
+  }
+}

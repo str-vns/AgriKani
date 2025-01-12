@@ -8,10 +8,12 @@ import {
     FORWARD_GEOCODE_FAIL,
     FORWARD_GEOCODE_REQUEST,
     FORWARD_GEOCODE_SUCCESS,
+    FETCH_ROUTE_REQUEST,
+    FETCH_ROUTE_SUCCESS,
+    FETCH_ROUTE_FAIL,
   } from "../Constants/locationConstants";
-  const apiKey =
-  Constants.expoConfig?.extra?.MAP_API_1 || "xBcXiGGSv1JriJwgNR96IHzOFiQ9RhVIDdFqtHBWzHU";
-
+  const apiKey = Constants.expoConfig?.extra?.MAP_API_1 ;
+  const mapBoxKey = Constants.expoConfig?.extra?.MAPBOX_API_KEY
 export const reverseCode = (lat, long) => async (dispatch) => {
 
   try {
@@ -64,4 +66,23 @@ export const forwardCode = (addressed) => async (dispatch) => {
             payload: error.response.data.message,
         });
     }
+}
+
+export const fetchRoute = (destination, origin) => async (dispatch) => {
+
+  try {
+    dispatch({ type: FETCH_ROUTE_REQUEST });
+    const response = await axios.get(
+      `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${origin.longitude},${origin.latitude};${Number(destination.long)},${Number(destination.lat)}?alternatives=true&geometries=geojson&access_token=${mapBoxKey}`
+    );
+    dispatch({
+      type: FETCH_ROUTE_SUCCESS,
+      payload: response.data.routes,
+    });
+  } catch (error) {
+    dispatch({
+      type: FETCH_ROUTE_FAIL,
+      payload: error.response.data.message,
+    });
+  }
 }

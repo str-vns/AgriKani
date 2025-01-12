@@ -9,7 +9,7 @@ import {
   import { orderReducer, orderCoopReducer, orderShippedReducer, historyDeliveryCoopReducer } from "./Reducers/orderReducer";
   import { OTPReducer, RegisterReducer, userReducer, EditProfileReducer, getUsersReducers, AllUsersReducer, userDeviceTokenReducer,  checkEmailReducer, otpForgotPasswordReducer } from "@redux/Reducers/userReducers";
   import { reducerProduct, reducerCoop, reducerCoopProduct, reducerCreateProduct, reducerEditProduct, reducerDelResProduct } from "@redux/Reducers/productReducers";
-  import { HereMapReducer } from "@redux/Reducers/locationReducers";
+  import { HereMapReducer, MapBoxRouteReducer } from "@redux/Reducers/locationReducers";
   import { coopYReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
   import { addressReducer } from "@redux/Reducers/addressReducer";
   import { typeListReducer,typeCreateReducer,typeUpdateReducer,typeDeleteReducer } from "@redux/Reducers/typeReducers";
@@ -91,6 +91,7 @@ import {
     deliveryHistory: deliveryHistoryReducer,
     checkDuplication: checkEmailReducer,
     otpForgot: otpForgotPasswordReducer,
+    MapBoxRoute: MapBoxRouteReducer
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));

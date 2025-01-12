@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -9,25 +9,30 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import * as Location from 'expo-location'
-import { WebView } from 'react-native-webview';
 import { useSocket } from "../../../SocketIo";
 import { getDeliveryTracking } from "@redux/Actions/deliveryActions";
 import { useDispatch, useSelector } from "react-redux";
-
+import AuthGlobal from "@redux/Store/AuthGlobal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import MapboxGL from '@rnmapbox/maps'
+import Constants from "expo-constants";
 
 const UserTracking = (props) => {
-  const webViewRef = useRef(null)
   const socket = useSocket();
   const dispatch = useDispatch()
   const navigation = useNavigation();
+  const context = useContext(AuthGlobal);
   const trackInfo = props.route.params.trackId;
+  const user = context?.stateUser?.userProfile;
   const { Deliveryloading ,deliveries, Deliveryerror } = useSelector((state) => state.deliveryList);
   const [markerCoordinate, setMarkerCoordinate] = useState({ lat: 37.78825, lng: -122.4324, });
+  const [currentDriverRoute, setCurrentDriverRoute] = useState([]);
   const [arrivedData, setArrivedData] = useState({});
- 
+  const [zoomLevel, setZoomLevel] = useState(11);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
-  console.log("Delivery Info:", deliveries?.deliveryLocation);
+  MapboxGL.setAccessToken(Constants.expoConfig?.extra?.MAPBOX_API_KEY);
+
    useFocusEffect(
     useCallback(() => {
         dispatch(getDeliveryTracking(trackInfo));
@@ -35,167 +40,53 @@ const UserTracking = (props) => {
     }, [trackInfo])
    )
 
+ useEffect(() => {
 
-
-    useEffect(() => {
-       socket.on('getDeliveryLocation', (data) => {
-        console.log("Received delivery location:", data);
-        setArrivedData({
-            latitude: data.latitude,
-            longitude: data.longitude,
-            senderId: data.senderId,
-            deliveryId: data.deliveryId,
-            status: data.status,
-          });
-       })
-       return () => {
-         socket.off('getDeliveryLocation');
-       };
-     }, [socket]);
-
-
-  useEffect(() => {
-           if (webViewRef.current && markerCoordinate) {
-             webViewRef.current.postMessage(JSON.stringify({markerCoordinate, arrivedData, deliveries}));
-           }
-  }, [markerCoordinate, arrivedData, deliveries]);
-
-let mapHtml;
-
-if (deliveries.status === "delivering") {
-  mapHtml = `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-        <title>Leaflet Map</title>  
-
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" rel="stylesheet">
-        <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"></script>
-        <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.1/dist/leaflet-routing-machine.css" />
-        <script src="./lrm-esri.js"></script>
-        <style>
-          body { margin: 0; padding: 0; }
-          #map { width: 100%; height: 100vh; }
-        </style>
-      </head>
-      <body>
-        <div id="map"></div>
-        <script>
-          // Initial locations
-          let markerCoordinate = { lat: ${markerCoordinate.lat}, lng: ${markerCoordinate.lng} }; // Example for user's location
-          const deliverInfo = {
-            deliveryLocation: { Latitude: ${arrivedData?.latitude || 0}, Longitude: ${arrivedData?.longitude || 0} },
-          };
-          const deliveryLocation = deliverInfo?.deliveryLocation || { Latitude: 0, Longitude: 0 };
-
-          // Initialize map
-          const map = L.map('map').setView([markerCoordinate.lat, markerCoordinate.lng], 15);
-
-          // Add tile layer
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(map);
-
-          // Add user and delivery markers
-          const userMarker = L.marker([markerCoordinate.lat, markerCoordinate.lng]).addTo(map);
-          const deliveryMarker = L.marker([deliveryLocation.Latitude, deliveryLocation.Longitude]).addTo(map);
-
-          // Initialize route control
-          const routeControl = L.Routing.control({
-            waypoints: [
-              L.latLng(markerCoordinate.lat, markerCoordinate.lng),
-              L.latLng(deliveryLocation.Latitude, deliveryLocation.Longitude),
-            ],
-            lineOptions: {
-              styles: [{ color: 'blue', opacity: 0.8, weight: 5 }],
-            },
-            altLineOptions: {
-              styles: [{ color: 'red', opacity: 0.8, weight: 2 }],
-            },
-            routeWhileDragging: false,
-            showAlternatives: true,
-            collapsible: true,
-            position: 'bottomleft',
-            show: false,
-            useZoomParameter: true,
-          }).addTo(map);
-
-          // Function to update driver location
-          function updateDriverLocation(newLat, newLng) {
-            // Update marker position
-            markerCoordinate = { lat: newLat, lng: newLng };
-            userMarker.setLatLng([newLat, newLng]);
-
-            // Update route
-            routeControl.setWaypoints([
-              L.latLng(markerCoordinate.lat, markerCoordinate.lng),
-              L.latLng(deliveryLocation.Latitude, deliveryLocation.Longitude),
-            ]);
-          }
-        </script>
-      </body>
-    </html>
-  `;
-} else {
-  mapHtml = `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-        <title>Leaflet Map</title>  
-
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" rel="stylesheet">
-        <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"></script>
-        <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.1/dist/leaflet-routing-machine.css" />
-        <script src="./lrm-esri.js"></script>
-        <style>
-          body { margin: 0; padding: 0; }
-          #map { width: 100%; height: 100vh; }
-        </style>
-      </head>
-      <body>
-        <div id="map"></div>
-        <script>
-          // Initial locations
-          let markerCoordinate = { lat: ${markerCoordinate.lat}, lng: ${markerCoordinate.lng} }; // Example for user's location
-          const deliverInfo = {
-            deliveryLocation: { Latitude: ${arrivedData?.latitude || 0}, Longitude: ${arrivedData?.longitude || 0} },
-          };
-          const deliveryLocation = deliverInfo?.deliveryLocation || { Latitude: 0, Longitude: 0 };
-
-          // Initialize map
-          const map = L.map('map').setView([markerCoordinate.lat, markerCoordinate.lng], 15);
-
-          // Add tile layer
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(map);
-
-          // Add user and delivery markers
-          const userMarker = L.marker([markerCoordinate.lat, markerCoordinate.lng]).addTo(map);
-          const deliveryMarker = L.marker([deliveryLocation.Latitude, deliveryLocation.Longitude]).addTo(map);
-        </script>
-      </body>
-    </html>
-  `;
-}
-  
-  const handleWebViewMessage = (event) => {
-    const { data } = event.nativeEvent;
-    try {
-      const parsedData = JSON.parse(data);
-      console.log("WebView message received:", parsedData);
-    } catch (error) {
-      console.error("Error parsing WebView message:", error);
+    if (!user?._id) {
+      console.warn("User ID is missing.");
+      return; 
     }
-  };
+  
+    if (!socket) {
+      console.warn("Socket is not initialized.");
+      return; 
+    }
+  
+    socket.emit("addUser", user._id);
+  
+    socket.on("getUsers", (users) => {
+      const onlineUsers = users.filter(
+        (user) => user.online && user.userId !== null
+      );
+  
+      setOnlineUsers(onlineUsers);
+    });
+  
+    return () => {
+      socket.off("getUsers");
+    };
+  }, [socket, user?._id]);
+
+   useEffect(() => {
+    socket.on('getDeliveryLocation', (data) => {
+      setArrivedData({
+        senderId: data.senderId,
+        deliveryId: data.deliveryId,
+        status: data.status,
+      });
+  
+      setMarkerCoordinate({
+        lat: data.latitude,
+        lng: data.longitude,
+      });
+
+      setCurrentDriverRoute(data.currentRoute);
+    });
+  
+    return () => {
+      socket.off('getDeliveryLocation');
+    };
+  }, [socket]);
 
 const getStatusColor = (status) => {
     switch (status) {
@@ -221,6 +112,11 @@ const getStatusColor = (status) => {
     return text.charAt(0).toUpperCase() + text.slice(1);
   };
 
+  const handleZoomIn = () => {
+    setZoomLevel(15); 
+  };
+
+
   return (
     <View style={styles.container}>
     {Deliveryloading ? (
@@ -231,14 +127,89 @@ const getStatusColor = (status) => {
     ) : (
       <>
         <View style={styles.mapContainer}>
-          <WebView
-            ref={webViewRef}
-            originWhitelist={["*"]}
-            source={{ html: mapHtml }}
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            onMessage={handleWebViewMessage}
-          />
+           <View style={styles.zoomUser}>
+                  <Text title="Zoom In" onPress={handleZoomIn} style={{ fontSize: 16 }}>
+                    Zoom In</Text>
+                </View>
+          <MapboxGL.MapView style={{ flex: 1 }} 
+              styleURL={MapboxGL.StyleURL.Street} 
+              onDidFinishLoadingMap={() => console.log("Map loaded successfully")} 
+              logoEnabled={true}
+              compassEnabled={true}
+              rotateEnabled={true}
+              scaleBarEnabled={true}
+              zoomEnabled={true}
+              pitchEnabled={true}
+              >
+             { markerCoordinate.lat && markerCoordinate.lng && !isNaN(markerCoordinate.lat) && !isNaN(markerCoordinate.lng) &&
+                <MapboxGL.Camera 
+                  zoomLevel={zoomLevel} 
+                  centerCoordinate={[markerCoordinate.lng, markerCoordinate.lat]} 
+                  animationMode={'flyTo'} 
+                  animationDuration={3000} 
+                />
+              }
+
+{ markerCoordinate?.lat && markerCoordinate?.lng && !isNaN(markerCoordinate.lat) && !isNaN(markerCoordinate.lng) ? (
+                <MapboxGL.PointAnnotation
+                  id="userMarker"
+                  coordinate={[markerCoordinate.lng, markerCoordinate.lat]}
+                >
+                  <View
+                    style={{
+                      height: 30,
+                      width: 30,
+                      backgroundColor: 'red',
+                      borderRadius: 15, // Correct circle radius
+                      borderColor: 'white',
+                      borderWidth: 3,
+                    }}
+                  />
+                </MapboxGL.PointAnnotation>
+              ) : null }
+
+              { deliveries?.deliveryLocation?.Latitude && deliveries?.deliveryLocation?.Longitude  ? (
+                <MapboxGL.PointAnnotation
+                  id="deliveryMarker"
+                  coordinate={[deliveries?.deliveryLocation?.Longitude, deliveries?.deliveryLocation?.Latitude]}
+                >
+                  <View
+                    style={{
+                      height: 30,
+                      width: 30,
+                      backgroundColor: 'blue',
+                      borderRadius: 15, 
+                      borderColor: 'white',
+                      borderWidth: 3,
+                    }}
+                  />
+                </MapboxGL.PointAnnotation>
+              ) : null }
+
+              { currentDriverRoute?.geometry?.coordinates?.length > 0 && arrivedData.status === 'delivering' && arrivedData.deliveryId === deliveries._id ? (
+                <MapboxGL.ShapeSource
+                  id="shapeSource"
+                  shape={{
+                    type: 'FeatureCollection',
+                    features: [
+                      {
+                        type: 'Feature',
+                        geometry: {
+                          type: 'LineString',
+                          coordinates: currentDriverRoute?.geometry?.coordinates,
+                        },
+                      },
+                    ],
+                  }}
+                >
+                  <MapboxGL.LineLayer
+                    id="lineLayer"
+                    style={{ lineWidth: 5, lineColor: '#ff0000' }}
+                  />
+                </MapboxGL.ShapeSource>
+              ) : null }
+
+              </MapboxGL.MapView>
         </View>
         <View style={styles.detailsContainer}>
           <View style={styles.driverInfoContainer}>
@@ -340,7 +311,17 @@ const styles = StyleSheet.create({
   },
   map: {
     ...StyleSheet.absoluteFillObject,
-  },
+  }, 
+  zoomUser: {
+    position: "absolute",
+    bottom: 400,
+    left: 10,
+    zIndex: 100,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+  }
 });
 
 export default UserTracking;
