@@ -123,18 +123,18 @@ const FarmerDashboard = () => {
     'default': require('../../../assets/weather/c01d.png'),
   };
 
-  useFocusEffect(
-    useCallback(() => { 
-        const fetchDailyWeather = async () =>
-          {
-              const response = await fetch('https://api.weatherbit.io/v2.0/forecast/daily?city=Manila&country=PH&key=7f1c9aeb7a02428cb625c5bbce429192');
-              const data = await response.json();
-              setDailyWeather(data);
-              }
+  // useFocusEffect(
+  //   useCallback(() => { 
+  //       const fetchDailyWeather = async () =>
+  //         {
+  //             const response = await fetch('https://api.weatherbit.io/v2.0/forecast/daily?city=Manila&country=PH&key=b38eb1b293194679af1fd62ae0feb39c');
+  //             const data = await response.json();
+  //             setDailyWeather(data);
+  //             }
               
-          fetchDailyWeather();
-            }, [])
-  )
+  //         fetchDailyWeather();
+  //           }, [])
+  // )
   
 
   useEffect(() => {
@@ -240,9 +240,9 @@ const FarmerDashboard = () => {
 />
 </View>
      
-<View style={styles.weatherContainer}>
+{/* <View style={styles.weatherContainer}>
       <View style={styles.weatherBox}>
-        <Image
+        <Image 
           blurRadius={70}
           source={require("@assets/img/bg.jpg")}
           style={styles.backgroundImage}
@@ -259,9 +259,9 @@ const FarmerDashboard = () => {
           <Text style={styles.weatherText}>Weather: {weather?.data[0].weather.description}</Text>
           <Text style={styles.weatherText}>Wind Speed: {weather?.data[0].wind_spd} m/s</Text>
         </View>
-      </View>
+      </View> */}
 
-<ScrollView horizontal={true} >
+{/* <ScrollView horizontal={true} >
       {dailyWeather?.data.map((item, index) => (
       <View key={item._id || index} style={styles.dailyWeatherContainer}>
       <View style={styles.dailyWeatherBox}>
@@ -285,9 +285,9 @@ const FarmerDashboard = () => {
       </View>
     </View>
       ))}
-    </ScrollView>
+    </ScrollView> */}
 
-    </View>
+    {/* </View> */}
       
       {/* Tab Selection */}
       <View style={styles.tabContainer}>
