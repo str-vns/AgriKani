@@ -132,7 +132,7 @@ const UserSidebar = () => {
     } else if (key === "product") {
       navigation.navigate("ProductsList");
     } else if (key === "news") {
-      navigation.navigate("BlogLists");
+      navigation.navigate("BlogList");
     } else if (key === "Forum") {
       navigation.navigate("CommunityForum");
     } else if (key === "orders") {

@@ -1,31 +1,33 @@
-import React from 'react'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import BlogLists from "@screens/Farmer/Blog/BlogList";
-import BlogCards from "@screens/Farmer/Blog/BlogCard";
-const Stack = createNativeStackNavigator()
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { View } from 'react-native'; // Use View instead of div
+// import BlogLists from '@screens/Farmer/Blog/BlogList';
+import BlogList from '@screens/Farmer/Blog/BlogList';
+import BlogCards from '@screens/Farmer/Blog/BlogCard';
+
+const Stack = createNativeStackNavigator();
 
 const Index = () => {
   return (
-    <div>
+    <View style={{ flex: 1 }}> 
       <Stack.Screen
-          name="BlogLists"
-          options={{
-            headerShown: false,
-            tabBarShowLabel: false,
-          }}
-          component={BlogLists}
-        />
+        name="BlogList"
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+        component={BlogList}
+      />
+      <Stack.Screen
+        name="BlogCards"
+        component={BlogCards}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+    </View>
+  );
+};
 
-        <Stack.Screen
-          name="BlogCards"
-          component={BlogCards}
-          options={{
-            headerShown: false,
-            tabBarShowLabel: false,
-          }}
-        />
-    </div>
-  )
-}
-
-export default Index
+export default Index;
