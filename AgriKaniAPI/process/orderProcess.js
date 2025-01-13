@@ -187,7 +187,7 @@ exports.updateOrderStatusCoop = async (id, req) => {
     await generateReceiptPDF(order, receiptPath);
    
     // Send receipt via email
-    const userEmail = order.user.email;
+    const email = order.user.email;
     const mailOptions = {
       to: email,
       subject: `Receipt for Order #${order._id}`,
