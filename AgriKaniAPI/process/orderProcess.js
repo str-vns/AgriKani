@@ -11,7 +11,7 @@ const generateReceiptPDF = require("../utils/pdfreceipts");
 const sendEmailWithAttachment = require("../utils/emailreceipts");
 const path = require("path");
 const fs = require("fs");
-const { coopSingle } = require("./farmInfoProcess");
+const { sendEmail } = require("../utils/sendMail");
 
 // Create a new order
 exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice, user }) => {
@@ -188,9 +188,11 @@ exports.updateOrderStatusCoop = async (id, req) => {
    
     // Send receipt via email
     const userEmail = order.user.email;
-    const emailSubject = `Receipt for Order #${order._id}`;
-    const emailHtml = `
-  <p>Dear ${order.user.firstName},</p>
+    const mailOptions = {
+      to: email,
+      subject: `Receipt for Order #${order._id}`,
+      html: `
+      <p>Dear ${order.user.firstName},</p>
   <p>Thank you for your purchase! Please find your order receipt attached.</p>
   <h4>Order Details:</h4>
   <p>
@@ -216,9 +218,12 @@ exports.updateOrderStatusCoop = async (id, req) => {
   </ul>
   <h4>Total Purchase: ₱${totalPrice}</h4>
   <p>We appreciate your business and hope to serve you again soon!</p>
-`;
+      `,
+      };
+   
+
     
-    await sendEmailWithAttachment(userEmail, emailSubject, "", receiptPath, emailHtml);
+      await sendEmail(mailOptions);
 
    
         if (inventory.quantity === 0) {
