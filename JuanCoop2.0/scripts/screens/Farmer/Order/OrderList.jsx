@@ -115,7 +115,10 @@ const OrderList = ({ navigation }) => {
       dispatch(sendNotifications(notification , token))
       dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
       setRefresh(false);
-      onRefresh()
+
+      setTimeout(() => {
+        onRefresh()
+      }, 1000)
    } catch (error) {
      console.error("Error deleting or refreshing orders:", error);
    } finally {
@@ -163,7 +166,10 @@ const OrderList = ({ navigation }) => {
       dispatch(sendNotifications(notification , token))
       dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
       setRefresh(false);
-      onRefresh()
+      
+      setTimeout(() => {
+        onRefresh()
+      }, 1000)
    } catch (error) {
      console.error("Error deleting or refreshing orders:", error);
    } finally {
