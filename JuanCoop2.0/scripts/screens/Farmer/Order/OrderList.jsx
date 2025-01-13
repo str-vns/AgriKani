@@ -114,7 +114,7 @@ const OrderList = ({ navigation }) => {
       dispatch(sendNotifications(notification , token))
       dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
       setRefresh(false);
-      setLoading(true);
+      setLoading(false);
       onRefresh()
    } catch (error) {
      console.error("Error deleting or refreshing orders:", error);
@@ -174,55 +174,7 @@ const OrderList = ({ navigation }) => {
    
   };
 
-  const handleDeliveryOrder = (orderId, InvId, Items) => {
-    setLoading(true);
-    setRefresh(true);
-    try {
-      let productNames = []
-
-      Items?.orderItems?.forEach(item => {
-        if (item.product && item.inventoryProduct) {
-          const productInfo = `${item.product.productName} ${item.inventoryProduct.unitName} ${item.inventoryProduct.metricUnit}`;
-          productNames.push(productInfo);
-        }
-      });
-
-      const productList = productNames.join(', ');
   
-      const notification = {
-        title: `Order: ${orderId}`, 
-        content: `Your order ${productList} has been Delivered your Product Enjoy!.`,
-        url: Items?.orderItems[0]?.product?.image[0].url,
-        user: Items.user._id,
-        fcmToken: fcmToken,
-        type: "order",
-      }
-
-      socket.emit("sendNotification", {
-        senderName: userName,
-        receiverName:  Items?.user?._id,
-        type: "order",
-      }
-    )
-
-      const orderupdateInfo = {
-        InvId,
-        orderStatus: "Delivered",
-      }
-
-      dispatch(sendNotifications(notification , token))
-      dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
-      setRefresh(false);
-      onRefresh()
-   } catch (error) {
-     console.error("Error deleting or refreshing orders:", error);
-   } finally {
-
-     setRefresh(false);
-     setLoading(false);
-   }
-   
-  }; 
 
   
   const getStatusColor = (status) => {
