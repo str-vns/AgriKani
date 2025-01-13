@@ -8,7 +8,8 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl
 } from "react-native";
 import { allCoopOrders } from "@redux/Actions/coopActions";
 import { fetchCoopOrders } from "@redux/Actions/orderActions";
@@ -114,12 +115,11 @@ const OrderList = ({ navigation }) => {
       dispatch(sendNotifications(notification , token))
       dispatch(updateCoopOrders(orderId, orderupdateInfo, token))
       setRefresh(false);
-      setLoading(false);
       onRefresh()
    } catch (error) {
      console.error("Error deleting or refreshing orders:", error);
    } finally {
-
+    setLoading(false);
      setRefresh(false);
    }
    
@@ -362,6 +362,9 @@ const OrderList = ({ navigation }) => {
         keyExtractor={(item) => item._id}  
         renderItem={renderOrder}           
         ItemSeparatorComponent={() => <View style={styles.separator} />} 
+        refreshControl={
+                    <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
+                  }
         ListEmptyComponent={
           <Text style={styles.noOrdersText}>No orders found.</Text>
         }  
