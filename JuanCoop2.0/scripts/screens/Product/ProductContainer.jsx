@@ -25,7 +25,7 @@ import { Profileuser } from "@redux/Actions/userActions";
 import { categoryList } from "@src/redux/Actions/categoryActions";
 import { WishlistUser } from "@redux/Actions/userActions";
 import UserFooter from "../Others/UserFooter";
-
+import messaging from "@react-native-firebase/messaging";
 const ProductContainer = () => {
   const { products, error } = useSelector((state) => state.allProducts);
   const { coops } = useSelector((state) => state.allofCoops); 
@@ -34,7 +34,7 @@ const ProductContainer = () => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
-
+  
   const [focus, setFocus] = useState(false);
   const [token, setToken] = useState();
   const [active, setActive] = useState([]);
@@ -84,7 +84,9 @@ const ProductContainer = () => {
         const res = await AsyncStorage.getItem("jwt");
         if (res) {
           setToken(res);
-
+          messaging().getToken().then((token) => {
+            setFcmToken(token);
+          });
           dispatch(Profileuser(userId, res));
         } else {
           setErrors("No JWT token found.");

@@ -87,6 +87,7 @@ const Riderlist = () => {
     };
   
   const renderItem = ({ item }) => (
+
     <View style={styles.riderContainer}>
       <Image 
   source={{ 
@@ -105,16 +106,29 @@ const Riderlist = () => {
     <Ionicons name="trash-outline" color="red" size={20} />
   </TouchableOpacity>
 </View>
-        <Text>Approved: 
+        <Text>Approved: {" "} 
         <Text style={{ color: item.approvedAt ? 'green' : 'red' }}>
-           {item.approvedAt ? 'Approved' : 'Not Approved'}
+          {item.approvedAt ? ' Approved' : ' Not Approved'}
       </Text>
+
+        </Text>
+
+        <Text>Available: {" "}
+        <Text style={{ color: item?.isAvailable ? 'green' : 'red' }}>
+        {item?.isAvailable ? 'Available' : 'Unavailable'}
+       </Text>
+
         </Text>
         {item.approvedAt ? (
           <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.assignButton}
            onPress={() => navigation.navigate("Assign", { driver: item })}>
             <Text style={styles.assignButtonText}>Assigned</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.assignButton}
+           onPress={() => navigation.navigate("RiderDetails", { driver: item })}>
+            <Text style={styles.assignButtonText}>View</Text>
           </TouchableOpacity>
           </View>
           ) : null}

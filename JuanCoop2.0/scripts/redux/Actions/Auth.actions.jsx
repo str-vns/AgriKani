@@ -91,7 +91,7 @@ export const setLogoutUser = () => {
     return {
         type: SET_LOGOUT_USER,
         payload: {},
-        userProfile: {},
+        userProfile: "",
         isLoginUser: false,
         isguest: true,
         isLoading: false,

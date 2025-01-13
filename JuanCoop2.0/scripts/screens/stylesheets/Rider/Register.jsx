@@ -169,6 +169,92 @@ export default StyleSheet.create({
             color: "#333",
             backgroundColor: "#fff",
           },
+          pickerStyle2:{
+            width: "100%",
+            flex: 1,
+            height: height * 0.07,
+            color: "#333",
+            backgroundColor: "#fff",
+            borderWidth: 1,
+            borderColor: "#ddd",
+            borderRadius: 5,
+            justifyContent: "center",
+            paddingHorizontal: 30,
+            marginBottom: 20,
+            backgroundColor: "#f9f9f9",
+          },
+          scrollContent2: {
+            padding: 20,
+            paddingTop: height * 0.33, 
+          },
+          label: {
+            fontSize: 16,
+            marginBottom: 10,
+            color: "#333",
+          },
+          result: {
+            fontSize: 18,
+            marginTop: 20,
+            fontWeight: "bold",
+          },
+          showAllButton: {
+            flexDirection: "row",
+            paddingVertical: 8,
+            paddingHorizontal: 12,
+            borderRadius: 5,
+            marginTop: 10,
+            backgroundColor: "transparent",  
           
+          },
+          showAllButtonText: {
+            color: "#007bff",
+            fontSize: 14,
+            fontWeight: "bold",
+            marginRight: 8, 
+            marginLeft: 120,
+            //textAlign: "center",
+          },
+          productCard: {
+            padding: 10,
+            marginBottom: 15,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: '#ddd',
+            backgroundColor: '#fff',
+          },
+          productDetails: {
+            marginBottom: 10,
+          },
+          cityBarangayBox: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',  // This will push the trash icon to the right side
+            alignItems: 'center', // Vertically center the text and trash icon
+            padding: 10,
+            borderWidth: 1,
+            borderColor: '#ddd',
+            borderRadius: 5,
+            backgroundColor: '#f9f9f9',
+            marginTop: 5, // Space above the city/barangay box
+          },
+          cityText: {
+            fontSize: 16,
+            fontWeight: '500',
+            marginRight: 10, // Space between city text and trash icon
+          },
+          trashIcon: {
+            marginLeft: 5,  // Ensures there's some space between the text and the icon
+          },
+          showAllButton: {
+            paddingVertical: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+          showAllButtonText: {
+            fontSize: 14,
+            fontWeight: '600',
+          },
+          arrowIcon: {
+            marginLeft: 5,
+          },
 
       })

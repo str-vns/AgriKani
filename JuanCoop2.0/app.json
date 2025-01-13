@@ -70,8 +70,8 @@
       "BASE_ADDRESS_1": "http://192.168.50.236:4000/api/v2/",
       "ALT_BASE_ADDRESS": "http://192.168.20.250:4000/api/v2/",
       "SOCKET_ADDRESS": "http://localhost:8900",
-      "MAPBOX_API_KEY": "pk.eyJ1Ijoic3RlYjExIiwiYSI6ImNtM3p0cXY1NzI3YTkybG9tdzExZHZwbjgifQ.9pINyIob5rl4EOc4474T4w"
-
+      "MAPBOX_API_KEY": "pk.eyJ1Ijoic3RlYjExIiwiYSI6ImNtM3p0cXY1NzI3YTkybG9tdzExZHZwbjgifQ.9pINyIob5rl4EOc4474T4w",
+      "WEATHER_API_KEY": "b38eb1b293194679af1fd62ae0feb39c"
     }
   }
 }

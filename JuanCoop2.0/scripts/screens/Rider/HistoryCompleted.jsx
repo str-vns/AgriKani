@@ -7,20 +7,24 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { Profileuser } from "@redux/Actions/userActions";
 import { getCompletedDelivery } from "@redux/Actions/deliveryActions";
+import { Picker } from '@react-native-picker/picker';
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { driverProfile, updateAvailability } from "@redux/Actions/driverActions";
 
 const Deliveries = () => {
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const userId = context?.stateUser?.userProfile?._id;
+   const { Profileloading, Profiledriver, ProfileError } = useSelector((state) => state.driverProfile);
   const { Deliveryloading, delivery, Deliveryerror } = useSelector( state => state.deliveryComplete);
   const [activeTab, setActiveTab] = useState("Completed");
   const [loading, setLoading] = useState(false);
@@ -39,6 +43,7 @@ const Deliveries = () => {
             if (userId) {
               dispatch(Profileuser(userId, res));
               dispatch(getCompletedDelivery(userId, res));
+              dispatch(driverProfile(userId, res))
             } else {
               setErrors('User ID is missing.');
             }
@@ -61,6 +66,7 @@ const Deliveries = () => {
       setRefreshing(true);
       try {
         dispatch(getCompletedDelivery(userId, token));
+        dispatch(driverProfile(userId, token))
       } catch (err) {
         console.error("Error refreshing users:", err);
       } finally {
@@ -92,6 +98,36 @@ const Deliveries = () => {
       return text.charAt(0).toUpperCase() + text.slice(1);
     };
 
+    const handleChange = () => {
+       Alert.alert(
+            "Update Availability",
+            "Are you sure you want to update your availability status?",
+            [
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel",
+              },
+              {
+                text: "OK",
+                onPress: async () => {
+                  try {
+                    dispatch(updateAvailability(userId, token));
+                    setTimeout(() => {
+                      onRefresh()
+                    }, 1000)
+                   
+                    console.log("Availability updated successfully");
+                  } catch (error) {
+                    console.error("Error updating availability: ", error);
+                  }
+                },
+              },
+            ]
+          );
+
+    }
+
   const renderOrderItem = ({ item }) => (
     <View style={styles.orderCard}>
       <View style={styles.orderInfo}>
@@ -112,6 +148,29 @@ const Deliveries = () => {
             <Ionicons name="menu" size={34} color="black" />
           </TouchableOpacity>
           <Text style={styles.headerTitle2}>Delivery List</Text>
+
+          <View style={styles.drawerContainer}>
+                    <Text style={styles.TextTop}>Availability </Text>
+                   {Profileloading ? (  <View style={[styles.circle, { backgroundColor: 'gray' }]} >
+                          <Text style={styles.circleText}></Text>
+                        </View>) : (<View style={[styles.circle, { backgroundColor: Profiledriver?.isAvailable ? 'green' : 'gray' }]} >
+                          <Text style={styles.circleText}></Text>
+                        </View>)}
+                </View>
+                {/* Picker for toggling availability */}
+                <View style={styles.pickerContainer}>
+                 
+                  <Picker
+                    selectedValue={Profiledriver?.isAvailable ? 'true' : 'false'}
+                    onValueChange={handleChange}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Update Availability Status" value=""  enabled={false}/>
+                    { Profiledriver?.isAvailable ?  <Picker.Item label="Not Available" value="false" />
+                    : <Picker.Item label="Available" value="true" />  }
+          
+                  </Picker>
+                </View>
         </View>
         
       <View style={styles.header}>
@@ -286,6 +345,40 @@ drawerButton: {
   emptyText: {
     fontSize: 18,
     color: "#777",
+  },
+  circle: {
+    width: 20,
+    height: 20,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 36,
+   
+  },
+  circleText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  pickerContainer: {
+    marginTop: 10,
+    width: '10%',
+    alignSelf: 'flex-end', 
+  },
+  picker: {
+    height: 20,
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 5,
+  },
+  TextTop: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    left: 15,
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  drawerContainer: {
+    flexDirection: 'column'
   },
 });
 

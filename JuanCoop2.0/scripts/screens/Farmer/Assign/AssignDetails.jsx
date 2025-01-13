@@ -74,18 +74,16 @@ const AssignDetails = (props) => {
   };
 
   const assignDriver = () => {  
-    if (!driverId) {
-       setErrors("Please select a driver.");
-    }
+    // if (!driverId) {
+    //    setErrors("Please select a driver.");
+    // }
 
     const data = {
-      assignedTo: driverId.driverId,
       orderId: AssingInfo._id,
       coopId: userId,
 
     };
 
-    console.log("data", data);
     dispatch(createDelivery(data, token));
     navigation.navigate("AssignList");
   }

@@ -23,6 +23,21 @@ import {
     ONLY_APPROVED_DRIVER_REQUEST,
     ONLY_APPROVED_DRIVER_SUCCESS,
     ONLY_APPROVED_DRIVER_FAIL,
+    ASSIGN_LOCATION_REQUEST,
+    ASSIGN_LOCATION_SUCCESS,
+    ASSIGN_LOCATION_FAIL,
+    MAX_CAPACITY_REQUEST,
+    MAX_CAPACITY_SUCCESS,
+    MAX_CAPACITY_FAIL,
+    UPDATE_AVAILABILITY_REQUEST,
+    UPDATE_AVAILABILITY_SUCCESS,
+    UPDATE_AVAILABILITY_FAIL,
+    REMOVE_LOCATION_REQUEST,
+    REMOVE_LOCATION_SUCCESS,
+    REMOVE_LOCATION_FAIL,
+    DRIVER_PROFILE_REQUEST,
+    DRIVER_PROFILE_SUCCESS,
+    DRIVER_PROFILE_FAIL,
     CLEAR_ERRORS,
 } from "../Constants/driverConstants";
 import axios from "axios";
@@ -195,6 +210,108 @@ export const approveDriverOnly = (driverId, token) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: ONLY_APPROVED_DRIVER_FAIL,
+            payload: error.response ? error.response.data : error.message,
+        });
+    }
+}
+
+export const assignLocation = (driverId, location, token) => async (dispatch) => {
+
+    try {
+        dispatch({ type: ASSIGN_LOCATION_REQUEST });
+        const { data } = await axios.post(`${baseURL}driver/location/${driverId}`, location, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        dispatch({ type: ASSIGN_LOCATION_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: ASSIGN_LOCATION_FAIL,
+            payload: error.response ? error.response.data : error.message,
+        });
+    }
+}
+
+export const removeLocation = (driverId, locationId, token) => async (dispatch) => {
+ 
+    try {
+        dispatch({ type: REMOVE_LOCATION_REQUEST });
+        const { data } = await axios.patch(`${baseURL}driver/remove/location/${driverId}`, locationId, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        dispatch({ type: REMOVE_LOCATION_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: REMOVE_LOCATION_FAIL,
+            payload: error.response ? error.response.data : error.message,
+        });
+    }
+}
+
+export const maxCapacity = (driverId, capacity, token) => async (dispatch) => {
+    console.log(capacity, "capacity");
+    console.log(driverId, "driverId");
+
+    try {
+
+        dispatch({ type: MAX_CAPACITY_REQUEST });
+
+        const { data } = await axios.post(`${baseURL}driver/capacity/${driverId}`, capacity, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        dispatch({ type: MAX_CAPACITY_SUCCESS, payload: data });
+
+    } catch (error) {
+        dispatch({
+            type: MAX_CAPACITY_FAIL,
+            payload: error.response ? error.response.data : error.message,
+        });
+    }
+}
+
+export const updateAvailability = (driverId, token) => async (dispatch) => {
+    try {
+        dispatch({ type: UPDATE_AVAILABILITY_REQUEST });
+        const { data } = await axios.patch(`${baseURL}driver/available/${driverId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        dispatch({ type: UPDATE_AVAILABILITY_SUCCESS, payload: data });
+    } catch (error) {
+        dispatch({
+            type: UPDATE_AVAILABILITY_FAIL,
+            payload: error.response ? error.response.data : error.message,
+        });
+    }
+}
+
+export const driverProfile = (driverId, token) => async (dispatch) => {
+
+    try {
+
+        dispatch({ type: DRIVER_PROFILE_REQUEST });
+
+        const { data } = await axios.get(`${baseURL}driver/single/${driverId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        dispatch({ type: DRIVER_PROFILE_SUCCESS, payload: data.details });
+
+    } catch (error) {
+        dispatch({
+            type: DRIVER_PROFILE_FAIL,
             payload: error.response ? error.response.data : error.message,
         });
     }

@@ -10,7 +10,7 @@ export const WeatherProvider = ({ children }) => {
 
       const fetchWeather = async () => 
       {
-        const response = await fetch('https://api.weatherbit.io/v2.0/current?city=Manila&country=PH&key=7f1c9aeb7a02428cb625c5bbce429192');
+        const response = await fetch('https://api.weatherbit.io/v2.0/current?city=Manila&country=PH&key=b38eb1b293194679af1fd62ae0feb39c');
         const data = await response.json();
         setCurrentWeather(data);
       }

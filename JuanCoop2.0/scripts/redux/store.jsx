@@ -21,7 +21,7 @@ import {
   import { sendNotificationReducers, getNotificationReducers, readNotificationReducers } from "@redux/Reducers/notificationReducers";
   import { inventoryCreateReducer, singleInventoryReducer } from "@redux/Reducers/inventoryReducer";
   import { memberListReducer, memberApiReducer } from "@redux/Reducers/memberReducer";
-  import { driverApiReducer, driverListReducer, onlyApprovedDriverReducer } from "@redux/Reducers/driverReducer";
+  import { driverApiReducer, driverListReducer, onlyApprovedDriverReducer, driverProfileReducer } from "@redux/Reducers/driverReducer";
   import { deliveryListReducer, deliveryApiReducer, deliveryCompleteReducer, deliveryHistoryReducer } from "@redux/Reducers/deliveryReducers";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
@@ -91,7 +91,8 @@ import {
     deliveryHistory: deliveryHistoryReducer,
     checkDuplication: checkEmailReducer,
     otpForgot: otpForgotPasswordReducer,
-    MapBoxRoute: MapBoxRouteReducer
+    MapBoxRoute: MapBoxRouteReducer,
+    driverProfile: driverProfileReducer
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));

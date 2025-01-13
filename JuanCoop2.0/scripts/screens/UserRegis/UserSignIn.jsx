@@ -184,15 +184,12 @@ const UserSignIn = () => {
       navigation.navigate("Deliveries");
     }
     else {
+     
+    
       setError(
-        context?.stateUser?.userProfile &&
-        (typeof context.stateUser.userProfile === "string" ||
-          (typeof context.stateUser.userProfile === "object" &&
-           Object.keys(context.stateUser.userProfile).length > 0))
-          ? typeof context.stateUser.userProfile === "string"
-            ? context.stateUser.userProfile
-            : JSON.stringify(context.stateUser.userProfile)
-          : null 
+        context?.stateUser?.userProfile === "" || context?.stateUser?.userProfile === null
+          ? null
+          : "Invalid email or password"
       );
     setIsLoading(false);
     }

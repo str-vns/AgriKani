@@ -148,7 +148,7 @@ const OrderList = ({ navigation }) => {
         fcmToken: fcmToken,
         type: "order",
       };
-
+       console.log(fcmToken)
         socket.emit("sendNotification", {
           senderName: userName,
           receiverName:  Items?.user?._id,

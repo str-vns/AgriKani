@@ -12,6 +12,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux';
 import { useWeather } from '../../../CurrentWeather';
 import { useSocket } from "../../../SocketIo";
+import messaging from '@react-native-firebase/messaging';
+import Constants from "expo-constants";
 
 const FarmerDashboard = () => {
   const weather = useWeather();
@@ -30,7 +32,9 @@ const FarmerDashboard = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dailyWeather, setDailyWeather] = useState(null);
   const InventoryInfo = Invsuccess?.details;
+  const [fcmToken, setFcmToken] = useState("");
 
+  
    useEffect(() => {
     if (!socket) {
       console.warn("Socket is not initialized.");
@@ -123,18 +127,21 @@ const FarmerDashboard = () => {
     'default': require('../../../assets/weather/c01d.png'),
   };
 
-  // useFocusEffect(
-  //   useCallback(() => { 
-  //       const fetchDailyWeather = async () =>
-  //         {
-  //             const response = await fetch('https://api.weatherbit.io/v2.0/forecast/daily?city=Manila&country=PH&key=b38eb1b293194679af1fd62ae0feb39c');
-  //             const data = await response.json();
-  //             setDailyWeather(data);
-  //             }
+  useFocusEffect(
+    useCallback(() => { 
+        const fetchDailyWeather = async () =>
+          {
+              const response = await fetch(`https://api.weatherbit.io/v2.0/forecast/daily?city=Manila&country=PH&key=b38eb1b293194679af1fd62ae0feb39c`);
+              const data = await response.json();
+              setDailyWeather(data);
+              }
               
-  //         fetchDailyWeather();
-  //           }, [])
-  // )
+          fetchDailyWeather();
+    
+
+            }, [])
+          
+  )
   
 
   useEffect(() => {
@@ -185,7 +192,7 @@ const FarmerDashboard = () => {
     datasets: [
       {
         data: [500, 1000, 1500, 3000, 1200, 2500, 2400],
-        strokeWidth: 2, // line thickness
+        strokeWidth: 2,
       },
     ],
   };
@@ -240,7 +247,7 @@ const FarmerDashboard = () => {
 />
 </View>
      
-{/* <View style={styles.weatherContainer}>
+<View style={styles.weatherContainer}>
       <View style={styles.weatherBox}>
         <Image 
           blurRadius={70}
@@ -259,10 +266,10 @@ const FarmerDashboard = () => {
           <Text style={styles.weatherText}>Weather: {weather?.data[0].weather.description}</Text>
           <Text style={styles.weatherText}>Wind Speed: {weather?.data[0].wind_spd} m/s</Text>
         </View>
-      </View> */}
+      </View>
 
-{/* <ScrollView horizontal={true} >
-      {dailyWeather?.data.map((item, index) => (
+<ScrollView horizontal={true} >
+      {dailyWeather?.data?.map((item, index) => (
       <View key={item._id || index} style={styles.dailyWeatherContainer}>
       <View style={styles.dailyWeatherBox}>
       <Image
@@ -285,9 +292,9 @@ const FarmerDashboard = () => {
       </View>
     </View>
       ))}
-    </ScrollView> */}
+    </ScrollView>
 
-    {/* </View> */}
+    </View>
       
       {/* Tab Selection */}
       <View style={styles.tabContainer}>

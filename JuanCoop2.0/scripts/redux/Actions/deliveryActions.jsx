@@ -191,10 +191,6 @@ export const updateDeliveryStatus = (deliveryId, status, token) => async (dispat
 
 }
 
-
-export const generateQRCode = (deliveryId, token) => async (dispatch) => {
-}
-
 export const deliveryList = (coopId, token) => async (dispatch) => {
     try{
 

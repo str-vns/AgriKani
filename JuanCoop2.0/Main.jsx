@@ -83,6 +83,7 @@ useEffect(() => {
     if (permissionGranted) {
       try {
         const FCMtoken = await messaging().getToken();
+        
         console.log("FCM Token:", FCMtoken);
       } catch (error) {
         console.error("Error getting FCM token:", error);
