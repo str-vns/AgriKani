@@ -1,3 +1,4 @@
+const { DRIVER } = require("./resource");
 
 module.exports = {
   //User
@@ -158,4 +159,9 @@ module.exports = {
   DRIVER_COOP_ID: "/driver/coop/:id",
   DRIVER_COOP_ONLY_APPROVED_ID: "/driver/coop/approved/:id",
   DRIVER_DELIVERY_THIS_MONTH: "/driver/delivery/month/:id",
+  DRIVER_ASSING_LOCATION: "/driver/location/:id",
+  DRIVER_MAX_CAPACITY: "/driver/capacity/:id",
+  DRIVER_IS_AVAILABLE: "/driver/available/:id",
+  DRIVER_REMOVE_LOCATION: "/driver/remove/location/:id",
+  DRIVER_SINGLE_ID: "/driver/single/:id",
 };

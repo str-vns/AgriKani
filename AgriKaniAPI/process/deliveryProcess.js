@@ -5,7 +5,6 @@ const Driver = require("../models/driver");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
-const moment = require("moment");
 
 const startOfDay = new Date();
 startOfDay.setHours(0, 0, 0, 0); 
@@ -26,10 +25,16 @@ exports.createDeliveryProcess = async (req) => {
         throw new ErrorHandler(STATUSCODE.BAD_REQUEST, "Coop not found");
     }
 
+    const couriers  = await Driver.find({ coopId: coopid._id }).lean().exec();
+
+    if (!couriers) {
+        throw new ErrorHandler(STATUSCODE.BAD_REQUEST, "Courier not found");
+    }
+
       const orders = await Order.findOne({ "orderItems.coopUser": coopid._id, _id: orderid._id })
         .populate({ path: "user", select: "firstName lastName email image.url" })
         .populate({ path: "orderItems.inventoryProduct", select: "metricUnit unitName" })
-        .populate({ path: "shippingAddress", select: "address city phoneNum latitude longitude" })
+        .populate({ path: "shippingAddress", select: "address city barangay phoneNum latitude longitude" })
         .sort({ createdAt: -1 })
         .lean()
         .exec();
@@ -43,6 +48,45 @@ exports.createDeliveryProcess = async (req) => {
             orderItems: filteredItems
         };
 
+        const dailyDeliveries  = await Delivery.find({ createdAt: { $gte: startOfDay, $lte: endOfDay }}).lean().exec();
+
+        const courierAssignments = {};
+        for (const courier of couriers) {
+          courierAssignments[courier._id] = dailyDeliveries.filter(
+            delivery => delivery.assignedTo.toString() === courier._id.toString()
+          ).length;
+        }
+
+        
+        const sortedCouriers = couriers.sort((a, b) => {
+            return courierAssignments[a._id] - courierAssignments[b._id];
+          });
+
+          let assignedCourier = null;
+          for (const courier of sortedCouriers) {
+            const formattedCity = filteredOrder.shippingAddress.city.replace(/ City$/i, '');
+ 
+            const isLocationMatch = courier.assignedLocation.some(location => 
+                location.barangay === filteredOrder.shippingAddress.barangay &&
+                location.city.replace(/ City$/i, '') === formattedCity
+              );
+            console.log(isLocationMatch, "isLocationMatch");
+
+            if (isLocationMatch &&
+              courier.isAvailable === true
+            ) {
+              assignedCourier = courier;
+              break;
+            }
+          }
+      
+          if (!assignedCourier) {
+            throw new ErrorHandler(STATUSCODE.BAD_REQUEST, "No available courier for the delivery");
+          }
+
+          console.log(assignedCourier, "assignedCourier");
+        
+        {
     const delivery = await Delivery.create({
         orderId: orderid._id,
         coopId: coopid._id,
@@ -57,7 +101,7 @@ exports.createDeliveryProcess = async (req) => {
             Latitude: filteredOrder.shippingAddress.latitude,
             Longitude: filteredOrder.shippingAddress.longitude,
         },
-        assignedTo: req.body.assignedTo,
+        assignedTo: assignedCourier._id,
     });
    
 
@@ -74,6 +118,8 @@ exports.createDeliveryProcess = async (req) => {
     }).lean().exec();
     
     return delivery;   
+
+ }
 }
 
 exports.getDeliveryTrackingProcess = async (id) => {

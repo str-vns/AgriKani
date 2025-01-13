@@ -59,6 +59,36 @@ const driverRoutes = [
         path: PATH.DRIVER_COOP_ONLY_APPROVED_ID,
         roles: [],
         handler: driverController.getDriverByIdApprove,
+    },
+    {
+        method: METHOD.PATCH,
+        path: PATH.DRIVER_IS_AVAILABLE,
+        roles: [],
+        handler: driverController.availableDriver,
+    },
+    {
+        method: METHOD.POST,
+        path: PATH.DRIVER_ASSING_LOCATION,
+        roles: [],
+        handler: driverController.postDriverLocation,
+    },
+    {
+        method: METHOD.POST,
+        path: PATH.DRIVER_MAX_CAPACITY,
+        roles: [],
+        handler: driverController.maxCapacityDriver,
+    },
+    {
+        method: METHOD.PATCH,
+        path: PATH.DRIVER_REMOVE_LOCATION,
+        roles: [],
+        handler: driverController.removeDriverLocation,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.DRIVER_SINGLE_ID,
+        roles: [],
+        handler: driverController.getSingleDriver,
     }
 ];
 

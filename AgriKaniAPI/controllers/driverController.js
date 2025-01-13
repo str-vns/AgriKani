@@ -81,3 +81,41 @@ exports.getDriverByIdApprove = asyncHandler(async (req, res, next) => {
     ? SuccessHandler(res, `Driver has been fetched Successfully`, driver)
     : next(new ErrorHandler("No Driver Found"));
 });
+
+exports.postDriverLocation = asyncHandler(async (req, res, next) => {
+
+  const driver = await DriverProcess.createAssignedLocationProcess( req, req.params.id);
+  return driver
+    ? SuccessHandler(res, `Driver Location has been updated Successfully`, driver)
+    : next(new ErrorHandler("No Driver Found"));
+});
+
+exports.removeDriverLocation = asyncHandler(async (req, res, next) => {
+  const driver = await DriverProcess.removeAssignedLocationProcess(req, req.params.id);
+  return driver
+    ? SuccessHandler(res, `Driver Location has been updated Successfully`, driver)
+    : next(new ErrorHandler("No Driver Found"));
+});
+
+exports.availableDriver = asyncHandler(async (req, res, next) => {
+  const driver = await DriverProcess.updateAvailabilityProcess(req.params.id);
+  return driver
+    ? SuccessHandler(res, `Driver has been updated Successfully`, driver)
+    : next(new ErrorHandler("No Driver Found"));
+});
+
+exports.maxCapacityDriver = asyncHandler(async (req, res, next) => {
+  const driver = await DriverProcess.maxCapacityProcess(req, req.params.id);
+  return driver
+    ? SuccessHandler(res, `Driver has been updated Successfully`, driver)
+    : next(new ErrorHandler("No Driver Found"));
+});
+
+exports.getSingleDriver = asyncHandler(async (req, res, next) => {
+
+  const driver = await DriverProcess.getSingleDriverProcess(req.params.id);
+  return driver
+    ? SuccessHandler(res, `Driver has been fetched Successfully`, driver)
+    : next(new ErrorHandler("No Driver Found"));
+}
+);

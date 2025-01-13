@@ -5,8 +5,7 @@ const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
 const admin = require('firebase-admin');
 const serviceAccount = require('../notifacation-ko-firebase-adminsdk-sahjo-8e50ce651d.json');
-const { annotate } = require('pdfkit');
-const notification = require('../models/notification');
+
 // NOTE Three DOTS MEANS OK IN COMMENT
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -38,9 +37,7 @@ exports.CreateNotification = async (req) => {
       body: req.body.content,
       imageUrl: req.body.url,
     },
-    android: {
-      priority: 'high',
-    },
+
     apns: {
       payload: {
         aps: {
@@ -58,6 +55,7 @@ exports.CreateNotification = async (req) => {
       const failedTokens = [];
       response.responses.forEach((resp, idx) => {
         if (!resp.success) {
+          console.log('Error sending to token:', response.responses[idx].error);
           failedTokens.push(tokens[idx]);
         }
       });

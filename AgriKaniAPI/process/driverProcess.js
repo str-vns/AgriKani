@@ -9,6 +9,8 @@ const { default: mongoose } = require("mongoose");
 const { uploadImageSingle } = require("../utils/imageCloud");
 const { cloudinary } = require("../utils/cloudinary");
 const { sendEmail } = require("../utils/sendMail");
+const { id } = require("date-fns/locale");
+const { bufferedPageRange } = require("pdfkit");
 
 exports.registerDriverProcess = async (req) => {
   try {
@@ -112,7 +114,7 @@ exports.approveDriverProcess = async (id) => {
   const driver = await Driver.findById(id).select('+password').exec();
 
   if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
-
+  driver.isAvailable = true;
   driver.approvedAt = new Date();
 
   const role = ROLE.DRIVER;
@@ -456,5 +458,123 @@ exports.getDriverByIdApproveProcess = async (id) => {
   if (!coopExist) throw new ErrorHandler("Coop not exist"); 
 
   const driver = await Driver.find({ coopId: coopExist._id, approvedAt: { $ne: null }}).lean().exec();
+
   return driver;
 };
+
+exports.createAssignedLocationProcess = async (req, id) => {
+  try {
+    const driver = await Driver.findById(id).lean().exec()
+    if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
+
+    const coopExist = await Farm.findById(driver.coopId).lean().exec();
+    if (!coopExist) throw new ErrorHandler("Coop not exist");
+
+    const locationExists = driver.assignedLocation.some(
+      (location) => location.barangay === req.body.barangay && location.city === req.body.city
+    );
+    
+    if (locationExists) {
+      return driver; 
+    } else {
+      const assignedLocation = await Driver.updateOne(
+        { _id: id },
+        {
+          $push: {
+            assignedLocation: {
+              barangay: req.body.barangay,
+              city: req.body.city
+            }
+          }
+        }
+      );
+      return assignedLocation;
+    }
+
+  } catch (error) {
+    throw new ErrorHandler(error.message);
+  }
+}
+
+exports.removeAssignedLocationProcess = async (req, id) => {
+  try {
+    const driver = await Driver.findById(id).lean().
+    exec();
+    if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
+
+    const coopExist = await Farm.findById(driver.coopId).lean().exec();
+
+    if (!coopExist) throw new ErrorHandler("Coop not exist");
+
+    const assignedLocation = await Driver.updateOne(
+      { _id: id },
+      {
+        $pull: {
+          assignedLocation: {
+            _id: req.body.locationId
+          }
+        }
+      }
+    );
+  
+    return assignedLocation;
+
+  } catch (error) {
+
+    throw new ErrorHandler(error.message);
+  }
+}
+
+exports.updateAvailabilityProcess = async (id) => {
+  try {
+    const user = await User.findById(id).lean().exec();
+    const driver = await Driver.findOne({userId: user._id}).
+    exec();
+
+    if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
+
+    driver.isAvailable = !driver.isAvailable;
+    await driver.save();
+
+    return driver;
+
+  } catch (error) {
+    throw new ErrorHandler(error.message);
+  }
+}
+
+exports.maxCapacityProcess = async (req, id) => {
+ 
+  try {
+    const driver = await Driver.findById(id).lean().
+    exec();
+    if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
+
+    if (driver.maxCapacity === STATUSCODE.ZERO)
+      throw new ErrorHandler("Max Capacity is Required");
+
+    if(driver.maxCapacity >= 100)
+      throw new ErrorHandler("Max Capacity must be not greater than 100");
+
+    const drivers = await Driver.updateOne(
+      { _id: id },
+      { $set: { maxCapacity: req.body.capacity } }
+    );
+
+
+    return drivers;
+
+  } catch (error) {
+    throw new ErrorHandler(error.message);
+  }
+}
+
+exports.getSingleDriverProcess = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+      throw new ErrorHandler(`Invalid Driver ID: ${id}`);
+
+  const driver = await Driver.findOne({ userId: id }).lean().exec();
+  if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
+
+  return driver;
+}

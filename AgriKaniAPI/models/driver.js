@@ -88,6 +88,21 @@ const driverSchema = new mongoose.Schema({
             ref: RESOURCE.USER,
             required: false,
      },
+    assignedLocation:[{
+        barangay: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+   }] ,
+    maxCapacity: {
+        type: Number,
+    },
+    isAvailable: {
+        type: Boolean,
+        default: false,
+    },
     approvedAt: {
         type: Date,
         default: null,

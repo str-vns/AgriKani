@@ -6,7 +6,7 @@ const asyncHandler = require("express-async-handler");
 const CheckField = require("../helpers/FieldMonitor");
 
 exports.createDelivery = [
-    CheckField(["assignedTo", "coopId", "orderId"]),
+    CheckField([ "coopId", "orderId"]),
     asyncHandler(async (req, res) => {
         const delivery = await DeliveryProcess.createDeliveryProcess(req);
         return SuccessHandler(
