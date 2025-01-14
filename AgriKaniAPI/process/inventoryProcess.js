@@ -184,3 +184,14 @@ exports.InActiveInventoryInfo = async (id) => {
 
     return inventory;
 }
+
+exports.InventoryProduct = async (id) => {
+    if (!mongoose.Types.ObjectId.isValid(id))
+        throw new ErrorHandler(`Invalid Inventory ID: ${id}`);
+
+    const inventory = await Inventory.find({ productId: id })
+        .populate({ path: "productId", select: "productName" })
+
+    return inventory;
+
+}

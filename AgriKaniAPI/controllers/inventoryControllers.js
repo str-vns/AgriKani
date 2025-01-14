@@ -83,3 +83,12 @@ exports.InActiveInventory = asyncHandler(async (req, res) => {
     );
 });
 
+exports.getInventoryProduct = asyncHandler(async (req, res) => {
+
+    const inventory = await inventoryProcess.InventoryProduct(req.params.id);
+    return SuccessHandler(
+    res,
+    `The Inventory ${inventory.productName} has been Restore Successfully`,
+    inventory
+    );
+});

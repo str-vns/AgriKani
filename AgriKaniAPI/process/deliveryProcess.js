@@ -81,8 +81,9 @@ exports.createDeliveryProcess = async (req) => {
           }
       
           if (!assignedCourier) {
-            throw new ErrorHandler(STATUSCODE.BAD_REQUEST, "No available courier for the delivery");
-          }
+            throw new ErrorHandler(STATUSCODE.BAD_REQUEST, "No courier available for this location");
+              
+        }
 
           console.log(assignedCourier, "assignedCourier");
         

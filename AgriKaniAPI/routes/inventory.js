@@ -48,6 +48,12 @@ const inventoryRoutes = [
     roles: [],
     handler: inventoryController.InActiveInventory,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.INVENTORY_PRODUCT_ID,
+    roles: [],
+    handler: inventoryController.getInventoryProduct,
+  }
 ];
 
 inventoryRoutes.forEach((route) => {
