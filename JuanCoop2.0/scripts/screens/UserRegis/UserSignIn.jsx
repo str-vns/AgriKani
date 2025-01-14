@@ -187,13 +187,14 @@ const UserSignIn = () => {
      
     
       setError(
-        context?.stateUser?.userProfile === "" || context?.stateUser?.userProfile === null
+        context?.stateUser?.userProfile === "" || context?.stateUser?.userProfile === null || context?.stateUser?.userProfile === undefined
           ? null
           : "Invalid email or password"
       );
     setIsLoading(false);
     }
   }, [context?.stateUser?.isAuthenticated]);
+  
 
   const handleSubmit = () => {
     setIsLoading(true);

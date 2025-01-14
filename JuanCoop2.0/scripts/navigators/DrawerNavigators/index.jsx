@@ -208,6 +208,21 @@ const context = useContext(AuthGlobal);
           component={CoopNavigators}
         />
 
+        <Drawer.Screen
+            name="InventoryList"
+            initialParams={{ screen: "InventoryList" }}
+            options={{ headerShown: false, tabBarShowLabel: false }}
+            component={CoopNavigators}
+        />
+
+        <Drawer.Screen
+            name="ReviewList"
+            initialParams={{ screen: "ReviewList" }}
+            options={{ headerShown: false, tabBarShowLabel: false }}
+            component={CoopNavigators}
+        />
+           
+
       </Drawer.Navigator>
     </Box>
   );

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Rating } from "react-native-elements";
 import Carousel from "react-native-reanimated-carousel";
@@ -14,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCoop } from "@redux/Actions/productActions";
 import { addToCart } from "@src/redux/Actions/cartActions";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import styles from "@screens/stylesheets/singleProduct";
 
@@ -62,6 +64,8 @@ const SingleProduct = ({ route }) => {
       coop: product.coop,
       image: product.image[0]?.url,
      }
+    AsyncStorage.setItem("cartItem", JSON.stringify(cartItem));
+    Alert.alert("Item added to cart");
     dispatch(addToCart(cartItem));
     } else {
       const cartItem ={
@@ -76,8 +80,11 @@ const SingleProduct = ({ route }) => {
         user: product.user,
         image: product.image[0]?.url,
        }   
+     
+      Alert.alert("Item added to cart");
       dispatch(addToCart(cartItem));
     }
+
   };
 
   useFocusEffect(

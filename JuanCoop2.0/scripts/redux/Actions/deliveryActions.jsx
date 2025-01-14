@@ -44,11 +44,12 @@ export const createDelivery = (deliveryData, token) => async (dispatch) => {
         };
     
         const { data } = await axios.post(`${baseURL}delivery`, deliveryData, config);
-       
+        
         dispatch({
             type: CREATE_DELIVERY_SUCCESS,
             payload: data.details,
         });
+
     } catch(error) {
         dispatch({
             type: CREATE_DELIVERY_FAIL,

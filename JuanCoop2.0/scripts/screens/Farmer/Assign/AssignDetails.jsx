@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { approveDriverOnly } from "@redux/Actions/driverActions";
@@ -26,10 +27,11 @@ const AssignDetails = (props) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { driloading, drivers, drierror } = useSelector((state) => state.onlyApprovedDriver);
+  const { Deliveryloading,success, Deliveryerror } = useSelector((state) => state.deliveryApi);
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState(null);
-  const [driverId, setDriverId] = useState("");
+  
   const userId = context.stateUser?.userProfile?._id;
   const orderItems = AssingInfo?.orderItems.map((item) => ({
     product: item?.product,
@@ -74,9 +76,8 @@ const AssignDetails = (props) => {
   };
 
   const assignDriver = () => {  
-    // if (!driverId) {
-    //    setErrors("Please select a driver.");
-    // }
+   
+   
 
     const data = {
       orderId: AssingInfo._id,
@@ -84,8 +85,26 @@ const AssignDetails = (props) => {
 
     };
 
+  
     dispatch(createDelivery(data, token));
+
+    if(success)
+   { 
     navigation.navigate("AssignList");
+  } else {
+    Alert.alert(
+      "Assign Driver",
+      "There is no courier available at the moment",
+      [
+        {
+          text: "OK",
+          onPress: () => console.log("OK Pressed"),
+        },
+      ]
+    )
+    return;
+  }
+ 
   }
 
   return (
@@ -146,34 +165,13 @@ const AssignDetails = (props) => {
         </Text>
       </View>
 
-      <Text style={styles.textHeaderInput}>Choose To Assign Driver</Text>
-             <View style={styles.CoopContainer}>
-               <Picker
-                 selectedValue={driverId}
-                 style={styles.pickerStyle}
-                 onValueChange={(itemValue) => setDriverId(itemValue)}
-               >
-                 <Picker.Item label="Select Driver" value="" enabled={false} />
-                 { drivers && drivers?.length > 0 ? (
-         drivers.map((driver, index) => (
-           <Picker.Item
-             key={index}
-             label={` ${driver.firstName || ""} ${driver.lastName || "None"}`.trim()}
-             value={{ driverId: driver._id}} 
-             style={styles.pickerText}
-           />
-         ))
-                 ) : (
-                   <Text>No Driver</Text>
-                 )}
-               </Picker>
-             </View>
   {errors && <Text style={{ color: "red", textAlign: "center" }}>{errors}</Text>}
 
   {driloading ? ( <ActivityIndicator size="large" color="#FFC107" /> ) : (
     <TouchableOpacity
     style={styles.deliverButton}
     onPress={() => assignDriver()}
+    disabled={Deliveryloading}
   >
     <Text style={styles.buttonText}>Assign now</Text>
   </TouchableOpacity>

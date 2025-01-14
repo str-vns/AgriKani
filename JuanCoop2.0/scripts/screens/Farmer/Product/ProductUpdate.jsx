@@ -280,42 +280,7 @@ const handleCreateProduct = (item) => {
               : "Select Types"}
           </Text>
         </TouchableOpacity>
-
-        <Text style={styled.label}>Inventory</Text>
-        <ScrollView horizontal={true} >
-      {singleProduct?.stock.map((item, index) => (
-        <View key={item._id || index} style={styled.inventoryCard}>
-          <View style={styled.cardContent}>
-         
-            <View style={styled.stockInfo}>
-            <Text style={styled.stockTextLarge} >Public: <Text style={[styles.stockTextSmall,{ color: item.status === "active" ? 'green' : 'gray' }]}> {item.status === "active" ? "Active" : "Inactive"}</Text>
-              </Text>
-              <Text style={styled.stockTextLarge}>
-                Metric: {item.unitName} {item.metricUnit}
-              </Text>
-              <Text style={styled.stockTextSmall}>Price: ₱ {item.price}</Text>
-              <View style={styled.actionButtons}>
-              <TouchableOpacity onPress={() => handleEditInventory(item)}>
-                <Ionicons name="pencil" size={20} color="green" />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDeleteInventory(item._id)}>
-                <Ionicons name="trash" size={20} color="red" />
-              </TouchableOpacity>
-            </View>
-            </View>
-          </View>
-        </View>
-      ))}
-      <TouchableOpacity onPress={() => handleCreateProduct(productId)} >
-      <View  style={styled.inventoryCard}>
-          <View style={styled.cardContent}>
-            <View style={styled.stockInfo}>
-            <Ionicons name="add" size={50} color="black" />
-            </View>
-            </View>
-            </View>
-      </TouchableOpacity>
-    </ScrollView>
+        
         <Modal
           transparent={true}
           animationType="slide"

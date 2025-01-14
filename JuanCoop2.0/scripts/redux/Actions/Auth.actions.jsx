@@ -4,6 +4,9 @@ import Toast from "react-native-toast-message";
 import baseURL from "@assets/commons/baseurl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import {
+    CLEAR_CART,
+  } from '../Constants/cartConstants';
 
 export const SET_CURRENT_USER = "SET_CURRENT_USER"
 export const SET_LOGOUT_USER = "SET_LOGOUT_USER"
@@ -33,7 +36,7 @@ export const loginUser = async (user, dispatch) => {
 
             await AsyncStorage.setItem("jwt", token);
             await AsyncStorage.setItem("user", JSON.stringify(userInfo));
-
+            
             const decoded = jwtDecode(token);
 
             dispatch(setCurrentUser(decoded, userInfo ));
@@ -68,6 +71,15 @@ export const logoutUser = async (dispatch) => {
     try {
         AsyncStorage.removeItem("jwt");
         AsyncStorage.removeItem("user")
+        AsyncStorage.removeItem("cartItems");
+
+        const cartItems = await AsyncStorage.getItem("cartItems");
+        if (!cartItems) {
+            console.log('cartItems successfully removed.');
+        } else {
+            console.log('cartItems still exists:', cartItems);
+        }
+
         await AsyncStorage.clear();
         console.log('AsyncStorage data cleared successfully.');
         dispatch(setLogoutUser())
@@ -97,6 +109,7 @@ export const setLogoutUser = () => {
         isLoading: false,
     };
 }
+
 
 export const isLogin = async (dispatch) => {
     try {

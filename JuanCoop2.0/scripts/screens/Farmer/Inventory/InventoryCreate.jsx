@@ -12,6 +12,7 @@ import { createInventory } from "@redux/Actions/inventoryActions";
 
 const InventoryCreate = (props) => {
     const { item } = props.route.params;
+
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const { Invloading, Invsuccess, Inverror } = useSelector((state) => state.invent)
@@ -76,11 +77,11 @@ const InventoryCreate = (props) => {
                 metricUnit,
                 price: unitPrice,
                 quantity,
-                productId: item
+                productId: item._id
            }
             //   console.log(inventory)
            dispatch(createInventory(inventory, token))
-           navigation.navigate("ProductsList");
+           navigation.navigate("InventoryDetail", { Inv: item });
         }
       
     }

@@ -14,6 +14,9 @@ import {
   SINGLE_INVENTORY_REQUEST,
   SINGLE_INVENTORY_SUCCESS,
   SINGLE_INVENTORY_FAIL,
+  INVENTORY_PRODUCTS_REQUEST,
+  INVENTORY_PRODUCTS_SUCCESS,
+  INVENTORY_PRODUCTS_FAIL,
 } from "@redux/Constants/inventoryConstants";
 import axios from "axios";
 import baseURL from "@assets/commons/baseurl";
@@ -170,4 +173,35 @@ export const singleInventory = (inventoryId, token) => async (dispatch) => {
           : error.message,
     });
   }
+}
+
+export const inventoryProducts = (inventoryId, token) => async (dispatch) => {
+
+    try {
+        dispatch({ type: INVENTORY_PRODUCTS_REQUEST });
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+
+        const { data } = await axios.get(
+            `${baseURL}inventory/product/${inventoryId}`,
+            config
+        );
+
+        dispatch({
+            type: INVENTORY_PRODUCTS_SUCCESS,
+            payload: data.details,
+        });
+    } catch (error) {
+        dispatch({
+            type: INVENTORY_PRODUCTS_FAIL,
+            payload:
+                error.response && error.response.data.message
+                    ? error.response.data.message
+                    : error.message,
+        });
+    }
 }

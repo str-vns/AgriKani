@@ -18,19 +18,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { singleNotification } from "@redux/Actions/notificationActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const UserFooter = () => {
   const { notifloading, notification, notiferror } = useSelector((state) => state.getNotif);
+   const cartItems = useSelector((state) => state.cartItems);
   const dispatch = useDispatch();
   const context = useContext(AuthGlobal);
   const navigation = useNavigation();
   const socket = useSocket();
-
   const userId = context.stateUser?.userProfile?._id;
   const [selected, setSelected] = useState(1);
   const [notif, setNotif] = useState([]);
   const [token, setToken] = useState(null);
-
+  const numCartItems = cartItems.length;
+  console.log("notif", numCartItems);
+  
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -54,17 +55,20 @@ const UserFooter = () => {
       };
     }
   }, [socket]);
-  
+
+
+
  useFocusEffect(
     useCallback(() => {
       dispatch(singleNotification(userId, token));
       setNotif([]);
+
     }, [dispatch, token])
   );
 
   const numNotif = notification.filter((notif) => notif.readAt === null).length;
   const overallNotif = Number(numNotif) + notif.length;
-
+ 
   console.log("notif", overallNotif);
   const handleMessage = () => {
     {
@@ -178,6 +182,11 @@ const handleNotif = () => {
             alignItems="center"
           >
             <Center>
+            {(numCartItems > 0 ) && (
+  <View style={styles.cartCircle}>
+    <Text style={styles.cartText}>{numCartItems}</Text>
+  </View>
+)}
               <Icon
                 mb="1"
                 as={

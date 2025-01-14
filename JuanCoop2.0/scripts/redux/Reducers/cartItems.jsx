@@ -3,21 +3,14 @@ import {
     REMOVE_FROM_CART,
     CLEAR_CART,
     UPDATE_CART_QUANTITY,
+    SET_CART_ITEMS
   } from '../Constants/cartConstants';
+  import AsyncStorage from '@react-native-async-storage/async-storage';
   
   const cartItems = (state = [], action) => {
     switch (action.type) {
       case ADD_TO_CART:
-        const existingItem = state.find(item => item.inventoryId === action.payload.inventoryId);
-        if (existingItem) {
-          return state.map(item =>
-            item.inventoryId === action.payload.inventoryId
-              ? { ...item, quantity: item.quantity + action.payload.quantity }
-              : item
-          );
-        } else {
-          return [...state, action.payload];
-        }
+        return action.payload;  // The updated cart items after the action
   
       case REMOVE_FROM_CART:
         return state.filter(cartItem => cartItem.inventoryId !== action.payload);
@@ -32,6 +25,9 @@ import {
             : item
         );
   
+        case SET_CART_ITEMS:
+          return action.payload; 
+
       default:
         return state;
     }

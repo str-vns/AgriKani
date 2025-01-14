@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import { removeFromCart, updateCartQuantity } from "@src/redux/Actions/cartActio
 import { useNavigation } from "@react-navigation/native";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import styles from "@screens/stylesheets/Cart/userCart";
+import { setCartItems } from '@redux/Actions/cartActions';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -20,6 +22,22 @@ const Cart = () => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const isLogin = context?.stateUser?.isAuthenticated;
+ 
+ useEffect(() => {
+  const loadCartItems = async () => {
+    try {
+      const storedCart = await AsyncStorage.getItem('cartItems');
+      if (storedCart) {
+        const cartItems = JSON.parse(storedCart);
+        dispatch(setCartItems(cartItems));
+      }
+    } catch (error) {
+      console.error("Error loading cart from AsyncStorage:", error);
+    }
+  };
+
+  loadCartItems();
+}, [dispatch]);
 
   const handleRemoveItem = (item) => {
     dispatch(removeFromCart(item.inventoryId));

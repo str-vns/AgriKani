@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProduct } from "@redux/Actions/productActions";
 import { useSocket } from "@SocketIo";
 import { ScrollView } from "react-native-gesture-handler";
+import { clearCart } from "@src/redux/Actions/cartActions";
 
 const UserSidebar = () => {
   const socket = useSocket();
@@ -49,11 +50,13 @@ const UserSidebar = () => {
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Product", icon: "cube-outline", key: "product" },
+    { label: "Inventory", icon: "archive-outline", key: "inventory" },
     { label: "Orders", icon: "clipboard-outline", key: "orders" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
     { label: "Notifications", icon: "notifications-outline", key: "notifications" },
     { label: "Rider", icon: "car-outline", key: "rider" },
     { label: "Members", icon: "people-outline", key: "members" },
+    { label: "Reviews", icon: "star-outline", key: "reviews" },
     { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Community Forum", icon: "create-outline", key: "Forum" },
     { label: "Product Archive", icon: "archive-outline", key: "productArchive" },
@@ -143,6 +146,10 @@ const UserSidebar = () => {
       navigation.navigate( "MemberList" )
     } else if (key === "rider"){
       navigation.navigate( "Riderlist" )
+    } else if (key === "reviews"){
+      navigation.navigate("ReviewList");
+    } else if (key === "inventory"){
+      navigation.navigate("InventoryList");
     }
     
 
@@ -284,7 +291,10 @@ const UserSidebar = () => {
               style={[styles.menuItem, styles.logoutButton]}
               onPress={() => {
                 handleLogoutSocket();
-                AsyncStorage.removeItem("jwt"), logoutUser(context.dispatch);
+                AsyncStorage.removeItem("jwt"), 
+                AsyncStorage.removeItem("cartItems"),
+                dispatch(clearCart());
+                logoutUser(context.dispatch);
                 navigation.navigate("Home");
                 dispatch(getProduct());
               }}
@@ -334,7 +344,10 @@ const UserSidebar = () => {
               style={[styles.menuItem, styles.logoutButton]}
               onPress={() => {
                 handleLogoutSocket();
-                AsyncStorage.removeItem("jwt"), logoutUser(context.dispatch);
+                AsyncStorage.removeItem("jwt"), 
+                AsyncStorage.removeItem("cartItems"),
+                dispatch(clearCart());
+                logoutUser(context.dispatch);
                 navigation.navigate("Home");
                 dispatch(getProduct());
               }}
@@ -382,7 +395,10 @@ const UserSidebar = () => {
               style={[styles.menuItem, styles.logoutButton]}
               onPress={() => {
                 handleLogoutSocket();
-                AsyncStorage.removeItem("jwt"), logoutUser(context.dispatch);
+                AsyncStorage.removeItem("jwt"),
+                AsyncStorage.removeItem("cartItems"),
+                 dispatch(clearCart());
+                 logoutUser(context.dispatch);
                 navigation.navigate("Home");
                 dispatch(getProduct());
               }}
@@ -430,7 +446,9 @@ const UserSidebar = () => {
             style={[styles.menuItem, styles.logoutButton]}
             onPress={() => {
               handleLogoutSocket();
-              AsyncStorage.removeItem("jwt"), logoutUser(context.dispatch);
+              AsyncStorage.removeItem("jwt"), 
+              dispatch(clearCart());
+              logoutUser(context.dispatch);
               navigation.navigate("Home");
               dispatch(getProduct());
             }}
