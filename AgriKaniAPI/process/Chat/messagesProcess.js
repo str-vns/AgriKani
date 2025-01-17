@@ -25,7 +25,7 @@ exports.newMessage = async (req) => {
     image: image,
   });
 
-  return message;
+  return { ...req.body };
 };
 
 exports.getMesssages = async (id) => {

@@ -176,7 +176,10 @@ exports.singleProduct = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Product ID: ${id}`);
 
-  const singleProduct = await Product.findById(id).lean().exec();
+  const singleProduct = await Product.findById(id)
+  .populate({path: "stock", select: "quantity metricUnit unitName price status"})
+  .populate({path: "reviews.user", select: "firstName lastName image.url"})
+  .lean().exec();
 
   if (!singleProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 

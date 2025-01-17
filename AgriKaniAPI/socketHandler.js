@@ -30,7 +30,8 @@ const handleSocketConnections = (io) => {
 
   io.on("connection", (socket) => {
     console.log("Client connected");
-
+    
+    
     socket.on("addUser", (userId) => {
       addUser(userId, socket.id);
       io.emit("getUsers", users);  

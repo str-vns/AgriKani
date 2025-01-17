@@ -164,3 +164,5 @@
 20241227	11:39:36	7ad3e036-a97a-4e5b-9691-27f1ad0b9a58	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
 20241227	11:39:39	03c246ee-8a14-480d-8d0c-567f5cde83ce	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
 20241227	11:39:42	a8f65e6a-407f-458a-a5f4-1e9fcadbb124	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20250117	17:45:23	24d2e675-99db-422c-9179-6a0d9ec1a9e4	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
+20250117	17:45:23	9a00ec21-6bae-42d2-b9d0-568a232e242b	Too Many Requests: Too many login attempts from this IP, please try again after a 60 second pause	POST	/signin	undefined
