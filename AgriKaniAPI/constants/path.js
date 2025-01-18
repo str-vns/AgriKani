@@ -42,6 +42,7 @@ module.exports = {
   SHIPPING_ID: "/shipping/:id",
   ADDRESS: "/address",
   ADDRESS_ID: "/address/:id",
+  ADDRESS_FETCH_ID: "/address/fetch/:id",
 
   //cooperative
   FARM: "/farm",

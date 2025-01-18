@@ -81,3 +81,17 @@ exports.singleAddress = async (id) => {
 
   return addressProduct;
 };
+
+exports.singleAddressId = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Address ID: ${id}`);
+
+  const addressProduct = await Address.findById(id)
+  .populate({ path: "userId", select: "firstName lastName email image.url phoneNum" })
+  .lean().exec();
+
+  console.log(addressProduct, "Single Address object");
+  if (!addressProduct) throw new ErrorHandler(`Address not exist with ID: ${id}`);
+
+  return addressProduct;
+}

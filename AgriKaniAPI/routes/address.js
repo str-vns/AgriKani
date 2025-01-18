@@ -35,6 +35,12 @@ const addressRoutes = [
     roles: [],
     handler: addressController.SingleAddress,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.ADDRESS_FETCH_ID,
+    roles: [],
+    handler: addressController.SingleAddressId,
+  }
 ];
 
 addressRoutes.forEach((route) => {

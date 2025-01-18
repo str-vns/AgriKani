@@ -67,3 +67,15 @@ exports.SingleAddress = asyncHandler(async (req, res, next) => {
         address
       );
 });
+
+
+exports.SingleAddressId = asyncHandler(async (req, res, next) => {
+  const address = await addressProcess.singleAddressId(req.params.id);
+  return address?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Address Found"))
+    : SuccessHandler(
+        res,
+        `${address.fullName} Address has been fetched Successfully`,
+        address
+      );
+});
