@@ -146,13 +146,6 @@ const UserChatlist = () => {
 
   return (
     <View style={styles.container}>
-       <View style={styles.header}>
-        <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Message</Text>
-      </View>
       <FlatList
         ref={scrollRef}
         data={users} 

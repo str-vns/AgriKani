@@ -1,10 +1,19 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView, Image, StyleSheet } from 'react-native';
-import Message from './UserMessage';
-import { useSelector, useDispatch } from 'react-redux';
-import { useSocket } from '../../../SocketIo';
-import { listMessages, sendingMessage } from '@redux/Actions/messageActions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+  Image,
+  StyleSheet,
+} from "react-native";
+import Message from "./UserMessage";
+import { useSelector, useDispatch } from "react-redux";
+import { useSocket } from "../../../SocketIo";
+import { listMessages, sendingMessage } from "@redux/Actions/messageActions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,9 +32,11 @@ const UserChat = (props) => {
   const [images, setImages] = useState([]);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const validConversations = Array.isArray(conversations) ? conversations : [];
-  const myConvo = validConversations.find(convo => convo.members.includes(item?._id));
+  const myConvo = validConversations.find((convo) =>
+    convo.members.includes(item?._id)
+  );
   useEffect(() => {
-    socket.on('getMessage', (data) => {
+    socket.on("getMessage", (data) => {
       // console.log("Received message:", data); // Check if this is triggered
       setArrivedMessages((prevMessages) => [
         ...prevMessages,
@@ -34,12 +45,12 @@ const UserChat = (props) => {
           text: data.text,
           image: data.image,
           createdAt: Date.now(),
-        }
+        },
       ]);
     });
 
     return () => {
-      socket.off('getMessage');
+      socket.off("getMessage");
     };
   }, [socket]);
 
@@ -92,7 +103,6 @@ const UserChat = (props) => {
 
   const sendMessage = () => {
     if (newMessage.trim() || images.length) {
-   
       const message = {
         sender: UserId,
         text: newMessage,
@@ -100,12 +110,11 @@ const UserChat = (props) => {
         image: images,
       };
 
-      // console.log("Sending message:", message); 
-
+      // console.log("Sending message:", message);
 
       socket.emit("sendMessage", {
         senderId: UserId,
-        receiverId: myConvo.members.find(member => member !== UserId),
+        receiverId: myConvo.members.find((member) => member !== UserId),
         text: newMessage,
         image: images, // Send images with the message if any
       });
@@ -124,38 +133,35 @@ const UserChat = (props) => {
   return (
     <View style={styles.container}>
       {messages && Array.isArray(messages) && messages.length > 0 ? (
-       <FlatList
-      ref={scrollRef}
-      data={[...messages, ...arrivedMessages]}  // Combine messages from Redux and new arrived messages
-      renderItem={({ item, index }) => (
-        <Message
-          key={index}
-          messages={item}
-          own={item.sender === UserId}
+        <FlatList
+          ref={scrollRef}
+          data={[...messages, ...arrivedMessages]} // Combine messages from Redux and new arrived messages
+          renderItem={({ item, index }) => (
+            <Message key={index} messages={item} own={item.sender === UserId} />
+          )}
+          keyExtractor={(item, index) => item._id || index.toString()}
+          contentContainerStyle={styles.flatListContent}
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={() =>
+            scrollRef.current?.scrollToEnd({ animated: true })
+          }
         />
-      )}
-      keyExtractor={(item, index) => item._id || index.toString()}
-      contentContainerStyle={styles.flatListContent}
-      showsVerticalScrollIndicator={false}
-      onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
-    />
       ) : (
         <Text style={styles.noMessages}>No messages available</Text>
       )}
-         <ScrollView horizontal>
-  {images.map((imageUri, index) => (
-    <View key={index} style={styles.imageContainer}>
-
-      <Image source={{ uri: imageUri }} style={styles.image} />
-      <TouchableOpacity
-        onPress={() => deleteImage(index)}
-        style={styles.deleteButton}
-      >
-        <Ionicons name="close-outline" size={25} color="black" />
-      </TouchableOpacity>
-    </View>
-  ))}
-</ScrollView>
+      <ScrollView horizontal>
+        {images.map((imageUri, index) => (
+          <View key={index} style={styles.imageContainer}>
+            <Image source={{ uri: imageUri }} style={styles.image} />
+            <TouchableOpacity
+              onPress={() => deleteImage(index)}
+              style={styles.deleteButton}
+            >
+              <Ionicons name="close-outline" size={25} color="black" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Type something..."
@@ -163,11 +169,15 @@ const UserChat = (props) => {
           onChangeText={(text) => setNewMessage(text)}
           value={newMessage}
         />
-      <TouchableOpacity onPress={pickImage} >
-  <Ionicons name="images-outline" size={30} color="black" style={styles.iconRight} />
-</TouchableOpacity>
+        <TouchableOpacity onPress={pickImage}>
+          <Ionicons
+            name="images-outline"
+            size={30}
+            color="black"
+            style={styles.iconRight}
+          />
+        </TouchableOpacity>
 
-      
         <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
           <Text style={styles.sendButtonText}>Send</Text>
         </TouchableOpacity>
@@ -179,37 +189,39 @@ const UserChat = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
+    paddingBottom:50,
   },
   flatListContent: {
     paddingBottom: 80,
   },
   inputContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 10,
     borderTopWidth: 1,
-    borderTopColor: '#e1e1e1',
+    borderTopColor: "#e1e1e1",
     bottom: 12,
   },
   textInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#e1e1e1',
+    borderColor: "#e1e1e1",
     borderRadius: 10,
     paddingHorizontal: 15,
     paddingVertical: 10,
     marginRight: 10,
   },
   sendButton: {
-    backgroundColor: '#f7b900',
+    backgroundColor: "#f7b900",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   sendButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
+    
   },
   imageContainer: {
     position: "relative",
@@ -229,15 +241,15 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   noMessages: {
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 20,
     fontSize: 18,
-    color: '#808080',
+    color: "#808080",
   },
-  
+
   iconRight: {
-    marginRight: 10, 
-    top: 8 
+    marginRight: 10,
+    top: 8,
   },
 });
 

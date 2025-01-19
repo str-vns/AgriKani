@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
 //container
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF', // Background color
     },
     scrollViewContainer: {
         padding: 20,
@@ -121,7 +121,6 @@ const styles = StyleSheet.create({
     },
     editProfile: {
       fontSize: 16,
-      color: '#FFA500',
       marginTop: 10,
     },
 

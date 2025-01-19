@@ -118,8 +118,7 @@ const chatNow = async () => {
           style={styles.profileImage}
         />
       )}
-      <Text style={styles.profileName}>{cooperative.farmName}</Text>
-      <Text style={styles.profileFollowing}>100 Following</Text>
+       <Text style={styles.profileName}>{cooperative.farmName}</Text>
       <TouchableOpacity style={styles.editProfile} onPress={() => chatNow()}>
         <Text style={styles.editProfile}>Chat Now</Text>
       </TouchableOpacity>
@@ -127,6 +126,16 @@ const chatNow = async () => {
   );
 
   return (
+    <View style={{ flex: 1 }}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.drawerButton}
+          onPress={() => navigation.openDrawer()}
+        >
+          <Ionicons name="menu" size={34} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Cooperative Profile  </Text>
+      </View>
     <FlatList
       ListHeaderComponent={renderProfileHeader}
       data={coopProducts}
@@ -136,6 +145,7 @@ const chatNow = async () => {
       columnWrapperStyle={styles.prodrow}
       contentContainerStyle={styles.prodList}
     />
+      </View>
   );
 };
 
