@@ -183,12 +183,16 @@ const cameraPermission = await Camera.requestCameraPermissionsAsync();
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-            onPress={() => navigation.navigate('Profile')} 
-            style={styles.backButtonContainer}
+         <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.drawerButton}
+            onPress={() => navigation.openDrawer()}
           >
-            <Text style={styles.backButtonText}>{"< Back"}</Text>
+            <Ionicons name="menu" size={34} color="black" />
           </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>Update Profile</Text>
+        </View>
 
       <TouchableOpacity style={styles.profilePicContainer}>
       { user?.image && user?.image?.url ? ( 
@@ -288,9 +292,10 @@ const cameraPermission = await Camera.requestCameraPermissionsAsync();
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#F7F8FA',
+    flexGrow: 1,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   profilePicContainer: {
     alignItems: 'center',
@@ -369,6 +374,22 @@ buttonRow: {
     justifyContent: 'space-around',
     width: '100%',
     marginTop: 20,
+},
+header: {
+  flexDirection: "row",
+  alignItems: "center",
+  paddingHorizontal: 20,
+  paddingTop: 15,
+  paddingBottom: 15,
+  backgroundColor: "#fff",
+
+},
+headerTitle: {
+  fontSize: 22,
+  fontWeight: "700",
+  flex: 1,
+  textAlign: "center",
+  color: "#333",
 },
 });
 

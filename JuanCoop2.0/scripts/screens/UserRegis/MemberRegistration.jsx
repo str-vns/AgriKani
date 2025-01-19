@@ -26,6 +26,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import messaging from '@react-native-firebase/messaging';
 
 
+
 function MemberRegistration() {
   const { coops } = useSelector((state) => state.allofCoops);
   const context = useContext(AuthGlobal);
@@ -51,7 +52,9 @@ function MemberRegistration() {
   const [modalVisible2, setModalVisible2] = useState(false);
   const [loadings, setLoadings] = useState(false);
   const [errors, setErrors] = useState(null);
- 
+  const handleBackClick = () => {
+    navigation.navigate('UserProfile');
+  };
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -226,8 +229,10 @@ function MemberRegistration() {
 
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
+      
       <View style={styles.container}>
-        <Text style={styles.title}>Agriconnect</Text>
+        
+        <Text style={styles.title}>JuanCoop</Text>
         <Image source={require("@assets/img/logo.png")} style={styles.logo} />
         <Text style={styles.subtitle}>Member Registration</Text>
 

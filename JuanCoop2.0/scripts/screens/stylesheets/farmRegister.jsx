@@ -96,7 +96,7 @@ export default StyleSheet.create({
   },
   registerButtonText: {
     fontSize: 22,
-    color: "#000",
+    color: "#FFFFFF",
     fontWeight: "bold",
   },
   modalContainer: {

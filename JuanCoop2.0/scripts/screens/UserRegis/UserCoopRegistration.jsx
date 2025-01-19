@@ -6,7 +6,7 @@ const StartScreen = ({ navigation }) => {
     <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <View style={styles.container}>
         {/* Farmer Icon */}
-        <Image source={require('@assets/img/Loogo.png')} style={styles.image} />
+        <Image source={require('@assets/img/logo.png')} style={styles.image} />
 
         {/* Title */}
         <Text style={styles.title}>JuanCoop</Text>
@@ -60,18 +60,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20, // Padding to prevent text touching edges
   },
   button: {
-    backgroundColor: '#FFA500', // Brighter yellow for attention
+    backgroundColor: '#f7b900', // Brighter yellow for attention
     paddingVertical: 15,
     paddingHorizontal: 40, // More horizontal padding for a bigger button
     borderRadius: 30, // More rounded corners for a modern feel
-    shadowColor: '#000', // Add shadow for depth
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 5, // For Android shadow effect
   },
   buttonText: {
-    color: '#000', // Black text for contrast
+    color: '#FFFFFF', // Black text for contrast
     fontSize: 20, // Slightly larger text for readability
     fontWeight: 'bold',
   },
