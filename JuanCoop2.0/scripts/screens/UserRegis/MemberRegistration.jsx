@@ -19,13 +19,11 @@ import { Picker } from "@react-native-picker/picker";
 import { allCoops } from "@redux/Actions/coopActions";
 import { createMember } from "@redux/Actions/memberActions";
 import { sendNotifications } from "@redux/Actions/notificationActions";
-import { useSocket } from '../../../SocketIo';
+import { useSocket } from "../../../SocketIo";
 import * as ImagePicker from "expo-image-picker";
 import styles from "@screens/stylesheets/UserRegis/memberRegistration";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import messaging from '@react-native-firebase/messaging';
-
-
+import messaging from "@react-native-firebase/messaging";
 
 function MemberRegistration() {
   const { coops } = useSelector((state) => state.allofCoops);
@@ -53,7 +51,7 @@ function MemberRegistration() {
   const [loadings, setLoadings] = useState(false);
   const [errors, setErrors] = useState(null);
   const handleBackClick = () => {
-    navigation.navigate('UserProfile');
+    navigation.navigate("UserProfile");
   };
   useEffect(() => {
     const fetchJwt = async () => {
@@ -69,7 +67,6 @@ function MemberRegistration() {
     fetchJwt();
   }, [userId, dispatch]);
 
- 
   useFocusEffect(
     useCallback(() => {
       dispatch(allCoops());
@@ -168,7 +165,6 @@ function MemberRegistration() {
   };
 
   const memberRegistration = async () => {
-  
     if (
       !address ||
       !barangay ||
@@ -191,23 +187,22 @@ function MemberRegistration() {
       validId: validId,
       userId: userId,
     };
-    
-  
+
     const notification = {
-      title: `Request for Membership Registration`, 
+      title: `Request for Membership Registration`,
       content: `You have a new request for membership registration name ${userName} ${userLast}. Please check the application for approval.`,
       user: coopId.userId,
       fcmToken: fcmToken,
-      type: "members"
-    }
-    
+      type: "members",
+    };
+
     socket.emit("sendNotification", {
       senderName: userName,
-      receiverName:  coopId.userId,
+      receiverName: coopId.userId,
       type: "Request for Membership Registration",
     });
 
-    dispatch(sendNotifications(notification , token))
+    dispatch(sendNotifications(notification, token));
     dispatch(createMember(memberRegistration, token));
 
     setAddress("");
@@ -218,24 +213,33 @@ function MemberRegistration() {
     setValidId(null);
     setMainBarangayClearance("");
     setMainValidId("");
-    
-    Alert.alert("Member Registration", "Member Registration Successful, We will send to email if your Registration was accepted by Cooperative that you Choose", [
-      {
-        text: "OK",
-        onPress: () => navigation.navigate("Home"),
-      },
-    ]);
+
+    Alert.alert(
+      "Member Registration",
+      "Member Registration Successful, We will send to email if your Registration was accepted by Cooperative that you Choose",
+      [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("Home"),
+        },
+      ]
+    );
   };
 
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
-      
       <View style={styles.container}>
-        
-        <Text style={styles.title}>JuanCoop</Text>
-        <Image source={require("@assets/img/logo.png")} style={styles.logo} />
-        <Text style={styles.subtitle}>Member Registration</Text>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.drawerButton}
+            onPress={() => navigation.openDrawer()}
+          >
+            <Ionicons name="menu" size={34} color="black" />
+          </TouchableOpacity>
 
+          <Text style={styles.headerTitle}>Member Registration</Text>
+        </View>
+        <Image source={require("@assets/img/logo.png")} style={styles.logo} />
         <Text style={styles.textHeaderInput}>Address</Text>
         <TextInput
           placeholder="Address"
@@ -267,15 +271,15 @@ function MemberRegistration() {
             onValueChange={(itemValue) => setCoopId(itemValue)}
           >
             <Picker.Item label="Select Cooperative" value="" enabled={false} />
-            { coops && coops?.length > 0 ? (
-    coops.map((coop, index) => (
-      <Picker.Item
-        key={index}
-        label={coop.farmName || "None"}
-        value={{ coopId: coop._id, userId: coop.user._id }} 
-        style={styles.pickerText}
-      />
-    ))
+            {coops && coops?.length > 0 ? (
+              coops.map((coop, index) => (
+                <Picker.Item
+                  key={index}
+                  label={coop.farmName || "None"}
+                  value={{ coopId: coop._id, userId: coop.user._id }}
+                  style={styles.pickerText}
+                />
+              ))
             ) : (
               <Text>No Cooperative</Text>
             )}
@@ -288,22 +292,20 @@ function MemberRegistration() {
           contentContainerStyle={styles.imageButton}
         >
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-           
-                  {mainbarangayClearance ? (
-                    <Image
-                      source={{ uri: mainbarangayClearance }}
-                      style={styles.image}
-                    />
-                  ) : (
-                    <View style={styles.ImageCard}>
-                    <View style={styles.cardContent}>
-                      <View style={styles.imageInfo}>
+            {mainbarangayClearance ? (
+              <Image
+                source={{ uri: mainbarangayClearance }}
+                style={styles.image}
+              />
+            ) : (
+              <View style={styles.ImageCard}>
+                <View style={styles.cardContent}>
+                  <View style={styles.imageInfo}>
                     <Ionicons name="camera-outline" size={50} color="black" />
-                    </View>
+                  </View>
+                </View>
               </View>
-            </View>
-                  )}
-            
+            )}
           </TouchableOpacity>
         </ScrollView>
 
@@ -313,19 +315,17 @@ function MemberRegistration() {
           contentContainerStyle={styles.imageButton}
         >
           <TouchableOpacity onPress={() => setModalVisible2(true)}>
-
-                  {mainValidId ? (
-                    <Image source={{ uri: mainValidId }} style={styles.image} />
-                  ) : (
-                    <View style={styles.ImageCard}>
-              <View style={styles.cardContent}>
-                <View style={styles.imageInfo}>
+            {mainValidId ? (
+              <Image source={{ uri: mainValidId }} style={styles.image} />
+            ) : (
+              <View style={styles.ImageCard}>
+                <View style={styles.cardContent}>
+                  <View style={styles.imageInfo}>
                     <Ionicons name="camera-outline" size={50} color="black" />
-                    </View>
+                  </View>
+                </View>
               </View>
-            </View>
-                  )}
-             
+            )}
           </TouchableOpacity>
         </ScrollView>
 
@@ -335,9 +335,11 @@ function MemberRegistration() {
           onPress={() => memberRegistration()}
           disabled={loadings}
         >
-          {loadings ? ( <ActivityIndicator size="small" color="#fff" />) 
-          : (<Text style={styles.buttonText}>Member Registration</Text>)}
-         
+          {loadings ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Apply</Text>
+          )}
         </TouchableOpacity>
 
         {/* Barangay Clearance */}

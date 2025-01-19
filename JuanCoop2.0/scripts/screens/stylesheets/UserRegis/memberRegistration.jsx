@@ -135,4 +135,19 @@ export default StyleSheet.create({
         width: width * 0.70,
         marginTop: 20,
       },
+      header: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 20,
+        paddingTop: 15,
+        paddingBottom: 15,
+        backgroundColor: "#fff",
+      },
+      headerTitle: {
+        fontSize: 22,
+        fontWeight: "700",
+        flex: 1,
+        textAlign: "center",
+        color: "#333",
+      },
 });

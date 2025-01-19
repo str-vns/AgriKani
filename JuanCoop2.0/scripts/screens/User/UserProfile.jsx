@@ -179,7 +179,7 @@ const UserProfile = () => {
             <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
 
-          {context?.stateUser?.isAuthenticated &&
+          {/* {context?.stateUser?.isAuthenticated &&
           userInfo?.roles &&
           userInfo.roles.includes("Customer") &&
           userInfo.roles.includes("Cooperative") ? (
@@ -205,7 +205,45 @@ const UserProfile = () => {
                 </Text>
               )}
             </View>
-          )}
+          )} */}
+         <View style={styles.registrationContainer}>
+      {context?.stateUser?.isAuthenticated && userInfo?.roles ? (
+        userInfo.roles.includes("Cooperative") ? (
+          // If the user is already part of a Cooperative
+          <TouchableOpacity 
+            style={styles.editFarmButton} 
+            onPress={() => navigation.navigate("EditFarm")}
+          >
+            <Text style={styles.editFarmButtonText}>Edit Your Farm</Text>
+          </TouchableOpacity>
+        ) : (
+          // If not part of a Cooperative, check other conditions
+          <View style={styles.registrationOptionsContainer}>
+            {filterUser?.length === 0 && (
+              // Show "Register your Cooperative" if not already in a Coop
+              <TouchableOpacity 
+                style={styles.registerCoopButton} 
+                onPress={() => navigation.navigate("ProfileCoop")}
+              >
+                <Text style={styles.registerCoopButtonText}>Register your Cooperative</Text>
+              </TouchableOpacity>
+            )}
+            {filterMember2?.length === 0 && (
+              // Show "Join Member" if not already a member of a group
+              <View style={styles.joinMemberContainer}>
+                <Text style={styles.joinMemberText}>Join Member</Text>
+                <TouchableOpacity 
+                  style={styles.joinMemberLinkButton} 
+                  onPress={() => navigation.navigate("MembersRegistration")}
+                >
+                  <Text style={styles.joinMemberLinkText}>Register here!</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )
+      ) : null}
+    </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
@@ -293,6 +331,59 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "center",
     color: "#333",
+  },
+  registrationContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  registrationOptionsContainer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  editFarmButton: {
+    backgroundColor: "#4CAF50",
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  editFarmButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  registerCoopButton: {
+    backgroundColor: "#2196F3",
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  registerCoopButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  joinMemberContainer: {
+    marginTop: 15,
+    alignItems: "center",
+  },
+  joinMemberText: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 5,
+  },
+  joinMemberLinkButton: {
+    marginTop: 5,
+  },
+  joinMemberLinkText: {
+    color: "#007BFF",
+    fontSize: 16,
+    textDecorationLine: "underline",
   },
 });
 
