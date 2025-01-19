@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -236,104 +237,104 @@ const UserSignIn = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>AgriKaani</Text>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>JuanCoop</Text>
 
-      <Image source={require("@assets/img/logo.png")} style={styles.logo} />
+        <Image source={require("@assets/img/logo.png")} style={styles.logo} />
 
-      <Text style={styles.subtitle}>Login to your account</Text>
-      <Text style={styles.instructions}>Welcome to AgriKaani</Text>
+        <Text style={styles.subtitle}>Login to your account</Text>
+        <Text style={styles.instructions}>Welcome to JuanCoop</Text>
 
-      <TextInput
-        placeholder="Enter your Email"
-        placeholderTextColor="#ccc"
-        style={styles.input}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        name="email"
-        id="email"
-        value={email}
-        onChangeText={(text) => setEmail(text)}
-      />
-
-      {/* Password input with eye icon */}
-      <View style={styles.passwordContainer}>
         <TextInput
-          placeholder="Enter your password"
+          placeholder="Enter your Email"
           placeholderTextColor="#ccc"
-          style={styles.passwordInput}
-          secureTextEntry={!isPasswordVisible}
-          value={password}
-          onChangeText={(text) => setPassword(text)}
+          style={styles.input}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          name="email"
+          id="email"
+          value={email}
+          onChangeText={(text) => setEmail(text)}
         />
-        <TouchableOpacity
-          onPress={() => setPasswordVisible(!isPasswordVisible)}
-        >
-          <Icon
-            name={isPasswordVisible ? "eye-off" : "eye"}
-            size={24}
-            color="#777"
+
+        {/* Password input with eye icon */}
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Enter your password"
+            placeholderTextColor="#ccc"
+            style={styles.passwordInput}
+            secureTextEntry={!isPasswordVisible}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
           />
+          <TouchableOpacity
+            onPress={() => setPasswordVisible(!isPasswordVisible)}
+          >
+            <Icon
+              name={isPasswordVisible ? "eye-off" : "eye"}
+              size={24}
+              color="#777"
+            />
+          </TouchableOpacity>
+        </View>
+    
+
+        <Text
+    style={[styles.linkText, styles.rightAlign]}
+    onPress={() => navigation.navigate("ForgotPass")}
+  >
+    forgot Password?
+  </Text>
+        
+        {error ? <Error message={error} /> : null}
+        <TouchableOpacity
+          style={styles.buttonEmail}
+          onPress={() => handleSubmit()}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
         </TouchableOpacity>
+
+        <View style={styles.divider}>
+          <View style={styles.line} />
+          <Text style={styles.dividerText}>or continue with</Text>
+          <View style={styles.line} />
+        </View>
+
+        <TouchableOpacity style={styles.buttonGoogle}>
+          <Image
+            source={{
+              uri: "https://freelogopng.com/images/all_img/1657952217google-logo-png.png",
+            }}
+            style={styles.googleLogo}
+          />
+          <Text style={styles.buttonText}></Text>
+        </TouchableOpacity>
+
+        <Text style={styles.agreement}>
+          Don’t have an account?{" "}
+          <Text
+            style={styles.linkText}
+            onPress={() => navigation.navigate("Register")}
+          >
+            Sign Up
+          </Text>
+        </Text>
+        {/* <Text style={styles.agreement}>
+          <Text
+            style={styles.linkText}
+            // onPress={() => navigation.navigate("Register")}
+          >
+            Forgot Your Password?
+          </Text>
+        </Text> */}
       </View>
-  
-
-      <Text>
-        <Text
-          style={styles.linkText}
-          onPress={() => navigation.navigate("ForgotPass")}
-        >
-          forgot Password?
-        </Text>
-      </Text>
-      
-      {error ? <Error message={error} /> : null}
-      <TouchableOpacity
-        style={styles.buttonEmail}
-        onPress={() => handleSubmit()}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Login</Text>
-        )}
-      </TouchableOpacity>
-
-      <View style={styles.divider}>
-        <View style={styles.line} />
-        <Text style={styles.dividerText}>or continue with</Text>
-        <View style={styles.line} />
-      </View>
-
-      <TouchableOpacity style={styles.buttonGoogle}>
-        <Image
-          source={{
-            uri: "https://freelogopng.com/images/all_img/1657952217google-logo-png.png",
-          }}
-          style={styles.googleLogo}
-        />
-        <Text style={styles.buttonText}></Text>
-      </TouchableOpacity>
-
-      <Text style={styles.agreement}>
-        Don’t have an account?{" "}
-        <Text
-          style={styles.linkText}
-          onPress={() => navigation.navigate("Register")}
-        >
-          Sign Up
-        </Text>
-      </Text>
-      {/* <Text style={styles.agreement}>
-        <Text
-          style={styles.linkText}
-          // onPress={() => navigation.navigate("Register")}
-        >
-          Forgot Your Password?
-        </Text>
-      </Text> */}
-    </View>
+    </ScrollView>
   );
 };
 

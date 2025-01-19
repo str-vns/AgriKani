@@ -42,11 +42,12 @@ export default StyleSheet.create({
       flexDirection: "row",
       alignItems: "center",
       width: "100%",
+      height:"8.5%",
       padding: 7,
       borderColor: "#ddd",
       borderWidth: 1,
       borderRadius: 10,
-      marginBottom: 20,
+      
     },
     passwordInput: {
       flex: 1,
@@ -105,7 +106,14 @@ export default StyleSheet.create({
     },
     linkText: {
       color: "#007bff",
-      textAlign: "center",
+      textAlign: "right", // Aligns text to the right
+      fontSize: 14,
+      marginTop: 5,
+      marginBottom: 5,
+    },
+    rightAlign: {
+      alignSelf: "flex-end", // Ensures it moves to the right edge
+      marginRight: 10, // Adds spacing from the right edge
     },
   });
   
