@@ -3,13 +3,18 @@ const Farm = require("../models/farm");
 const Product = require("../models/product");
 const Otp = require("../models/otp");
 const bcrypt = require("bcrypt");
+const token = require("../utils/token");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose, trusted } = require("mongoose");
 const { uploadImageSingle } = require("../utils/imageCloud");
 const { cloudinary } = require("../utils/cloudinary");
 const uuid = require("uuid");
+const { sendEmail } = require("../utils/sendMail");
+const { google } = require("googleapis");
+const { OAuth2 } = google.auth;
 const blacklistedTokens = [];
+const client = new OAuth2(process.env.GOOGLE_CREDS)
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -397,9 +402,9 @@ exports.resetforgotPassword = async (req) => {
     throw new ErrorHandler("Password does not match");
   }
 
-  if (user.resetTokenUsed) {
-    throw new ErrorHandler("Reset token has been used");
-  }
+  // if (user.resetTokenUsed) {
+  //   throw new ErrorHandler("Reset token has been used");
+  // }
 
   const hashedPassowrd = await bcrypt.hash(
     req.body.newPassword,
@@ -414,4 +419,144 @@ exports.resetforgotPassword = async (req) => {
    return `Password has been reset successfully for user with email ${req.body.email}`;
 }
 
+exports.googleLoginWeb = async (req, res) => {
+  try{
+
+
+    const verify = await client.verifyIdToken({ idToken: req.body.credential, audience: process.env.GOOGLE_CREDS });
+     console.log(verify.payload, "verify"); 
+    const { email_verified, email, given_name, family_name, picture } = verify.payload;
+   
+    if (!email_verified) return res.status(400).json({ msg: "Email verification failed." });
+
+     const user = await User.findOne({ email });
+
+  if(!user) 
+  {
+    const newUser = await User.create({
+      firstName: given_name,
+      lastName: family_name || " " ,
+      email: email,
+      image: {
+        public_id: "google",
+        url: picture,
+        originalname: "google",
+      },
+      password: await bcrypt.hash(email + process.env.SALT, 10),
+      gender: GENDER.PNTS,
+      age: 18,
+      phoneNum: "09123456789",
+      roles: [ROLE.CUSTOMER],
+    });
+  }
+
+ const accountUser = await User.findOne({ email }).exec();
+  const accessToken = token.generateAccessToken(
+    accountUser.email,
+    accountUser.roles,
+    accountUser.firstName,
+    accountUser.lastName,
+    accountUser.image
+  );
+  const accessTokenMaxAge = 7 * 24 * 60 * 60 * 1000;
+ console.log(accountUser)
+  return {user: accountUser, accessToken, accessTokenMaxAge};
+
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
   
+exports.forgotPassword = async (req) => {
+  console.log(req.body.email);
+  try {
+      const resetToken = uuid.v4();
+      let user = await User.findOne({ email: req.body.email });
+
+      if (!user) {
+       throw new ErrorHandler("User not found", 500); 
+      }
+ 
+      const resetUrl = `http://localhost:5174/resetPassword/${resetToken}`;
+     const email = req.body.email;
+  const mailOptions = {
+    to: email,
+    subject: `Password Recovery - JuanCoop`,
+    html: `
+      <section class="max-w-2xl px-6 py-8 mx-auto bg-white dark:bg-gray-900">
+      <header>
+         <h1> Juan Coop</h1>     
+      </header>
+  
+      <main class="mt-8">
+          <h4 class="text-gray-700 dark:text-gray-200">Hi \n\n${user?.firstName}${user?.lastName}\n\n,</h4>
+  
+          <p class="mt-2 leading-loose text-gray-600 dark:text-gray-300">
+              This message Enable you to create New Password In <span class="font-semibold ">JuanCoop</span>.
+          </p>
+          
+
+             <a href="${resetUrl}" class="button px-6 py-2 mt-4 text-sm font-medium tracking-wider text-white"> New Password</a>
+          
+          <p class="mt-8 text-gray-600 dark:text-gray-300">
+              Thanks, <br>
+              JuanCoop
+          </p>
+      </main>
+      
+  
+      
+  </section>
+    `,
+};
+
+  await sendEmail(mailOptions);
+
+  await User.findByIdAndUpdate(
+    user._id,
+    {
+      resetToken: resetToken,
+      resetTokenUsed: false,
+    },
+    { new: true }
+  );
+
+return resetToken;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+exports.resetforgotPasswordWeb = async (req) => {
+  console.log(req)
+   const user = await User.findOne({
+     resetToken: req.params.resetToken,
+   });
+ 
+  //  console.log(req.params.resetToken)
+   if (!user) {
+     throw new ErrorHandler("User not found with this email");
+   }
+ 
+   if (req.body.newPassword !== req.body.confirmPassword) {
+     throw new ErrorHandler("Password does not match");
+   }
+ 
+  //  if (user.resetTokenUsed) {
+  //    throw new ErrorHandler("Reset token has been used");
+  //  }
+ 
+   const hashedPassowrd = await bcrypt.hash(
+     req.body.newPassword,
+     Number(process.env.SALT)
+   )
+ 
+   await User.findByIdAndUpdate(user._id, {
+     password: hashedPassowrd,
+     resetTokenUsed: true,
+   });
+ 
+    return `Password has been reset successfully for user with email ${user.email}`;
+ }

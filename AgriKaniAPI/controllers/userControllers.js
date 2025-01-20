@@ -165,3 +165,21 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 
   return SuccessHandler(res, `Password Reset Successfully`, reset);
 });
+
+exports.googleLogin1 = asyncHandler(async (req, res) => {
+  const google = await userProcess.googleLoginWeb (req, res);
+
+  return SuccessHandler(res, `Google Login Successfully`, google);
+});
+
+exports.forgotPassword = asyncHandler(async (req, res) => {
+  const forgot = await userProcess.forgotPassword(req);
+
+  return SuccessHandler(res, `Email Sent Successfully`, forgot);
+});
+
+exports.forgotPasswordWeb = asyncHandler(async (req, res) => {
+  const forgot = await userProcess.resetforgotPasswordWeb(req);
+
+  return SuccessHandler(res, `Email Sent Successfully`, forgot);
+});

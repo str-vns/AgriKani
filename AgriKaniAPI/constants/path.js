@@ -14,7 +14,9 @@ module.exports = {
   CHECK_EMAIL: "/check-email",
   OTP_FORGOT_PASSWORD: "/otp-forgot-password",
   RESET_PASSWORD: "/reset-password",
-
+  FORGOR_PASSWORD_WEB: "/reset-Password-Web",
+  RESET_PASSWORD_WEB: "/resetPassword/:resetToken",
+  GOOGLE_LOGIN_WEB: "/google-login-web",
   //Auth
   LOGIN: "/signin",
   LOGOUT: "/signout",

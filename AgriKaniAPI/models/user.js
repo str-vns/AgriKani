@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
   },
   lastName: {
     type: String,
-    required: [true, "Please enter your Last Name!"],
+    // required: [true, "Please enter your Last Name!"],
     maxLength: [30, "Your name cannot exceed 30 characters!"],
   },
   age: {

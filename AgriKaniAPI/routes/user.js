@@ -95,6 +95,24 @@ const userRoutes = [
     roles: [],
     handler: userController.resetPassword,
   },
+  {
+    method: method.POST,
+    path: path.GOOGLE_LOGIN_WEB,
+    roles: [],
+    handler: userController.googleLogin1,
+  },
+  {
+    method: method.POST,
+    path: path.FORGOR_PASSWORD_WEB,
+    roles: [],
+    handler: userController.forgotPassword,
+  },
+  {
+    method: method.POST,
+    path:   path.RESET_PASSWORD_WEB,
+    roles: [],
+    handler: userController.forgotPasswordWeb,
+  }
 ];
 
 userRoutes.forEach((route) => {
