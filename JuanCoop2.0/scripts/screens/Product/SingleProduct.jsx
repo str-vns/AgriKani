@@ -79,6 +79,7 @@ const SingleProduct = ({ route }) => {
         coop: product.coop,
         user: product.user,
         image: product.image[0]?.url,
+        maxQuantity: selectedSize?.quantity,
        }   
      
       Alert.alert("Item added to cart");

@@ -3,13 +3,23 @@ import { jwtDecode } from "jwt-decode";
 import Toast from "react-native-toast-message";
 import baseURL from "@assets/commons/baseurl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import {
+  GOOGLE_LOGIN_REQUEST, 
+  GOOGLE_LOGIN_SUCCESS,
+  GOOGLE_LOGIN_FAIL,
+} from "../Constants/userConstants";
 import {
     CLEAR_CART,
   } from '../Constants/cartConstants';
 
 export const SET_CURRENT_USER = "SET_CURRENT_USER"
 export const SET_LOGOUT_USER = "SET_LOGOUT_USER"
+import {
+  GoogleSignin,
+  isErrorWithCode,
+  statusCodes
+} from '@react-native-google-signin/google-signin';
+import axios from "axios";
 
 export const loginUser = async (user, dispatch) => {
 
@@ -53,6 +63,38 @@ export const loginUser = async (user, dispatch) => {
   
     }
 };
+
+export const googleLogin = async (dispatch) => {
+    try {
+
+      await GoogleSignin.hasPlayServices();
+  
+      const response = await GoogleSignin.signIn();
+  
+      const { data } = await axios.post(`${baseURL}google-login-web`, { 
+        credential: response.data.idToken 
+      });
+  
+      
+      if (data && data.details) {
+        const token = data.details.accessToken;
+        const userInfo = data.details.user;
+  
+        await AsyncStorage.setItem("jwt", token);
+        await AsyncStorage.setItem("user", JSON.stringify(userInfo));
+  
+        const decoded = jwtDecode(token);
+        console.log(decoded)
+        dispatch(setCurrentUser(decoded, userInfo));
+        dispatch({ type: GOOGLE_LOGIN_SUCCESS, payload: data.details });
+      } else {
+        console.log("No user details found in the response.");
+      }
+    } catch (error) {
+      console.error("Error during Google Login:", error);
+      dispatch(setCurrentUser({}, error.message));
+    }
+  };
 
 export const getUserProfile = (id) => {
     fetch(`${baseURL}users/${id}`, {

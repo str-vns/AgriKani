@@ -129,7 +129,7 @@ const UserSidebar = () => {
     } else if (key === "profile") {
       navigation.navigate("Profile");
     } else if (key === "messages") {
-      navigation.navigate("Messaging");
+      navigation.navigate("Messaging", { screen: "Messages" });
     } else if (key === "productArchive") {
       navigation.navigate("productArchive");
     } else if (key === "product") {
@@ -207,11 +207,11 @@ const UserSidebar = () => {
         userslogin?.roles.includes("Cooperative") ? (
           <>
             <Image
-              source={{ uri: user?.image?.url }}
+              source={{ uri: userslogin?.image?.url }}
               style={styles.profileImage}
             />
             <Text style={styles.profileName}>
-              {user?.firstName} {user?.lastName}
+              {userslogin?.firstName} {userslogin?.lastName}
             </Text>
             <Text style={styles.profileRole}>Cooperative</Text>
           </>
@@ -220,11 +220,11 @@ const UserSidebar = () => {
           userslogin?.roles.includes("Customer") ? (
           <>
             <Image
-              source={{ uri: user?.image?.url }}
+              source={{ uri: userslogin?.image?.url }}
               style={styles.profileImage}
             />
             <Text style={styles.profileName}>
-              {user?.firstName} {user?.lastName}
+              {userslogin?.firstName} {userslogin?.lastName}
             </Text>
             <Text style={styles.profileRole}>User</Text>
           </>
@@ -238,11 +238,11 @@ const UserSidebar = () => {
         userslogin?.roles.includes("Driver") ? (
         <>
           <Image
-            source={{ uri: user?.image?.url }}
+            source={{ uri: userslogin?.image?.url }}
             style={styles.profileImage}
           />
           <Text style={styles.profileName}>
-            {user?.firstName} {user?.lastName}
+            {userslogin?.firstName} {userslogin?.lastName}
           </Text>
           <Text style={styles.profileRole}>Driver</Text>
         </>

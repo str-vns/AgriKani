@@ -13,6 +13,7 @@ import QrScan from "@src/screens/Rider/QrScan";
 import RiderDetails from "@src/screens/Rider/RiderDetails";
 import AssignLocation from "@src/screens/Rider/RiderAssignLoc";
 import MaxCapacity from "@src/screens/Rider/RiderCapacity";
+import CoopDashboard from "@screens/Farmer/FarmerDashboard";
 // Coop part for rider
 import Register from "@src/screens/Rider/Register";
 import Otp from "@src/screens/Rider/Otp";

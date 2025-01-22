@@ -22,7 +22,7 @@ const FarmerNotification = ({ navigation }) => {
   const context = useContext(AuthGlobal);
   const userId = context.stateUser.userProfile?._id;
   const roles = context.stateUser.userProfile.roles; 
-  const userRole = roles.includes("Cooperative") && roles.includes("Customer") ? styles.containerCooP : styles.container;
+  const userRole = roles?.includes("Cooperative") && roles?.includes("Customer") ? styles.containerCooP : styles.container;
   const { notifloading, notification, notiferror } = useSelector((state) => state.getNotif);
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = useState(false);

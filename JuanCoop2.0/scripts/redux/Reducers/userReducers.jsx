@@ -65,6 +65,11 @@ import {
   RESET_PASSWORD_REQUEST,
   RESET_PASSWORD_SUCCESS,
   RESET_PASSWORD_FAIL,
+  
+  GOOGLE_LOGIN_REQUEST, 
+  GOOGLE_LOGIN_SUCCESS,
+  GOOGLE_LOGIN_FAIL,
+  
 } from "../Constants/userConstants";
 
 export const RegisterReducer = (state = { user: {} }, action) => {
@@ -307,6 +312,22 @@ export const otpForgotPasswordReducer = (state = { otp: {} }, action) => {
     case OTP_FORGOT_PASSWORD_FAIL:
       case RESET_PASSWORD_FAIL:
       return { loading: false, error: true, otps: action.payload };
+    case CLEAR_ERRORS:
+      return { ...state, error: null };
+    default:
+      return state;
+  }
+}
+
+export const googleLoginReducer = (state = { googleUser: {} }, action) => { 
+
+  switch (action.type) {
+    case GOOGLE_LOGIN_REQUEST:
+      return { loading: true, googleUser: {} };
+    case GOOGLE_LOGIN_SUCCESS:
+      return { loading: false, googleUser: action.payload };
+    case GOOGLE_LOGIN_FAIL:
+      return { loading: false, error: action.payload };
     case CLEAR_ERRORS:
       return { ...state, error: null };
     default:

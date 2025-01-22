@@ -50,12 +50,16 @@ import {
   RESET_PASSWORD_REQUEST,
   RESET_PASSWORD_SUCCESS,
   RESET_PASSWORD_FAIL,
+    
+  GOOGLE_LOGIN_REQUEST, 
+  GOOGLE_LOGIN_SUCCESS,
+  GOOGLE_LOGIN_FAIL,
 } from "../Constants/userConstants";
 import baseURL from "@assets/commons/baseurl";
 import Toast from "react-native-toast-message";
 import mime from "mime";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { setCurrentUser } from "./Auth.actions";
 
 export const registeruser = (userData) => async (dispatch) => {
   const regi = userData.registration
@@ -245,7 +249,16 @@ export const ProfileEdit = (userDataId, token, userData) => async (dispatch) => 
         type: EDIT_PROFILE_SUCCESS,
         payload: data.details,
     });
-
+    
+    const userInfo = data.details.user;
+    const TokiToken = data.details.accessToken;
+    console.log("User Info:", userInfo);
+    await AsyncStorage.setItem("user", JSON.stringify(userInfo));
+    await AsyncStorage.setItem("jwt", TokiToken);
+    const decoded = token;
+    
+    dispatch(setCurrentUser(decoded, userInfo ));
+ 
     Toast.show({
         topOffset: 60,
         type: "success",
@@ -650,4 +663,5 @@ export const clearErrors = () => async (dispatch) => {
 
 	})
 }
+
 

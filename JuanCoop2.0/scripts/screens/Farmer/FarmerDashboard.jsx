@@ -131,7 +131,7 @@ const FarmerDashboard = () => {
     useCallback(() => { 
         const fetchDailyWeather = async () =>
           {
-              const response = await fetch(`https://api.weatherbit.io/v2.0/forecast/daily?city=Manila&country=PH&key=b38eb1b293194679af1fd62ae0feb39c`);
+              const response = await fetch(`https://api.weatherbit.io/v2.0/forecast/daily?city=Manila&country=PH&key=${Constants?.expoConfig?.extra?.WEATHER_API_KEY}`);
               const data = await response.json();
               setDailyWeather(data);
               }

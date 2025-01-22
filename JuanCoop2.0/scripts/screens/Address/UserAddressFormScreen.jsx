@@ -142,7 +142,7 @@ const UserAddressForm = ({ route, navigation }) => {
     setIsLoading(true);
 
     try {
-      dispatch(addAddress(payload));
+      dispatch(addAddress(payload,));
       setIsLoading(false);
       navigation.goBack(); 
 

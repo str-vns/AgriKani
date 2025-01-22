@@ -18,13 +18,28 @@ import { useSocket } from "../../../SocketIo";
 import styles from "@screens/stylesheets/UserRegis/UserSignIn";
 import messaging from "@react-native-firebase/messaging";
 import { saveDeviceToken } from "@redux/Actions/userActions";
-import { useDispatch } from "react-redux";
+import { googleLogin } from "@redux/Actions/Auth.actions";
+import { useDispatch, useSelector } from "react-redux";
+import Constants from "expo-constants";
+import {
+    GoogleSignin,
+    GoogleSigninButton,
+    statusCodes,
+} from '@react-native-google-signin/google-signin';
 
+GoogleSignin.configure({
+  webClientId: "239225060602-onmhk6p6a374mhh2n6p8gmbcmp79vbao.apps.googleusercontent.com",
+  scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+  offlineAccess: true,
+  forceCodeForRefreshToken: true,
+  iosClientId: Constants?.expoConfig?.extra?.GOOGLE_LOGIN_IOS,  
+})
 
 const UserSignIn = () => {
   const dispatch = useDispatch();
   const socket = useSocket();
   const context = useContext(AuthGlobal);
+  const { loading, googleUser } = useSelector((state) => state.googleLogin);
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,6 +49,7 @@ const UserSignIn = () => {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
   const [error, setError] = useState("");
+  const [userInfos, setUserInfos] = useState("");
   const userInfo = context?.stateUser?.user?.CustomerInfo;
   const user = context?.stateUser?.userProfile;
 
@@ -116,6 +132,7 @@ const UserSignIn = () => {
     return unsubscribe;
   }, []);
 
+  console.log("User Info: ",context?.stateUser?.userProfile );
   useEffect(() => {
     if (
       context?.stateUser?.isAuthenticated &&
@@ -124,7 +141,7 @@ const UserSignIn = () => {
       userInfo.roles.includes("Cooperative")
     ) {
       const saveDtoken = {
-        email: email,
+        email: email || googleUser?.user?.email ,
         deviceToken: fcmToken,
       };
 
@@ -140,7 +157,7 @@ const UserSignIn = () => {
       userInfo.roles.includes("Admin")
     ) {
       const saveDtoken = {
-        email: email,
+        email: email || googleUser?.user?.email,
         deviceToken: fcmToken,
       };
 
@@ -156,7 +173,7 @@ const UserSignIn = () => {
       userInfo.roles.includes("Customer")
     ) {
       const saveDtoken = {
-        email: email,
+        email: email || googleUser?.user?.email,
         deviceToken: fcmToken,
       };
 
@@ -172,7 +189,7 @@ const UserSignIn = () => {
       userInfo.roles.includes("Driver")
     ) {
       const saveDtoken = {
-        email: email,
+        email: email || googleUser?.user?.email,
         deviceToken: fcmToken,
       };
 
@@ -183,8 +200,7 @@ const UserSignIn = () => {
       setIsLoading(false);
       console.log("Navigating to Home");
       navigation.navigate("Deliveries");
-    }
-    else {
+    }else if(  context?.stateUser?.userProfile === "Your email or password is incorrect. Please try again." ){
      
     
       setError(
@@ -194,7 +210,7 @@ const UserSignIn = () => {
       );
     setIsLoading(false);
     }
-  }, [context?.stateUser?.isAuthenticated]);
+  }, [context?.stateUser?.isAuthenticated, googleUser?.user?.email,]);
   
 
   const handleSubmit = () => {
@@ -235,6 +251,7 @@ const UserSignIn = () => {
 
     fetchAllStorage();
   }, []);
+
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -305,8 +322,8 @@ const UserSignIn = () => {
           <Text style={styles.dividerText}>or continue with</Text>
           <View style={styles.line} />
         </View>
-
-        <TouchableOpacity style={styles.buttonGoogle}>
+{/* 
+        <TouchableOpacity style={styles.buttonGoogle} onPress={() => promptAsync()}>
           <Image
             source={{
               uri: "https://freelogopng.com/images/all_img/1657952217google-logo-png.png",
@@ -314,8 +331,13 @@ const UserSignIn = () => {
             style={styles.googleLogo}
           />
           <Text style={styles.buttonText}></Text>
-        </TouchableOpacity>
-
+        </TouchableOpacity> */}
+        <GoogleSigninButton
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Light}
+          onPress={() => googleLogin(context.dispatch)}
+        />
+        
         <Text style={styles.agreement}>
           Don’t have an account?{" "}
           <Text

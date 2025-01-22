@@ -44,8 +44,10 @@ const Cart = () => {
   };
 
   const increment = (item) => {
+    if(item?.quantity < item?.maxQuantity) {
     dispatch(updateCartQuantity(item.inventoryId, item.quantity + 1));
   };
+}
 
   const decrement = (item) => {
     if (item.quantity > 1) {

@@ -5,6 +5,7 @@ import baseURL from "@assets/commons/baseurl";
 
 export const fetchAddresses = (userId) => async (dispatch) => {
   try {
+
     const response = await axios.get(`${baseURL}address/${userId}`);
     dispatch({
       type: GET_ADDRESSES,
@@ -15,9 +16,15 @@ export const fetchAddresses = (userId) => async (dispatch) => {
   }
 };
 
-export const addAddress = (addressData) => async (dispatch) => {
+export const addAddress = (addressData, token) => async (dispatch) => {
   try {
-    const response = await axios.post(`${baseURL}address`, addressData);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const response = await axios.post(`${baseURL}address`, addressData, config);
     dispatch({
       type: ADD_ADDRESS,
       payload: response.data.details,

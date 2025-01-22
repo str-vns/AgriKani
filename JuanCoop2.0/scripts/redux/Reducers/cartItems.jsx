@@ -10,7 +10,7 @@ import {
   const cartItems = (state = [], action) => {
     switch (action.type) {
       case ADD_TO_CART:
-        return action.payload;  // The updated cart items after the action
+        return action.payload;  
   
       case REMOVE_FROM_CART:
         return state.filter(cartItem => cartItem.inventoryId !== action.payload);

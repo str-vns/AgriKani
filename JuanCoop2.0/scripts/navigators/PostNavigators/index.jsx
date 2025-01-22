@@ -9,6 +9,7 @@ const Stack = createNativeStackNavigator();
 const Index = () => {
   return (
     <Stack.Navigator>
+      
        <Stack.Screen
         name="UserPostList"
         component={UserPostList}

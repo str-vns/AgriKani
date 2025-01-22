@@ -17,28 +17,54 @@ import {
   };
 
   export const addToCart = (payload) => {
-    return async (dispatch, getState) => {
-  
-      const storedCart = await AsyncStorage.getItem('cartItems');
-      let cartItems = storedCart ? JSON.parse(storedCart) : []; 
-      
-      const existingItem = cartItems.find(item => item.inventoryId === payload.inventoryId);
-      if (existingItem) {
-        cartItems = cartItems.map(item =>
-          item.inventoryId === payload.inventoryId
-            ? { ...item, quantity: item.quantity + payload.quantity }
-            : item
-        );
-      } else {
-        cartItems.push(payload);
-      }
+    return async (dispatch) => {
+      try {
 
-      await AsyncStorage.setItem('cartItems', JSON.stringify(cartItems));
-      
-      dispatch({
-        type: ADD_TO_CART,
-        payload: cartItems,
-      });
+        const storedCartItems = await AsyncStorage.getItem('cartItems');;
+        let cartItems = storedCartItems ? JSON.parse(storedCartItems) : [];
+  
+        if (!Array.isArray(cartItems)) {
+          console.warn("cartItems is not an array, resetting to an empty array.");
+          cartItems = [];
+        }
+
+        const existingCartItem = cartItems.find(item => item.inventoryId === payload.inventoryId);
+  
+        if (existingCartItem) {
+          const newQuantity = existingCartItem.quantity + payload.quantity;
+  
+          if (newQuantity <= existingCartItem.maxQuantity) {
+            cartItems = cartItems.map(item =>
+              item.inventoryId === payload.inventoryId
+                ? { ...item, quantity: newQuantity }
+                : item
+            );
+          } else {
+            const allowedQuantity = existingCartItem.maxQuantity - existingCartItem.quantity;
+            if (allowedQuantity > 0) {
+              cartItems = cartItems.map(item =>
+                item.inventoryId === payload.inventoryId
+                  ? { ...item, quantity: item.quantity + allowedQuantity }
+                  : item
+              );
+            } else {
+              console.log("Cannot add more, max quantity reached.");
+            }
+          }
+        } else {
+          const allowableQuantity = Math.min(payload.quantity, payload.maxQuantity);
+          cartItems.push({ ...payload, quantity: allowableQuantity });
+        }
+  
+        await AsyncStorage.setItem("cartItems", JSON.stringify(cartItems));
+  
+        dispatch({
+          type: ADD_TO_CART,
+          payload: cartItems,
+        });
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+      }
     };
   };
   

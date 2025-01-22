@@ -157,27 +157,38 @@ useEffect(() => {
    }, []);
 
   const handleBackPress = () => {
-    const currentRoute = navigation.getCurrentRoute()?.name;
-    console.log("Current Route:", navigation.getCurrentRoute());
-    if (currentRoute === "Coop") { 
-      Alert.alert("Exit App", "Exiting the application?", [
+    // const currentRoute = navigation.getCurrentRoute()?.name;
+    // console.log("Current Route:", navigation.getCurrentRoute());
+    // if (currentRoute === "Coop") { 
+    //   Alert.alert("Exit App", "Exiting the application?", [
+    //     {
+    //       text: "Cancel",
+    //       onPress: () => null,
+    //       style: "cancel",
+    //     },
+    //     {
+    //       text: "Ok",
+    //       onPress: () => BackHandler.exitApp(),
+    //     },
+    //   ]);
+    //   return true; 
+    // } else {
+
+    //   navigation.goBack();
+    //   return true; 
+    // }
+      Alert.alert("Hold on!", "Are you sure you want to go back?", [
         {
           text: "Cancel",
           onPress: () => null,
           style: "cancel",
         },
-        {
-          text: "Ok",
-          onPress: () => BackHandler.exitApp(),
-        },
+        { text: "YES", onPress: () => BackHandler.exitApp() },
       ]);
-      return true; 
-    } else {
-
-      navigation.goBack();
-      return true; 
-    }
+      return true;
   };
+
+
 
   useFocusEffect(
     React.useCallback(() => {

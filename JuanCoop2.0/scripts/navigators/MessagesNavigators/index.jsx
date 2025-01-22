@@ -3,12 +3,18 @@ import { View, Text, Image} from 'react-native';
 import { createStackNavigator } from "@react-navigation/stack";
 import Messages from "@screens/Message/UserChatlist";
 import ChatMessages from "@screens/Message/UserChat";
+import CoopDashboard from "@screens/Farmer/FarmerDashboard";
 const Stack = createStackNavigator();
 
 const Index = () => {
   return (
     <>
     <Stack.Navigator>
+    <Stack.Screen
+        name="CoopDashboard"
+        component={CoopDashboard}
+        options={{ headerShown: false, tabBarShowLabel: false }}
+      />
       <Stack.Screen
         name="Messages"
         component={Messages}
