@@ -12,6 +12,7 @@ const sendEmailWithAttachment = require("../utils/emailreceipts");
 const path = require("path");
 const fs = require("fs");
 const { sendEmail } = require("../utils/sendMail");
+const admin = require('firebase-admin');
 
 // Create a new order
 exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice, user }) => {
@@ -24,22 +25,59 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
     throw new ErrorHandler("User not found", 404);
   }
 
-  // Validate and update stock
   for (const item of orderItems) {
-    console.log(item, "Item");
-    const inventory = await Inventory.findById(item.inventoryProduct);
+    const userId = await Farm.findById(item.coopUser);
+    const singleUser = await User.findById(userId?.user).lean().exec();
+    const inventory = await Inventory.findById(item.inventoryProduct)
+      .populate({ path: "productId", select: "productName" });
+      const product = await Product.findById(item.product);
+
+    if (!singleUser) {
+      throw new ErrorHandler(STATUSCODE.NOT_FOUND, "User not found");
+    }
 
     if (!inventory) {
-      throw new ErrorHandler(`Inventory with ID ${item.product} not found`, 404);
+      throw new ErrorHandler(`Inventory with ID ${item.inventoryProduct} not found`, 404);
     }
 
-    if (inventory.quantity < item.quantity) {
-      throw new ErrorHandler(
-        `Insufficient stock for product ${inventory.productName}. Available stock: ${inventory.stock}`,
-        400
-      );
+    if (inventory.quantity !== 0) {
+      inventory.quantity -= item.quantity;
+      console.log("Quantity has been deducted");
     }
 
+    if (inventory.quantity <= 5) {
+      await Notification.create({
+        title: "Low Stock",
+        content: `Inventory ${inventory.productId?.productName}, ${inventory.unitName} ${inventory.metricUnit} has only ${inventory.quantity} items left`,
+        user: userId?.user,
+        type: "inventory",
+      });
+
+      await sendFcmNotification(singleUser, "Low Stock Alert", 
+        `Inventory ${inventory.productId?.productName} ${inventory.unitName} ${inventory.metricUnit} is running low. Only ${inventory.quantity} items left.`);
+    }
+
+    // if (inventory.quantity === 0) {
+    //   inventory.status = 'inactive';
+    //   await Notification.create({
+    //     title: "Product Out of Stock",
+    //     content: `Inventory ${inventory.productId?.productName}, ${inventory.unitName} ${inventory.metricUnit} is out of stock`,
+    //     user: userId?.user,
+    //     type: "inventory",
+    //   });
+
+    //   await sendFcmNotification(singleUser, "Out of Stock Alert", 
+    //     `Inventory ${inventory.productId?.productName}  ${inventory.unitName} ${inventory.metricUnit} is out of stock.`);
+    // }
+
+    await inventory.save();
+    const inventoryItems = await Inventory.find({ productId: inventory.productId?._id });
+    const allQuantitiesZero = inventoryItems.every(item => item.quantity === 0);
+    console.log("All quantities zero:", allQuantitiesZero);
+    if (allQuantitiesZero) {
+      product.activeAt = "inactive";
+      await product.save();
+    }
   }
 
   const order = new Order({
@@ -49,9 +87,55 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
     paymentMethod,
     totalPrice,
   });
-
   return await order.save();
 };
+
+const sendFcmNotification = async (user, title, content) => {
+  if (!user.deviceToken || user.deviceToken.length === 0) {
+    console.log("No device tokens found for the user.");
+    return;
+  }
+
+  const message = {
+    data: {
+      key1: "value1",
+      key2: "value2",
+      key3: "value3",
+    },
+    notification: {
+      title,
+      body: content,
+    },
+    apns: {
+      payload: {
+        aps: {
+          badges: 42,
+        },
+      },
+    },
+    tokens: user.deviceToken, 
+  };
+
+  try {
+    console.log("Sending notification to the user:", user.email);
+    const response = await admin.messaging().sendEachForMulticast(message);
+    console.log("Notification sent:", response);
+
+    if (response.failureCount > 0) {
+      const failedTokens = [];
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          console.log("Error sending to token:", response.responses[idx].error);
+          failedTokens.push(user.deviceToken[idx]);
+        }
+      });
+      console.log("Failed tokens:", failedTokens);
+    }
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};
+
 
 exports.updateOrderStatusProcess = async (id, req) => {
   console.log(id, req.body.inventoryProduct)
@@ -74,7 +158,7 @@ exports.updateOrderStatusProcess = async (id, req) => {
           if (!inventory) {
             console.warn(`Product with ID ${req.body.inventoryProduct} not found.`);
           }
-          // product.stock += matchedOrderItem.quantity;
+          inventory.quantity += matchedOrderItem.quantity;
           order.totalPrice -= matchedOrderItem.price;
           await inventory.save();
         } catch (error) {
@@ -163,15 +247,12 @@ exports.updateOrderStatusCoop = async (id, req) => {
     inventorys.includes(item.inventoryProduct?._id?.toString())
   );
   
-
-
   for (const matchedItem of matchedOrderItems) {
    
     if (matchedItem.orderStatus !== req.body.orderStatus) {
       const inventory = await Inventory.findById(matchedItem.inventoryProduct);
       const product = await Product.findById(matchedItem.product._id);
       const farm = await Farm.findById(product.coop);
-   
     
       matchedItem.orderStatus = req.body.orderStatus;
     
@@ -220,36 +301,15 @@ exports.updateOrderStatusCoop = async (id, req) => {
   <p>We appreciate your business and hope to serve you again soon!</p>
       `,
       };
-   
-
-    
+  
       await sendEmail(mailOptions);
-
    
-        if (inventory.quantity === 0) {
-          inventory.status = 'inactive';
-       await Notification.create({
-        title: "Product Out of Stock",
-        content: `Inventory ${product.productName}, ${inventory.unitName} ${inventory.metricUnit}  is out of stock`,
-        user: farm?.user,
-        type: "product",
-
-      });
-        }
       }
   
       if (req.body.orderStatus === 'Delivered') {
         matchedItem.deliveredAt = Date.now();
       }
   
-      await inventory.save();
-      const inventoryItems = await Inventory.find({ productId: product._id });
-      const allQuantitiesZero = inventoryItems.every(item => item.quantity === 0);
-  
-      if (allQuantitiesZero) {
-        product.activeAt = "inactive";
-        await product.save();
-      }
     }
   }
 

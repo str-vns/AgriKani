@@ -78,7 +78,7 @@ exports.InActiveInventory = asyncHandler(async (req, res) => {
 
     return SuccessHandler(
     res,
-    `The Inventory ${inventory.productName} has been Restore Successfully`,
+    `The Inventory ${inventory.productName} has been Active Successfully`,
     inventory
     );
 });
@@ -88,7 +88,16 @@ exports.getInventoryProduct = asyncHandler(async (req, res) => {
     const inventory = await inventoryProcess.InventoryProduct(req.params.id);
     return SuccessHandler(
     res,
-    `The Inventory ${inventory.productName} has been Restore Successfully`,
+    `The Inventory ${inventory.productName} has been Get Successfully`,
     inventory
     );
 });
+
+exports.inventoryCheck = asyncHandler(async (req, res) => {
+    const inventory = await inventoryProcess.InventoryCheckStock(req)
+    return SuccessHandler(
+    res,
+    `The Inventory has been Check Successfully`,
+    inventory
+    );
+})

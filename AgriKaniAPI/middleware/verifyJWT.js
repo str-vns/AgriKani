@@ -3,10 +3,10 @@ const ErrorHandler = require("../utils/errorHandler");
 const { getBlacklistedTokens } = require("../process/userProcess");
 const { STATUSCODE } = require("../constants/index");
 
+
 exports.verifyJWT = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization || req.headers.Authorization;
-
     if (!authHeader || !authHeader.match(/^Bearer\s+(.*)$/)) {
       throw new ErrorHandler("Please Log In First", STATUSCODE.UNAUTHORIZED);
     }

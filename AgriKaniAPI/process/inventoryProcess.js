@@ -93,8 +93,6 @@ exports.GetSingleInventory = async (id) => {
         })
         .lean()
         .exec();
-        
-        console.log(inventories, "Inventories related to the products");
     
       return inventories;
     } else {
@@ -195,3 +193,69 @@ exports.InventoryProduct = async (id) => {
     return inventory;
 
 }
+
+exports.InventoryCheckStock = async (req) => {
+    try {
+        const orderItems = req.body.orderItems;
+        const lowStockItems = [];
+        const updatedOrderItems = [];
+
+        for (const item of orderItems) {
+            const inventory = await Inventory.findById(item.inventoryId)
+                .populate({ path: "productId", select: "productName" })
+                .lean()
+                .exec();
+            console.log(inventory, "Inventory");
+            if (!inventory) {
+                return res.status(404).json({
+                    success: false,
+                    message: `Inventory not found for ID: ${item.inventoryId}`,
+                });
+            }
+
+            if (inventory.quantity === 0) {
+                lowStockItems.push({
+                    productName: inventory.productId.productName,
+                    inventoryId: item.inventoryId,
+                    unitName: inventory.unitName,
+                    metricUnit: inventory.metricUnit,
+                    reason: "out_of_stock",
+                    message: `Out of stock for ${inventory.productId.productName} ${inventory.unitName} ${inventory.metricUnit}`,
+                });
+            } else if (inventory.quantity < item.quantity) {
+                lowStockItems.push({
+                    productName: inventory.productId.productName,
+                    inventoryId: item.inventoryId,
+                    unitName: inventory.unitName,
+                    metricUnit: inventory.metricUnit,
+                    currentStock: inventory.quantity,
+                    reason: "low_stock",
+                    message: `Requested quantity (${item.quantity}) exceeds stock (${inventory.quantity}) for ${inventory.productId.productName} ${inventory.unitName} ${inventory.metricUnit}. Quantity adjusted to ${inventory.quantity}.`,
+                });
+                updatedOrderItems.push({
+                    ...item,
+                    quantity: inventory.quantity,
+                });
+            } else {
+                updatedOrderItems.push(item);
+            }
+        }
+
+        if (lowStockItems.length > 0) {
+            return ({
+                success: false,
+                message: "Some items have low or no stock.",
+                lowStockItems,
+                updatedOrderItems,
+            });
+        }
+
+        return ({
+            success: true,
+            message: "All items are in stock.",
+            updatedOrderItems: orderItems,
+        });
+    } catch (error) {
+        return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+    }
+};

@@ -27,7 +27,7 @@ const userRoutes = [
   {
     method: METHOD.PUT,
     path: PATH.USER_ID,
-    roles: [ROLE.ADMIN, ROLE.CUSTOMER, ROLE.FARMER],
+    roles: [ROLE.ADMIN, ROLE.CUSTOMER, ROLE.FARMER, ROLE.DRIVER, ROLE.MEMBER],
     middleware: [verifyJWT],
     handler: userController.UpdateUser,
   },

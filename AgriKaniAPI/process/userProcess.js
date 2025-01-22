@@ -156,7 +156,16 @@ exports.UpdateUserInfo = async (req, id) => {
     }
   ).exec();
 
-  return updateUser;
+  const accessToken = token.generateAccessToken(
+    updateUser.email,
+    updateUser.roles,
+    updateUser.firstName,
+    updateUser.lastName,
+    updateUser.image
+  );
+  const accessTokenMaxAge = 7 * 24 * 60 * 60 * 1000;
+
+  return { user: updateUser, accessToken, accessTokenMaxAge };
 };
 
 //Delete ...
@@ -560,3 +569,7 @@ exports.resetforgotPasswordWeb = async (req) => {
  
     return `Password has been reset successfully for user with email ${user.email}`;
  }
+
+exports.googleLoginMobile = async (req) => {
+  
+}

@@ -126,7 +126,7 @@ module.exports = {
   INVENTORY_ACTIVE_ID: "/inventory/active/:id",
   INVENTORY_INACTIVE_ID: "/inventory/inactive/:id",
   INVENTORY_PRODUCT_ID: "/inventory/product/:id",
-
+  INVENTORY_STOCK_CHECK: "/inventory/stock",
   //member
   MEMBER: "/member",
   MEMBER_ID: "/member/:id",

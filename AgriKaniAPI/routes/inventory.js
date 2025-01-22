@@ -53,6 +53,12 @@ const inventoryRoutes = [
     path: PATH.INVENTORY_PRODUCT_ID,
     roles: [],
     handler: inventoryController.getInventoryProduct,
+  },
+  {
+    method: METHOD.POST,
+    path: PATH.INVENTORY_STOCK_CHECK,
+    roles: [],
+    handler: inventoryController.inventoryCheck,
   }
 ];
 

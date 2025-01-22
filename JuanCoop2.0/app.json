@@ -1,11 +1,10 @@
 {
   "expo": {
-    "name": "JuanCoop2.0",
+    "name": "JuanCoop",
     "slug": "JuanCoop",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -14,7 +13,6 @@
       "googleServicesFile": "./google-services.json"
     },
     "android": {
-      
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -31,9 +29,15 @@
       "expo-router",
       "@react-native-firebase/app",
       [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.239225060602-qrl55rsrqs11sjcmph550ojkob07dv7b"
+        }
+      ],
+      [
         "@rnmapbox/maps",
         {
-            "MAPBOX_DOWNLOADS_TOKEN" : "pk.eyJ1Ijoic3RlYjExIiwiYSI6ImNtM3p0cXY1NzI3YTkybG9tdzExZHZwbjgifQ.9pINyIob5rl4EOc4474T4w"   
+          "MAPBOX_DOWNLOADS_TOKEN": "pk.eyJ1Ijoic3RlYjExIiwiYSI6ImNtM3p0cXY1NzI3YTkybG9tdzExZHZwbjgifQ.9pINyIob5rl4EOc4474T4w"
         }
       ],
       [
@@ -61,9 +65,6 @@
     "extra": {
       "router": {
         "origin": false
-      }, 
-      "eas": {
-        "projectId": "2f131683-026c-437f-b5fe-9bb0e74ecdbc"
       },
       "MAP_API_1": "xBcXiGGSv1JriJwgNR96IHzOFiQ9RhVIDdFqtHBWzHU",
       "BASE_ADDRESS": "http://192.168.50.223:4000/api/v2/",
@@ -71,8 +72,14 @@
       "ALT_BASE_ADDRESS": "http://192.168.20.250:4000/api/v2/",
       "SOCKET_ADDRESS": "http://localhost:8900",
       "MAPBOX_API_KEY": "pk.eyJ1Ijoic3RlYjExIiwiYSI6ImNtM3p0cXY1NzI3YTkybG9tdzExZHZwbjgifQ.9pINyIob5rl4EOc4474T4w",
-      "WEATHER_API_KEY": "b38eb1b293194679af1fd62ae0feb39c"
-    }
+      "WEATHER_API_KEY": "b38eb1b293194679af1fd62ae0feb39c",
+      "GOOGLE_LOGIN_ANDROID": "239225060602-pihukt1obheffea1oi4oionma7kspflp.apps.googleusercontent.com",
+      "GOOGLE_LOGIN_IOS": "239225060602-qrl55rsrqs11sjcmph550ojkob07dv7b.apps.googleusercontent.com",
+      "GOOGLE_LOGIN_WEB": "239225060602-onmhk6p6a374mhh2n6p8gmbcmp79vbao.apps.googleusercontent.com",
+      "eas": {
+        "projectId": "e0944635-b149-45a0-880d-ea9513954fec"
+      }
+    },
+    "scheme": "juanCoop"
   }
 }
-
