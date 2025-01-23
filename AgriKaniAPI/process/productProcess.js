@@ -116,6 +116,7 @@ exports.DeleteProductInfo = async (id) => {
     Product.deleteOne({ _id: id }).lean().exec(),
     Inventory.deleteMany({ productId: id }).lean().exec(),
     Order.updateMany({ "orderItems.product": id }, { $pull: { orderItems: { product: id } } }).lean().exec(),
+    User.updateMany({"wishlist.product": id}, { $pull: { wishlist: { product: id } } }).lean().exec(),
     cloudinary.uploader.destroy(publicIds),
   ]);
 
@@ -193,7 +194,7 @@ exports.CoopOnlyProduct = async (id) => {
   
   const coopId = await Farm.findOne({ user: id }).lean().exec();
 
-  const coopOnlyProduct = await Product.find({ coop: coopId._id, deletedAt: null })
+  const coopOnlyProduct = await Product.find({ coop: coopId._id, deletedAt: null, activeAt: 'active' })
   .populate({path: "reviews.user", select: "firstName lastName image.url"})
   .populate({path: "stock", select: "quantity metricUnit unitName price status"})
   .lean().exec();
