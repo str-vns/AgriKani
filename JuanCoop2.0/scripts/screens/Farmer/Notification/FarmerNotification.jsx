@@ -65,6 +65,8 @@ const FarmerNotification = ({ navigation }) => {
       navigate.navigate( "ProductsList" );
       } else if (type === "members") {
         navigate.navigate( "MemberList" );
+      } else if  (type === "message") {
+        navigation.navigate("Messaging", { screen: "Messages" });
       }
       
       onRefresh()

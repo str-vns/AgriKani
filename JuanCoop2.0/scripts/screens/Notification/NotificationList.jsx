@@ -64,6 +64,8 @@ const NotificationList = ({ navigation }) => {
       {
         navigate.navigate("User", { screen: "UserOrderList" });
     
+      } else if (type === "message") {
+        navigation.navigate("Home", { screen: "Messages" })
       }
       
       onRefresh()

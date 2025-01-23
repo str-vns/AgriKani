@@ -3,7 +3,8 @@ import {
     REMOVE_FROM_CART,
     CLEAR_CART,
     UPDATE_CART_QUANTITY, 
-    SET_CART_ITEMS
+    SET_CART_ITEMS,
+    UPDATE_CART_INV
   } from '../Constants/cartConstants';
   import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -115,3 +116,17 @@ import {
     payload: cartItems,
   };
 };
+
+export const updateCartInv = (inventoryId, quantity, maxQuantity) => {
+
+  return async (dispatch, getState) => {
+      dispatch({
+          type: UPDATE_CART_INV,
+          payload: { inventoryId, quantity, maxQuantity },
+
+      })
+
+      const { cartItems } = getState();
+      await persistCartToStorage(cartItems);
+  }
+}

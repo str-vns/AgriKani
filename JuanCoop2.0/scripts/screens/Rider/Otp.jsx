@@ -84,20 +84,22 @@ const Otp = (props) => {
     return () => clearInterval(interval);
   }, [isDisabled, timer])
 
+  useEffect(() => {
+    if (error) {
+      setErrors("Wrong OTP entered. Please try again!");
+
+      setTimeout(() => {
+        dispatch(clearErrors());
+        setErrors(""); 
+      }, 1000); 
+    }
+  })
+  
   const handleVerify = () => {
     const otpString = otp.join('');
     
     if (otpString.length < 6) {
       setErrors("Please fill the OTP");
-    }
-    
-    if (error) {
-      setErrors("Wrong OTP entered. Please try again!");
-  
-      setTimeout(() => {
-        dispatch(clearErrors());
-        setErrors(""); 
-      }, 1000); 
     }
 
     const registerInfo = {

@@ -42,13 +42,11 @@ const Main = () => {
   const { status: existingStatus } = await Notification.getPermissionsAsync();
   let finalStatus = existingStatus;
 
-  // Request permission if not already granted
   if (existingStatus !== 'granted') {
     const { status } = await Notification.requestPermissionsAsync();
     finalStatus = status;
   }
 
-  // Return true if permission is granted
   if (finalStatus === 'granted') {
     console.log("Notification permission granted.");
 

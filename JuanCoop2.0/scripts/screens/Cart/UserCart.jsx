@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState        } from "react";
 import {
   View,
   Text,
@@ -9,12 +9,14 @@ import {
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart, updateCartQuantity } from "@src/redux/Actions/cartActions";
+import { removeFromCart, updateCartQuantity, updateCartInv } from "@src/redux/Actions/cartActions";
 import { useNavigation } from "@react-navigation/native";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import styles from "@screens/stylesheets/Cart/userCart";
 import { setCartItems } from '@redux/Actions/cartActions';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import baseURL from "@assets/commons/baseurl";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -22,7 +24,9 @@ const Cart = () => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const isLogin = context?.stateUser?.isAuthenticated;
- 
+  const [token, setToken] = useState(null);
+  const [errors, setErrors] = useState("");
+
  useEffect(() => {
   const loadCartItems = async () => {
     try {
@@ -38,6 +42,19 @@ const Cart = () => {
 
   loadCartItems();
 }, [dispatch]);
+
+useEffect(() => {
+  const fetchJwt = async () => {
+      try {
+          const res = await AsyncStorage.getItem("jwt");
+          setToken(res);
+      } catch (error) {
+          console.error("Error retrieving JWT: ", error);
+      }
+  };
+
+  fetchJwt(); 
+}, []);
 
   const handleRemoveItem = (item) => {
     dispatch(removeFromCart(item.inventoryId));
@@ -55,14 +72,61 @@ const Cart = () => {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!isLogin) {
       navigation.navigate("RegisterScreen", { screen: "Login" });
     } else {
-      navigation.navigate("CheckOut", { 
-        screen: "AddressList", 
-        params: { cartItems: cartItems } 
-      });
+
+      const orderItems = {
+        orderItems: cartItems.map((item) => ({
+          product: item.productId,
+          inventoryId: item.inventoryId,
+          quantity: item.quantity,
+        })),
+      }
+
+      try {
+        const { data } = await axios.post(
+          `${baseURL}inventory/stock`, 
+          orderItems, 
+          { 
+            headers: { 
+              Authorization: `Bearer ${token}` 
+            }, 
+            timeout: 10000 
+          }
+        );
+       
+        console.log("Data: ", data);
+      if(data?.details?.success === true) {
+        navigation.navigate("CheckOut", { 
+          screen: "AddressList", 
+          params: { cartItems: cartItems } 
+        })
+        setErrors("");
+      } else {
+        data?.details?.lowStockItems?.forEach((item) => {
+        console.log("Low stock item: ", item);
+        if(item?.reason === "out_of_stock") {
+          setErrors(`${item.productName} ${item.unitName} ${item.metricUnit} is out of stock and has been removed from your cart.`);
+          dispatch(removeFromCart(item.inventoryId));
+        } else if (item?.reason === "low_stock") {
+          setErrors( `Quantity for ${item.productName} ${item.unitName} ${item.metricUnit} has been adjusted to ${item.currentStock} due to stock availability.`);
+          dispatch(updateCartInv(item.inventoryId, item.currentStock, item.currentStock));
+        }
+       
+        })
+      }
+
+
+      } catch (error) {
+        setErrors("Something went wrong while placing the order.");
+        console.error("Error creating order:", error);
+      }
+      // navigation.navigate("CheckOut", { 
+      //   screen: "AddressList", 
+      //   params: { cartItems: cartItems } 
+      // });
     }
   };
 
@@ -118,6 +182,7 @@ const Cart = () => {
       {cartItems.length > 0 && (
         <View style={styles.totalContainer}>
           <Text style={styles.totalText}>Total: ₱ {calculateTotalPrice()}</Text>
+          {errors ? <Text style={styles.errorText}>{errors}</Text> : null}
           <TouchableOpacity
             style={styles.checkoutButton}
             onPress={handleCheckout}

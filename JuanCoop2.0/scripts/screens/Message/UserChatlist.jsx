@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -8,6 +8,7 @@ import { conversationList } from '@redux/Actions/converstationActions';
 import { getUsers } from '@redux/Actions/userActions';
 import { useSocket } from '../../../SocketIo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { listMessages } from "@redux/Actions/messageActions";
 
 const UserChatlist = () => {
   const dispatch = useDispatch();
@@ -17,15 +18,37 @@ const UserChatlist = () => {
   const socket = useSocket();
   const UserId = context?.stateUser?.userProfile?._id;
   const { loading, conversations } = useSelector((state) => state.converList);
+  const { messages } = useSelector((state) => state.getMessages);
   const { users } = useSelector((state) => state.getThemUser);
   const [selectedChatId, setSelectedChatId] = useState(null); 
   const [token, setToken] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [isOnline, setIsOnline] = useState(false);
-  const [images, setImages] = useState([]);
-  const [imagesPreview, setImagesPreview] = useState([]);
-//   console.log("onlieUsers", onlineUsers);
-//  console.log(isOnline);
+  const [arrivedMessages, setArrivedMessages] = useState([]);
+  const validConversations = Array.isArray(conversations) ? conversations : [];
+const userIds = users.map((user) => user.details._id);
+const myConvos = validConversations.filter((convo) =>
+  convo.members.some((memberId) => userIds.includes(memberId))
+);
+
+useEffect(() => {
+  socket.on("getMessage", (data) => {
+    setArrivedMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        sender: data.senderId,
+        text: data.text,
+        image: data.image,
+        createdAt: Date.now(),
+      },
+    ]);
+  });
+
+  return () => {
+    socket.off("getMessage"); 
+  };
+}, [socket]);
+
 
   // Token retrieval
   useEffect(() => {
@@ -99,6 +122,7 @@ const UserChatlist = () => {
   };
 
   const renderItem = ({ item }) => (
+  
     <TouchableOpacity
   style={[styles.chatItem, item.details._id === selectedChatId && styles.selectedChatItem]}
   onPress={() => {
@@ -106,6 +130,7 @@ const UserChatlist = () => {
     navigation.navigate("ChatMessages", {
       item: item.details,
       conversations: conversations, 
+      isOnline: onlineUsers,
     });
   }}
 >
@@ -128,7 +153,26 @@ const UserChatlist = () => {
         <View style={styles.chatTextContainer}>
           {/* Name and Message */}
           <Text style={styles.name}>{item.details?.firstName} {item.details?.lastName}</Text>
-          <Text style={styles.message}>{item.message}</Text>
+          {/* <Text style={styles.message}>
+          {
+  conversations && conversations.length > 0 && messages && messages.length > 0
+    ? (() => {
+        const matchingConvo = conversations.find(convo => convo.members.includes(item.details._id));
+        const conversationId = matchingConvo?._id;
+     
+         console.log("conversationId", conversationId);
+         const sortedMessages = messages
+         .filter(msg => msg.conversationId === conversationId)
+         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+       
+         const latestMessage = sortedMessages.find(msg => msg.conversationId === conversationId);
+         console.log("latestMessage", latestMessage);
+
+        return latestMessage ? latestMessage.decryptedText : "No messages";
+      })()
+    : "No messages"
+}
+            </Text> */}
         </View>
       </View>
       <View style={styles.rightContainer}>

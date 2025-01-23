@@ -100,7 +100,7 @@ const onRefresh = useCallback(async () => {
   
         if (jwt && Users) {
           if (Users && Array.isArray(Users.wishlist)) {
-            const matchingProducts = Users.wishlist.filter(
+            const matchingProducts = Users?.wishlist?.filter(
               (item) => item.product === productIds
             );
             setWishlists(matchingProducts); 
@@ -140,7 +140,7 @@ const onRefresh = useCallback(async () => {
         {/* Product Image */}
         {item?.image?.[0]?.url ? (
           <Image 
-            source={{ uri: item.image[0].url }} 
+            source={{ uri: item?.image[0]?.url }} 
             style={styles.productImage} 
           />
         ) : (
@@ -152,10 +152,10 @@ const onRefresh = useCallback(async () => {
     
         {/* Product Info */}
         <View style={styles.productInfo}>
-          <Text style={styles.productName}>{item.productName}</Text>
-          <Text style={styles.productPrice}>₱{item.pricing}</Text>
+          <Text style={styles.productName}>{item?.productName}</Text>
+          <Text style={styles.productPrice}>₱{item?.pricing}</Text>
           <Text style={styles.productDescription}>
-            {item.description}
+            {item?.description}
           </Text>
         </View>
     
@@ -181,14 +181,17 @@ const onRefresh = useCallback(async () => {
   
   return (
     <View style={styles.container}>
-      {/* FlatList to render the wishlist items */}
+    { wishlist?.length > 0 ? (
       <FlatList
         data={wishlist}
         keyExtractor={(item) => item?._id || item?.id}
         renderItem={renderItem}
         contentContainerStyle={styles.flatListContent} // Ensure items are scrollable
         showsVerticalScrollIndicator={false} // Hide scroll bar
-      />
+      />) :
+      (
+        <Text>No items in wishlist</Text>
+      )}
     </View>
   );
 };

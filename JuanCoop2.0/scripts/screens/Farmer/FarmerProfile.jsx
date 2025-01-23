@@ -52,10 +52,11 @@ const FarmerProfile = (props) => {
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(getCoopProducts(cooperative?._id));
+      dispatch(getCoopProducts( cooperative.user?._id));
     }, [])
   );
 
+  console.log("coopProducts", coopProducts);
 const chatNow = async () => {
   const cooperativeUserId = cooperative.user?._id;
   const currentUserId = userId;
@@ -87,6 +88,7 @@ const chatNow = async () => {
 };
 
   const renderProductItem = ({ item }) => (
+
     <View style={styles.prodCard}>
       <TouchableOpacity
         onPress={() => navigation.navigate("SingleProduct", { item })}

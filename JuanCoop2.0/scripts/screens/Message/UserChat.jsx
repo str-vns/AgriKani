@@ -17,9 +17,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
-
+import { sendNotifications } from "@redux/Actions/notificationActions";
+import messaging from "@react-native-firebase/messaging";
 const UserChat = (props) => {
-  const { item, conversations } = props.route.params;
+  const { item, conversations, isOnline } = props.route.params;
+  console.log("isOnline", isOnline);
   const dispatch = useDispatch();
   const socket = useSocket();
   const scrollRef = useRef(null);
@@ -30,14 +32,16 @@ const UserChat = (props) => {
   const [arrivedMessages, setArrivedMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [images, setImages] = useState([]);
-  const [isAtBottom, setIsAtBottom] = useState(true);
+  const [fcmToken, setFcmToken] = useState("");
   const validConversations = Array.isArray(conversations) ? conversations : [];
   const myConvo = validConversations.find((convo) =>
     convo.members.includes(item?._id)
   );
+  const isOnlinerUser = isOnline.find((user) => user.userId === item?._id);
+
+  console.log("isOnlinerUser", isOnlinerUser);
   useEffect(() => {
     socket.on("getMessage", (data) => {
-      // console.log("Received message:", data); // Check if this is triggered
       setArrivedMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -54,11 +58,13 @@ const UserChat = (props) => {
     };
   }, [socket]);
 
-  // Retrieve JWT token
+
   useEffect(() => {
     const fetchJwt = async () => {
       try {
         const res = await AsyncStorage.getItem("jwt");
+        const fcmToken = await messaging().getToken();
+        setFcmToken(fcmToken);
         setToken(res);
       } catch (error) {
         console.error("Error retrieving JWT: ", error);
@@ -67,7 +73,7 @@ const UserChat = (props) => {
     fetchJwt();
   }, []);
 
-  // Fetch messages for the conversation
+
   useEffect(() => {
     if (token && myConvo) {
       dispatch(listMessages(myConvo._id, token));
@@ -110,18 +116,26 @@ const UserChat = (props) => {
         image: images,
       };
 
-      // console.log("Sending message:", message);
-
       socket.emit("sendMessage", {
         senderId: UserId,
         receiverId: myConvo.members.find((member) => member !== UserId),
         text: newMessage,
-        image: images, // Send images with the message if any
+        image: images, 
       });
 
-      // Dispatch to Redux
-      dispatch(sendingMessage(message, token));
+if (!isOnlinerUser ) {
+      const notification = {
+        title: `New message`, 
+        content: `You have a new message from ${context?.stateUser?.userProfile?.firstName} ${context?.stateUser?.userProfile?.lastName}`,
+        user: item._id,
+        url: item.image.url,
+        fcmToken: fcmToken,
+        type: "message",
+      }
+      dispatch(sendNotifications(notification , token))
+}
 
+      dispatch(sendingMessage(message, token));
       setNewMessage("");
       setImages([]);
       setArrivedMessages((prev) => [...prev, message]);
@@ -169,14 +183,14 @@ const UserChat = (props) => {
           onChangeText={(text) => setNewMessage(text)}
           value={newMessage}
         />
-        <TouchableOpacity onPress={pickImage}>
+        {/* <TouchableOpacity onPress={pickImage}>
           <Ionicons
             name="images-outline"
             size={30}
             color="black"
             style={styles.iconRight}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
           <Text style={styles.sendButtonText}>Send</Text>

@@ -130,4 +130,10 @@ export default StyleSheet.create({
     fontSize: scaleFont(16), 
     fontWeight: "bold",
   },
+  errorText: {
+    color: "#ff6347",
+    fontSize: scaleFont(11), 
+    marginTop: scale(10),
+    marginBottom: scale(5),
+  },
 });
