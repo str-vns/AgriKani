@@ -36,7 +36,7 @@ const LocationDetails = (props) => {
   const [currentRoute, setCurrentRoute] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(13);
+  const [zoomLevel, setZoomLevel] = useState(14);
 
   MapboxGL.setAccessToken(Constants.expoConfig?.extra?.MAPBOX_API_KEY);
 
@@ -221,10 +221,15 @@ return (
       ],
     }}
   >
-    <MapboxGL.LineLayer
-      id="lineLayer"
-      style={{ lineWidth: 5, lineColor: '#ff0000' }}
-    />
+    
+
+<MapboxGL.LineLayer
+  id="lineLayer"
+  style={{
+    lineWidth: 5,
+    lineColor: 'rgba(255, 0, 0, 0.4)', 
+  }}
+/>
   </MapboxGL.ShapeSource>
 ) : null}
        

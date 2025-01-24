@@ -255,6 +255,31 @@ export default StyleSheet.create({
           },
           arrowIcon: {
             marginLeft: 5,
+          }, checkbox: {
+            width: 20,
+            height: 20,
+            borderWidth: 2,
+            borderColor: '#f2d728',
+            borderRadius: 4,
+            marginRight: 8,
+          },
+          checked: {
+            backgroundColor: '#f2d728',
+          },
+          containerTermAndPolicy: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 20,
+          },
+          agreement: {
+            fontSize: 12,
+            color: "#777",
+            textAlign: "center",
+            marginTop: 20,
+          },
+          linkText: {
+            color: "#007bff",
           },
 
       })

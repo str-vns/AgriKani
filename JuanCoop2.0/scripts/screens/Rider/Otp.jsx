@@ -21,7 +21,7 @@ const Otp = (props) => {
   const dispatch = useDispatch()
   const inputRefs = useRef([])
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const { loading, error } = useSelector((state) => state.driverApi);
+  const { loading, success, error } = useSelector((state) => state.driverApi);
   const [errors, setErrors] = useState("");
   const [timer, setTimer] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -84,34 +84,68 @@ const Otp = (props) => {
     return () => clearInterval(interval);
   }, [isDisabled, timer])
 
-  useEffect(() => {
-    if (error) {
-      setErrors("Wrong OTP entered. Please try again!");
+  // useEffect(() => {
+  //   if (error) {
+  //     setErrors("Wrong OTP entered. Please try again!");
 
-      setTimeout(() => {
-        dispatch(clearErrors());
-        setErrors(""); 
-      }, 1000); 
-    }
-  })
-  
-  const handleVerify = () => {
+  //     setTimeout(() => {
+  //       dispatch(clearErrors());
+  //       setErrors(""); 
+  //     }, 5000); 
+  //   } else if (success === true) {
+  //     Alert.alert(
+  //       "Driver created successfully!",
+  //       "Please wait for admin approval.",
+  //       [
+  //         {
+  //           text: "OK",
+  //           onPress: () => {
+  //             dispatch(clearErrors());
+  //             navigation.navigate("Riderlist");
+  //           },
+  //         },
+  //       ]
+  //     );
+  //   }
+  // },[error, success])
+
+  const handleVerify = async () => {
     const otpString = otp.join('');
-    
-    if (otpString.length < 6) {
-      setErrors("Please fill the OTP");
-    }
-
+  
     const registerInfo = {
       otp: otpString,
       ...registration,  
     };
    
-    dispatch(createDriver(registerInfo, token));
+    if (otpString.length < 6) {
+      setErrors("Please fill the OTP");
+    } else {
+      const result = await dispatch(createDriver(registerInfo, token));
 
-    setOtp(["", "", "", "", "", ""]);
-    Alert.alert("Driver created successfully! Please Wait for Admin Approval");
-    navigation.navigate("Riderlist");
+      if (result === false) {
+        setErrors("Wrong OTP entered. Please try again!")
+        setTimeout(() => {
+        dispatch(clearErrors());
+        setErrors(""); 
+      }, 5000); 
+      } else if (result === true) {
+        Alert.alert(
+          "Driver created successfully!",
+          "Please wait for admin approval.",
+          [
+            {
+              text: "OK",
+              onPress: () => {
+                dispatch(clearErrors());
+                navigation.navigate("Riderlist");
+              },
+            },
+          ]
+        );
+      }
+    }
+
+   
   };
  
 

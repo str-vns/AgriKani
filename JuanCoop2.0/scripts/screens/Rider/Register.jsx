@@ -11,6 +11,8 @@ import { Camera } from "expo-camera";
 import { Picker } from "@react-native-picker/picker";
 import { useDispatch, useSelector } from "react-redux";
 import { OTPregister, checkEmail } from "@redux/Actions/userActions";
+import axios from "axios";
+import baseURL from "@assets/commons/baseurl";
 
 const Register = () => {
     const dispatch = useDispatch();
@@ -36,8 +38,8 @@ const Register = () => {
     const [launchCamera, setLaunchCamera] = useState(false);
     const [loadings, setLoadings] = useState(false);
     const [errors, setErrors] = useState(null);
-
-
+    const [checked, setChecked] = useState(false);
+    
     useEffect(() => {
         (async () => {
           const cameraStatus = await Camera.requestCameraPermissionsAsync();
@@ -146,51 +148,67 @@ const Register = () => {
 
   const handleSave = async () => {
     setLoadings(true);
-    dispatch(checkEmail({ email }));
+    const { data } = await axios.post(`${baseURL}check-email`, { email });
+    const response = await axios.post(`${baseURL}check-driver-email`, { email });
+    console.log("Response: ", response.data.details);
     if (!firstName || !lastName || !age || !phoneNum || !email || !password || !image || !driversLicenseImage || !gender ) {
       setErrors("All fields are required.");
       setLoadings(false);
       return;
-    }  else if (isEmailAvailable === true) {
+    }  else if ( !checked ) {
+      setErrors("Please accept the terms and conditions");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+      setLoadings(false);
+    } else if (data.details === true || response.data.details === true) {
       setErrors("Email already exists");
       setTimeout(() =>{
         setErrors("");
       }, 5000)
-    }  else if ( age < 18 ) {
+      setLoadings(false);
+    } else if ( age < 18 ) {
       setErrors("You must be 18 years or older to register");
       setTimeout(() =>{
         setErrors("");
       }, 5000)
+      setLoadings(false);
     } else if ( age > 164 ) {
       setErrors("Invalid age");
       setTimeout(() =>{
         setErrors("");
       }, 5000)
+      setLoadings(false);
     }  else if ( phoneNum.length < 11 ) {
       setErrors("Invalid phone number");
       setTimeout(() =>{
         setErrors("");
       }, 5000)
+      setLoadings(false);
     } else if ( password !== confirmPassword){
       setErrors("Passwords do not match");
       setTimeout(() =>{
         setErrors("");
       }, 5000)
+      setLoadings(false);
     }  else if ( password.length < 8){
       setErrors("Password must be at least 8 characters");
       setTimeout(() =>{
         setErrors("");
       }, 5000)
+      setLoadings(false);
     } else if ((!/[0-9]/.test(password) || !/[a-zA-Z]/.test(password) )){
       setErrors("Password must contain at least one number, one letter ");
       setTimeout(() =>{
         setErrors("");
       }, 5000)
+      setLoadings(false);
     } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)){
       setErrors("Password must contain at least one special character");
       setTimeout(() =>{
         setErrors("");
       }, 5000)
+      setLoadings(false);
     } else {
       dispatch(OTPregister({ email }));
       const riderRegister = {
@@ -220,6 +238,9 @@ const Register = () => {
     }
   };
 
+  const handleTermCondition = () => {
+    // navigation.navigate("TermsAndConditions");
+  }
   return (
     
     <KeyboardAvoidingView
@@ -337,7 +358,21 @@ const Register = () => {
                           )}
                      
                   </TouchableOpacity>
+
                 </ScrollView>
+                  <View style={styles.containerTermAndPolicy}>
+                      <TouchableOpacity
+                        style={[styles.checkbox, checked && styles.checked]}
+                        onPress={() => setChecked(!checked)}
+                      />
+                      {/* <Text style={styles.text}>{checked ? 'Checked' : 'Unchecked'}</Text> */}
+                      <Text style={styles.text}>
+                           I accept the {""}
+                          <Text style={[styles.linkText, { textDecorationLine: 'underline' }]} onPress={() => handleTermCondition()}>
+                            Terms and Conditions
+                          </Text>
+                        </Text>
+                    </View>
                 {errors && <Text style={styles.errorText}>{errors}</Text>}
       </ScrollView>
   

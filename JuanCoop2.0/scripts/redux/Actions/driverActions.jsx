@@ -43,9 +43,11 @@ import {
 import axios from "axios";
 import baseURL from "@assets/commons/baseurl";
 import mime from "mime"; 
+import { Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 export const createDriver = (driver, token) => async (dispatch) => {
-    console.log(driver.riderRegister, "driver");
+   
     const driverInfo = driver.riderRegister;
     try {
         dispatch({ type: CREATE_DRIVER_REQUEST });
@@ -79,13 +81,15 @@ export const createDriver = (driver, token) => async (dispatch) => {
                 "Content-Type": "multipart/form-data",
             },
         });
-
-        dispatch({ type: CREATE_DRIVER_SUCCESS, payload: data });
+      
+        dispatch({ type: CREATE_DRIVER_SUCCESS, payload: data.details });
+        return true;
     } catch (error) {
         dispatch({
             type: CREATE_DRIVER_FAIL,
             payload: error.response ? error.response.data : error.message,
         });
+        return false;
     }
 }
 

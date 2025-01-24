@@ -41,6 +41,15 @@ const UserOTP = (props) => {
     }
   };
 
+  useEffect(() => {
+         if(error) {
+          setErrors("Wrong OTP entered. Please try again!");
+          setTimeout(() => {
+            dispatch(clearErrors());
+            setErrors("");
+          }, 1000);
+        }
+  }, [error])
   const handleVerify = () => {
     const otpString = otp.join('');
     
@@ -48,21 +57,11 @@ const UserOTP = (props) => {
       setErrors("Please fill the OTP");
     }
     
-    if (error) {
-      setErrors("Wrong OTP entered. Please try again!");
-  
-      setTimeout(() => {
-        dispatch(clearErrors());
-        setErrors(""); 
-      }, 1000); 
-    }
-
     const registerInfo = {
       otp: otpString,
       ...registration,  
     };
   
-    console.log('Register Info:', registerInfo);  
     dispatch(registeruser(registerInfo));
 
   };

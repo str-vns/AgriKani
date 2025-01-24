@@ -190,4 +190,21 @@ export default StyleSheet.create({
       textAlign: "center",
       marginTop: 10,
     },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderWidth: 2,
+      borderColor: '#f2d728',
+      borderRadius: 4,
+      marginRight: 8,
+    },
+    checked: {
+      backgroundColor: '#f2d728',
+    },
+    containerTermAndPolicy: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 20,
+    },
   });

@@ -17,11 +17,12 @@ import * as ImagePicker from "expo-image-picker";
 import { useDispatch, useSelector } from "react-redux";
 import { OTPregister, checkEmail } from "@redux/Actions/userActions";
 import styles from "@screens/stylesheets/UserRegis/UserRegistration";
+import axios from "axios";
+import baseURL from "@assets/commons/baseurl";
 
 const UserRegistration = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { isEmailAvailable } = useSelector((state) => state.checkDuplication)
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,6 +39,7 @@ const UserRegistration = () => {
   const [launchCamera, setLaunchCamera] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [errors, setErrors] = useState("");
+  const [checked, setChecked] = useState(false);
 
      useEffect(() => {
           (async () => {
@@ -50,8 +52,10 @@ const UserRegistration = () => {
           })();
         }, []);
 
-  const register = () => {
-    dispatch(checkEmail({ email }));
+  const register = async () => {
+    const { data } = await axios.post(`${baseURL}check-email`, { email });
+    const response = await axios.post(`${baseURL}check-driver-email`, { email });
+    // dispatch(checkEmail({ email }));
     const registration = {
       firstName: firstName,
       lastName: lastName,
@@ -62,7 +66,7 @@ const UserRegistration = () => {
       gender: gender,
       image: image,
     };
-
+   
     if (
       !firstName ||
       !lastName ||
@@ -75,7 +79,13 @@ const UserRegistration = () => {
     ) {
       setErrors("Please fill in the required fields");
       return;
-    } else if (isEmailAvailable === true) {
+    }else if ( !checked ) {
+      setErrors("Please accept the terms and conditions");
+      setTimeout(() =>{
+        setErrors("");
+      }, 5000)
+    } 
+    else if (data.details === true || response.data.details === true) {
       setErrors("Email already exists");
       setTimeout(() =>{
         setErrors("");
@@ -184,6 +194,10 @@ const UserRegistration = () => {
       setPhoneNumber("09");
     }
   };
+
+  const  handleTermCondition = () => {
+    // navigation.navigate("TermsAndConditions");
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -351,7 +365,19 @@ const UserRegistration = () => {
             />
           </TouchableOpacity>
         </View>
-
+        <View style={styles.containerTermAndPolicy}>
+      <TouchableOpacity
+        style={[styles.checkbox, checked && styles.checked]}
+        onPress={() => setChecked(!checked)}
+      />
+      {/* <Text style={styles.text}>{checked ? 'Checked' : 'Unchecked'}</Text> */}
+      <Text style={styles.text}>
+           I accept the {""}
+          <Text style={[styles.linkText, { textDecorationLine: 'underline' }]} onPress={() => handleTermCondition()}>
+            Terms and Conditions
+          </Text>
+        </Text>
+    </View>
         {errors && typeof errors === "string" ? (
           <Text style={styles.errorText}>{errors}</Text>
         ) : null}
