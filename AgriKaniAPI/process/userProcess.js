@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Farm = require("../models/farm");
 const Product = require("../models/product");
+const Driver = require("../models/driver");
 const Otp = require("../models/otp");
 const bcrypt = require("bcrypt");
 const token = require("../utils/token");
@@ -351,6 +352,19 @@ exports.checkEmail = async (req) => {
     .collation({ locale: "en" })
     .lean()
     .exec();
+
+  if (duplicateEmail) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+exports.checkDriverEmail = async (req) => {
+  const duplicateEmail = await Driver.findOne({ email: req.body.email })
+  .collation({ locale: "en" })
+  .lean()
+  .exec();
 
   if (duplicateEmail) {
     return true;

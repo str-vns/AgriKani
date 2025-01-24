@@ -154,6 +154,14 @@ exports.getCheckEmail = asyncHandler(async (req, res) => {
     : SuccessHandler(res, `Email is registered`, email);
 });
 
+exports.getCheckDriverEmail = asyncHandler(async (req, res) => {
+  const email = await userProcess.checkDriverEmail(req);
+
+  return email === STATUSCODE.ZERO
+    ? res.status(200).json({ message: "Email is not registered" })
+    : SuccessHandler(res, `Email is registered`, email);
+} );
+
 exports.getOtpForgotPassword = asyncHandler(async (req, res) => {
   const otp = await userProcess.otpForgotPassword(req);
 

@@ -12,6 +12,7 @@ module.exports = {
   WISH_USER_ID: "/wish/users/:productId/:id",
   WISH_ID: "/wish/:id",
   CHECK_EMAIL: "/check-email",
+  CHECK_DRIVER_EMAIL: "/check-driver-email",
   OTP_FORGOT_PASSWORD: "/otp-forgot-password",
   RESET_PASSWORD: "/reset-password",
   FORGOR_PASSWORD_WEB: "/reset-Password-Web",

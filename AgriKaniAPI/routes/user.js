@@ -112,7 +112,13 @@ const userRoutes = [
     path:   path.RESET_PASSWORD_WEB,
     roles: [],
     handler: userController.forgotPasswordWeb,
-  }
+  },
+  {
+    method: method.POST,
+    path: path.CHECK_DRIVER_EMAIL,
+    roles: [],
+    handler: userController.getCheckDriverEmail,
+  },
 ];
 
 userRoutes.forEach((route) => {
