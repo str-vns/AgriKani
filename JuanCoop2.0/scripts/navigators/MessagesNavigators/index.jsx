@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, Image} from 'react-native';
+import { View, Text, Image, TouchableOpacity} from 'react-native';
 import { createStackNavigator } from "@react-navigation/stack";
-import Messages from "@screens/Message/UserChatlist";
-import ChatMessages from "@screens/Message/UserChat";
+import Messages from "@screens/Farmer/Message/UserChatlist";
+import ChatMessaging from "@screens/Farmer/Message/UserChat";
 import CoopDashboard from "@screens/Farmer/FarmerDashboard";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 const Stack = createStackNavigator();
 
 const Index = () => {
+  const navigation = useNavigation();
   return (
     <>
     <Stack.Navigator>
@@ -21,8 +24,8 @@ const Index = () => {
         options={{ headerShown: false }}
       />
     <Stack.Screen
-        name="ChatMessages"
-        component={ChatMessages}
+        name="ChatMessaging"
+        component={ChatMessaging}
         options={({ route }) => {
           const { item } = route.params;
           console.log("Item: ", item);
@@ -44,6 +47,11 @@ const Index = () => {
               </View>
             ),
             headerTitleAlign: "left",
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.navigate("Messaging", { screen: "Messages" })}>
+                <Ionicons name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              </TouchableOpacity>
+            ),
           };
         }}
       />

@@ -28,7 +28,7 @@ const UserTracking = (props) => {
   const [markerCoordinate, setMarkerCoordinate] = useState({ lat: 37.78825, lng: -122.4324, });
   const [currentDriverRoute, setCurrentDriverRoute] = useState([]);
   const [arrivedData, setArrivedData] = useState({});
-  const [zoomLevel, setZoomLevel] = useState(11);
+  const [zoomLevel, setZoomLevel] = useState(15);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   MapboxGL.setAccessToken(Constants.expoConfig?.extra?.MAPBOX_API_KEY);
@@ -144,12 +144,30 @@ const getStatusColor = (status) => {
              { markerCoordinate.lat && markerCoordinate.lng && !isNaN(markerCoordinate.lat) && !isNaN(markerCoordinate.lng) &&
                 <MapboxGL.Camera 
                   zoomLevel={zoomLevel} 
-                  centerCoordinate={[markerCoordinate.lng, markerCoordinate.lat]} 
+                  centerCoordinate={[deliveries?.deliveryLocation?.Longitude, deliveries?.deliveryLocation?.Latitude]} 
                   animationMode={'flyTo'} 
                   animationDuration={3000} 
                 />
               }
 
+{ deliveries?.deliveryLocation?.Latitude && deliveries?.deliveryLocation?.Longitude  ? (
+                <MapboxGL.PointAnnotation
+                  id="deliveryMarker"
+                  coordinate={[deliveries?.deliveryLocation?.Longitude, deliveries?.deliveryLocation?.Latitude]}
+                >
+                  <View
+                    style={{
+                      height: 30,
+                      width: 30,
+                      backgroundColor: 'blue',
+                      borderRadius: 15, 
+                      borderColor: 'white',
+                      borderWidth: 3,
+                    }}
+                  />
+                </MapboxGL.PointAnnotation>
+              ) : null }
+              
 { markerCoordinate?.lat && markerCoordinate?.lng && !isNaN(markerCoordinate.lat) && !isNaN(markerCoordinate.lng) ? (
                 <MapboxGL.PointAnnotation
                   id="userMarker"
@@ -168,23 +186,7 @@ const getStatusColor = (status) => {
                 </MapboxGL.PointAnnotation>
               ) : null }
 
-              { deliveries?.deliveryLocation?.Latitude && deliveries?.deliveryLocation?.Longitude  ? (
-                <MapboxGL.PointAnnotation
-                  id="deliveryMarker"
-                  coordinate={[deliveries?.deliveryLocation?.Longitude, deliveries?.deliveryLocation?.Latitude]}
-                >
-                  <View
-                    style={{
-                      height: 30,
-                      width: 30,
-                      backgroundColor: 'blue',
-                      borderRadius: 15, 
-                      borderColor: 'white',
-                      borderWidth: 3,
-                    }}
-                  />
-                </MapboxGL.PointAnnotation>
-              ) : null }
+            
 
               { currentDriverRoute?.geometry?.coordinates?.length > 0 && arrivedData.status === 'delivering' && arrivedData.deliveryId === deliveries._id ? (
                 <MapboxGL.ShapeSource

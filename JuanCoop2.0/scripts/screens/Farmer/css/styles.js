@@ -906,6 +906,31 @@ initiativesContainer: {
     position: "absolute", 
     padding: 10,
     borderRadius: 10, 
+  },  buttonContainer: {
+    flexDirection: 'row', // Arrange buttons in a row
+    justifyContent: 'space-between', // Distribute buttons with space
+    alignItems: 'center', // Align buttons vertically
+    paddingHorizontal: 10, // Optional padding
+    marginVertical: 10, // Optional vertical margin
+  },
+  button: {
+    flexDirection: 'row', // Icon and text arranged horizontally
+    alignItems: 'center', // Align content vertically in the button
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: '#007BFF', // Default background color
+    marginHorizontal: 5, // Space between buttons
+  },
+  reviewButton: {
+    backgroundColor: '#4CAF50', // Customize color for Review button
+  },
+  ShippingButton: {
+    backgroundColor: '#FFC107', // Customize color for Shipping button
+  },
+  buttonText: {
+    color: '#fff',
+    marginLeft: 5, 
+    fontSize: 14,
   },
 });
 

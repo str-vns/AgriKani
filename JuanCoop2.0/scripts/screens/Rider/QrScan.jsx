@@ -29,7 +29,7 @@ const viewMinY = (height - finderHeight) / 2;
   const [scanned, setScanned] = useState(false);
   const [token, setToken] = useState(null);
   const [fcmToken, setFcmToken] = useState(null);
-
+  const [ markerCoordinate, setMarkerCoordinate ] = useState({ latitude: 0, longitude: 0 });
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -114,8 +114,8 @@ const viewMinY = (height - finderHeight) / 2;
         const locationSubscription = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.High,
-            timeInterval: 3000, // 3 seconds
-            distanceInterval: 1, // 1 meter
+            timeInterval: 3000, 
+            distanceInterval: 1, 
           },
           (location) => {
             const { latitude, longitude } = location.coords;

@@ -75,7 +75,7 @@ const AssignDetails = (props) => {
     return method === "COD" ? "Cash on Delivery" : method;
   };
 
-  const assignDriver = () => {  
+  const assignDriver = async() => {  
    
    
 
@@ -86,12 +86,13 @@ const AssignDetails = (props) => {
     };
 
   
-    dispatch(createDelivery(data, token));
+   const response = await dispatch(createDelivery(data, token));
 
-    if(success)
+  console.log("response",response);
+    if(response?.success === true)
    { 
     navigation.navigate("AssignList");
-  } else {
+  } else if (response === false ) {
     Alert.alert(
       "Assign Driver",
       "There is no courier available at the moment",
@@ -106,7 +107,6 @@ const AssignDetails = (props) => {
   }
  
   }
-
   return (
     <View style = {styles.detailsContainer}>
     <View style={styles.header2}>
@@ -116,7 +116,7 @@ const AssignDetails = (props) => {
     >
       <Ionicons name="menu" size={34} color="black" />
     </TouchableOpacity>
-    <Text style={styles.headerTitle2}>Delivery List</Text>
+    <Text style={styles.headerTitle2}>Delivery Details</Text>
   </View>
 
     <ScrollView style={styles.container}>

@@ -132,7 +132,13 @@ useEffect(() => {
     const onRefresh = useCallback(async () => {
       setRefreshing(true);
       try {
-        dispatch(getDeliveryDriver(userId, token));
+        
+        const mark = {
+          latitude: markerCoordinate.lat,
+          longitude: markerCoordinate.lng,
+        };
+        
+        dispatch(getDeliveryDriver(userId, mark, token));
          dispatch(driverProfile(userId, token))
       } catch (err) {
         console.error("Error refreshing users:", err);

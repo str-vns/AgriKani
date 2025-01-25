@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import Message from "./UserMessage";
 import { useSelector, useDispatch } from "react-redux";
-import { useSocket } from "../../../SocketIo";
+import { useSocket } from "../../../../SocketIo";
 import { listMessages, sendingMessage } from "@redux/Actions/messageActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -19,9 +19,10 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { sendNotifications } from "@redux/Actions/notificationActions";
 import messaging from "@react-native-firebase/messaging";
+
 const UserChat = (props) => {
   const { item, conversations, isOnline } = props.route.params;
-  console.log("isOnline", item);
+  console.log("isOnline", conversations);
   const dispatch = useDispatch();
   const socket = useSocket();
   const scrollRef = useRef(null);
@@ -81,9 +82,11 @@ const UserChat = (props) => {
   }, [token, myConvo, dispatch]);
 
   useEffect(() => {
-    if (scrollRef.current && messages && messages.length > 0) {
-      scrollRef.current.scrollToEnd({ animated: false });
-    }
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollToEnd({ animated: true });
+      }
+    }, 100); // Adjust delay as needed
   }, [messages, arrivedMessages]);
 
   const pickImage = async () => {
@@ -147,19 +150,21 @@ if (!isOnlinerUser ) {
   return (
     <View style={styles.container}>
       {messages && Array.isArray(messages) && messages.length > 0 ? (
-        <FlatList
-          ref={scrollRef}
-          data={[...messages, ...arrivedMessages]} // Combine messages from Redux and new arrived messages
-          renderItem={({ item, index }) => (
-            <Message key={index} messages={item} own={item.sender === UserId} />
-          )}
-          keyExtractor={(item, index) => item._id || index.toString()}
-          contentContainerStyle={styles.flatListContent}
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() =>
-            scrollRef.current?.scrollToEnd({ animated: true })
-          }
-        />
+       <FlatList
+       ref={scrollRef}
+       data={[...(messages || []), ...arrivedMessages]} 
+       renderItem={({ item, index }) => (
+         <Message key={index} messages={item} own={item.sender === UserId} />
+       )}
+       keyExtractor={(item, index) => item._id || index.toString()}
+       contentContainerStyle={styles.flatListContent}
+       showsVerticalScrollIndicator={false}
+       onContentSizeChange={() => {
+         if (scrollRef.current) {
+           scrollRef.current.scrollToEnd({ animated: true });
+         }
+       }}
+     />
       ) : (
         <Text style={styles.noMessages}>No messages available</Text>
       )}

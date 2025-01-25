@@ -82,6 +82,11 @@ const HomeNavigation = () => {
                 </View>
               ),
               headerTitleAlign: "left",
+              headerLeft: () => (
+                            <TouchableOpacity onPress={() => navigation.navigate("Messages")}>
+                              <Ionicons name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+                            </TouchableOpacity>
+                          ),
             };
           }}
         />

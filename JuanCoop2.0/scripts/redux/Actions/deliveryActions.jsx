@@ -47,15 +47,18 @@ export const createDelivery = (deliveryData, token) => async (dispatch) => {
         
         dispatch({
             type: CREATE_DELIVERY_SUCCESS,
-            payload: data.details,
+            payload: data,
         });
-
+     
+        return data;
     } catch(error) {
+        console.log("error", error);
         dispatch({
             type: CREATE_DELIVERY_FAIL,
             payload: error.response ? error.response.data : error.message,
         });
         console.error("Error creating delivery:", error);
+        return false;
     }
 }
 
@@ -86,13 +89,21 @@ export const getDeliveryTracking = (deliveryId, token) => async (dispatch) => {
     }
 }
 
-export const getDeliveryDriver = (deliveryId, token) => async (dispatch) => {
+export const getDeliveryDriver = (deliveryId, mark, token) => async (dispatch) => {
     try {
-        
+
+        const params = {
+            latitude: mark.latitude,
+            longitude: mark.longitude,
+        };
+
         dispatch({
             type: GET_DELIVERY_DRIVER_REQUEST,
         });
+
+
         const response = await axios.get(`${baseURL}delivery/driver/${deliveryId}`, {
+            params: params,  
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -108,9 +119,9 @@ export const getDeliveryDriver = (deliveryId, token) => async (dispatch) => {
             type: GET_DELIVERY_DRIVER_FAIL,
             payload: error.response.data,
         });
-       console.error("Error getting delivery driver:", error);
+        console.error("Error getting delivery driver:", error);
     }
-}
+};
 
 export const getHistoryDelivery = (deliveryId, token) => async (dispatch) => {
     try {
