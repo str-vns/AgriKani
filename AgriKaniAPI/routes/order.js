@@ -7,6 +7,7 @@ const { METHOD, PATH, ROLES } = require("../constants/index");
 router.get('/order/daily', orderController.getDailySalesReport);
 router.get('/order/weekly', orderController.getWeeklySalesReport);
 router.get('/order/monthly', orderController.getMonthlySalesReport);
+router.get("/coopdashboard/:id", orderController.getCoopDashboardData);
 
 
 const orderRoutes = [

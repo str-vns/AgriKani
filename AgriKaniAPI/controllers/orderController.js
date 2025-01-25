@@ -4,7 +4,6 @@ const SuccessHandler = require("../utils/successHandler");
 const orderProcess = require("../process/orderProcess");
 const { STATUSCODE } = require("../constants/index");
 
-
 // Create a new order
 exports.createOrder = asyncHandler(async (req, res, next) => {
   const { orderItems, shippingAddress, paymentMethod, totalPrice, user } = req.body;
@@ -66,14 +65,6 @@ exports.GetOrderUser = asyncHandler(async (req, res, next) => {
   
 });
 
-exports.GetOrderCoop = asyncHandler(async (req, res, next) => {
-  const Orders = await orderProcess.getCoopOrderById(req.params.id);
-
-  return Orders?.length === STATUSCODE.ZERO
-      ? next(new ErrorHandler("No User Order Found", STATUSCODE.NOT_FOUND))
-      : SuccessHandler(res, "All orders fetched successfully", Orders);
-});
-
 exports.updateOrderStatusCoop = asyncHandler(async (req, res, next) => {
   try {
     const updatedOrder = await orderProcess.updateOrderStatusCoop(req.params.id, req);
@@ -108,6 +99,14 @@ exports.getReceipt = asyncHandler(async (req, res, next) => {
       return next(new ErrorHandler("Error while downloading receipt", 500));
     }
   });
+});
+
+exports.GetOrderCoop = asyncHandler(async (req, res, next) => {
+  const Orders = await orderProcess.getCoopOrderById(req.params.id);
+
+  return Orders?.length === STATUSCODE.ZERO
+      ? next(new ErrorHandler("No User Order Found", STATUSCODE.NOT_FOUND))
+      : SuccessHandler(res, "All orders fetched successfully", Orders);
 });
 
 exports.getDailySalesReport = asyncHandler(async (req, res, next) => {
@@ -149,5 +148,19 @@ exports.getMonthlySalesReport = asyncHandler(async (req, res, next) => {
     return SuccessHandler(res, "Monthly sales report fetched successfully", report);
   } catch (error) {
     return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+  }
+});
+
+exports.getCoopDashboardData = asyncHandler(async (req, res, next) => {
+  try {
+    const dashboardData = await orderProcess.getCoopDashboardData(req.params.id);
+
+    if (!dashboardData) {
+      return next(new ErrorHandler("No dashboard data found", 404));
+    }
+
+    return SuccessHandler(res, "Dashboard data fetched successfully", dashboardData);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
   }
 });
