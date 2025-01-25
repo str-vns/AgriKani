@@ -25,7 +25,7 @@ exports.getDeliveryTracking = asyncHandler(async (req, res, next) => {
 });
 
 exports.getDeliveryDriver = asyncHandler(async (req, res, next) => {
-    const delivery = await DeliveryProcess.getDeliveryDriverProcess(req.params.id);
+    const delivery = await DeliveryProcess.getDeliveryDriverProcess(req.params.id, req);
     return delivery
     ? SuccessHandler(res, `Delivery has been fetched Successfully`, delivery)
     : next(new ErrorHandler("No Delivery Found"));

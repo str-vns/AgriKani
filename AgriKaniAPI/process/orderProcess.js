@@ -330,7 +330,7 @@ exports.getShippedOrdersProcess = async (id) => {
     .populate({ path: "user", select: "firstName lastName email image.url phoneNum" })
     .populate({ path: "orderItems.inventoryProduct", select: "metricUnit unitName" })
     .populate({ path: "orderItems.product", select: "coop productName pricing price image.url", match: { coop: Coopinfo._id } })
-    .populate({ path: "shippingAddress", select: "address city phoneNum" })
+    .populate({ path: "shippingAddress", select: "address city phoneNum, barangay" })
     .sort({ createdAt: -1 })
     .lean()
     .exec();

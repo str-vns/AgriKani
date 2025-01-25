@@ -141,32 +141,70 @@ exports.getDeliveryTrackingProcess = async (id) => {
     return deliveries;
 }
 
-exports.getDeliveryDriverProcess = async (id) => {
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; 
+  }
 
+  exports.getDeliveryDriverProcess = async (id, req) => {
+    console.log(req.query, "req.query");  
+
+    // Validate ID
     if (!mongoose.Types.ObjectId.isValid(id))
         throw new ErrorHandler(`Invalid user ID: ${id}`);
 
+    // Get Driver info
     const drivers = await Driver.findOne({ userId: id }).lean().exec();
     if (!drivers) throw new ErrorHandler(`Driver not found with ID: ${id}`);
 
-  
+    // Get Deliveries for the driver within the time range
     const deliveries = await Delivery.find({
         assignedTo: drivers._id,
         createdAt: { $gte: startOfDay, $lte: endOfDay },
         status: { $ne: "delivered" }
-      })
-      .populate("orderId", "totalPrice paymentMethod")
-      .populate("coopId")
-      .populate("userId", "firstName lastName email image.url phoneNum")
-      .populate("orderItems.product", "productName pricing price image.url ")
-      .populate("orderItems.inventoryProduct", "metricUnit unitName")
-      .populate("shippingAddress", "address city barangay")
-      .populate("assignedTo", "firstName lastName email image.url userId") 
-      .lean().exec();
-    
-    return deliveries;
-}
+    })
+    .populate("orderId", "totalPrice paymentMethod")
+    .populate("coopId")
+    .populate("userId", "firstName lastName email image.url phoneNum")
+    .populate("orderItems.product", "productName pricing price image.url")
+    .populate("orderItems.inventoryProduct", "metricUnit unitName")
+    .populate("shippingAddress", "address city barangay")
+    .populate("assignedTo", "firstName lastName email image.url userId")
+    .lean()
+    .exec();
 
+    // Map and calculate distance for each delivery
+    const deliveriesWithDistances = deliveries.map(delivery => {
+        const deliveryLat = parseFloat(delivery.deliveryLocation.Latitude); 
+        const deliveryLon = parseFloat(delivery.deliveryLocation.Longitude);
+
+        const userLat = parseFloat(req.query.latitude);
+        const userLon = parseFloat(req.query.longitude);
+
+        if (isNaN(userLat) || isNaN(userLon)) {
+            throw new ErrorHandler('Invalid latitude or longitude provided.');
+        }
+
+        const distance = calculateDistance(userLat, userLon, deliveryLat, deliveryLon);
+        return { ...delivery, distance };
+    });
+
+    const nearbyDeliveries = deliveriesWithDistances.filter(delivery => {
+        return delivery.distance <= 70; 
+    });
+
+    const sortedDeliveries = nearbyDeliveries.sort((a, b) => a.distance - b.distance);
+
+    return sortedDeliveries; 
+};
 exports.getDeliveryCompletedProcess = async(id) => {
     const drivers = await Driver.findOne({ userId: id }).lean().exec();
     if (!drivers) throw new ErrorHandler(`Driver not found with ID: ${id}`);
