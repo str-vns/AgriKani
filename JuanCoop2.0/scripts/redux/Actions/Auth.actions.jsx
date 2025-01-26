@@ -34,8 +34,8 @@ export const loginUser = async (user, dispatch) => {
         });
 
         if (!response.ok) {
-            throw new Error('Your email or password is incorrect. Please try again.');
-           
+            // throw new Error('Your email or password is incorrect. Please try again.');
+            return false;
         }
 
         const data = await response.json();
@@ -52,7 +52,7 @@ export const loginUser = async (user, dispatch) => {
             dispatch(setCurrentUser(decoded, userInfo ));
 
             console.log("User loaded successfully:", data);
-            
+            return true
         } else {
             logoutUser(dispatch);
         }
