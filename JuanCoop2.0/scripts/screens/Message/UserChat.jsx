@@ -19,9 +19,11 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { sendNotifications } from "@redux/Actions/notificationActions";
 import messaging from "@react-native-firebase/messaging";
+import { useNavigation } from "@react-navigation/native";
 const UserChat = (props) => {
   const { item, conversations, isOnline } = props.route.params;
   console.log("isOnline", item);
+    const navigation = useNavigation();
   const dispatch = useDispatch();
   const socket = useSocket();
   const scrollRef = useRef(null);

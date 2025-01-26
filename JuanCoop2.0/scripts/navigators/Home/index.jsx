@@ -20,10 +20,12 @@ import SearchProduct from "@screens/Filter/SearchProduct";
 import CoopDistance from "@screens/User/UserDistance";
 import NotificationList from "@screens/Notification/NotificationList";
 import AddReviews from "@screens/Review/UserAddReview";
-
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 const Stack = createStackNavigator();
 
 const HomeNavigation = () => {
+  const navigation = useNavigation();
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [isOnline, setIsOnline] = useState(false);
   return (
