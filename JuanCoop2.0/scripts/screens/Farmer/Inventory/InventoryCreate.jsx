@@ -37,12 +37,17 @@ const InventoryCreate = (props) => {
       }, []);
 
 
-    if(Inverror){
-        setErrorMess(Inverror)
-        setTimeout(() => {
-            setErrorMess('')
-        }, 3000)
-    }
+        useEffect(() => {
+          if (Inverror) {
+            // setErrorMess(Inverror);
+            const timer = setTimeout(() => {
+              setErrorMess('');
+            }, 3000);
+        
+            // Cleanup the timeout
+            return () => clearTimeout(timer);
+          }
+        }, [Inverror]);
 
     const handleCreateInventory = (item) => {
 

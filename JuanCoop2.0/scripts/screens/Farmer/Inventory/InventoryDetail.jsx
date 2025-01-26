@@ -63,7 +63,7 @@ const InventoryDetail = (props) => {
   }, [dispatch]);
 
   const handleEditInventory = (item) => {
-    navigation.navigate("inventoryUpdate", { item });
+    navigation.navigate("inventoryUpdate", { item: item, InvItem: InvItem });
   };
 
   const handleDeleteInventory = (id) => {

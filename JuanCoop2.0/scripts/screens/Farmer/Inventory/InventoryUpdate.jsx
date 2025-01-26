@@ -10,7 +10,7 @@ import { ScrollView } from "native-base";
 import { updateInventory } from "@redux/Actions/inventoryActions";
 
 const InventoryUpdate = (props) => {
-    const { item } = props.route.params;
+    const { item, InvItem } = props.route.params;
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const { Invloading, Invsuccess, Inverror } = useSelector((state) => state.invent)
@@ -35,12 +35,17 @@ const InventoryUpdate = (props) => {
       }, []);
 
 
-    if(Inverror){
-        setErrorMess(Inverror)
-        setTimeout(() => {
-            setErrorMess('')
-        }, 3000)
-    }
+      useEffect(() => {
+        if (Inverror) {
+          // setErrorMess(Inverror);
+          const timer = setTimeout(() => {
+            setErrorMess('');
+          }, 3000);
+      
+          // Cleanup the timeout
+          return () => clearTimeout(timer);
+        }
+      }, [Inverror]);
     
     useFocusEffect(
         useCallback(() => {
@@ -88,7 +93,7 @@ const InventoryUpdate = (props) => {
            }
 
            dispatch(updateInventory(inventory, inventoryId, token))
-           navigation.navigate("ProductsList");
+           navigation.navigate("InventoryDetail", { Inv: InvItem });
         }
       
     }

@@ -108,10 +108,46 @@ exports.UpdateInventoryInfo = async (req, id) => {
     const inventoryExist = await Inventory.findById(id).lean().exec();
     if (!inventoryExist) throw new ErrorHandler(`Inventory not exist with ID: ${id}`);
 
-    const updateInventory = await Inventory.findByIdAndUpdate(
-        id,
+    const product = await Product.findById(inventoryExist.productId).lean().exec();
+ 
+    if(product.activeAt === 'inactive') {
+ 
+        const updateInventory = await Inventory.findByIdAndUpdate(
+            id,
+                {
+                    productId: inventoryExist.productId,
+                    ...req.body,
+                    status: "active",
+                    lastUpdated: Date.now(),
+                },
+                {
+                    new: true,
+                    runValidators: true,
+                }
+            )
+                .lean()
+                .exec();
+
+        
+        await Product.findByIdAndUpdate(
+            inventoryExist.productId,
+            {
+              activeAt: 'active',
+            },
+            {
+              new: true,
+              runValidators: true,
+            }
+          )
+
+          return updateInventory;
+    } 
+    else{
+        const updateInventory = await Inventory.findByIdAndUpdate(
+            id,
         {
             ...req.body,
+            productId: inventoryExist.productId,
             status: "active",
             lastUpdated: Date.now(),
         },
@@ -119,11 +155,15 @@ exports.UpdateInventoryInfo = async (req, id) => {
             new: true,
             runValidators: true,
         }
+       
     )
         .lean()
         .exec();
 
+        console.log(updateInventory, "Update Inventory")
     return updateInventory;
+    }
+
 }
 
 //Delete ...

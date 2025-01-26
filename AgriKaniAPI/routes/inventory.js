@@ -26,7 +26,7 @@ const inventoryRoutes = [
   },
   {
     method: METHOD.PUT,
-    path: PATH.INVENTORY_ID,
+    path: PATH.INVENTORY_UPDATE_ID,
     roles: [],
     handler: inventoryController.UpdateInventory,
   },
