@@ -46,12 +46,14 @@ const Email = (props) => {
         }, 5000);
        }
       
-       dispatch(otpForgotPassword({ otp: otpString, email: emailUser }));
-       if (error === true) {
+      const response = await dispatch(otpForgotPassword({ otp: otpString, email: emailUser }));
+console.log(response);
+
+       if (response !== true) {
          setErrors("Wrong OTP entered. Please try again!");
        } else {
         navigation.navigate("NewPassword", { email: emailUser });
-
+        setErrors("");
        }
         
      

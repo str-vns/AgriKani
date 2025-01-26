@@ -617,6 +617,7 @@ export const otpForgotPassword = (email) => async (dispatch) => {
       payload: data,
     });
     
+    return true
   } catch (error) {
     console.log("Error from otpForgotPassword:", error.message);
     dispatch({
@@ -625,6 +626,7 @@ export const otpForgotPassword = (email) => async (dispatch) => {
         ? error.response.data.message
         : error.message,
     });
+    return false
   }
 }
 
