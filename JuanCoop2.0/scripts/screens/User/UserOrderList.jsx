@@ -194,15 +194,15 @@ const UserOrderList = () => {
             <Text style={styles.orderStatus(orderItem.orderStatus)}>
           {orderItem.orderStatus}
         </Text>
-              {orderItem.orderStatus === "Delivered" && (
-                <TouchableOpacity
-                  style={[styles.button, styles.reviewButton]}
-                  onPress={() => handleOpenReviewModal(item._id, orderItem)}
-                >
-                  <Icon name="rate-review" size={20} color="#fff" />
-                  <Text style={styles.buttonText}>Review</Text>
-                </TouchableOpacity>
-              )}
+        {orderItem.orderStatus === "Delivered" && (
+              <TouchableOpacity
+                style={[styles.button, styles.reviewButton]}
+                onPress={() => handleReviewSubmit(item._id, orderItem)}
+              >
+                <Icon name="rate-review" size={20} color="#fff" />
+                <Text style={styles.buttonText}>Review</Text>
+              </TouchableOpacity>
+            )}
     
     {orderItem.orderStatus === "Shipping" && (
               <TouchableOpacity
