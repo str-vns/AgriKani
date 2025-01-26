@@ -3,7 +3,7 @@ const ErrorHandler = require("../../utils/errorHandler");
 const { STATUSCODE, ROLE } = require("../../constants/index");
 const { default: mongoose } = require("mongoose");
 const { cloudinary } = require("../../utils/cloudinary");
-
+const Message = require("../../models/ChatFeats/messages")
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -31,15 +31,33 @@ exports.GetAllConvo = async () => {
   return convo;
 };
 
-exports.getSingleConvo = async (req) => {
-    const convo = await Conversation.find(
-        {
-            members: { $in: [req.params.id]},
-        }
-    )
+// exports.getSingleConvo = async (req) => {
+//     const convo = await Conversation.find(
+//       { members: { $in: [req.params.id] } }
+//     ).sort({ createdAt: -1 });
 
-    return convo
-}
+//     return convo
+// }
+
+exports.getSingleConvo = async (req) => {
+  try {
+    const convo = await Conversation.find({ members: { $in: [req.params.id] } })
+      .lean()
+      .then(async (conversations) => {
+        for (let conversation of conversations) {
+          const latestMessage = await Message.findOne({ conversationId: conversation._id })
+            .sort({ createdAt: -1 });
+          conversation.latestMessage = latestMessage; // Attach the latest message to the conversation
+        }
+        return conversations.sort((a, b) => b.latestMessage?.createdAt - a.latestMessage?.createdAt);
+      });
+
+    return convo;
+  } catch (error) {
+    console.error('Error fetching the conversation:', error);
+    throw new Error('Failed to fetch the conversation');
+  }
+};
 
 exports.SoftdeleteConvo = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
