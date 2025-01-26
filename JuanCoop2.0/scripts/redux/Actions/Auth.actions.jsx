@@ -55,10 +55,11 @@ export const loginUser = async (user, dispatch) => {
             return true
         } else {
             logoutUser(dispatch);
+            console.log("No user details found in the response.");
         }
     } catch (err) {
         console.error('Login error:', err);
-        
+        return false;
         dispatch(setCurrentUser({}, err.message));
   
     }

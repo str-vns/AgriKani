@@ -29,21 +29,21 @@ const SingleProduct = ({ route }) => {
   const navigation = useNavigation();
   const [selectedSize, setSelectedSize] = useState(product?.stock[0]);
 
-  // Increment quantity with stock check
   const increment = () => {
-    if(product?.stock.length === 1)
-    {
-       if (quantity < product?.stock[0].quantity) {
-      setQuantity(quantity + 1);
-    }
-    } else {
-      if( quantity < selectedSize?.quantity){
+    if (product?.stock?.length === 1) {
+      if (quantity < product?.stock[0]?.quantity) {
         setQuantity(quantity + 1);
+      } else {
+        console.log("Maximum quantity reached");
+      }
+    } else {
+      if (quantity < selectedSize?.quantity) {
+        setQuantity(quantity + 1);
+      } else {
+        console.log("Maximum quantity reached for this size");
       }
     }
-   
   };
-
   // Decrement quantity
   const decrement = () => {
     if (quantity > 1) {
@@ -51,41 +51,51 @@ const SingleProduct = ({ route }) => {
     }
   };
 
-  const handleAddToCart = () => {
-    if(product?.stock.length === 1){
-     const cartItem ={
-      inventoryId: product.stock[0]._id,
-      id: product._id,
-      productName: product.productName,
-      pricing: product?.stock[0].price,
-      quantity,
-      metricUnit: product.stock[0].metricUnit,
-      unitName: product.stock[0].unitName,
-      coop: product.coop,
-      image: product.image[0]?.url,
-     }
-    AsyncStorage.setItem("cartItem", JSON.stringify(cartItem));
-    Alert.alert("Item added to cart");
-    dispatch(addToCart(cartItem));
-    } else {
-      const cartItem ={
-        inventoryId: selectedSize?._id,
-        id: product._id,
-        productName: product.productName,
-        pricing: selectedSize?.price,
-        quantity,
-        metricUnit: selectedSize?.metricUnit,
-        unitName: selectedSize?.unitName,
-        coop: product.coop,
-        user: product.user,
-        image: product.image[0]?.url,
-        maxQuantity: selectedSize?.quantity,
-       }   
-     
-      Alert.alert("Item added to cart");
-      dispatch(addToCart(cartItem));
-    }
+  const handleAddToCart = async () => {
+    try {
+      if (product?.stock?.length === 1) {
+        const cartItem = {
+          inventoryId: product.stock[0]._id,
+          id: product._id,
+          productName: product.productName,
+          pricing: product?.stock[0].price,
+          quantity: quantity ,
+          metricUnit: product.stock[0].metricUnit,
+          unitName: product.stock[0].unitName,
+          coop: product.coop,
+          image: product.image[0]?.url,
+          maxQuantity: product?.stock[0]?.quantity,
+        };
+  
+        AsyncStorage.setItem("cartItem", JSON.stringify(cartItem));
+  
+        Alert.alert("Item added to cart");
 
+        dispatch(addToCart(cartItem));
+      } else if (selectedSize) {
+        const cartItem = {
+          inventoryId: selectedSize?._id,
+          id: product._id,
+          productName: product.productName,
+          pricing: selectedSize?.price,
+          quantity: quantity ,
+          metricUnit: selectedSize?.metricUnit,
+          unitName: selectedSize?.unitName,
+          coop: product.coop,
+          user: product.user,
+          image: product.image[0]?.url,
+          maxQuantity: selectedSize?.quantity,
+        };
+  
+        Alert.alert("Item added to cart");
+        dispatch(addToCart(cartItem));
+      } else {
+        Alert.alert("Please select a size or ensure stock is available.");
+      }
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+      Alert.alert("An error occurred while adding the item to the cart.");
+    }
   };
 
   useFocusEffect(
@@ -96,6 +106,7 @@ const SingleProduct = ({ route }) => {
     },[dispatch, product])
 
   )
+
   const handleSelectSize = (item) => {
     setSelectedSize(item);
     setQuantity(1);
