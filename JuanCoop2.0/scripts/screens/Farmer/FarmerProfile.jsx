@@ -19,11 +19,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createConversation } from "@redux/Actions/converstationActions";
 import { conversationList } from "@redux/Actions/converstationActions";
 import { getUsers } from "@redux/Actions/userActions";
+import { useSocket } from "../../../SocketIo";
 
 const FarmerProfile = (props) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
+  const socket = useSocket();
   const cooperative = props.route.params.coop;
   const userItem = props.route.params.coop.user;
   const userId = context?.stateUser?.userProfile?._id;
