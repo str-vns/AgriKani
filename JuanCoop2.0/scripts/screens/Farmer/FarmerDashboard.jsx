@@ -34,32 +34,32 @@ const FarmerDashboard = () => {
   const InventoryInfo = Invsuccess?.details;
   const [fcmToken, setFcmToken] = useState("");
 
-  
-   useEffect(() => {
-    if (!socket) {
-      console.warn("Socket is not initialized.");
-      return;
-    }
+
+  //  useEffect(() => {
+  //   if (!socket) {
+  //     console.warn("Socket is not initialized.");
+  //     return;
+  //   }
   
 
-      if (userId) {
-        socket.emit("addUser", userId);
-      } else {
-        console.warn("User ID is missing.");
-      }
+  //     if (userId) {
+  //       socket.emit("addUser", userId);
+  //     } else {
+  //       console.warn("User ID is missing.");
+  //     }
     
-        socket.on("getUsers", (users) => {
-          const onlineUsers = users.filter(
-            (user) => user.online && user.userId !== null
-          );
+  //       socket.on("getUsers", (users) => {
+  //         const onlineUsers = users.filter(
+  //           (user) => user.online && user.userId !== null
+  //         );
     
-          setOnlineUsers(onlineUsers);
-        });
+  //         setOnlineUsers(onlineUsers);
+  //       });
     
-        return () => {
-          socket.off("getUsers");
-        };
-      }, [socket, userId]);
+  //       return () => {
+  //         socket.off("getUsers");
+  //       };
+  //     }, [socket, userId]);
 
   const weatherIcons = {
     'a01d': require('../../../assets/weather/a01d.png'),
@@ -137,9 +137,31 @@ const FarmerDashboard = () => {
               }
               
           fetchDailyWeather();
-    
+          if (!socket) {
+            console.warn("Socket is not initialized.");
+            return;
+          }
+        
+      
+            if (userId) {
+              socket.emit("addUser", userId);
+            } else {
+              console.warn("User ID is missing.");
+            }
+          
+              socket.on("getUsers", (users) => {
+                const onlineUsers = users.filter(
+                  (user) => user.online && user.userId !== null
+                );
+          
+                setOnlineUsers(onlineUsers);
+              });
+          
+              return () => {
+                socket.off("getUsers");
+              };
 
-            }, [])
+            }, [socket, userId])
           
   )
   

@@ -240,7 +240,7 @@ const cameraPermission = await Camera.requestCameraPermissionsAsync();
             <Picker.Item label="Prefer Not To Say" value="prefer not to say" />
           </Picker>
         </View>
-      {errors ? <Error message={errors} /> : null}
+        {errors ? <Error message={typeof errors === 'string' ? errors : errors.message || 'An error occurred'} /> : null}
         <TouchableOpacity style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>Save & Update</Text>
         </TouchableOpacity>

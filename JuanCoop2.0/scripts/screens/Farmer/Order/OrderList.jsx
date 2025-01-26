@@ -236,6 +236,7 @@ const OrderList = ({ navigation }) => {
   };
 
   const chatNow = async (item) => {
+    setLoading(true);
     const UserIdThe = item?.user?._id;
     const currentUserId = userId;
 
@@ -254,7 +255,7 @@ const OrderList = ({ navigation }) => {
           navigation.navigate("Messaging", {
             screen: "ChatMessaging", // Correct screen name based on your Stack.Navigator
             params: {
-              item: item.user,
+              item: item?.user,
               conversations: conversations,
               isOnline: onlineUsers,
             },
@@ -276,9 +277,11 @@ const OrderList = ({ navigation }) => {
                   isOnline: onlineUsers,
                 },
               });
-            }, 5000);
+            }, 5000)
+            setRefresh(false);
           } else {
             console.error("Error creating conversation");
+            setRefresh(false);
           }
         }
       } catch (error) {
