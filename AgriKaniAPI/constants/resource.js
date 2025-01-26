@@ -26,4 +26,5 @@ module.exports = {
     MEMBER: "member",
     DELIVERY: "delivery",
     DRIVER: "driver",
+    CANCELLED: "cancelled",
 }
