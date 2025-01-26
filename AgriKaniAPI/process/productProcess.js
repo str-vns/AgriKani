@@ -196,6 +196,7 @@ exports.CoopOnlyProduct = async (id) => {
   const coopOnlyProduct = await Product.find({ coop: coopId._id, deletedAt: null })
   .populate({path: "reviews.user", select: "firstName lastName image.url"})
   .populate({path: "stock", select: "quantity metricUnit unitName price status"})
+  .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
   .lean().exec();
 
   if (!coopOnlyProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
@@ -209,7 +210,7 @@ exports.CoopOnlyArchiveProduct = async (id) => {
 
   const coopId = await Farm.findOne({ user: id }).lean().exec(); 
 
-  const coopOnlyArchiveProduct = await Product.find({ coop: coopId._id, deletedAt:  { $ne: null } }).lean().exec();
+  const coopOnlyArchiveProduct = await Product.find({ coop: coopId._id, deletedAt:  { $ne: null } }).sort({ createdAt: STATUSCODE.NEGATIVE_ONE }).lean().exec();
 
   if (!coopOnlyArchiveProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
 
