@@ -141,7 +141,7 @@ const getStatusColor = (status) => {
               zoomEnabled={true}
               pitchEnabled={true}
               >
-             { markerCoordinate.lat && markerCoordinate.lng && !isNaN(markerCoordinate.lat) && !isNaN(markerCoordinate.lng) &&
+             { deliveries?.deliveryLocation?.Longitude && deliveries?.deliveryLocation?.Latitude &&
                 <MapboxGL.Camera 
                   zoomLevel={zoomLevel} 
                   centerCoordinate={[deliveries?.deliveryLocation?.Longitude, deliveries?.deliveryLocation?.Latitude]} 
