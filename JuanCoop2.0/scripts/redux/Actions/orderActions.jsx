@@ -20,7 +20,10 @@ import {
   SHIPPED_ORDER_SUCCESS,
   HISTORY_DELIVERY_COOP_REQUEST,
   HISTORY_DELIVERY_COOP_SUCCESS,
-  HISTORY_DELIVERY_COOP_FAIL
+  HISTORY_DELIVERY_COOP_FAIL,
+  COOP_DASHBOARD_REQUEST, 
+  COOP_DASHBOARD_SUCCESS, 
+  COOP_DASHBOARD_FAIL
 } from '../Constants/orderConstants';
 import baseURL from '@assets/commons/baseurl';
 
@@ -237,3 +240,24 @@ export const historyDeliveryCoop = (coopId, token) => async (dispatch) => {
     console.error("Error getting delivery history ", error);
   }
 }
+
+export const fetchCoopDashboardData = (userId, token) => async (dispatch) => {
+  try {
+    dispatch({ type: COOP_DASHBOARD_REQUEST });
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.get(`${baseURL}coopdashboard/${userId}`, config);  
+
+    dispatch({ type: COOP_DASHBOARD_SUCCESS, payload: data.details });
+  } catch (error) {
+    dispatch({
+      type: COOP_DASHBOARD_FAIL,
+      payload: error.response?error.response.data.message : error.message,
+    });
+  }
+};

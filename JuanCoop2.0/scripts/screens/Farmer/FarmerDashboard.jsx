@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, FlatList, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LineChart } from 'react-native-chart-kit'; // For the line chart
+import { BarChart, PieChart } from 'react-native-chart-kit';
 import { useFocusEffect, useNavigation } from '@react-navigation/native'; // Assuming navigation is set up
 import styles from './css/styles';
 import { Profileuser } from "@redux/Actions/userActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { getCoopProducts } from '@redux/Actions/productActions'
 import { singleInventory } from '@redux/Actions/inventoryActions'
+import { fetchCoopDashboardData } from '@redux/Actions/orderActions';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux';
 import { useWeather } from '../../../CurrentWeather';
@@ -22,10 +23,14 @@ const FarmerDashboard = () => {
   const socket = useSocket();
   const { coopProducts } = useSelector((state) => state.CoopProduct);
   const { Invsuccess } = useSelector((state) => state.sinvent);
+  const { coopdashboards: dashboard, coopdashboardloading: loading, coopdashboarderror: error } = useSelector(
+    (state) => state.coopdashboards || {}
+  );
+
   const screenWidth = Dimensions.get('window').width;
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
-  const [loading, setLoading] = useState(false);
+  const [loadingData, setLoading] = useState(false);
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -33,33 +38,6 @@ const FarmerDashboard = () => {
   const [dailyWeather, setDailyWeather] = useState(null);
   const InventoryInfo = Invsuccess?.details;
   const [fcmToken, setFcmToken] = useState("");
-
-
-  //  useEffect(() => {
-  //   if (!socket) {
-  //     console.warn("Socket is not initialized.");
-  //     return;
-  //   }
-  
-
-  //     if (userId) {
-  //       socket.emit("addUser", userId);
-  //     } else {
-  //       console.warn("User ID is missing.");
-  //     }
-    
-  //       socket.on("getUsers", (users) => {
-  //         const onlineUsers = users.filter(
-  //           (user) => user.online && user.userId !== null
-  //         );
-    
-  //         setOnlineUsers(onlineUsers);
-  //       });
-    
-  //       return () => {
-  //         socket.off("getUsers");
-  //       };
-  //     }, [socket, userId]);
 
   const weatherIcons = {
     'a01d': require('../../../assets/weather/a01d.png'),
@@ -161,11 +139,8 @@ const FarmerDashboard = () => {
                 socket.off("getUsers");
               };
 
-            }, [socket, userId])
-          
+            }, [socket, userId])       
   )
-  
-
   useEffect(() => {
     const fetchUserData = async () => {
       setLoading(true);
@@ -207,33 +182,33 @@ const FarmerDashboard = () => {
     return () => {}; // Cleanup function if no outOfStockProducts
   }, [InventoryInfo?.length]);
 
-  const [selectedTab, setSelectedTab] = useState('Weekly');
+  useEffect(() => {
+    if (userId) {
+      dispatch(fetchCoopDashboardData(userId));
+    }
+  }, [dispatch, userId]);
 
-  const lineData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  const salesTrends = dashboard?.salesTrends || { daily: 0, weekly: 0, monthly: 0 };
+  const rankedProducts = dashboard?.rankedProducts || [];
+
+  const salesTrendsData = {
+    labels: ["Daily", "Weekly", "Monthly"],
     datasets: [
       {
-        data: [500, 1000, 1500, 3000, 1200, 2500, 2400],
-        strokeWidth: 2,
+        data: [salesTrends.daily || 0, salesTrends.weekly || 0, salesTrends.monthly || 0],
       },
     ],
   };
+  console.log("salesTrendsData:", salesTrends);
+  console.log("rankedProducts:", rankedProducts);
 
-  const chartConfig = {
-    backgroundGradientFrom: '#fff',
-    backgroundGradientTo: '#fff',
-    decimalPlaces: 2,
-    color: (opacity = 1) => `rgba(255, 165, 0, ${opacity})`, // Orange line
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`, // Black labels
-    style: {
-      borderRadius: 16,
-    },
-    propsForDots: {
-      r: '6',
-      strokeWidth: '2',
-      stroke: '#FFA500', // Orange stroke
-    },
-  };
+  const topProductsData = rankedProducts.map((p) => ({
+    name: p.productName || "Unknown",
+    population: p.totalQuantitySold || 0,
+    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+    legendFontColor: "#7F7F7F",
+    legendFontSize: 12,
+  }));
 
   return (
     <ScrollView style={styles.container}>
@@ -244,142 +219,131 @@ const FarmerDashboard = () => {
         <Text style={styles.headerTitle}>Dashboard</Text>
       </View>
       <View style={styles.bannerContainer}>
-  <Text style={styles.bannerText}>⚠️ Out of Stock:</Text>
-  <FlatList
-  data={InventoryInfo?.length > 0 ? [InventoryInfo[currentIndex]] : []}
-  keyExtractor={(item) => `${item._id}`}
-  renderItem={({ item }) =>
-    item ? (
-      <View style={styles.productContainer}>
-        <View style={styles.centeredContent}>
+        <Text style={styles.bannerText}>⚠️ Out of Stock:</Text>
+          <FlatList
+            data={InventoryInfo?.length > 0 ? [InventoryInfo[currentIndex]] : []}
+            keyExtractor={(item) => `${item._id}`}
+            renderItem={({ item }) =>
+              item ? (
+                <View style={styles.productContainer}>
+                  <View style={styles.centeredContent}>
 
-          <Text style={styles.productText}>
-            {item.productId?.productName || 'Unknown Product'}
-          </Text>
+                    <Text style={styles.productText}>
+                      {item.productId?.productName || 'Unknown Product'}
+                    </Text>
 
-          <Text style={styles.stockText}>
-            {item.unitName} {item.metricUnit}
-          </Text>
-        </View>
-      </View>
-    ) : null
-  }
-  horizontal
-  showsHorizontalScrollIndicator={false}
-/>
-</View>
-     
-<View style={styles.weatherContainer}>
-      <View style={styles.weatherBox}>
-        <Image 
-          blurRadius={70}
-          source={require("@assets/img/bg.jpg")}
-          style={styles.backgroundImage}
-        />
-
-        <View style={styles.overlay}>
-        <Image
-  source={weatherIcons[weather?.data[0]?.weather?.icon] || weatherIcons['default']}
-  style={styles.cloudImage}
-/>
-  
-          <Text style={styles.weatherText}>City: {weather?.data[0].city_name}</Text>
-          <Text style={styles.weatherText}>Temperature: {weather?.data[0].temp}°C</Text>
-          <Text style={styles.weatherText}>Weather: {weather?.data[0].weather.description}</Text>
-          <Text style={styles.weatherText}>Wind Speed: {weather?.data[0].wind_spd} m/s</Text>
-        </View>
-      </View>
-
-<ScrollView horizontal={true} >
-      {dailyWeather?.data?.map((item, index) => (
-      <View key={item._id || index} style={styles.dailyWeatherContainer}>
-      <View style={styles.dailyWeatherBox}>
-      <Image
-          blurRadius={70}
-          source={require("../../../assets/img/bg.jpg")}
-          style={styles.backgroundImageDaily}
-        />
-        <View style={styles.dailyOverlay}>
-
-          <Text style={styles.dailyWeatherDate}>{item.valid_date}</Text>
-    
-          <Image
-            source={weatherIcons[item?.weather?.icon] || weatherIcons['default']}
-            style={styles.dailyWeatherCloudImage}
+                    <Text style={styles.stockText}>
+                      {item.unitName} {item.metricUnit}
+                    </Text>
+                  </View>
+                </View>
+              ) : null
+            }
+            horizontal
+            showsHorizontalScrollIndicator={false}
           />
+      </View>
+      <View style={styles.weatherContainer}>
+        <View style={styles.weatherBox}>
+          <Image 
+            blurRadius={70}
+            source={require("@assets/img/bg.jpg")}
+            style={styles.backgroundImage}
+          />
+
+          <View style={styles.overlay}>
+          <Image
+    source={weatherIcons[weather?.data[0]?.weather?.icon] || weatherIcons['default']}
+    style={styles.cloudImage}
+  />
     
-          <Text style={styles.dailyWeatherText} ellipsizeMode='tail'  numberOfLines={1}>{item.weather.description}</Text>
-          <Text style={styles.dailyWeatherTempText}>{item.temp}°C</Text>
+            <Text style={styles.weatherText}>City: {weather?.data[0].city_name}</Text>
+            <Text style={styles.weatherText}>Temperature: {weather?.data[0].temp}°C</Text>
+            <Text style={styles.weatherText}>Weather: {weather?.data[0].weather.description}</Text>
+            <Text style={styles.weatherText}>Wind Speed: {weather?.data[0].wind_spd} m/s</Text>
+          </View>
         </View>
-      </View>
-    </View>
-      ))}
-    </ScrollView>
 
-    </View>
+  <ScrollView horizontal={true} >
+        {dailyWeather?.data?.map((item, index) => (
+        <View key={item._id || index} style={styles.dailyWeatherContainer}>
+        <View style={styles.dailyWeatherBox}>
+        <Image
+            blurRadius={70}
+            source={require("../../../assets/img/bg.jpg")}
+            style={styles.backgroundImageDaily}
+          />
+          <View style={styles.dailyOverlay}>
+
+            <Text style={styles.dailyWeatherDate}>{item.valid_date}</Text>
       
-      {/* Tab Selection */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tabButton, selectedTab === 'Daily' && styles.activeTab]}
-          onPress={() => setSelectedTab('Daily')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'Daily' && styles.activeTabText]}>Daily</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, selectedTab === 'Weekly' && styles.activeTab]}
-          onPress={() => setSelectedTab('Weekly')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'Weekly' && styles.activeTabText]}>Weekly</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, selectedTab === 'Monthly' && styles.activeTab]}
-          onPress={() => setSelectedTab('Monthly')}
-        >
-          <Text style={[styles.tabText, selectedTab === 'Monthly' && styles.activeTabText]}>Monthly</Text>
-        </TouchableOpacity>
+            <Image
+              source={weatherIcons[item?.weather?.icon] || weatherIcons['default']}
+              style={styles.dailyWeatherCloudImage}
+            />
+      
+            <Text style={styles.dailyWeatherText} ellipsizeMode='tail'  numberOfLines={1}>{item.weather.description}</Text>
+            <Text style={styles.dailyWeatherTempText}>{item.temp}°C</Text>
+          </View>
+        </View>
       </View>
+        ))}
+      </ScrollView>
 
-      {/* Sales Line Chart */}
-      <View style={styles.chartContainer}>
-        <Text style={styles.salesText}>This Week Sales</Text>
-        <Text style={styles.salesValue}>$2435.17</Text>
-        <LineChart
-          data={lineData}
-          width={screenWidth * 0.9}
-          height={220}
-          chartConfig={chartConfig}
-          bezier
-          style={styles.chartStyle}
-        />
       </View>
-
-      {/* Sales Stats */}
       <View style={styles.statsContainer}>
-        <View style={styles.statBox}>
-          <Text style={styles.statTitle}>Gross Sales</Text>
-          <Text style={styles.statValue}>$2572.73</Text>
-          <Text style={styles.statChangePositive}>+ $230.34</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Daily Sales</Text>
+            <Text style={styles.statValue}>₱{salesTrends.daily}</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Weekly Sales</Text>
+            <Text style={styles.statValue}>₱{salesTrends.weekly}</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statTitle}>Monthly Sales</Text>
+            <Text style={styles.statValue}>₱{salesTrends.monthly}</Text>
+          </View>
         </View>
-
-        <View style={styles.statBox}>
-          <Text style={styles.statTitle}>Net Sales</Text>
-          <Text style={styles.statValue}>$2192.73</Text>
-          <Text style={styles.statChangeNegative}>- $120.34</Text>
+        <View style={styles.totalOrdersCard}>
+          <Text style={styles.totalOrdersTitle}>Total Orders</Text>
+          <Text style={styles.totalOrdersValue}>{dashboard?.totalOrders ?? 0}</Text>
         </View>
-
-        <View style={styles.statBox}>
-          <Text style={styles.statTitle}>Discount</Text>
-          <Text style={styles.statValue}>- $150.06</Text>
-          <Text style={styles.statChangePositive}>+ 10%</Text>
+        <View style={styles.chartsContainer}>
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Sales Trends</Text>
+            <BarChart
+              data={salesTrendsData}
+              width={screenWidth - 40}
+              height={220}
+              chartConfig={{
+                backgroundColor: "#fff",
+                backgroundGradientFrom: "#f5f5f5",
+                backgroundGradientTo: "#e5e5e5",
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              }}
+              style={styles.chart}
+            />
+          </View>
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Top Selling Products</Text>
+            <PieChart
+              data={topProductsData}
+              width={screenWidth - 40}
+              height={220}
+              chartConfig={{
+                backgroundColor: "#fff",
+                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              }}
+              accessor={"population"}
+              backgroundColor={"transparent"}
+              paddingLeft={"15"}
+              absolute
+            />
+          </View>
         </View>
-
-        <View style={styles.statBox}>
-          <Text style={styles.statTitle}>Tax</Text>
-          <Text style={styles.statValue}>$139.69</Text>
-          <Text style={styles.statChangeNegative}>+ $21</Text>
-        </View>
-      </View>
     </ScrollView>
   );
 };

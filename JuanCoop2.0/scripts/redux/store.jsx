@@ -6,7 +6,7 @@ import {
   import { thunk } from "redux-thunk";
   
   import cartItems from "@redux/Reducers/cartItems";
-  import { orderReducer, orderCoopReducer, orderShippedReducer, historyDeliveryCoopReducer } from "./Reducers/orderReducer";
+  import { orderReducer, orderCoopReducer, orderShippedReducer, historyDeliveryCoopReducer, coopdashboardReducer } from "./Reducers/orderReducer";
   import { OTPReducer, RegisterReducer, userReducer, EditProfileReducer, getUsersReducers, AllUsersReducer, 
     userDeviceTokenReducer,  checkEmailReducer, otpForgotPasswordReducer, googleLoginReducer } from "@redux/Reducers/userReducers";
   import { reducerProduct, reducerCoop, reducerCoopProduct, reducerCreateProduct, reducerEditProduct, reducerDelResProduct } from "@redux/Reducers/productReducers";
@@ -68,6 +68,7 @@ import {
     createConversation: conversationCreateReducer,
     coopOrders: coopOrderReducer,
     upOrders: coopOrderUpdateReducer,
+    coopdashboards: coopdashboardReducer,
     post: postReducer,
     sales: salesReducer,
     rank: rankedReducer,

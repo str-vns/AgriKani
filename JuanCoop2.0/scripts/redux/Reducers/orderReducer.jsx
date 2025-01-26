@@ -19,7 +19,10 @@ import {
     SHIPPED_ORDER_SUCCESS,
     HISTORY_DELIVERY_COOP_REQUEST,
     HISTORY_DELIVERY_COOP_SUCCESS,
-    HISTORY_DELIVERY_COOP_FAIL
+    HISTORY_DELIVERY_COOP_FAIL,
+    COOP_DASHBOARD_REQUEST, 
+    COOP_DASHBOARD_SUCCESS, 
+    COOP_DASHBOARD_FAIL
   } from '../Constants/orderConstants';
   
   const initialState = {
@@ -27,6 +30,16 @@ import {
     order: null, // For single order creation or updates
     loading: false,
     error: null,
+    coopdashboards: {
+      totalRevenue: 0,
+      totalOrders: 0,
+      rankedProducts: [],
+      salesTrends: {
+        daily: 0,
+        weekly: 0,
+        monthly: 0,
+      },
+    },
   };
   
   export const orderReducer = (state = initialState, action) => {
@@ -120,3 +133,16 @@ import {
         return state;
     }
   }
+
+  export const coopdashboardReducer = (state = initialState, action) => {
+    switch (action.type) {
+      case COOP_DASHBOARD_REQUEST:
+        return { ...state, coopdashboardloading: true };
+      case COOP_DASHBOARD_SUCCESS:
+        return { ...state, coopdashboardloading: false, coopdashboards: action.payload };
+      case COOP_DASHBOARD_FAIL:
+        return { ...state, coopdashboardloading: false, coopdashboarderror: action.payload };
+      default:
+        return state;
+    }
+  };  

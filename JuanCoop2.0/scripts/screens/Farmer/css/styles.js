@@ -3,6 +3,63 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
 
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: "#fff",
+    padding: 16,
+    margin: 4,
+    borderRadius: 8,
+    alignItems: "center",
+    elevation: 2,
+  },
+  statTitle: {
+    fontSize: 16,
+    color: "#777",
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  totalOrdersCard: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 16,
+    elevation: 2,
+  },
+  totalOrdersTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#555",
+  },
+  totalOrdersValue: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#007BFF",
+  },
+  chartsContainer: {
+    marginTop: 16,
+  },
+  chartCard: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+    elevation: 2,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#555",
+    marginBottom: 8,
+  },
 //container
     container: {
         flex: 1,
