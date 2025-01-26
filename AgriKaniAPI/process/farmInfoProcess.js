@@ -201,7 +201,7 @@ exports.singleFarm = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Farm ID: ${id}`);
 
-  const singleFarm = await Farm.findById(id)
+  const singleFarm = await Farm.findOne({user: id})
     .populate({ path: "user", select: "firstName lastName email image.url" })
     .lean()
     .exec();
