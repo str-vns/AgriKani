@@ -128,6 +128,7 @@ module.exports = {
   INVENTORY_ACTIVE_ID: "/inventory/active/:id",
   INVENTORY_INACTIVE_ID: "/inventory/inactive/:id",
   INVENTORY_PRODUCT_ID: "/inventory/product/:id",
+  INVENTORY_UPDATE_ID: "/inventory/update/:id",
   INVENTORY_STOCK_CHECK: "/inventory/stock",
   //member
   MEMBER: "/member",
@@ -170,4 +171,10 @@ module.exports = {
   DRIVER_IS_AVAILABLE: "/driver/available/:id",
   DRIVER_REMOVE_LOCATION: "/driver/remove/location/:id",
   DRIVER_SINGLE_ID: "/driver/single/:id",
+
+  //Cancelled
+  CANCELLED: "/cancelled",
+  CANCELLED_ID: "/cancelled/:id",
+  CANCELLED_ORDER_ID: "/cancelled/order/:id",
+  CANCELLED_ORDER: "/cancelled/order",
 };
