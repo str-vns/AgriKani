@@ -59,6 +59,7 @@ const FarmRegistration = ({ navigation }) => {
     lng: 120.9842,
   });
 
+  console.log(userInfo);
   //Token
   useEffect(() => {
     const fetchJwt = async () => {
@@ -160,7 +161,7 @@ const FarmRegistration = ({ navigation }) => {
       quality: 1,
     });
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
+    if (!result?.canceled && result?.assets && result?.assets?.length > 0) {
       const newImages = [];
       result.assets.forEach((asset) => {
         if (!image.some((existingImage) => existingImage.uri === asset.uri)) {
@@ -363,7 +364,7 @@ const FarmRegistration = ({ navigation }) => {
         </TouchableOpacity>
 
         <ScrollView horizontal>
-          {image.length > 0 &&
+          {image?.length > 0 &&
             image.map((imageItem, index) => {
               const imageUrl = imageItem.url || imageItem;
               return (
@@ -434,7 +435,7 @@ const FarmRegistration = ({ navigation }) => {
               </>
             ) : (
               <>
-                {location.length > 0 && (
+                {location?.length > 0 && (
                   <FlatList
                     data={location}
                     keyExtractor={(item, index) => index.toString()}
