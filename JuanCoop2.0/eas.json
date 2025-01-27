@@ -12,7 +12,8 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-         "resourceClass": "large"
+        "resourceClass": "medium"
+
       },
       "ios": {
         "distribution": "internal"  
