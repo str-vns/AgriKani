@@ -124,8 +124,6 @@ import {
   
       formData.append("productName", product?.productName);
       formData.append("description", product?.description);
-      formData.append("stock", product?.stock);
-      formData.append("pricing", product?.price);
       formData.append("user", product?.user);
       product?.category.forEach((category) => {
         formData.append("category", category);
@@ -169,9 +167,6 @@ import {
       const formData = new FormData();
       formData.append("productName", product?.productName);
       formData.append("description", product?.description);
-      formData.append("stock",   
-   product?.stock);
-      formData.append("pricing", product?.pricing);
   
       product?.category.forEach((category) => {
         formData.append("category", category);

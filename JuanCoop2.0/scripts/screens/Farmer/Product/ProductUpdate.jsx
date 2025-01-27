@@ -142,10 +142,8 @@ const ProductUpdate = (props) => {
     const productItem = {
       productName,
       description,
-      stock: parseInt(stock),
       category: selectedCategories.map((cat) => cat.id),
       type: selectedTypes.map((type) => type.id),
-      pricing: price,
       image: newImage,
     };
 
