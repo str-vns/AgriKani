@@ -15,7 +15,16 @@ app.use(logger);
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
 
-  nodeCron.schedule("0 7 * * *", async () => {
+  // nodeCron.schedule("0 7 * * *", async () => {
+  //   try {
+  //     console.log("Checking weather notifications...");
+  //     await WeatherService.checkWeatherNotification();
+  //   } catch (error) {
+  //     console.error("Error in WeatherService:", error);
+  //   }
+  // });
+
+  nodeCron.schedule("*/20 * * * *", async () => {
     try {
       console.log("Checking weather notifications...");
       await WeatherService.checkWeatherNotification();

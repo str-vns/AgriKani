@@ -8,7 +8,8 @@ exports.checkWeatherNotification = async () => {
     const response = await axios.get(
       `https://api.weatherbit.io/v2.0/current?city=Manila&country=PH&key=${process.env.API_WEATHER_KEY}`
     );
-    const weatherData = response.data.data[0].precip;
+    // const weatherData = response.data.data[0].precip;
+    const weatherData = 3;
 
     let notification = null;
     if (weatherData >= 2.6 && weatherData <= 7.5) {
