@@ -24,7 +24,7 @@ import * as ImagePicker from "expo-image-picker";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
-import { getCoop } from "@redux/Actions/productActions";
+import { getSingleCoop } from "@redux/Actions/productActions";
 import { deleteCoopImage, UpdateCoop } from "@redux/Actions/coopActions";
 import { WebView } from "react-native-webview";
 import styles from "@screens/stylesheets/Coop/CoopFolderdes/FarmEdit";
@@ -77,7 +77,7 @@ const FarmRegistration = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       if (userInfo) {
-        dispatch(getCoop(userInfo));
+        dispatch(getSingleCoop(userInfo));
       }
     }, [userInfo])
   );

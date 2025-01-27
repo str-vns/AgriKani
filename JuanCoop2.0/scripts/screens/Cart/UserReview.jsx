@@ -109,7 +109,7 @@ const Review = ({ route, navigation }) => {
       />
       
       <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Total: ${totalPrice.toFixed(2)}</Text>
+        <Text style={styles.totalText}>Total: ₱ {totalPrice.toFixed(2)}</Text>
       </View>
 
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmOrder}>

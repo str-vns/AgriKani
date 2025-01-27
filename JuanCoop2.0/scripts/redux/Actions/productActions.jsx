@@ -351,3 +351,29 @@ import {
     });
   };
   
+  export const getSingleCoop = (userId) => async (dispatch) => {
+
+    try {
+      dispatch({ type: SINGLE_COOP_REQUEST });
+  
+      const { data } = await axios.get(`${baseURL}farm/info/${userId}`);
+      console.log("Data from getSingleCoop", data);
+      dispatch({
+        type: SINGLE_COOP_SUCCESS,
+        payload: data.details,
+      });
+    } catch (error) {
+      const errorMessage =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message;
+  
+      dispatch({
+        type: SINGLE_COOP_FAIL,
+        payload: errorMessage,
+      });
+  
+      console.log("Error from getCoop", errorMessage);
+    }
+  };
+  

@@ -313,7 +313,7 @@ const OrderList = ({ navigation }) => {
   };
 
   const renderOrder = ({ item }) => {
-    const formattedDate = new Date(item.createdAt).toLocaleDateString("en-US", {
+    const formattedDate = new Date(item?.createdAt).toLocaleDateString("en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
@@ -323,22 +323,22 @@ const OrderList = ({ navigation }) => {
       <View style={styles.orderCard}>
         <View style={styles.orderContent}>
           <View style={styles.orderDetails}>
-            <Text style={styles.orderId}>Order #{item._id}</Text>
+            <Text style={styles.orderId}>Order #{item?._id}</Text>
             <Text style={styles.customerName}>
-              Customer: {item.user.firstName} {item.user.lastName}
+              Customer: {item?.user?.firstName} {item?.user?.lastName}
             </Text>
             <Text style={styles.orderDate}>Date: {formattedDate}</Text>
             <Text style={styles.orderInfo}>
-              Total Price: ${item.totalPrice}
+              Total Price: ${item?.totalPrice}
             </Text>
             <Text style={styles.orderInfo}>
               {" "}
-              Delivery Address: {item.shippingAddress.address},{" "}
-              {item.shippingAddress.city}
+              Delivery Address: {item?.shippingAddress?.address},{" "}
+              {item?.shippingAddress?.city}
             </Text>
             <Text
               style={[
-                styles.paymentStatus ? styles.paidStatus : styles.unpaidStatus,
+                styles?.paymentStatus ? styles?.paidStatus : styles?.unpaidStatus,
               ]}
             >
               Payment: NOT PAID
@@ -353,10 +353,10 @@ const OrderList = ({ navigation }) => {
                       style={styles.orderItemContainer}
                     >
                       <View style={styles.imageAndTextContainer}>
-                        {orderItem.product?.image &&
-                        orderItem.product?.image?.length > 0 ? (
+                        {orderItem?.product?.image &&
+                        orderItem?.product?.image?.length > 0 ? (
                           <Image
-                            source={{ uri: orderItem.product.image[0].url }}
+                            source={{ uri: orderItem?.product?.image[0]?.url }}
                             style={styles.orderImage}
                             onError={() => console.error("Error loading image")}
                           />
@@ -375,20 +375,20 @@ const OrderList = ({ navigation }) => {
                             {orderItem.inventoryProduct?.metricUnit}
                           </Text>
                           <Text style={styles.orderItemPrice}>
-                            Price: ${orderItem.price}
+                            Price: ${orderItem?.price}
                           </Text>
                           <Text style={styles.orderItemQuantity}>
-                            Quantity: {orderItem.quantity}
+                            Quantity: {orderItem?.quantity}
                           </Text>
 
                           <Text
                             style={[
-                              styles[`status${orderItem.orderStatus}`],
-                              getStatusColor(orderItem.orderStatus),
+                              styles[`status${orderItem?.orderStatus}`],
+                              getStatusColor(orderItem?.orderStatus),
                             ]}
                           >
                             <Text style={{ color: "black" }}>Status: </Text>
-                            {orderItem.orderStatus}
+                            {orderItem?.orderStatus}
                           </Text>
                         </View>
                       </View>
@@ -425,14 +425,14 @@ const OrderList = ({ navigation }) => {
                       disabled={loading}
                       onPress={() =>
                         handleProcessOrder(
-                          item._id,
-                          item.orderItems
+                          item?._id,
+                          item?.orderItems
                             .flat()
                             .filter(
                               (orderItem) =>
-                                orderItem.orderStatus !== "Cancelled"
+                                orderItem?.orderStatus !== "Cancelled"
                             )
-                            .map((orderItem) => orderItem.inventoryProduct._id),
+                            .map((orderItem) => orderItem?.inventoryProduct?._id),
                           item
                         )
                       }
@@ -458,14 +458,14 @@ const OrderList = ({ navigation }) => {
                       disabled={loading}
                       onPress={() =>
                         handleShippingOrder(
-                          item._id,
-                          item.orderItems
+                          item?._id,
+                          item?.orderItems
                             .flat()
                             .filter(
                               (orderItem) =>
-                                orderItem.orderStatus !== "Cancelled"
+                                orderItem?.orderStatus !== "Cancelled"
                             )
-                            .map((orderItem) => orderItem.inventoryProduct._id),
+                            .map((orderItem) => orderItem?.inventoryProduct?._id),
                           item
                         )
                       }
@@ -503,7 +503,7 @@ const OrderList = ({ navigation }) => {
           {filteredOrders && filteredOrders?.length > 0 ? (
             <FlatList
               data={filteredOrders}
-              keyExtractor={(item) => item._id}
+              keyExtractor={(item) => item?._id}
               renderItem={renderOrder}
               ItemSeparatorComponent={() => <View style={styles.separator} />}
               refreshControl={

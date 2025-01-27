@@ -3,6 +3,7 @@ import {
   View,
   Text,
   Linking,
+  ScrollView,
   TouchableOpacity,
   Image,
   Alert,
@@ -72,6 +73,7 @@ const DriverDetails = (props) => {
     }
 
   return (
+    <ScrollView> 
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
@@ -187,7 +189,7 @@ const DriverDetails = (props) => {
       </Modal>
       
     </View>
-    
+    </ScrollView>
   );
 };
 
