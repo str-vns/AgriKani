@@ -5,6 +5,7 @@ const allowedOrigins = [
   "http://localhost:4000",
   "http://localhost:8900",
   "https://agrikani.onrender.com",
+  "https://juancoopweb.onrender.com",
 ];
 
 module.exports = allowedOrigins;
