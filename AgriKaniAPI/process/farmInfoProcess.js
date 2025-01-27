@@ -200,13 +200,13 @@ exports.RestoreFarmInfo = async (id) => {
 exports.singleFarm = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Farm ID: ${id}`);
-
-  const singleFarm = await Farm.findOne({user: id})
+     console.log(id, "Farm ID");
+  const singleFarm = await Farm.findById(id)
     .populate({ path: "user", select: "firstName lastName email image.url" })
     .lean()
     .exec();
-
-  if (!singleFarm) throw new ErrorHandler(`Product not exist with ID: ${id}`);
+ 
+  if (!singleFarm) throw new ErrorHandler(`Farmer not exist with ID: ${id}`);
 
   return singleFarm;
 };
