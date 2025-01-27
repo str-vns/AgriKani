@@ -517,3 +517,18 @@ exports.DisapproveCoop = async (id) => {
   if (!coopUpdate) throw new ErrorHandler(`Coop not Update with ID ${id}`);
   return coopUpdate;
 }
+
+exports.singleFarmInfo = async (id) => {
+  console.log(id, "Farm ID"); 
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Farm ID: ${id}`);
+     console.log(id, "Farm ID");
+  const singleFarm = await Farm.findOne({ user: id })
+    .populate({ path: "user", select: "firstName lastName email image.url" })
+    .lean()
+    .exec();
+ 
+  if (!singleFarm) throw new ErrorHandler(`Farmer not exist with ID: ${id}`);
+
+  return singleFarm;
+};

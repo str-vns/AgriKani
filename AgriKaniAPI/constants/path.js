@@ -63,7 +63,7 @@ module.exports = {
   COOP_SHIPPING: "/orders/shipping/:id",
   COOP_DELIVERY: "/orders/delivery/:id",
   COOP_DELIVERY_HISTORY_ID: "/orders/delivery/history/:id",
-
+  FARM_ID_INFO: "/farm/info/:id",
   //Comment
   COMMENT: "/products/comment",
 

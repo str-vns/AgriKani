@@ -89,6 +89,12 @@ const farmRoutes = [
     roles: [],
     handler: farmController.DisapproveCooperative,
   },
+  {
+    method: METHOD.GET,
+    path: PATH.FARM_ID_INFO,
+    roles: [],
+    handler: farmController.getSingleFarmInfo,
+  },
 ];
 
 farmRoutes.forEach((route) => {

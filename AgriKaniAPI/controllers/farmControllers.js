@@ -161,3 +161,15 @@ exports.DisapproveCooperative = asyncHandler(async (req, res) => {
     coop
   );
 });
+
+exports.getSingleFarmInfo = asyncHandler(async (req, res) => {
+  const farm = await farmProcess.singleFarmInfo(req.params.id);
+
+  return farm?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Farm Found"))
+    : SuccessHandler(
+        res,
+        `All Farm Information has been fetched Successfully`,
+        farm
+      );
+});
