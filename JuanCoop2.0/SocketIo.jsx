@@ -9,9 +9,10 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     // https://agrikani.onrender.com
     // http://192.168.50.236:4000
+    // http://192.168.50.222:4000
     useEffect(() => {
 
-      const socketConnection = io("http://192.168.50.222:4000", {
+      const socketConnection = io("https://agrikani.onrender.com", {
         transports: ["websocket"],
         cors: {
           origin: [
