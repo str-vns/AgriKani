@@ -24,7 +24,7 @@ mongoose.connection.once("open", () => {
   //   }
   // });
 
-  nodeCron.schedule("*/20 * * * *", async () => {
+  nodeCron.schedule("*/10 * * * *", async () => {
     try {
       console.log("Checking weather notifications...");
       await WeatherService.checkWeatherNotification();
