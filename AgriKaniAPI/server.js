@@ -24,14 +24,14 @@ mongoose.connection.once("open", () => {
   //   }
   // });
 
-  nodeCron.schedule("*/10 * * * *", async () => {
-    try {
-      console.log("Checking weather notifications...");
-      await WeatherService.checkWeatherNotification();
-    } catch (error) {
-      console.error("Error in WeatherService:", error);
-    }
-  });
+  // nodeCron.schedule("*/10 * * * *", async () => {
+  //   try {
+  //     console.log("Checking weather notifications...");
+  //     await WeatherService.checkWeatherNotification();
+  //   } catch (error) {
+  //     console.error("Error in WeatherService:", error);
+  //   }
+  // });
 
   nodeCron.schedule("30 20 * * *", async () => {
     try {
