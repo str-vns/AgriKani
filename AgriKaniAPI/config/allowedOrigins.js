@@ -6,6 +6,7 @@ const allowedOrigins = [
   "http://localhost:8900",
   "https://agrikani.onrender.com",
   "https://juancoopweb.onrender.com",
+  "https://juan-coop-iyfsfiken-str-vns-projects.vercel.app/",
 ];
 
 module.exports = allowedOrigins;
