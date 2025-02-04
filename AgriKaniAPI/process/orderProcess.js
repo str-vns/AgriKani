@@ -406,21 +406,21 @@ exports.getRankedProducts = async () => {
       },
       {
         $lookup: {
-          from: "products",  // Look up the product details from the "products" collection
-          localField: "_id",  // Join on the product ID from the orderItems
-          foreignField: "_id", // Match it with the _id field in the products collection
-          as: "productDetails"  // The matched product will be placed in the productDetails array
+          from: "products",  
+          localField: "_id",  
+          foreignField: "_id", 
+          as: "productDetails" 
         }
       },
       { 
-        $unwind: "$productDetails"  // Flatten the productDetails array to get the product name directly
+        $unwind: "$productDetails"  
       },
       {
         $project: {
-          productId: "$_id",  // Include the product ID
-          totalQuantitySold: 1,  // Include the total quantity sold
-          name: "$productDetails.name",  // Get the product name from the joined data
-          price: "$productDetails.price",  // Optionally, include the price of the product
+          productId: "$_id",  
+          totalQuantitySold: 1,  
+          name: "$productDetails.name",  
+          price: "$productDetails.price",  
         }
       }
     ]);
@@ -664,5 +664,86 @@ const monthlySales = await Order.aggregate([
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
     throw new ErrorHandler("Error processing dashboard data", 500);
+  }
+};
+
+exports.getOverallDashboardData = async () => {
+  try {
+    // Your existing logic to fetch dashboard data
+    const orders = await Order.find({ "orderItems.orderStatus": "Shipping" })
+      .populate("orderItems.product")
+      .lean();
+
+    const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+    const totalOrders = orders.length;
+
+    const rankedProducts = await Order.aggregate([
+      { $unwind: "$orderItems" },
+      { $match: { "orderItems.orderStatus": "Shipping" } },
+      {
+        $group: {
+          _id: "$orderItems.product",
+          totalQuantitySold: { $sum: "$orderItems.quantity" },
+        },
+      },
+      { $sort: { totalQuantitySold: -1 } },
+  { $limit: 5 }, 
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" },
+      {
+        $project: {
+          _id: 0,
+          productId: "$_id",
+          productName: "$productDetails.productName",
+          totalQuantitySold: 1,
+        
+        },
+      },
+    ]);
+
+    const currentDate = new Date();
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(currentDate.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const dailySales = await Order.aggregate([
+      { $match: { "orderItems.orderStatus": "Shipping", createdAt: { $gte: startOfDay } } },
+      { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
+    ]);
+
+    const weeklySales = await Order.aggregate([
+      { $match: { "orderItems.orderStatus": "Shipping", createdAt: { $gte: sevenDaysAgo } } },
+      { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
+    ]);
+
+    const monthlySales = await Order.aggregate([
+      { $match: { "orderItems.orderStatus": "Shipping", createdAt: { $gte: startOfMonth } } },
+      { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
+    ]);
+
+    return {
+      totalRevenue,
+      totalOrders,
+      rankedProducts,
+      salesTrends: {
+        daily: dailySales[0]?.revenue || 0,
+        weekly: weeklySales[0]?.revenue || 0,
+        monthly: monthlySales[0]?.revenue || 0,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching overall dashboard data:", error);
+    throw new Error("Error processing dashboard data");
   }
 };

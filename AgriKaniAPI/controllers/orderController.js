@@ -164,3 +164,18 @@ exports.getCoopDashboardData = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
+exports.getOverallDashboardData = asyncHandler(async (req, res, next) => {
+  console.log("Fetching overall dashboard data")
+  try {
+    const dashboardData = await orderProcess.getOverallDashboardData();
+
+    if (!dashboardData) {
+      return next(new ErrorHandler("No dashboard data found", 404));
+    }
+
+    return SuccessHandler(res, "Dashboard data fetched successfully", dashboardData);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});

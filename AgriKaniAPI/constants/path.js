@@ -115,6 +115,7 @@ module.exports = {
   TOTAL_TYPE_USERS: "/users/type",
   RANKED_PRODUCTS: "/products/ranked",
   COOP_DASHBOARD: "/coopdashboard/:id", 
+  OVERALL_DASHBOARD: "/overalldashboard", 
 
   //Notification
   NOTIFICATION: "/notification",

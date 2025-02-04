@@ -8,6 +8,7 @@ router.get('/order/daily', orderController.getDailySalesReport);
 router.get('/order/weekly', orderController.getWeeklySalesReport);
 router.get('/order/monthly', orderController.getMonthlySalesReport);
 router.get("/coopdashboard/:id", orderController.getCoopDashboardData);
+router.get("/overalldashboard", orderController.getOverallDashboardData);
 
 
 const orderRoutes = [
