@@ -48,14 +48,14 @@ exports.getDriverId = asyncHandler(async (req, res, next) => {
 });
 
 exports.approveDriver = asyncHandler(async (req, res, next) => {
-  const driver = await DriverProcess.approveDriverProcess(req.params.id);
+  const driver = await DriverProcess.approveDriverProcess(req.params.id, req);
   return driver
     ? SuccessHandler(res, `Driver has been approved Successfully`, driver)
     : next(new ErrorHandler("No Driver Found"));
 });
 
 exports.disapproveDriver = asyncHandler(async (req, res, next) => {
-  const driver = await DriverProcess.disapproveDriverProcess(req.params.id);
+  const driver = await DriverProcess.disapproveDriverProcess(req.params.id, req);
   return driver
     ? SuccessHandler(res, `Driver has been disapproved Successfully`, driver)
     : next(new ErrorHandler("No Driver Found"));

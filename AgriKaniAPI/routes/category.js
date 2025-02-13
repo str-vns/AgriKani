@@ -4,12 +4,12 @@ const categoriesController = require("../controllers/categoryControllers");
 const { verifyJWT, authorizeRoles } = require("../middleware/verifyJWT");
 const { METHOD, PATH, ROLE } = require("../constants/index");
 
-// Category Routes
-router.post("/category", verifyJWT, categoriesController.categorieCreate);
-router.get("/category", categoriesController.GetAllCategories);
-router.get("/category/:id", categoriesController.GetSingleCategory);
-router.put("/category/:id", verifyJWT, categoriesController.UpdateCategories);
-router.delete("/category/:id", categoriesController.DeleteCategories);
+// // Category Routes
+// router.post("/category", verifyJWT, categoriesController.categorieCreate);
+// router.get("/category", categoriesController.GetAllCategories);
+// router.get("/category/:id", categoriesController.GetSingleCategory);
+// router.put("/category/:id", verifyJWT, categoriesController.UpdateCategories);
+// router.delete("/category/:id", categoriesController.DeleteCategories);
 
 const categoryRoutes = [
   {

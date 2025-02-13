@@ -3,7 +3,7 @@ const validator = require("validator");
 const { RESOURCE } = require("../constants/index");
 
 const cancelledSchema = new mongoose.Schema({
-  orderCancelled: {
+  CancelledId: {
     type: mongoose.Schema.Types.ObjectId,
     required: [true, "Please provide the order ID!"],
   },

@@ -8,7 +8,6 @@ const mongoose = require("mongoose");
 const Inventory = require("../models/inventoryM");
 const Farm = require("../models/farm");
 const generateReceiptPDF = require("../utils/pdfreceipts");
-const sendEmailWithAttachment = require("../utils/emailreceipts");
 const path = require("path");
 const fs = require("fs");
 const { sendEmail } = require("../utils/sendMail");
@@ -341,11 +340,15 @@ exports.getShippedOrdersProcess = async (id) => {
 
  const filteredOrders = orders.map(order => {
     const filteredItems = order.orderItems.filter(item => 
-        item.coopUser.toString() === Coopinfo._id.toString()
+        item.coopUser.toString() === Coopinfo._id.toString() &&
+        item.orderStatus === "Shipping"
     );
     return {
         ...order,
-        orderItems: filteredItems
+        orderItems: filteredItems,
+        totalAmount: filteredItems.reduce((acc, item) =>
+          item.orderStatus !== "Cancelled" ? acc + item.price * item.quantity : acc,
+      0)
     };
 }).filter(order => order.orderItems.length > 0);
   
@@ -375,34 +378,37 @@ exports.getCoopOrderById = async (id) => {
   if (!orders || orders.length === 0) {
     throw new ErrorHandler(`No orders found for user ID: ${id}`, 404);
   }
-
+console.log
   const filteredOrders = orders.map(order => {
     const filteredItems = order.orderItems.filter(item => 
         item.coopUser.toString() === Coopinfo._id.toString()
     );
     return {
         ...order,
-        orderItems: filteredItems
+        orderItems: filteredItems,
+        totalAmount: filteredItems.reduce((acc, item) => 
+          item.orderStatus !== "Cancelled" ? acc + item.price * item.quantity : acc, 
+      0)
     };
 }).filter(order => order.orderItems.length > 0);
 
-  
+  console.log("Filtered Orders:", filteredOrders);
   return filteredOrders;
 }
 
 exports.getRankedProducts = async () => {
   try {
-    // Aggregate orders to get the total quantity sold for each product
+  
     const rankedProducts = await Order.aggregate([
-      { $unwind: "$orderItems" },  // Deconstruct the orderItems array in each order
+      { $unwind: "$orderItems" }, 
       {
         $group: {
-          _id: "$orderItems.product",  // Group by product ID
-          totalQuantitySold: { $sum: "$orderItems.quantity" },  // Sum the quantity sold for each product
+          _id: "$orderItems.product",  
+          totalQuantitySold: { $sum: "$orderItems.quantity" },  
         }
       },
       {
-        $sort: { totalQuantitySold: -1 }  // Sort products by total quantity sold in descending order
+        $sort: { totalQuantitySold: -1 }  
       },
       {
         $lookup: {

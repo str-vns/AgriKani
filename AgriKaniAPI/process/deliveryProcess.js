@@ -14,6 +14,7 @@ endOfDay.setHours(23, 59, 59, 999);
 
 exports.createDeliveryProcess = async (req) => {
    
+    console.log(req.body, "req.body");
     const orderid = await Order.findById(req.body.orderId).lean().exec();
     if (!orderid) { 
         throw new ErrorHandler(STATUSCODE.BAD_REQUEST, "Order not found");
@@ -70,7 +71,7 @@ exports.createDeliveryProcess = async (req) => {
                 location.barangay === filteredOrder.shippingAddress.barangay &&
                 location.city.replace(/ City$/i, '') === formattedCity
               );
-            console.log(isLocationMatch, "isLocationMatch");
+            // console.log(isLocationMatch, "isLocationMatch");
 
             if (isLocationMatch &&
               courier.isAvailable === true
@@ -85,7 +86,7 @@ exports.createDeliveryProcess = async (req) => {
               
         }
 
-          console.log(assignedCourier, "assignedCourier");
+        //   console.log(assignedCourier, "assignedCourier");
         
         {
     const delivery = await Delivery.create({
@@ -102,6 +103,7 @@ exports.createDeliveryProcess = async (req) => {
             Latitude: filteredOrder.shippingAddress.latitude,
             Longitude: filteredOrder.shippingAddress.longitude,
         },
+        totalAmount: req.body.totalAmount,
         assignedTo: assignedCourier._id,
     });
    
@@ -205,6 +207,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
     return sortedDeliveries; 
 };
+
 exports.getDeliveryCompletedProcess = async(id) => {
     const drivers = await Driver.findOne({ userId: id }).lean().exec();
     if (!drivers) throw new ErrorHandler(`Driver not found with ID: ${id}`);

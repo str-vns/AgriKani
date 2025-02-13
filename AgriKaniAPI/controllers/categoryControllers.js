@@ -56,8 +56,9 @@ exports.GetAllCategories = asyncHandler(async (req, res, next) => {
 
 exports.UpdateCategories = [
   // upload.array("image"),
-  upload.single("image"), 
-  CheckField(["categoryName", "image"]),
+
+  upload.single("image"),
+  CheckField(["categoryName"]),
   asyncHandler(async (req, res) => {
     const category = await categoryProcess.UpdateCategory(req, req.params.id);
     return SuccessHandler(

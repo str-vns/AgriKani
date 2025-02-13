@@ -30,6 +30,11 @@ const deliverySchema = new mongoose.Schema({
                 required: true,
               },
     }],
+    totalAmount: {
+        type: Number,
+        required: true,
+        default: 0.0,
+    },
     userId: {
         type: mongoose.Schema.ObjectId,
         ref: RESOURCE.USER,

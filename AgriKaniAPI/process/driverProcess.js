@@ -103,11 +103,11 @@ exports.getDriverByIdProcess = async (id) => {
     const coopExist = await Farm.findOne({ user: id }).lean().exec();
     if (!coopExist) throw new ErrorHandler("Coop not exist"); 
 
-    const driver = await Driver.find({ coopId: coopExist._id }).lean().exec();
+    const driver = await Driver.find({ coopId: coopExist._id }).sort({ createdAt: -1 }).lean().exec();
     return driver;
 };
 
-exports.approveDriverProcess = async (id) => {
+exports.approveDriverProcess = async (id, req) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Driver ID: ${id}`);
 
@@ -117,7 +117,9 @@ exports.approveDriverProcess = async (id) => {
   driver.isAvailable = true;
   driver.approvedAt = new Date();
 
-  const role = ROLE.DRIVER;
+  const user = await Farm.findById(driver.coopId).lean().exec();
+
+     const role = ROLE.DRIVER;
 
     const newUser = await User.create({
       email: driver.email,
@@ -222,7 +224,12 @@ exports.approveDriverProcess = async (id) => {
       };
       
       await sendEmail(mailOptions);
-     
+      await sendFcmNotification(
+        user, "Driver Approved", 
+        "Your driver account has been approved",
+        req.body.fcmToken
+      );
+
     return driver;
 };
 
@@ -233,13 +240,22 @@ exports.getCoopDriverProcess = async (id) => {
     return driver;
 };
 
-exports.disapproveDriverProcess = async (id) => {
+exports.disapproveDriverProcess = async (id, req) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(id))
             throw new ErrorHandler(`Invalid Driver ID: ${id}`);
 
         const driver = await Driver.findById(id).lean().exec();
         if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
+
+        const user = await Farm.findById(driver.coopId).lean().exec();
+
+        await sendFcmNotification(
+          user, "Driver Disapproved",
+          "Your driver account has been disapproved due to incomplete information or not meeting the required criteria", 
+          req.body.fcmToken
+        );
+        
     const email = driver.email;
   const mailOptions = {
     to: email,
@@ -578,3 +594,61 @@ exports.getSingleDriverProcess = async (id) => {
 
   return driver;
 }
+
+const sendFcmNotification = async (user, title, content, fcmToken) => {
+  if (!user.deviceToken || user.deviceToken.length === 0) {
+    console.log("No device tokens found for the user.");
+    return;
+  }
+
+  let registrationTokens = user.deviceToken;
+  if (fcmToken) {
+    registrationTokens = registrationTokens.filter(
+      (token) => token !== fcmToken
+    );
+  }
+
+  if (registrationTokens.length === 0) {
+    console.log("No valid tokens available for sending notifications.");
+    return;
+  }
+
+  const message = {
+    data: {
+      key1: "value1",
+      key2: "value2",
+      key3: "value3",
+    },
+    notification: {
+      title,
+      body: content,
+    },
+    apns: {
+      payload: {
+        aps: {
+          badges: 42,
+        },
+      },
+    },
+    tokens: registrationTokens, 
+  };
+
+  try {
+    console.log("Sending notification to the user:", user.email);
+    const response = await admin.messaging().sendEachForMulticast(message);
+    console.log("Notification sent:", response);
+
+    if (response.failureCount > 0) {
+      const failedTokens = [];
+      response.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          console.log("Error sending to token:", response.responses[idx].error);
+          failedTokens.push(user.deviceToken[idx]);
+        }
+      });
+      console.log("Failed tokens:", failedTokens);
+    }
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};

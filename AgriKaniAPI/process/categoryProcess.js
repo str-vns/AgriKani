@@ -44,17 +44,17 @@ exports.UpdateCategory= async (req, id) => {
   if (!categoryExist) throw new ErrorHandler(`Category not exist with ID: ${id}`);
 // console.log(categoryExist, "Full product object");
 
-let image_img = userExist.image || {};
+let image_img = categoryExist.image || {};
 if (req.file) {
   image_img = await uploadImageSingle(req.file)
-  await cloudinary.uploader.destroy(`${userExist.image.public_id}`);
+  await cloudinary.uploader.destroy(`${categoryExist.image.public_id}`);
 }
 
 if (image_img.length === STATUSCODE.ZERO)
   throw new ErrorHandler("Required to add one image");
 
 
-  const updateCategory = await Product.findByIdAndUpdate(
+  const updateCategory = await Category.findByIdAndUpdate(
     id,
     {
       ...req.body,
