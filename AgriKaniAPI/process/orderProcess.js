@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Order = require("../models/order");
 const Notification = require("../models/notification");
+const Member = require("../models/members");
 const User = require("../models/user");
 const Product = require("../models/product")
 const ErrorHandler = require("../utils/errorHandler");
@@ -14,7 +15,7 @@ const { sendEmail } = require("../utils/sendMail");
 const admin = require('firebase-admin');
 
 // Create a new order
-exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice, user }) => {
+exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice,shippingPrice, user }) => {
   if (!orderItems || orderItems.length === 0) {
     throw new ErrorHandler("No order items provided", 400);
   }
@@ -84,6 +85,7 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
     orderItems,
     shippingAddress,
     paymentMethod,
+    shippingPrice,
     totalPrice,
   });
   return await order.save();
@@ -149,20 +151,59 @@ exports.updateOrderStatusProcess = async (id, req) => {
 
   if (req.body.orderStatus === 'Cancelled') {
     const matchedOrderItem = order.orderItems.find(item => item.inventoryProduct.toString() === req.body.inventoryProduct);
-      if (matchedOrderItem.orderStatus !== 'Cancelled') {
-        try {
-          const inventory = await Inventory.findById(req.body.inventoryProduct);
-  
-          if (!inventory) {
-            console.warn(`Product with ID ${req.body.inventoryProduct} not found.`);
-          }
-          inventory.quantity += matchedOrderItem.quantity;
-          order.totalPrice -= matchedOrderItem.price;
-          await inventory.save();
-        } catch (error) {
-          console.error(`Error replenishing stock for product ${item.product}:`, error);
+
+    if (matchedOrderItem && matchedOrderItem.orderStatus !== 'Cancelled') {
+      try {
+        const inventory = await Inventory.findById(req.body.inventoryProduct);
+
+        // if (!inventory) {
+        //   console.warn(`Product with ID ${req.body.inventoryProduct} not found.`);
+        // } else {
+        //   inventory.quantity += matchedOrderItem.quantity;
+        //   await inventory.save();
+        // }
+
+        // order.totalPrice -= matchedOrderItem.price * matchedOrderItem.quantity;
+
+
+        const remainingItemsInCoop = order.orderItems.filter(
+          item => item.coopUser.toString() === matchedOrderItem.coopUser.toString() &&
+                  item.inventoryProduct.toString() !== req.body.inventoryProduct &&
+                  item.orderStatus !== 'Cancelled'
+        );
+
+        console.log("Remaining items in coop:", remainingItemsInCoop.length);
+
+        if (remainingItemsInCoop.length === 0) {
+          order.totalPrice -= 75; 
+          order.shippingPrice -= 75;
         }
+
+        const member = await Member.findOne({ userId: order.user, coopId: matchedOrderItem.coopUser });
+
+        const taxMultiplier = member ? 0 : 0.12; 
+
+        const deductedAmount = parseFloat((matchedOrderItem.price * matchedOrderItem.quantity * (1 + taxMultiplier)).toFixed(2));
+
+      
+order.totalPrice -= deductedAmount;
+
+// const remainingTaxableTotal = order.orderItems
+//   .filter(item => item.orderStatus !== 'Cancelled') 
+//   .reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+// const newTaxAmount = remainingTaxableTotal * taxMultiplier;
+
+// order.totalPrice = remainingTaxableTotal + newTaxAmount;
+
+// if (remainingTaxableTotal === 0) {
+//   order.totalPrice = 0;
+// }
+
+      } catch (error) {
+        console.error(`Error replenishing stock for product ${matchedOrderItem.product}:`, error);
       }
+    }
   }
 
   order.orderItems.forEach((item) => {
@@ -338,33 +379,48 @@ exports.getShippedOrdersProcess = async (id) => {
     throw new ErrorHandler(`No orders found for user ID: ${id}`, 404);
   }
 
- const filteredOrders = orders.map(order => {
-    const filteredItems = order.orderItems.filter(item => 
-        item.coopUser.toString() === Coopinfo._id.toString() &&
-        item.orderStatus === "Shipping"
-    );
-    return {
+  const filteredOrders = await Promise.all(
+    orders.map(async (order) => {
+   
+      const isMember = await Member.exists({ userId: order.user._id, coopId: Coopinfo._id });
+
+      const filteredItems = order.orderItems.filter(item => 
+        item.coopUser.toString() === Coopinfo._id.toString()
+      );
+
+      const totalItem = filteredItems.reduce((acc, item) => 
+        item.orderStatus !== "Cancelled" ? acc + item.price * item.quantity : acc, 0
+      );
+
+      const uniqueCoops = new Set(filteredItems.map(item => item.coopUser.toString()));
+      const shippingFee = uniqueCoops.size * 75;
+
+      const taxRate = isMember ? 0 : 0.12;
+      const tax = totalItem * taxRate;
+
+      return {
         ...order,
         orderItems: filteredItems,
-        totalAmount: filteredItems.reduce((acc, item) =>
-          item.orderStatus !== "Cancelled" ? acc + item.price * item.quantity : acc,
-      0)
-    };
-}).filter(order => order.orderItems.length > 0);
-  
-  return filteredOrders;
+        totalItem,
+        shippingFee,
+        tax,
+        totalAmount: totalItem + shippingFee + tax,
+      };
+    })
+  );
+
+  return filteredOrders.filter(order => order.orderItems.length > 0);
 }
 
 exports.getCoopOrderById = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new ErrorHandler(`Invalid User ID: ${id}`, 400);
   }
+  
   const Coopinfo = await Farm.findOne({ user: id });
   if (!Coopinfo) {
     throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
   }
-
-  
 
   const orders = await Order.find({ "orderItems.coopUser": Coopinfo._id })
     .populate({ path: "user", select: "firstName lastName email image.url" })
@@ -378,23 +434,39 @@ exports.getCoopOrderById = async (id) => {
   if (!orders || orders.length === 0) {
     throw new ErrorHandler(`No orders found for user ID: ${id}`, 404);
   }
-console.log
-  const filteredOrders = orders.map(order => {
-    const filteredItems = order.orderItems.filter(item => 
+
+  const filteredOrders = await Promise.all(
+    orders.map(async (order) => {
+   
+      const isMember = await Member.exists({ userId: order.user._id, coopId: Coopinfo._id });
+
+      const filteredItems = order.orderItems.filter(item => 
         item.coopUser.toString() === Coopinfo._id.toString()
-    );
-    return {
+      );
+
+      const totalItem = filteredItems.reduce((acc, item) => 
+        item.orderStatus !== "Cancelled" ? acc + item.price * item.quantity : acc, 0
+      );
+
+      const uniqueCoops = new Set(filteredItems.map(item => item.coopUser.toString()));
+      const shippingFee = uniqueCoops.size * 75;
+
+      const taxRate = isMember ? 0 : 0.12;
+      const tax = totalItem * taxRate;
+
+      return {
         ...order,
         orderItems: filteredItems,
-        totalAmount: filteredItems.reduce((acc, item) => 
-          item.orderStatus !== "Cancelled" ? acc + item.price * item.quantity : acc, 
-      0)
-    };
-}).filter(order => order.orderItems.length > 0);
+        totalItem,
+        shippingFee,
+        tax,
+        totalAmount: totalItem + shippingFee + tax,
+      };
+    })
+  );
 
-  console.log("Filtered Orders:", filteredOrders);
-  return filteredOrders;
-}
+  return filteredOrders.filter(order => order.orderItems.length > 0);
+};
 
 exports.getRankedProducts = async () => {
   try {

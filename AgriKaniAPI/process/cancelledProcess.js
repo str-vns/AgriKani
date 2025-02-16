@@ -22,7 +22,10 @@ exports.GetSingleCancelled = async (id) => {
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new ErrorHandler(`Invalid Cancelled ID: ${id}`);
     
-    const cancelled = await Cancelled.findById(id).lean().exec();
+    const cancelled = await Cancelled.findOne({ cancelledId: id })
+    .populate("cancelledBy", "firstName lastName image.url")
+    .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
+    .lean().exec();
     if (!cancelled) throw new ErrorHandler(`Cancelled not found with ID: ${id}`);
     
     return cancelled;

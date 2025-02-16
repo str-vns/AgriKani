@@ -27,6 +27,7 @@ const inventory = require("./routes/inventory");
 const member = require("./routes/member");
 const driver = require("./routes/driver");
 const delivery = require("./routes/delivery")
+const cancelled = require("./routes/cancelled");
 
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
@@ -54,7 +55,8 @@ app.use(
   inventory,
   member,
   driver,
-  delivery
+  delivery,
+  cancelled
 );
 
 module.exports = app;

@@ -159,15 +159,12 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   exports.getDeliveryDriverProcess = async (id, req) => {
     console.log(req.query, "req.query");  
 
-    // Validate ID
     if (!mongoose.Types.ObjectId.isValid(id))
         throw new ErrorHandler(`Invalid user ID: ${id}`);
 
-    // Get Driver info
     const drivers = await Driver.findOne({ userId: id }).lean().exec();
     if (!drivers) throw new ErrorHandler(`Driver not found with ID: ${id}`);
 
-    // Get Deliveries for the driver within the time range
     const deliveries = await Delivery.find({
         assignedTo: drivers._id,
         createdAt: { $gte: startOfDay, $lte: endOfDay },
@@ -328,6 +325,8 @@ exports.getDeliveryThisMonthProcess = async (id) => {
         createdAt: { $gte: startOfDay, $lte: endOfDay }
     })
     .populate("assignedTo", "firstName lastName image.url")
+    .populate("orderItems.product", "productName pricing price image.url")
+    .populate("orderItems.inventoryProduct", "metricUnit unitName")
     .lean()
     .exec();
 

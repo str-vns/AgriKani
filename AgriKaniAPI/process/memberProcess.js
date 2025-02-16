@@ -107,11 +107,18 @@ exports.GetMemberListInactiveProcess = async (id, req) => {
 
 exports.SingleMemberProcess = async (id) => {
     const member = await Member
-        .findOne({ userId: id })
-        .populate("userId")
-        .populate("coopId")
-        .lean()
-        .exec();
+    .find({ userId: id })
+    .populate({
+        path: "userId", 
+    })
+    .populate({
+        path: "coopId", 
+        populate: {
+            path: "user", 
+        }
+    })
+    .lean()
+    .exec();
     if (!member) throw new ErrorHandler(`Member not exist with ID: ${req.user._id}`);
 
     return member;

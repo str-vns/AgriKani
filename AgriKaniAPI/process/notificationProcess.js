@@ -49,7 +49,7 @@ admin.initializeApp({
 // };
 
 exports.CreateNotification = async (req) => {
-  console.log("Sending notification to the user:", req);
+  // console.log("Sending notification to the user:", req);
   if (!mongoose.Types.ObjectId.isValid(req.body.user))
     throw new ErrorHandler(`Invalid User ID: ${req.body.user}`);
 
@@ -60,12 +60,12 @@ exports.CreateNotification = async (req) => {
   }
 
   if (!singleUser.deviceToken || singleUser.deviceToken.length === 0) {
-    console.log("No device tokens found for the user.");
+    // console.log("No device tokens found for the user.");
     return;
   }
 
   let registrationTokens = singleUser.deviceToken;
-  console.log("Registration tokens:", registrationTokens);
+  // console.log("Registration tokens:", registrationTokens);
   if (req.body.fcmToken) {
     registrationTokens = registrationTokens.filter(
       (token) => token !== req.body.fcmToken
@@ -73,7 +73,7 @@ exports.CreateNotification = async (req) => {
   }
 
   if (registrationTokens.length === 0) {
-    console.log("No valid tokens available for sending notifications.");
+    // console.log("No valid tokens available for sending notifications.");
     return;
   }
 
@@ -97,28 +97,28 @@ exports.CreateNotification = async (req) => {
     },
     tokens: registrationTokens,
   };
-   console.log("Sending notification to the user:", singleUser.email);
+  //  console.log("Sending notification to the user:", singleUser.email);
   admin
     .messaging()
     .sendEachForMulticast(message)
     .then((response) => {
-      console.log("Notification sent:", response);
+      // console.log("Notification sent:", response);
       if (response.failureCount > 0) {
         const failedTokens = [];
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
-            console.log(
-              "Error sending to token:",
-              response.responses[idx].error
-            );
-            failedTokens.push(registrationTokens[idx]);
+            // console.log(
+            //   "Error sending to token:",
+            //   response.responses[idx].error
+            // );
+            // failedTokens.push(registrationTokens[idx]);
           }
         });
         console.log("Failed tokens:", failedTokens);
       }
     })
     .catch((error) => {
-      console.error("Error sending notification:", error);
+      // console.error("Error sending notification:", error);
     });
 
     const notification = await Notification.create({

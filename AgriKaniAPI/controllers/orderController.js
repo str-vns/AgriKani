@@ -6,7 +6,7 @@ const { STATUSCODE } = require("../constants/index");
 
 // Create a new order
 exports.createOrder = asyncHandler(async (req, res, next) => {
-  const { orderItems, shippingAddress, paymentMethod, totalPrice, user } = req.body;
+  const { orderItems, shippingAddress, paymentMethod, totalPrice, shippingPrice, user } = req.body;
   console.log("orderItems", orderItems);
   try {
     const createdOrder = await orderProcess.createOrderProcess({
@@ -14,6 +14,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
       orderItems,
       shippingAddress,
       paymentMethod,
+      shippingPrice,
       totalPrice,
     });
 

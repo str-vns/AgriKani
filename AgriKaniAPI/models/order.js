@@ -54,6 +54,11 @@ const orderSchema = new mongoose.Schema({
     ref: "address",
     required: true,
   },
+  shippingPrice: {
+    type: Number,
+    required: true,
+    default: 0.0,
+  },
   paymentMethod: {
     type: String,
     required: true,
