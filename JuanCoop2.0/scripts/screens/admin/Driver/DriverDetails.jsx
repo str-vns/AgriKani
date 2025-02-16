@@ -17,6 +17,7 @@ import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { driverApproved, driverRejected } from "@redux/Actions/driverActions";
+import messaging from '@react-native-firebase/messaging';
 
 const DriverDetails = (props) => {
   const driver = props.route.params.driver;
@@ -26,11 +27,16 @@ const DriverDetails = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState(null);
+   const [fcmToken, setFcmToken] = useState(null);
+
   useEffect(() => {
     const fetchJwt = async () => {
       try {
         const res = await AsyncStorage.getItem("jwt");
         setToken(res);
+        messaging().getToken().then((token) => {
+          setFcmToken(token);
+        });
       } catch (error) {
         console.error("Error retrieving JWT: ", error);
       }
@@ -45,31 +51,54 @@ const DriverDetails = (props) => {
 }
 
     const handleApprove = async (driverId) => {
-        setIsLoading(true);
-
-        try {
-            dispatch(driverApproved(driverId, token));
-            Alert.alert("Driver approved successfully");
-            navigation.navigate("DriverList");
-        } catch (error) {
-            Alert.alert("Error approving driver");
-        } finally {
-            setIsLoading(false);
-        }
+      Alert.alert(
+            "Driver Approval",
+            "Are you sure you want to Approve this Driver?",
+            [
+              {
+                text: "Yes",
+                onPress: async () => {
+                  try {
+                    setIsLoading(true);
+                    dispatch(driverApproved(driverId, fcmToken, token));
+                    navigation.navigate("DriverList");
+                  } finally {
+                    setIsLoading(false);
+                  }
+                },
+              },
+              {
+                text: "No",
+                style: "cancel",
+              },
+            ]
+          );
     }
         
     const handleDelete = async (driverId) => {
-        setIsLoading(true);
+      Alert.alert(
+        "Driver Disapproval",
+        "Are you sure you want to Disapprove this Driver?",
+        [
+          {
+            text: "Yes",
+            onPress: async () => {
+              try {
+                setIsLoading(true);
+                dispatch(driverRejected(driverId, fcmToken, token));
+                navigation.navigate("DriverList");
+              } finally {
+                setIsLoading(false);
+              }
+            },
+          },
+          {
+            text: "No",
+            style: "cancel",
+          },
+        ]
+      );
 
-        try {
-            dispatch(driverRejected(driverId, token));
-            Alert.alert("Driver rejected successfully");
-            navigation.navigate("DriverList");
-        } catch (error) {
-            Alert.alert("Error rejecting driver");
-        } finally {
-            setIsLoading(false);
-        }
     }
 
   return (
@@ -111,7 +140,7 @@ const DriverDetails = (props) => {
             ]}
           >
             Approval Status:{" "}
-            {driver?.approvedAt === null ? "Not Approved" : "Approved"}
+            {driver?.approvedAt === null ? "Pending" : "Approved"}
           </Text>
         </View>
       </View>

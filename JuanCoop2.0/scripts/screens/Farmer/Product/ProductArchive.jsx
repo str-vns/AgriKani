@@ -33,17 +33,36 @@ const ProductArchive = ({ navigation }) => {
   )
 
   const handleRestoreProduct = (id) => {
-    setRefresh(true);
-    try {
-
-       dispatch(restoreProducts(id));
-       onRefresh()
-    } catch (error) {
-      console.error("Error deleting or refreshing products:", error);
-    } finally {
-
-      setRefresh(false);
-    }
+    Alert.alert(
+      "Restore Confirmation",
+      "Are you sure you want to restore this product?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Restore",
+          onPress: async () => {
+            setRefresh(true);
+            try {
+              dispatch(restoreProducts(id));
+              onRefresh();
+  
+              setTimeout(() => {
+                Alert.alert("Success", "Product restored successfully.");
+              }, 1000);
+            } catch (error) {
+              console.error("Error restoring the product:", error);
+              Alert.alert("Error", "Failed to restore product. Please try again.");
+            } finally {
+              setRefresh(false);
+            }
+          },
+          style: "default",
+        },
+      ]
+    );
   };
 
   const handleDeleteProduct = (id) => {

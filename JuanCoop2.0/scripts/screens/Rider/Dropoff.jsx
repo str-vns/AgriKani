@@ -37,7 +37,7 @@ const LocationDetails = (props) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(14);
-
+  
   MapboxGL.setAccessToken(Constants.expoConfig?.extra?.MAPBOX_API_KEY);
 
   useEffect(() => {
@@ -80,9 +80,9 @@ const LocationDetails = (props) => {
     }, [socket, user?._id]);
 
   const failedDelivery = () => {
-    dispatch(updateDeliveryStatus(deliverInfo._id, "failed" , token))
-    setCurrentRoute(null);
-    navigation.navigate("Deliveries");
+    // dispatch(updateDeliveryStatus(deliverInfo._id, "failed" , token))
+    // setCurrentRoute(null);
+    navigation.navigate("Rider_Cancelled", { deliveryId: deliverInfo._id, userId: deliverInfo?.userId?._id  });
   };
 
   const reDeliver = () => {
@@ -284,11 +284,12 @@ Duration: {altRoute?.legs?.[0]?.duration
           <Text style={styles.driverName}>
             {deliverInfo?.userId?.firstName} {deliverInfo?.userId?.lastName}
           </Text>
+          <Text style={styles.driverName}>Total Price: ₱ {deliverInfo?.totalAmount}</Text>
           <Text style={styles.driverPhone}>Order# {deliverInfo?.orderId?._id}</Text>
         </View>
       </View>
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.dropOffButton} onPress={() => failedDelivery()}>
+        <TouchableOpacity style={styles.dropOffButton} onPress={() => failedDelivery( )}>
           <Text style={styles.buttonText}>Failed</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.dropOffButton} onPress={() => reDeliver()}>
@@ -428,7 +429,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
-  }
+  },
+  
 });
 
 export default LocationDetails;

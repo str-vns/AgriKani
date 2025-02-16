@@ -6,7 +6,6 @@ import {
     SET_CART_ITEMS,
     UPDATE_CART_INV
   } from '../Constants/cartConstants';
-  import AsyncStorage from '@react-native-async-storage/async-storage';
   
   const cartItems = (state = [], action) => {
     switch (action.type) {

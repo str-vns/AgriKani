@@ -989,6 +989,18 @@ initiativesContainer: {
     marginLeft: 5, 
     fontSize: 14,
   },
+  buttonCancelled: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginLeft: 80, 
+  },
+  
+  buttonTextCancelled: {
+    color: "white",
+    fontWeight: "bold",
+  },
 });
 
 

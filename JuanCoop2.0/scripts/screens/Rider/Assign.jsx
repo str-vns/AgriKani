@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { thisMonthDelivery } from '@redux/Actions/deliveryActions';
@@ -15,8 +16,9 @@ import { removeDelivery } from '@redux/Actions/deliveryActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Assign = (props) => {
-  const driverId = props.route.params.driver;
-  const userId = driverId._id;
+  
+  const driverId = props?.route?.params?.driver;
+  const userId = driverId?._id;
   const navigation = useNavigation();
   const dispatch = useDispatch()
   const { Deliveryloading, deliveries, Deliveryerror } = useSelector((state) => state.deliveryList);
@@ -96,11 +98,28 @@ const Assign = (props) => {
   }, [ userId, token]);
 
   const removeDeliverys = (id) => {
- console.log("id", id)
-    dispatch(removeDelivery(id, token));
-    onRefresh()
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this delivery?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => {
+            dispatch(removeDelivery(id, token));
+            onRefresh();
+          },
+          style: "destructive", 
+        },
+      ]
+    );
   };
+
   const renderOrder = ({ item }) => {
+    console.log("item", item);
     return (
       <View style={styles.orderRow}>
 
@@ -129,7 +148,15 @@ const Assign = (props) => {
     </Text>
   </TouchableOpacity>
 </Text>
-          {/* Trash Button */}
+{ item.status === 'failed' && (
+  <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("InfoCancelled", { deliveryItem: item })}
+          >
+           <Text style={styles.buttonText} >view</Text>
+          </TouchableOpacity>
+        )}
+
           <TouchableOpacity
             style={styles.trashButton}
             onPress={() => removeDeliverys(item._id)} 
@@ -282,6 +309,20 @@ const styles = StyleSheet.create({
   },
   disabledButtonText: {
     color: '#fff',
+  },
+  button: {
+    backgroundColor: '#007bff',  // Blue color
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 15,
+  },
+  buttonText: {
+    color: '#fff',  // White text color
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   });
   

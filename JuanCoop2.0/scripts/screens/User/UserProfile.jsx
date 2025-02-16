@@ -90,9 +90,13 @@ const UserProfile = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"} 
+      style={{ flex: 1 }}
+    >
+      <ScrollView 
+        contentContainerStyle={{ flexGrow: 1 }} // Ensures full height for scrolling
+        keyboardShouldPersistTaps="handled" // Allows tapping outside to dismiss keyboard
       >
         <View style={styles.header}>
           <TouchableOpacity
@@ -101,30 +105,10 @@ const UserProfile = () => {
           >
             <Ionicons name="menu" size={34} color="black" />
           </TouchableOpacity>
-
           <Text style={styles.headerTitle}>Profile</Text>
         </View>
-
-        <ScrollView contentContainerStyle={styles.container}>
-          {context?.stateUser?.isAuthenticated &&
-          userInfo?.roles &&
-          userInfo.roles.includes("Customer") &&
-          userInfo.roles.includes("Cooperative") ? (
-            <TouchableOpacity
-              onPress={() => navigation.navigate("CoopDashboard")} // Go back to previous screen
-              style={styles.backButtonContainer}
-            >
-              {/* <Text style={styles.backButtonText}>{"< Back"}</Text> */}
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Home")} // Go back to previous screen
-              style={styles.backButtonContainer}
-            >
-              {/* <Text style={styles.backButtonText}>{"< Back"}</Text> */}
-            </TouchableOpacity>
-          )}
-
+  
+        <View style={styles.container}>
           {/* Profile Image Section */}
           <View style={styles.profileSection}>
             {user?.image && user?.image?.url ? (
@@ -140,7 +124,8 @@ const UserProfile = () => {
             )}
             <Text style={styles.emailText}>{user?.email}</Text>
           </View>
-
+  
+          {/* Input Fields */}
           <TextInput
             placeholder="First name"
             style={styles.input}
@@ -171,82 +156,54 @@ const UserProfile = () => {
             value={user?.gender ? String(user?.gender) : ""}
             editable={false}
           />
-          {/* Update Button */}
+  
+          {/* Update Profile Button */}
           <TouchableOpacity
             style={styles.updateButton}
             onPress={() => navigation.navigate("EditProfile")}
           >
             <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
-
-          {/* {context?.stateUser?.isAuthenticated &&
-          userInfo?.roles &&
-          userInfo.roles.includes("Customer") &&
-          userInfo.roles.includes("Cooperative") ? (
-            <TouchableOpacity onPress={() => navigation.navigate("EditFarm")}>
-              <Text>Edit Your Farm</Text>
-            </TouchableOpacity>
-          ) : filterUser?.length !== 0 ? null : (
-            <View>
-              <TouchableOpacity
-                onPress={() => navigation.navigate("ProfileCoop")}
-              >
-                <Text>Register your Cooperative</Text>
-              </TouchableOpacity>
-              {filterMember2?.length !== 0 ? null : (
-                <Text>
-                  {" "}
-                  Join Member
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("MembersRegistration")}
-                  >
-                    <Text>Register here!</Text>
-                  </TouchableOpacity>
-                </Text>
-              )}
-            </View>
-          )} */}
-         <View style={styles.registrationContainer}>
-      {context?.stateUser?.isAuthenticated && userInfo?.roles ? (
-        userInfo.roles.includes("Cooperative") ? (
-          // If the user is already part of a Cooperative
-          <TouchableOpacity 
-            style={styles.editFarmButton} 
-            onPress={() => navigation.navigate("EditFarm")}
-          >
-            <Text style={styles.editFarmButtonText}>Edit Your Farm</Text>
-          </TouchableOpacity>
-        ) : (
-          // If not part of a Cooperative, check other conditions
-          <View style={styles.registrationOptionsContainer}>
-            {filterUser?.length === 0 && (
-              // Show "Register your Cooperative" if not already in a Coop
-              <TouchableOpacity 
-                style={styles.registerCoopButton} 
-                onPress={() => navigation.navigate("ProfileCoop")}
-              >
-                <Text style={styles.registerCoopButtonText}>Register your Cooperative</Text>
-              </TouchableOpacity>
-            )}
-            {filterMember2?.length === 0 && (
-              // Show "Join Member" if not already a member of a group
-              <View style={styles.joinMemberContainer}>
-                <Text style={styles.joinMemberText}>Join Member</Text>
+  
+          {/* Registration Options */}
+          <View style={styles.registrationContainer}>
+            {context?.stateUser?.isAuthenticated && userInfo?.roles ? (
+              userInfo.roles.includes("Cooperative") ? (
                 <TouchableOpacity 
-                  style={styles.joinMemberLinkButton} 
-                  onPress={() => navigation.navigate("MembersRegistration")}
+                  style={styles.editFarmButton} 
+                  onPress={() => navigation.navigate("EditFarm")}
                 >
-                  <Text style={styles.joinMemberLinkText}>Register here!</Text>
+                  <Text style={styles.editFarmButtonText}>Edit Your Farm</Text>
                 </TouchableOpacity>
-              </View>
-            )}
+              ) : (
+                <View style={styles.registrationOptionsContainer}>
+                  {filterUser?.length === 0 && (
+                    <TouchableOpacity 
+                      style={styles.registerCoopButton} 
+                      onPress={() => navigation.navigate("ProfileCoop")}
+                    >
+                      <Text style={styles.registerCoopButtonText}>Register your Cooperative</Text>
+                    </TouchableOpacity>
+                  )}
+  
+                  <View style={styles.joinMemberContainer}>
+                    <Text style={styles.joinMemberText}>Join Member</Text>
+                    <TouchableOpacity 
+                      style={styles.joinMemberLinkButton} 
+                      onPress={() => navigation.navigate("MemberList")}
+                    >
+                      <Text style={styles.joinMemberLinkText}>Register here!</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )
+            ) : null}
           </View>
-        )
-      ) : null}
-    </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  </TouchableWithoutFeedback>
+  
   );
 };
 

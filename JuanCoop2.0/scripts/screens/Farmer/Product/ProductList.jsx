@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Ensure you have @expo/vector-icons installed
 import styles from '../css/styles.js';
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -49,18 +49,36 @@ const ProductList = ({ navigation }) => {
   }, [Coopid]);
 
   const handleDeleteProduct = async (id) => {
-    
-    setRefresh(true);
-    try {
-
-       dispatch(soflDelProducts(id));
-       onRefresh()
-    } catch (error) {
-      console.error("Error deleting or refreshing products:", error);
-    } finally {
-
-      setRefresh(false);
-    }
+    Alert.alert(
+      "Remove Confirmation",
+      "Are you sure you want to remove this product?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Remove",
+          onPress: async () => {
+            setRefresh(true);
+            try {
+              dispatch(soflDelProducts(id));
+              onRefresh();
+  
+              setTimeout(() => {
+                Alert.alert("Success", "Product Remove successfully.");
+              }, 1000);
+            } catch (error) {
+              console.error("Error deleting or refreshing products:", error);
+              Alert.alert("Error", "Failed to delete product. Please try again.");
+            } finally {
+              setRefresh(false);
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
   };
 
   const handleActiveProduct = async (id) => {

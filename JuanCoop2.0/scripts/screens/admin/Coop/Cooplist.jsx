@@ -20,7 +20,7 @@ const Cooplist = () => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const { loading, coops, error } = useSelector((state) => state.allofCoops);
-  const [selectedTab, setSelectedTab] = useState("Not_Approved");
+  const [selectedTab, setSelectedTab] = useState("Pending");
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const Cooplist = () => {
     }, [dispatch, token])
   );
 
-  // Refresh users
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -74,16 +74,16 @@ const Cooplist = () => {
         <TouchableOpacity
           style={[
             styles.tabButton,
-            selectedTab === "Not_Approved" && styles.activeTab,
+            selectedTab === "Pending" && styles.activeTab,
           ]}
           onPress={() => {
-            setSelectedTab("Not_Approved");
+            setSelectedTab("Pending");
           }}
         >
           <Text
             style={[
               styles.tabText,
-              selectedTab === "Not_Approved" && styles.activeTabText,
+              selectedTab === "Pending" && styles.activeTabText,
             ]}
           >
             Not Approved

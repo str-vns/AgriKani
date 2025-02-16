@@ -1,20 +1,75 @@
 import React, { useContext, useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet, FlatList, Image, Alert, TouchableOpacity } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createOrder } from "@src/redux/Actions/orderActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { clearCart } from "@src/redux/Actions/cartActions";
+import { memberDetails } from "@redux/Actions/memberActions";
 
 const Review = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { cartItems, addressData, paymentMethod } = route.params;
-  console.log("cartitems",cartItems)
+  const { loading, members, error } = useSelector((state) => state.memberList);
   const context = useContext(AuthGlobal);
+  const approvedMember = members?.find(member => member.approvedAt !== null);
+  const coopId = approvedMember?.coopId?._id;
   const userId = context?.stateUser?.userProfile?._id;
   const [token, setToken] = useState("");
 
-  const totalPrice = cartItems.reduce((acc, item) => acc + item.pricing * item.quantity, 0);
+  const calculateShipping = () => {
+    const uniqueCoops = new Set();
+  
+    cartItems.forEach((item) => {
+      if (item?.coop?._id) {
+        uniqueCoops.add(item.coop._id);
+      }
+    });
+  
+    const shippingCost = uniqueCoops.size * 75; 
+  
+    return shippingCost;
+  };
+  
+
+  const calculatedTax = () => {
+    let hasNonMemberItem = false; 
+
+    cartItems.forEach((item) => {
+        if (item?.coop?._id !== coopId) {
+            hasNonMemberItem = true; 
+        }
+    });
+
+    return hasNonMemberItem ? 0.12 : 0; 
+};
+
+  const calculateTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + item.pricing * item.quantity, 0);
+  };
+
+const calculateFinalTotal = () => {
+    const shippingCost = calculateShipping();
+
+    let taxableTotal = 0;
+    let nonTaxableTotal = 0;
+
+    cartItems.forEach((item) => {
+        const itemTotal = item.pricing * item.quantity;
+        console.log("Item Total: ", itemTotal);
+        if (item?.coop?._id !== coopId) {
+            taxableTotal += itemTotal;  
+        } else {
+            nonTaxableTotal += itemTotal;  
+        }
+    });
+
+    const taxAmount = taxableTotal * 0.12; 
+    const finalTotal = taxableTotal + nonTaxableTotal + taxAmount + shippingCost;
+
+    return finalTotal.toFixed(2);
+};
+
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -31,6 +86,11 @@ const Review = ({ route, navigation }) => {
     fetchJwt();
   }, []);
 
+  useEffect(() => { 
+    if(userId) {
+      dispatch(memberDetails(userId, token));
+    }
+  }, [userId]);
   const handleConfirmOrder = async () => {
     if (!userId || !token) {
       Alert.alert("Error", "User not authenticated. Please log in.");
@@ -61,7 +121,8 @@ const Review = ({ route, navigation }) => {
       
       shippingAddress: addressData._id,
       paymentMethod,
-      totalPrice,
+      shippingPrice: calculateShipping(),
+      totalPrice: calculateFinalTotal(),
     };
   
     try {
@@ -109,7 +170,9 @@ const Review = ({ route, navigation }) => {
       />
       
       <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Total: ₱ {totalPrice.toFixed(2)}</Text>
+      <Text style={styles.totalShippingText}>Shipping Fee: ₱ {calculateShipping()}</Text>
+      <Text style={styles.totalShippingText}>Overall Item: ₱ {calculateTotalPrice()}</Text>
+        <Text style={styles.totalText}>Total: ₱ {calculateFinalTotal()}</Text>
       </View>
 
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmOrder}>
@@ -192,6 +255,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "600",
+  },
+  totalShippingText: {
+    fontSize: 13,
+    color: "#333",
+    textAlign: "right",
   },
 });
 

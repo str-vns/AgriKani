@@ -136,4 +136,9 @@ export default StyleSheet.create({
     marginTop: scale(10),
     marginBottom: scale(5),
   },
+  ShippingFeeText: {
+    fontSize: scaleFont(15), 
+    color: "#333",
+    marginBottom: scale(5),
+  },
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,17 +11,29 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import {  updateDeliveryStatus } from "@redux/Actions/deliveryActions";
+import { useDispatch } from "react-redux";
 
 const Details = (props) => {
   const deliveryDetails = props.route.params.deliveryId;
+  const dispatch = useDispatch()
   const navigation = useNavigation();
   const orderItems = deliveryDetails?.orderItems.map((item) => ({
     product: item?.product,
     inventoryProduct: item?.inventoryProduct,
     quantity: item?.quantity,
   }));
+  const [token, setToken] = useState("");
 
-  console.log("deliveryDetails", orderItems);
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await AsyncStorage.getItem("jwt");
+      if (res) {
+        setToken(res);
+      }
+    };
+    fetchData();
+  }, []);
+
 
    const deliveryNow = (item) => {
         Alert.alert("Delivery", "Are you sure you want to deliver this item?", [
@@ -105,7 +117,7 @@ const Details = (props) => {
           <Text style={styles.label}>Mode of Payment:</Text> {getPaymentMethodDisplay(deliveryDetails?.orderId?.paymentMethod)}
         </Text>
         <Text style={styles.text}>
-          <Text style={styles.label}>To Pay:</Text> ₱ {deliveryDetails?.orderId?.totalPrice}
+          <Text style={styles.label}>To Pay:</Text> ₱ {deliveryDetails?.totalAmount}
         </Text>
       </View>
 

@@ -7,6 +7,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Image,
+  Alert 
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -67,10 +68,28 @@ const InventoryDetail = (props) => {
   };
 
   const handleDeleteInventory = (id) => {
-    dispatch(deleteInventory(id, token));
-    setTimeout(() => {
-      onRefresh();
-    }, 2000);
+    Alert.alert(
+      "Delete Confirmation",
+      "Are you sure you want to delete this inventory item?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => {
+            dispatch(deleteInventory(id, token));
+  
+            setTimeout(() => {
+              Alert.alert("Success", "Inventory item deleted successfully.");
+              onRefresh();
+            }, 2000);
+          },
+          style: "destructive",
+        },
+      ]
+    );
   };
 
   const handleCreateProduct = (item) => {

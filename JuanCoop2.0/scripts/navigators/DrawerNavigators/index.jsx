@@ -186,7 +186,7 @@ const context = useContext(AuthGlobal);
           name="Riderlist"
           initialParams={{ screen: "Riderlist" }}
           options={{ headerShown: false, tabBarShowLabel: false }}
-          component={RiderNavigators}
+          component={CoopNavigators}
         />
         <Drawer.Screen
           name="Deliveries"
@@ -221,7 +221,9 @@ const context = useContext(AuthGlobal);
             options={{ headerShown: false, tabBarShowLabel: false }}
             component={CoopNavigators}
         />
+        
            
+        
 
       </Drawer.Navigator>
     </Box>

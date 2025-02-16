@@ -12,7 +12,7 @@ const DriverList = () => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const { loading, drivers, error } = useSelector((state) => state.driverList);
-  const [selectedTab, setSelectedTab] = useState("Not_Approved");
+  const [selectedTab, setSelectedTab] = useState("Pending");
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -66,16 +66,16 @@ const DriverList = () => {
         <TouchableOpacity
           style={[
             styles.tabButton,
-            selectedTab === "Not_Approved" && styles.activeTab,
+            selectedTab === "Pending" && styles.activeTab,
           ]}
           onPress={() => {
-            setSelectedTab("Not_Approved");
+            setSelectedTab("Pending");
           }}
         >
           <Text
             style={[
               styles.tabText,
-              selectedTab === "Not_Approved" && styles.activeTabText,
+              selectedTab === "Pending" && styles.activeTabText,
             ]}
           >
             Not Approved

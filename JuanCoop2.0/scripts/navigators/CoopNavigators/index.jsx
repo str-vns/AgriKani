@@ -15,6 +15,15 @@ import InventoryList from "@screens/Farmer/Inventory/InventoryList";
 import InventoryDetail from "@screens/Farmer/Inventory/InventoryDetail";
 import inventoryCreate from "@screens/Farmer/Inventory/InventoryCreate";
 import inventoryUpdate from "@screens/Farmer/Inventory/InventoryUpdate";
+import InfoCancelled from "@src/screens/Cancelled/InfoCancelled";
+import Assign from "@src/screens/Rider/Assign";
+import RiderDetails from "@src/screens/Rider/RiderDetails";
+import AssignLocation from "@src/screens/Rider/RiderAssignLoc";
+import MaxCapacity from "@src/screens/Rider/RiderCapacity";
+import Riderlist from "@src/screens/Rider/Riderlist";
+import History from "@src/screens/Rider/History";
+import Reason from "@screens/Cancelled/ReasonCancelled"
+
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -131,6 +140,57 @@ const Index = () => {
         }}
       />
 
+<Stack.Screen
+        name="Riderlist"
+        component={Riderlist}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name= "RiderDetails"
+        component={RiderDetails}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AssignLocation"
+        component={AssignLocation}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="MaxCapacity"
+        component={MaxCapacity}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="History"
+        component={History}
+        options={{ headerShown: false }}
+      />
+
+   <Stack.Screen
+        name="Assign"
+        component={Assign}
+        options={{ headerShown: false }}
+      />
+      
+      <Stack.Screen
+        name="InfoCancelled"
+        component={InfoCancelled}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="Reason"
+        component={Reason}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+      
     </Stack.Navigator>
   );
 };

@@ -14,6 +14,8 @@ import { useNavigation } from "@react-navigation/native";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { activeCooperative, deleteCooperative } from "@redux/Actions/coopActions";
+import messaging from '@react-native-firebase/messaging';
+import { sendNotifications } from "@redux/Actions/notificationActions";
 
 const CoopDetails = (props) => {
   const coops = props.route.params.coop;
@@ -21,12 +23,16 @@ const CoopDetails = (props) => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState(null);
+  const [fcmToken, setFcmToken] = useState(null);
 
   useEffect(() => {
     const fetchJwt = async () => {
       try {
         const res = await AsyncStorage.getItem("jwt");
         setToken(res);
+        messaging().getToken().then((token) => {
+          setFcmToken(token);
+        });
       } catch (error) {
         console.error("Error retrieving JWT: ", error);
       }
@@ -35,18 +41,73 @@ const CoopDetails = (props) => {
     fetchJwt();
   }, []);
 
-  const handleApprove = (coopId, userId) => {
-    setIsLoading(true);
-    dispatch(activeCooperative(coopId, userId, token));
-    setIsLoading(false);
-    navigation.navigate("CoopList");
+  const handleApprove = async (coopId, userId) => {
+    Alert.alert(
+      "Approve Cooperative",
+      "Are you sure you want to approve this cooperative?",
+      [
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+
+              const data = {
+                title: "Cooperative Approval",
+                body: "Your cooperative has been approved.",
+                user: userId,
+                fcmToken: fcmToken,
+                type: "profile",
+              }
+
+              setIsLoading(true);
+              dispatch(activeCooperative(coopId, userId, token));
+              dispatch(sendNotifications(data, token));
+              navigation.navigate("CoopList");
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        },
+        {
+          text: "No",
+          style: "cancel",
+        },
+      ]
+    );
   };
 
   const handleDelete = (coopId) => {
-    setIsLoading(true);
-    dispatch(deleteCooperative(coopId,token));
-    setIsLoading(false);
-    navigation.navigate("CoopList");
+    Alert.alert(
+      "Disapprove Cooperative",
+      "Are you sure you want to Disapprove this cooperative?",
+      [
+        {
+          text: "Yes",
+          onPress: async () => {
+            try {
+              
+              const data = {
+                title: "Cooperative Approval",
+                body: "Your cooperative has been disapproved. Please provide the necessary requirements. Thank you.",
+                user: userId,
+                fcmToken: fcmToken,
+                type: "profile",
+              }
+
+              setIsLoading(true);
+              dispatch(deleteCooperative(coopId,token));
+              navigation.navigate("CoopList");
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        },
+        {
+          text: "No",
+          style: "cancel",
+        },
+      ]
+    );
   };
 
   const handleFileOpen = (fileUrl) => {
@@ -98,7 +159,7 @@ const CoopDetails = (props) => {
             ]}
           >
             Approval Status:{" "}
-            {coops?.approvedAt === null ? "Not Approved" : "Approved"}
+            {coops?.approvedAt === null ? "Pending" : "Approved"}
           </Text>
         </View>
       </View>

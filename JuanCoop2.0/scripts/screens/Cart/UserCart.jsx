@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import styles from "@screens/stylesheets/Cart/userCart";
 import { setCartItems } from '@redux/Actions/cartActions';
+import { memberDetails } from "@redux/Actions/memberActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import baseURL from "@assets/commons/baseurl";
@@ -21,12 +22,29 @@ import baseURL from "@assets/commons/baseurl";
 const Cart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cartItems);
+  const { loading, members, error } = useSelector((state) => state.memberList);
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
+  const approvedMember = members?.find(member => member.approvedAt !== null);
+  const coopId = approvedMember?.coopId?._id;
+  const userId = context?.stateUser?.userProfile?._id;
   const isLogin = context?.stateUser?.isAuthenticated;
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState("");
 
+  useEffect(() => {
+    const fetchJwt = async () => {
+        try {
+            const res = await AsyncStorage.getItem("jwt");
+            setToken(res);
+        } catch (error) {
+            console.error("Error retrieving JWT: ", error);
+        }
+    };
+  
+    fetchJwt(); 
+  }, []);
+  
  useEffect(() => {
   const loadCartItems = async () => {
     try {
@@ -34,6 +52,7 @@ const Cart = () => {
       if (storedCart) {
         const cartItems = JSON.parse(storedCart);
         dispatch(setCartItems(cartItems));
+        dispatch(memberDetails(userId, token));
       }
     } catch (error) {
       console.error("Error loading cart from AsyncStorage:", error);
@@ -42,19 +61,6 @@ const Cart = () => {
 
   loadCartItems();
 }, [dispatch]);
-
-useEffect(() => {
-  const fetchJwt = async () => {
-      try {
-          const res = await AsyncStorage.getItem("jwt");
-          setToken(res);
-      } catch (error) {
-          console.error("Error retrieving JWT: ", error);
-      }
-  };
-
-  fetchJwt(); 
-}, []);
 
   const handleRemoveItem = (item) => {
     dispatch(removeFromCart(item.inventoryId));
@@ -155,10 +161,59 @@ useEffect(() => {
       </View>
     );
   };
+  
+  const calculateShipping = () => {
+    const uniqueCoops = new Set();
+  
+    cartItems.forEach((item) => {
+      if (item?.coop?._id) {
+        uniqueCoops.add(item.coop._id);
+      }
+    });
+  
+    const shippingCost = uniqueCoops.size * 75; 
+  
+    return shippingCost;
+  };
+  
+
+  const calculatedTax = () => {
+    let hasNonMemberItem = false; 
+
+    cartItems.forEach((item) => {
+        if (item?.coop?._id !== coopId) {
+            hasNonMemberItem = true; 
+        }
+    });
+
+    return hasNonMemberItem ? 0.12 : 0; 
+};
 
   const calculateTotalPrice = () => {
-    return cartItems.reduce((total, item) => total + item.pricing * item.quantity, 0).toFixed(2);
+    return cartItems.reduce((total, item) => total + item.pricing * item.quantity, 0);
   };
+
+const calculateFinalTotal = () => {
+    const shippingCost = calculateShipping();
+
+    let taxableTotal = 0;
+    let nonTaxableTotal = 0;
+
+    cartItems.forEach((item) => {
+        const itemTotal = item.pricing * item.quantity;
+        console.log("Item Total: ", itemTotal);
+        if (item?.coop?._id !== coopId) {
+            taxableTotal += itemTotal;  
+        } else {
+            nonTaxableTotal += itemTotal;  
+        }
+    });
+
+    const taxAmount = taxableTotal * 0.12; 
+    const finalTotal = taxableTotal + nonTaxableTotal + taxAmount + shippingCost;
+
+    return finalTotal.toFixed(2);
+};
 
   return (
     <View style={styles.container}>
@@ -181,7 +236,9 @@ useEffect(() => {
       )}
       {cartItems.length > 0 && (
         <View style={styles.totalContainer}>
-          <Text style={styles.totalText}>Total: ₱ {calculateTotalPrice()}</Text>
+          <Text style={styles.ShippingFeeText}>Overall Item: ₱ {calculateTotalPrice() }</Text>
+          <Text style={styles.ShippingFeeText}>Shipping Fee: ₱ {calculateShipping() }</Text>
+          <Text style={styles.totalText}>Total: ₱ {calculateFinalTotal() }</Text>
           {errors ? <Text style={styles.errorText}>{errors}</Text> : null}
           <TouchableOpacity
             style={styles.checkoutButton}

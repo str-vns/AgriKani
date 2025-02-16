@@ -129,10 +129,10 @@ export const listDriverDisapproved = (token) => async (dispatch) => {
     }
 }
 
-export const driverApproved = (driverId, token) => async (dispatch) => {
+export const driverApproved = (driverId, fcmToken, token) => async (dispatch) => {
     try {
         dispatch({ type: DRIVER_APPROVED_REQUEST });
-        const { data } = await axios.patch(`${baseURL}driver/approved/${driverId}`, {}, {
+        const { data } = await axios.patch(`${baseURL}driver/approved/${driverId}`, fcmToken, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -147,10 +147,10 @@ export const driverApproved = (driverId, token) => async (dispatch) => {
     }
 }
 
-export const driverRejected = (driverId, token) => async (dispatch) => {
+export const driverRejected = (driverId, fcmToken, token) => async (dispatch) => {
     try {
         dispatch({ type: DRIVER_REJECTED_REQUEST });
-        const { data } = await axios.patch(`${baseURL}driver/disapproved/${driverId}`, {}, {
+        const { data } = await axios.patch(`${baseURL}driver/disapproved/${driverId}`, fcmToken, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

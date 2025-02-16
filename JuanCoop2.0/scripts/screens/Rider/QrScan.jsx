@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Text, View, StyleSheet, Button, Dimensions, Alert } from "react-native";
+import { Text, View, StyleSheet, Button, Dimensions, Alert, TouchableOpacity } from "react-native";
 import { CameraView, Camera } from "expo-camera";
 import {updateDeliveryStatus } from "@redux/Actions/deliveryActions";   
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -22,6 +22,7 @@ const viewMinY = (height - finderHeight) / 2;
   const navigation = useNavigation()
   const dispatch = useDispatch();
   const socket = useSocket()
+  const deliverInfo = props.route.params.deliveryId;
   const delivery_ID = props.route.params.deliveryId._id;
   const userName = context.stateUser.userProfile?.firstName;
   const user = context?.stateUser?.userProfile;
@@ -163,51 +164,76 @@ const viewMinY = (height - finderHeight) / 2;
 
   return (
     <View style={styles.container}>
+    {/* Camera Scan at the Top */}
+    <View style={styles.cameraContainer}>
       <CameraView
         onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr", "pdf417"],
-        }}
+        barcodeScannerSettings={{ barcodeTypes: ["qr", "pdf417"] }}
         facing="back"
         style={StyleSheet.absoluteFillObject}
-        >
-        {/* <View >
-            <View style={styles.scanningBox} />
-        </View> */}
-      </CameraView>
+      />
       {scanned && (
-         <View style={styles.buttonContainer}>
-         <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />
-       </View>
+        <View style={styles.scanButtonContainer}>
+          <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />
+        </View>
       )}
     </View>
+    
+    {/* Delivery Info at the Bottom */}
+    <View style={styles.detailsContainer}>
+      <Text style={styles.driverName}>{deliverInfo?.userId?.firstName} {deliverInfo?.userId?.lastName}</Text>
+      <Text style={styles.infoText}>Total Price: ₱ {deliverInfo?.totalAmount}</Text>
+      <Text style={styles.infoText}>Order# {deliverInfo?.orderId?._id}</Text>
+    </View>
+  </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
+    backgroundColor: "#fff",
+  },
+  cameraContainer: {
+    flex: 8,
     justifyContent: "center",
+    alignItems: "center",
   },
-  overlay: {
+  detailsContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#fff",
+    padding: 15,
+    alignItems: "center",
   },
-  scanningBox: {
-    width: width * 0.61,
-    height: height * 0.3,
-    borderWidth: 3,
-    borderColor: "white",
-    borderRadius: 10,
-    backgroundColor: "transparent",
+  scanButtonContainer: {
+    position: "absolute",
+    bottom: 20,
+    alignSelf: "center",
   },
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 50,
-    alignSelf: 'center',
+  driverName: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  infoText: {
+    fontSize: 16,
+    marginTop: 5,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
+    marginTop: 20,
+  },
+  dropOffButton: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
+
 
 export default QrScan;

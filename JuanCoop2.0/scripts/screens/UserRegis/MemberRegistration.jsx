@@ -24,9 +24,11 @@ import * as ImagePicker from "expo-image-picker";
 import styles from "@screens/stylesheets/UserRegis/memberRegistration";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import messaging from "@react-native-firebase/messaging";
+import { memberDetails } from "@redux/Actions/memberActions";
 
 function MemberRegistration() {
   const { coops } = useSelector((state) => state.allofCoops);
+  const { loading, members, error } = useSelector((state) => state.memberList);
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const socket = useSocket();
@@ -53,6 +55,8 @@ function MemberRegistration() {
   const handleBackClick = () => {
     navigation.navigate("UserProfile");
   };
+
+  
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -70,8 +74,10 @@ function MemberRegistration() {
   useFocusEffect(
     useCallback(() => {
       dispatch(allCoops());
+      dispatch(memberDetails(userId, token));
     }, [])
   );
+
 
   useEffect(() => {
     (async () => {
@@ -265,25 +271,27 @@ function MemberRegistration() {
         />
         <Text style={styles.textHeaderInput}>Choose Cooperative To Join</Text>
         <View style={styles.CoopContainer}>
-          <Picker
-            selectedValue={coopId}
-            style={styles.pickerStyle}
-            onValueChange={(itemValue) => setCoopId(itemValue)}
-          >
-            <Picker.Item label="Select Cooperative" value="" enabled={false} />
-            {coops && coops?.length > 0 ? (
-              coops.map((coop, index) => (
-                <Picker.Item
-                  key={index}
-                  label={coop.farmName || "None"}
-                  value={{ coopId: coop._id, userId: coop.user._id }}
-                  style={styles.pickerText}
-                />
-              ))
-            ) : (
-              <Text>No Cooperative</Text>
-            )}
-          </Picker>
+        <Picker
+  selectedValue={coopId}
+  style={styles.pickerStyle}
+  onValueChange={(itemValue) => setCoopId(itemValue)}
+>
+  <Picker.Item label="Select Cooperative" value="" enabled={false} />
+  {coops && coops.length > 0 ? (
+    coops
+    .filter(coop => !members.some(member => member.coopId?._id === coop._id))
+      .map((coop, index) => (
+        <Picker.Item
+          key={index}
+          label={coop.farmName || "None"}
+          value={{ coopId: coop._id, userId: coop.user._id }}
+          style={styles.pickerText}
+        />
+      ))
+  ) : (
+    <Text>No Cooperative</Text>
+  )}
+</Picker>
         </View>
 
         <Text style={styles.imageText}>Barangay Clearance</Text>

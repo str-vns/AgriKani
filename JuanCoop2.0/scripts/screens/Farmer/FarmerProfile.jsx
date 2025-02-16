@@ -26,10 +26,11 @@ const FarmerProfile = (props) => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const socket = useSocket();
-  const cooperative = props.route.params.coop;
-  const userItem = props.route.params.coop.user;
+  console.log(props?.route?.params?.coop?.user);
+  const cooperative = props?.route?.params?.coop;
+  const userItem = props?.route?.params?.coop?.user;
   const userId = context?.stateUser?.userProfile?._id;
-  const { loading, coopProducts, error } = useSelector((state) => state.CoopProduct);
+  const { loading, coopProducts, error } = useSelector((state) => state?.CoopProduct);
   const { users } = useSelector((state) => state.getThemUser);
   const { success } = useSelector((state) => state.createConversation);
   const { conversations } = useSelector((state) => state.converList);
@@ -37,7 +38,7 @@ const FarmerProfile = (props) => {
   const [isOnline, setIsOnline] = useState(false);
   const existConvo = conversations.find(
     (convo) =>
-      convo.members.includes(cooperative.user?._id) &&
+      convo.members.includes(cooperative?.user?._id) &&
       convo.members.includes(userId)
   );
   console.log(success);
@@ -65,14 +66,14 @@ const FarmerProfile = (props) => {
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(getCoopProducts(cooperative.user?._id));
+      dispatch(getCoopProducts(cooperative?.user?._id));
     }, [])
   );
 
   useEffect(() => {
       if (conversations && Array.isArray(conversations) && userId && token) {
         const friends = conversations.flatMap((conversation) =>
-          conversation.members.filter((member) => member !== userId)
+          conversation?.members?.filter((member) => member !== userId)
         );
   
         if (friends.length > 0) {
@@ -85,8 +86,8 @@ const FarmerProfile = (props) => {
       socket.emit("addUser", userId);
   
       socket.on("getUsers", (users) => {
-        const onlineUsers = users.filter(
-          (user) => user.online && user.userId !== null
+        const onlineUsers = users?.filter(
+          (user) => user?.online && user?.userId !== null
         );
         setOnlineUsers(onlineUsers);
       });
@@ -99,13 +100,13 @@ const FarmerProfile = (props) => {
 
   useEffect(() => {
   
-      if (users && onlineUsers.length > 0) {
+      if (users && onlineUsers?.length > 0) {
         const userIsOnline = users.some((user) =>
           onlineUsers.some(
             (onlineUser) =>
-              onlineUser.userId === user.details._id &&
-              onlineUser.online &&
-              onlineUser.userId !== null
+              onlineUser?.userId === user?.details?._id &&
+              onlineUser?.online &&
+              onlineUser?.userId !== null
           )
         );
   
@@ -117,7 +118,7 @@ const FarmerProfile = (props) => {
 
 
   const chatNow = async () => {
-    const cooperativeUserId = cooperative.user?._id;
+    const cooperativeUserId = cooperative?.user?._id;
     const currentUserId = userId;
 
     if (context?.stateUser?.isAuthenticated) {
@@ -163,15 +164,15 @@ const FarmerProfile = (props) => {
       <TouchableOpacity
         onPress={() => navigation.navigate("SingleProduct", { item })}
       >
-        {Array.isArray(item?.image) && item.image.length > 0 ? (
+        {Array.isArray(item?.image) && item?.image?.length > 0 ? (
           <Image source={{ uri: item.image[0].url }} style={styles.prodImage} />
         ) : (
           <Text>No Image</Text>
         )}
-        <Text style={styles.prodName}>{item.productName}</Text>
-        <Text style={styles.prodDescription}>{item.description}</Text>
+        <Text style={styles.prodName}>{item?.productName}</Text>
+        <Text style={styles.prodDescription}>{item?.description}</Text>
         <View style={styles.prodpriceContainer}>
-          <Text style={styles.prodprice}>{item.pricing}</Text>
+          <Text style={styles.prodprice}>{item?.pricing}</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -181,7 +182,7 @@ const FarmerProfile = (props) => {
     <View style={styles.profileContainer}>
       {cooperative?.user?.image?.url ? (
         <Image
-          source={{ uri: cooperative.user.image.url }}
+          source={{ uri: cooperative?.user?.image?.url }}
           style={styles.profileImage}
         />
       ) : (
@@ -190,7 +191,7 @@ const FarmerProfile = (props) => {
           style={styles.profileImage}
         />
       )}
-      <Text style={styles.profileName}>{cooperative.farmName}</Text>
+      <Text style={styles.profileName}>{cooperative?.farmName}</Text>
       <TouchableOpacity style={styles.editProfile} onPress={() => chatNow()}>
         <Text style={styles.editProfile}>Chat Now</Text>
       </TouchableOpacity>
@@ -211,7 +212,7 @@ const FarmerProfile = (props) => {
       <FlatList
         ListHeaderComponent={renderProfileHeader}
         data={coopProducts}
-        keyExtractor={(item, index) => item.id || index.toString()}
+        keyExtractor={(item, index) => item?.id || index.toString()}
         renderItem={renderProductItem}
         numColumns={2}
         columnWrapperStyle={styles.prodrow}

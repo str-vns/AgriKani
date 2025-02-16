@@ -11,6 +11,9 @@ import Requirements from "@screens/Farmer/Registration/RequirementsRegistration"
 import MembersRegistration from "@screens/UserRegis/MemberRegistration";
 import UserTracking from "@screens/User/UserTracking";
 import QrGenerate from "@screens/User/QrGenerate";
+import ClientCancelled from "@screens/Cancelled/Client_Cancelled";
+import MemberList from "@screens/UserRegis/MemberList";
+import CoopFarmProfile from "@screens/Farmer/FarmerProfile";
 const Stack = createNativeStackNavigator();
 
 const UserNavigation = () => {
@@ -59,6 +62,23 @@ const UserNavigation = () => {
           tabBarShowLabel: false,
         }}
       />
+      < Stack.Screen
+        name="MemberList"
+        component={MemberList}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+
+<Stack.Screen
+          name="CoopFarmProfile"
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
+          component={CoopFarmProfile}
+        />
 
       <Stack.Screen
         name="MembersRegistration"
@@ -107,7 +127,13 @@ const UserNavigation = () => {
           headerShown: false,
         }}
       />
-   
+      < Stack.Screen
+        name="Client_Cancelled"
+        component={ClientCancelled}
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   );
 };

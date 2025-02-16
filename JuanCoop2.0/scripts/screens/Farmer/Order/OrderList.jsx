@@ -328,9 +328,13 @@ const OrderList = ({ navigation }) => {
               Customer: {item?.user?.firstName} {item?.user?.lastName}
             </Text>
             <Text style={styles.orderDate}>Date: {formattedDate}</Text>
+            { item?.totalAmount !== 0 && 
+            (
             <Text style={styles.orderInfo}>
-              Total Price: ${item?.totalPrice}
+              Total Price: ₱ {item?.totalAmount}
             </Text>
+            )
+            }
             <Text style={styles.orderInfo}>
               {" "}
               Delivery Address: {item?.shippingAddress?.address},{" "}
@@ -365,22 +369,23 @@ const OrderList = ({ navigation }) => {
                         )}
 
                         <View style={styles.textContainer}>
-                          {orderItem.product?.productName && (
-                            <Text style={styles.orderItemName}>
-                              {orderItem.product.productName}
-                            </Text>
-                          )}
+                 
+    {orderItem.product?.productName && (
+      <Text style={styles.orderItemName}>{orderItem.product.productName}</Text>
+    )}
+   
+ 
                           <Text style={styles.orderItemPrice}>
                             Size: {orderItem.inventoryProduct?.unitName}{" "}
                             {orderItem.inventoryProduct?.metricUnit}
                           </Text>
                           <Text style={styles.orderItemPrice}>
-                            Price: ${orderItem?.price}
+                            Price: ₱ {orderItem?.price}
                           </Text>
                           <Text style={styles.orderItemQuantity}>
                             Quantity: {orderItem?.quantity}
                           </Text>
-
+                          <View style={{  flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 5  }}>
                           <Text
                             style={[
                               styles[`status${orderItem?.orderStatus}`],
@@ -390,6 +395,12 @@ const OrderList = ({ navigation }) => {
                             <Text style={{ color: "black" }}>Status: </Text>
                             {orderItem?.orderStatus}
                           </Text>
+                          { orderItem?.orderStatus === "Cancelled" && (
+                          <TouchableOpacity style={styles.buttonCancelled} onPress={() => navigation.navigate("Reason", { order: orderItem })}>
+                          <Text style={styles.buttonTextCancelled}>View</Text>
+                          </TouchableOpacity>
+                          )}
+                          </View>
                         </View>
                       </View>
                     </View>

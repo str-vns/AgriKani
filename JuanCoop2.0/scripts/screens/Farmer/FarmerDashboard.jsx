@@ -243,7 +243,7 @@ const FarmerDashboard = () => {
             showsHorizontalScrollIndicator={false}
           />
       </View>
-      <View style={styles.weatherContainer}>
+      {/* <View style={styles.weatherContainer}>
         <View style={styles.weatherBox}>
           <Image 
             blurRadius={70}
@@ -289,8 +289,8 @@ const FarmerDashboard = () => {
       </View>
         ))}
       </ScrollView>
-
-      </View>
+      </View> */}
+      
       <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Text style={styles.statTitle}>Daily Sales</Text>

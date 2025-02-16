@@ -24,6 +24,7 @@ import {
   import { memberListReducer, memberApiReducer } from "@redux/Reducers/memberReducer";
   import { driverApiReducer, driverListReducer, onlyApprovedDriverReducer, driverProfileReducer } from "@redux/Reducers/driverReducer";
   import { deliveryListReducer, deliveryApiReducer, deliveryCompleteReducer, deliveryHistoryReducer } from "@redux/Reducers/deliveryReducers";
+  import { cancelledReducerApi, cancelledReducer } from "@redux/Reducers/cancelledReducer";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
@@ -95,8 +96,9 @@ import {
     otpForgot: otpForgotPasswordReducer,
     MapBoxRoute: MapBoxRouteReducer,
     driverProfile: driverProfileReducer,
-    googleLogin: googleLoginReducer
-
+    googleLogin: googleLoginReducer,
+    cancelled: cancelledReducer,
+    cancelledApi: cancelledReducerApi,
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));

@@ -39,6 +39,7 @@ const AssignDetails = (props) => {
     quantity: item?.quantity,
   }));
   
+  console.log("orderItems",orderItems);
   if (drierror) {
     setErrors("Please try again later.");
   }
@@ -80,9 +81,9 @@ const AssignDetails = (props) => {
    
 
     const data = {
-      orderId: AssingInfo._id,
+      orderId: AssingInfo?._id,
       coopId: userId,
-
+      totalAmount: AssingInfo?.totalAmount,
     };
 
   
@@ -161,7 +162,7 @@ const AssignDetails = (props) => {
           <Text style={styles.label}>Mode of Payment:</Text> {getPaymentMethodDisplay(AssingInfo?.paymentMethod)}
         </Text>
         <Text style={styles.text}>
-          <Text style={styles.label}>To Pay:</Text> ₱ {AssingInfo?.totalPrice}
+          <Text style={styles.label}>To Pay:</Text> ₱ {AssingInfo?.totalAmount}
         </Text>
       </View>
 
@@ -277,6 +278,7 @@ textHeaderInput: {
   textAlign: "left",
   marginBottom: height * 0.01, 
 },
+
 });
 
 export default AssignDetails;

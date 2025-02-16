@@ -80,8 +80,8 @@ useEffect(() => {
               dispatch(driverProfile(userId, res))
 
               const mark = {
-                latitude: markerCoordinate.lat,
-                longitude: markerCoordinate.lng,
+                latitude: markerCoordinate?.lat,
+                longitude: markerCoordinate?.lng,
               };
               dispatch(getDeliveryDriver(userId, mark, res));
             } else {
@@ -118,7 +118,7 @@ useEffect(() => {
   
     socket.on("getUsers", (users) => {
       const onlineUsers = users.filter(
-        (user) => user.online && user.userId !== null
+        (user) => user?.online && user?.userId !== null
       );
       console.log("Online users: ", onlineUsers);
       setOnlineUsers(onlineUsers);
@@ -134,8 +134,8 @@ useEffect(() => {
       try {
         
         const mark = {
-          latitude: markerCoordinate.lat,
-          longitude: markerCoordinate.lng,
+          latitude: markerCoordinate?.lat,
+          longitude: markerCoordinate?.lng,
         };
         
         dispatch(getDeliveryDriver(userId, mark, token));
@@ -183,7 +183,7 @@ useEffect(() => {
           onPress: () => {
             console.log("Deliver Pressed");
             if(item.status === "pending") {
-            dispatch(updateDeliveryStatus(item._id, "delivering", token));
+            dispatch(updateDeliveryStatus(item?._id, "delivering", token));
             navigation.navigate("Dropoff",  { deliveryItem: item})
             } else {
               navigation.navigate("Dropoff",  { deliveryItem: item})
@@ -197,10 +197,10 @@ useEffect(() => {
  
     <View style={styles.orderCard}>
       <View style={styles.orderInfo}>
-        <Text style={styles.name}>{item.userId.firstName} {item.userId.lastName}</Text>
-        <Text style={styles.orderNumber}>Order # {item.orderId._id}</Text>
-        <Text>Status:  <Text style={[styles.status, { color: getStatusColor(item.status) }]}>
-        {capitalizeFirstLetter(item.status)}
+        <Text style={styles.name}>{item.userId.firstName} {item?.userId?.lastName}</Text>
+        <Text style={styles.orderNumber}>Order # {item?.orderId?._id}</Text>
+        <Text>Status:  <Text style={[styles.status, { color: getStatusColor(item?.status) }]}>
+        {capitalizeFirstLetter(item?.status)}
   </Text>
 </Text>
       </View>
@@ -325,14 +325,14 @@ useEffect(() => {
 
        {Deliveryloading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : deliveries && deliveries.length === 0 || Deliveryerror ? (
+      ) : deliveries && deliveries?.length === 0 || Deliveryerror ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No Deliveries found.</Text>
         </View>
       ) : (
         <FlatList
           data={deliveries}
-          keyExtractor={(item) => item._id}
+          keyExtractor={(item) => item?._id}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }

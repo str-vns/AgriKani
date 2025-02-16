@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Image, TouchableOpacity, Modal,  Pressable, } from "react-native";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Image, TouchableOpacity, Modal,  Pressable, RefreshControl, } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useSelector, useDispatch } from "react-redux";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -18,7 +18,8 @@ const UserOrderList = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [refresh, setRefresh] = React.useState(false);
-  const filteredOrders = orders?.map((order) => ({...order,orderItems: order.orderItems.filter((item) => item.orderStatus !== "Cancelled"), })).filter((order) => order.orderItems.length > 0);
+  const [refreshing, setRefreshing] = useState(false);
+  // const filteredOrders = orders?.map((order) => ({...order,orderItems: order.orderItems.filter((item) => item.orderStatus !== "Cancelled"), })).filter((order) => order.orderItems.length > 0);
   
   useEffect(() => {
     const fetchJwt = async () => {
@@ -50,26 +51,27 @@ const UserOrderList = () => {
   
   }, [userId, token, dispatch]);
 
-  const handleCancelOrder = (orderId, inventortId) => {
+  const handleCancelOrder = (orderId, inventortId, orderItemId, coopUser) => {
 
-    setRefresh(true);
-    try {
+  navigation.navigate("Client_Cancelled", { orderId, inventortId, orderItemId, coopUser });
+  //   setRefresh(true);
+  //   try {
 
-      const status = 
-      {
-        orderStatus: "Cancelled",
-        inventoryProduct: inventortId,
-      }
+  //     const status = 
+  //     {
+  //       orderStatus: "Cancelled",
+  //       inventoryProduct: inventortId,
+  //     }
 
-      dispatch(updateOrderStatus(orderId, status,  token));
+  //     dispatch(updateOrderStatus(orderId, status,  token));
 
-      onRefresh()
-   } catch (error) {
-     console.error("Error deleting or refreshing orders:", error);
-   } finally {
+  //     onRefresh()
+  //  } catch (error) {
+  //    console.error("Error deleting or refreshing orders:", error);
+  //  } finally {
 
-     setRefresh(false);
-   }
+  //    setRefresh(false);
+  //  }
    
   };
 
@@ -93,7 +95,7 @@ const UserOrderList = () => {
 
   const renderItem = ({ item }) => {
     const isExpanded = expandedOrders[item._id];
-
+    console.log(item.orderItems[0]._id)
     return (
       <View style={styles.orderCard}>
       <View style={styles.orderHeader}>
@@ -155,7 +157,7 @@ const UserOrderList = () => {
             {orderItem.orderStatus === "Pending" && (
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => handleCancelOrder(item._id, orderItem.inventoryProduct._id)}
+                onPress={() => handleCancelOrder(item?._id, orderItem.inventoryProduct?._id, orderItem?._id, orderItem?.coopUser)}
               >
                 <Icon name="cancel" size={20} color="#fff" />
                 <Text style={styles.buttonText}>Cancel</Text>
@@ -218,7 +220,7 @@ const UserOrderList = () => {
               {orderItem.orderStatus === "Pending" && (
                 <TouchableOpacity
                   style={[styles.button, styles.cancelButton]}
-                  onPress={() => handleCancelOrder( item._id, orderItem.inventoryProduct._id)}
+                  onPress={() => handleCancelOrder(item?._id, orderItem.inventoryProduct?._id, orderItem?._id, orderItem?.coopUser)}
                 >
                   <Icon name="cancel" size={20} color="#fff" />
                   <Text style={styles.buttonText}>Cancel</Text>
@@ -254,9 +256,12 @@ const UserOrderList = () => {
         
   <ActivityIndicator />
 ) : (
-  filteredOrders && filteredOrders.length > 0 ? (
+  orders && orders.length > 0 ? (
     <FlatList
-      data={filteredOrders}
+      data={orders}
+      refreshControl={
+                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                   }
       keyExtractor={(item) => item._id}
       renderItem={renderItem}
       ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -313,6 +318,7 @@ const styles = StyleSheet.create({
     status === "Delivered" ? "#28a745" :
     status === "Processing" ? "#0000FF" :
     status === "Shipping" ? "#FFA500" :
+    status === "Cancelled" ? "red" :
     "#ffc107"
   }),
   orderTotal: {
