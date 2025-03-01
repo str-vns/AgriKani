@@ -24,6 +24,7 @@ const Client_Cancelled = (props) => {
      const orderItemId = cancelled.orderItemId;
      const coops = cancelled.coopUser;
      const userName = context.stateUser.userProfile?.firstName;
+     const lastName = context.stateUser.userProfile?.lastName;  
      const [selectedReason, setSelectedReason] = useState(null);
      const [otherReason, setOtherReason] = useState("");
      const [token, setToken] = useState(null);
@@ -115,7 +116,7 @@ const Client_Cancelled = (props) => {
       
           const notification = {
             title: `Order Cancelled`,
-            content: `The order has been cancelled by the client`,
+            content: `The order has been cancelled by the User ${userName} ${lastName}.`,
             user: coop?.user?._id,
             fcmToken: fcmToken,
             type: "order",

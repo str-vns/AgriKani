@@ -86,7 +86,7 @@ const Rider_Cancelled = (props) => {
        // ------- notif------- //
        const notification = {
         title: `Delivery Failed`,
-        content: `Your Product has been failed to deliver by the rider`,
+        content: `Your Product has been failed to deliver because ${selectedReason === "Other" ? otherReason : selectedReason}, ${userName}`,
         user: userId,
         fcmToken: fcmToken,
         type: "order",
