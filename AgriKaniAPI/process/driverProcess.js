@@ -143,7 +143,7 @@ exports.approveDriverProcess = async (id, req) => {
     const email = driver.email;
     const mailOptions = {
       to: email,
-      subject: "Driver Not Approved",
+      subject: "Driver Approved",
       html: `
       <!DOCTYPE html>
         <html lang="en">
@@ -211,8 +211,8 @@ exports.approveDriverProcess = async (id, req) => {
       </div>
                  <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1734260381/images/olwhjvr5dvjhrgbwrcsa.png" alt="AgriKaAni Logo" style="max-width: 25%; height: auto;" />
                 <h4>Hi! ${driver.firstName}, ${driver.lastName}<h4>
-                <h1>Your Driver is Not Approved!</h1>
-                <p>The information you provided was incomplete, did not meet the required criteria</p>
+                <h1>Your Driver is Approved!</h1>
+                <p>Your driver has been Approve!</p>
                 <p>Thank you for using our service!</p>
             </div>
             <div class="footer">

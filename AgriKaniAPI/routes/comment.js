@@ -11,6 +11,18 @@ const commentRoutes = [
     roles: [],
     handler: commentController.CreateProductReview,
   },
+  {
+    method: METHOD.POST,
+    path: PATH.COMMENT_COOP,
+    roles: [],
+    handler: commentController.CreateCoopReview,
+  },
+  {
+    method: METHOD.POST,
+    path: PATH.COMMENT_COURIER,
+    roles: [],
+    handler: commentController.CreateCourierReview,
+  },
 ];
 
 commentRoutes.forEach((route) => {

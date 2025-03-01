@@ -77,6 +77,14 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
+      driverRating: {
+        type: Number,
+        required: true,
+      },
+      serviceRating: {
+        type: Number,
+        required: true,
+      },
       comment: {
         type: String,
         required: true,

@@ -66,7 +66,9 @@ module.exports = {
   FARM_ID_INFO: "/farm/info/:id",
   //Comment
   COMMENT: "/products/comment",
-
+  COMMENT_COOP: "/cooperative/comment",
+  COMMENT_COURIER: "/courier/comment",
+  
   //Post
   POST: "/p",
   POST_ID: "/p/:id",
@@ -178,4 +180,20 @@ module.exports = {
   CANCELLED_ID: "/cancelled/:id",
   CANCELLED_ORDER_ID: "/cancelled/order/:id",
   CANCELLED_ORDER: "/cancelled/order",
+
+  //Senior
+  SENIOR: "/senior",
+  SENIOR_ID: "/senior/:id",
+  SENIOR_DISAPPROVED: "/senior/disapproved",
+  SENIOR_APPROVED: "/senior/approved",
+  SENIOR_APPROVED_ID: "/senior/approved/:id",
+  SENIOR_DISAPPROVED_ID: "/senior/disapproved/:id",
+
+  //Pwd
+  PWD: "/pwd",
+  PWD_ID: "/pwd/:id",
+  PWD_DISAPPROVED: "/pwd/disapproved",
+  PWD_APPROVED: "/pwd/approved",
+  PWD_APPROVED_ID: "/pwd/approved/:id",
+  PWD_DISAPPROVED_ID: "/pwd/disapproved/:id",
 };

@@ -18,3 +18,31 @@ exports.CreateProductReview = [
     );
   }),
 ];
+
+exports.CreateCoopReview = [
+  upload.array("image"),
+   CheckField(["rating", "comment", "user", "order", "coopId"  ]),
+  asyncHandler(async (req, res, next) => {
+    const review = await commentProcess.CreateCoopReview(req);
+
+    return SuccessHandler(
+      res,
+      `Review: ${review?.firstName} ${review?.lastName} has been created successfully`,
+      review
+    );
+  }),
+];
+
+exports.CreateCourierReview = [
+  upload.array("image"),
+   CheckField(["rating", "comment", "user", "order", "driverId"  ]),
+  asyncHandler(async (req, res, next) => {
+    const review = await commentProcess.CreateCourierReview(req);
+
+    return SuccessHandler(
+      res,
+      `Review: ${review?.firstName} ${review?.lastName} has been created successfully`,
+      review
+    );
+  }),
+];

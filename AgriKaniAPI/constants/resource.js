@@ -27,4 +27,6 @@ module.exports = {
     DELIVERY: "delivery",
     DRIVER: "driver",
     CANCELLED: "cancelled",
+    SENIOR: "senior",
+    PWD: "pwd",
 }

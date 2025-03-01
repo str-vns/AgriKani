@@ -62,24 +62,20 @@ const farmSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  sentiment: {
+    type: String,
+    default: "neutral",
+  },
+  sentimentOverall: {
+    type: Number,
+    default: 0,
+  },
   reviews: [
     {
       user: {
         type: mongoose.Schema.ObjectId,
         ref: "user",
         required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      avatar: {
-        public_id: {
-          type: String,
-        },
-        url: {
-          type: String,
-        },
       },
       rating: {
         type: Number,
@@ -89,8 +85,11 @@ const farmSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-
-      images: [
+      sentimentScore:{
+        type: Number,
+        default: 0,
+      },
+      image: [
         {
           public_id: {
             type: String,
@@ -100,10 +99,18 @@ const farmSchema = new mongoose.Schema({
             type: String,
             required: true,
           },
+          originalname: {
+            type: String,
+            required: true,
+          },
         },
       ],
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
-  ],
+  ], 
   requirements: {
     businessPermit: {
       public_id: {

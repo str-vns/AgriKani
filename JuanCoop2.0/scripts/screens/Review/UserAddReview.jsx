@@ -28,6 +28,8 @@ const UserAddReview = (props) => {
   const navigation = useNavigation();
   const [review, setReview] = useState("");
   const [stars, setStars] = useState(0);
+  const [dStars,  setDStars] = useState(0);
+  const [sStars,  setSStars] = useState(0);
   const [token, setToken] = useState(null);
   const [errormessage, setErrorMessage] = useState("");
   const isReview = products?.reviews?.find(
@@ -67,6 +69,14 @@ const UserAddReview = (props) => {
     setStars(rating);
   };
 
+  const handleDStar = (rating) => {
+    setDStars(rating);
+  };
+
+  const handleSStar = (rating) => {
+    setSStars(rating);
+  };
+  
   const handlePostReview = () => {
     if (stars === 0) {
       setErrorMessage("Please rate the product");
@@ -77,6 +87,8 @@ const UserAddReview = (props) => {
       order: transactionId,
       productId: productId.product._id,
       rating: stars,
+      driverRating: dStars,
+      serviceRating: sStars,
       comment: review,
     };
 
@@ -141,8 +153,8 @@ const UserAddReview = (props) => {
         <Text style={styles.reviewCat}>Seller Service</Text>
         <AirbnbRating
           count={5}
-          defaultRating={stars}
-          onFinishRating={handleStar}
+          defaultRating={sStars}
+          onFinishRating={handleSStar}
           size={30}
           starContainerStyle={styles.starContainer}
         />
@@ -153,8 +165,8 @@ const UserAddReview = (props) => {
         <Text style={styles.reviewCat}>Delivery Speed</Text>
         <AirbnbRating
           count={5}
-          defaultRating={stars}
-          onFinishRating={handleStar}
+          defaultRating={dStars}
+          onFinishRating={handleDStar}
           size={30}
           starContainerStyle={styles.starContainer}
         />

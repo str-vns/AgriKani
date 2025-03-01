@@ -28,7 +28,8 @@ const member = require("./routes/member");
 const driver = require("./routes/driver");
 const delivery = require("./routes/delivery")
 const cancelled = require("./routes/cancelled");
-
+const pwd = require("./routes/Discount/pwd");
+const senior = require("./routes/Discount/senior");
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -56,7 +57,9 @@ app.use(
   member,
   driver,
   delivery,
-  cancelled
+  cancelled,
+  pwd,
+  senior
 );
 
 module.exports = app;
