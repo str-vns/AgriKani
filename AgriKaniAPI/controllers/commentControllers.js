@@ -46,3 +46,12 @@ exports.CreateCourierReview = [
     );
   }),
 ];
+
+exports.CreatePostComment = [
+  CheckField(["comment", "user", "post"]), // Ensure field names match
+  asyncHandler(async (req, res) => {
+    const post = await commentProcess.CreatePostComment(req);
+    return SuccessHandler(res, "Comment added successfully", post);
+  }),
+];
+

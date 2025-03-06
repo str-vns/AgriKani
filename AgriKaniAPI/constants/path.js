@@ -1,4 +1,4 @@
-const { DRIVER } = require("./resource");
+const { DRIVER, IMAGE } = require("./resource");
 
 module.exports = {
   //User
@@ -70,12 +70,21 @@ module.exports = {
   COMMENT_COURIER: "/courier/comment",
   
   //Post
+  POST_CREATE: "/p/create",
   POST: "/p",
-  POST_ID: "/p/:id",
+  POST_UPDATE_ID: "/p/update/:id",
+  POST_DELETE_ID: "/p/delete/:id",
+  POST_SOFT_ID: "/p/softdel/:id",
   RESTORE_POST_ID: "/restore/p/:id",
-  POST_USER_ID: "/p/user/:id",
-  APPROVE_POST: "/p/approve/:id",
+  POST_USER_ID: "/p/user/:userId",
+  POST_ID: "/p/:id",
   POST_STATUS_APPROVE: "/approve/p",
+  APPROVE_POST: "/p/approve/:id",
+  IMAGE_POST_DELETE: "/p/image/:postId/:imageId",
+  LIKE_POST: "/p/like/:id",
+
+  POST_UPDATE_POST: "/p/update/:id",
+  POST_USER_ID: "/p/user/:id",
   SHARE_POST: "/s",
   SHARE_POST_ID: "/s/:id",
   RESTORE_SHARE_POST_ID: "/restore/share/:id",
@@ -196,4 +205,9 @@ module.exports = {
   PWD_APPROVED: "/pwd/approved",
   PWD_APPROVED_ID: "/pwd/approved/:id",
   PWD_DISAPPROVED_ID: "/pwd/disapproved/:id",
+
+  POST_ADD_COMMENT: "/post/comment",
+  POST_GET_COMMENT: "/post/:postId",
+  // POST_UPDATE_COMMENT: "/post/:postId/comments/update/:commentId",
+  // POST_DELETE_COMMENT: "/post/:postId/comments/delete/:commentId",
 };

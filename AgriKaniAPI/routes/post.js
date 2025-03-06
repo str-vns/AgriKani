@@ -7,7 +7,7 @@ const { METHOD, PATH, ROLES } = require("../constants/index");
 const postRoutes = [
   {
     method: METHOD.POST,
-    path: PATH.POST,
+    path: PATH.POST_CREATE,
     roles: [],
     handler: postControllers.CreatePost,
   },
@@ -19,19 +19,19 @@ const postRoutes = [
   },
   {
     method: METHOD.PUT,
-    path: PATH.POST_ID,
+    path: PATH.POST_UPDATE_ID,
     roles: [],
     handler: postControllers.UpdatePost,
   },
   {
     method: METHOD.DELETE,
-    path: PATH.POST_ID,
+    path: PATH.POST_DELETE_ID,
     roles: [],
     handler: postControllers.DeletePost,
   },
   {
     method: METHOD.PATCH,
-    path: PATH.POST_ID,
+    path: PATH.POST_SOFT_ID,
     roles: [],
     handler: postControllers.SoftDelPost,
   },
@@ -55,7 +55,7 @@ const postRoutes = [
   },
   {
     method: METHOD.POST,
-    path: PATH.POST_ID,
+    path: PATH.LIKE_POST,
     roles: [],
     handler: postControllers.LikePost,
   },
@@ -70,6 +70,18 @@ const postRoutes = [
     path: PATH.POST_STATUS_APPROVE,
     roles: [],
     handler: postControllers.GetApprovedPosts,
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.POST_GET_COMMENT,
+    roles: [],
+    handler: postControllers.GetComments,
+  },
+  {
+    method: METHOD.PUT,
+    path: PATH.IMAGE_POST_DELETE,
+    roles: [],
+    handler: postControllers.DeletePostImage,
   },
 ];
 
