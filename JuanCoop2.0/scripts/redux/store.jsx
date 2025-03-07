@@ -6,12 +6,12 @@ import {
   import { thunk } from "redux-thunk";
   
   import cartItems from "@redux/Reducers/cartItems";
-  import { orderReducer, orderCoopReducer, orderShippedReducer, historyDeliveryCoopReducer, coopdashboardReducer } from "./Reducers/orderReducer";
+  import { orderReducer, orderCoopReducer, orderShippedReducer, historyDeliveryCoopReducer, coopdashboardReducer, overalldashboardReducer} from "./Reducers/orderReducer";
   import { OTPReducer, RegisterReducer, userReducer, EditProfileReducer, getUsersReducers, AllUsersReducer, 
     userDeviceTokenReducer,  checkEmailReducer, otpForgotPasswordReducer, googleLoginReducer } from "@redux/Reducers/userReducers";
   import { reducerProduct, reducerCoop, reducerCoopProduct, reducerCreateProduct, reducerEditProduct, reducerDelResProduct } from "@redux/Reducers/productReducers";
   import { HereMapReducer, MapBoxRouteReducer } from "@redux/Reducers/locationReducers";
-  import { coopYReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
+  import { coopReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
   import { addressReducer } from "@redux/Reducers/addressReducer";
   import { typeListReducer,typeCreateReducer,typeUpdateReducer,typeDeleteReducer } from "@redux/Reducers/typeReducers";
   import { categoryListReducer,categoryCreateReducer,categoryEditReducer,categoryDeleteReducer} from "@redux/Reducers/categoryReducers";
@@ -40,7 +40,7 @@ import {
     userOnly: userReducer,
     EditProfile: EditProfileReducer,
     Geolocation: HereMapReducer,
-    Coop: coopYReducer,
+    Coop: coopReducer,
     CoopProduct: reducerCoopProduct,
     addresses: addressReducer,
     types: typeListReducer,
@@ -70,6 +70,7 @@ import {
     coopOrders: coopOrderReducer,
     upOrders: coopOrderUpdateReducer,
     coopdashboards: coopdashboardReducer,
+    overalldashboards: overalldashboardReducer,
     post: postReducer,
     sales: salesReducer,
     rank: rankedReducer,
