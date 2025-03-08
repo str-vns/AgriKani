@@ -40,7 +40,7 @@ app.use(cookieParser());
 app.get('/app-redirect', (req, res) => {
   const paymentIntentId = req.query.payment_intent_id || "12345";
   const appDeepLink = `juanCoop://Review?payment_intent_id=${paymentIntentId}`;
-  const fallbackUrl = 'https://yourwebsite.com'; 
+  const fallbackUrl = 'https://yourwebsite.com';
 
   res.send(`
     <html>
@@ -49,24 +49,31 @@ app.get('/app-redirect', (req, res) => {
         <script type="text/javascript">
           function openApp() {
             let now = new Date().getTime();
-            // First, try to open the app via the deep link
+            // Try to open the app via the deep link
             window.location.href = "${appDeepLink}";
             
-            // If the app doesn't open within 2.5s, redirect to fallback URL
+            // Fallback if the app doesn't open within 4 seconds
             setTimeout(function() {
               let elapsed = new Date().getTime() - now;
-              if (elapsed < 2500) {
+              if (elapsed < 4000) {
                 window.location.replace("${fallbackUrl}");
               }
-            }, 2500);
+            }, 4000);
           }
 
-          window.onload = openApp;
+          window.onload = function() {
+            // Adding a manual interaction fallback
+            let fallbackMessage = document.getElementById('fallback');
+            setTimeout(() => {
+              fallbackMessage.style.display = 'block';
+            }, 2000);
+          }
         </script>
       </head>
       <body>
         <p>Redirecting to app...</p>
-        <p>If nothing happens, <a href="${appDeepLink}">click here</a>.</p>
+        <button onclick="openApp()">Open App</button>
+        <p id="fallback" style="display:none;">If nothing happens, <a href="${appDeepLink}">click here</a>.</p>
       </body>
     </html>
   `);
