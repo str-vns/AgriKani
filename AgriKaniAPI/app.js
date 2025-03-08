@@ -45,16 +45,17 @@ const getPaymentStatus = async (paymentIntentId) => {
       },
     });
 
-    return data.data.attributes.payments[0].status || "failed"; 
+    return data?.data?.attributes?.payments[0]?.attributes?.status || "failed"; 
   } catch (error) {
     console.error('Error retrieving payment intent:', error);
-    return "failed"; 
+    return "failed"; // Return "failed" in case of an error
   }
 };
 
 app.get('/app-redirect', async (req, res) => {
-  const paymentIntentId = req.query.payment_intent_id || "12345";
+  const paymentIntentId = req.query.payment_intent_id || "pi_HpHWKXpBRjchxLeqb3dnqfNT";
   const paymentStatus = await getPaymentStatus(paymentIntentId);
+  console.log('Payment status:', paymentStatus);
   const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
   const fallbackUrl = 'https://yourwebsite.com';
 
