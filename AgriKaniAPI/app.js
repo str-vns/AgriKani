@@ -30,10 +30,38 @@ const delivery = require("./routes/delivery")
 const cancelled = require("./routes/cancelled");
 const pwd = require("./routes/Discount/pwd");
 const senior = require("./routes/Discount/senior");
+const axios = require("axios");
+
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+app.get('/app-redirect', (req, res) => {
+  const data = req.query.data; 
+  const appDeepLink = `juanCoop://`;
+  const fallbackUrl = 'https://yourwebsite.com'; 
+
+  res.send(`
+    <html>
+      <head>
+        <title>Redirecting...</title>
+        <script type="text/javascript">
+          setTimeout(function() {
+            window.location.replace("${appDeepLink}");
+          }, 100);
+          setTimeout(function() {
+            window.location.replace("${fallbackUrl}");
+          }, 3000);
+        </script>
+      </head>
+      <body>
+        <p>Redirecting to app...</p>
+        <p>If nothing happens, <a href="${appDeepLink}">click here</a>.</p>
+      </body>
+    </html>
+  `);
+});
 
 app.use(
   "/api/v2",
