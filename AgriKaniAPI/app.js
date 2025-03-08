@@ -31,8 +31,7 @@ const cancelled = require("./routes/cancelled");
 const pwd = require("./routes/Discount/pwd");
 const senior = require("./routes/Discount/senior");
 const axios = require("axios");
-const Paymongo = require('paymongo');
-const paymongoInstance = new Paymongo(process.env.PAYMONGO_SECRET_KEY);
+
 
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
@@ -41,10 +40,16 @@ app.use(cookieParser());
 
 const getPaymentStatus = async (paymentIntentId) => {
   try {
-    const paymentIntent = await paymongoInstance.paymentIntents.retrieve(paymentIntentId);
-    if (paymentIntent.data) {
-      return paymentIntent.data.attributes.status; 
+    const response = await axios.get(`https://api.paymongo.com/v1/payment_intents/${paymentIntentId}`, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString('base64')}`, 
+      },
+    });
+
+    if (response.data && response.data.data) {
+      return response.data.data.attributes.status; 
     }
+    return null;
   } catch (error) {
     console.error('Error retrieving payment intent:', error);
     return null;
