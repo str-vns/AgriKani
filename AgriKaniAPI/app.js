@@ -38,8 +38,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get('/app-redirect', (req, res) => {
-  const data = req.query.data; 
-  const appDeepLink = `juanCoop://`;
+  const paymentIntentId = req.query.payment_intent_id || "12345";
+  const appDeepLink = `juanCoop://Review?payment_intent_id=${paymentIntentId}`;
   const fallbackUrl = 'https://yourwebsite.com'; 
 
   res.send(`
@@ -47,12 +47,24 @@ app.get('/app-redirect', (req, res) => {
       <head>
         <title>Redirecting...</title>
         <script type="text/javascript">
-          setTimeout(function() {
-            window.location.replace("${appDeepLink}");
-          }, 100);
-          setTimeout(function() {
-            window.location.replace("${fallbackUrl}");
-          }, 3000);
+          function openApp() {
+            // Try opening the app via iframe
+            let now = new Date().getTime();
+            let iframe = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = "${appDeepLink}";
+            document.body.appendChild(iframe);
+            
+            // If app doesn't open within 2.5s, redirect to fallback URL
+            setTimeout(function() {
+              let elapsed = new Date().getTime() - now;
+              if (elapsed < 2500) {
+                window.location.replace("${fallbackUrl}");
+              }
+            }, 2500);
+          }
+
+          window.onload = openApp;
         </script>
       </head>
       <body>
