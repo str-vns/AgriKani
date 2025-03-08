@@ -39,7 +39,7 @@ app.use(cookieParser());
 
 app.get('/app-redirect', (req, res) => {
   const paymentIntentId = req.query.payment_intent_id || "12345";
-  const appDeepLink = `juanCoop://Review?payment_intent_id=${paymentIntentId}`;
+  const appDeepLink = `juanCoop://Review?payment_intent_id=${paymentIntentId}`;  // Ensure the case is correct
   const fallbackUrl = 'https://yourwebsite.com';
 
   res.send(`
