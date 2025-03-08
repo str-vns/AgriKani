@@ -49,14 +49,19 @@ app.get('/app-redirect', (req, res) => {
         <script type="text/javascript">
           function openApp() {
             let now = new Date().getTime();
+            console.log("Attempting to open the app with deep link:", "${appDeepLink}");
+
             // Try to open the app via the deep link
             window.location.href = "${appDeepLink}";
-            
+
             // Fallback if the app doesn't open within 4 seconds
             setTimeout(function() {
               let elapsed = new Date().getTime() - now;
               if (elapsed < 4000) {
+                console.log("The app did not open, redirecting to fallback URL.");
                 window.location.replace("${fallbackUrl}");
+              } else {
+                console.log("App opened successfully.");
               }
             }, 4000);
           }
@@ -66,6 +71,7 @@ app.get('/app-redirect', (req, res) => {
             let fallbackMessage = document.getElementById('fallback');
             setTimeout(() => {
               fallbackMessage.style.display = 'block';
+              console.log("Displaying fallback message: If nothing happens, click here.");
             }, 2000);
           }
         </script>
