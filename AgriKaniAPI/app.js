@@ -39,13 +39,40 @@ app.use(cookieParser());
 
 app.get('/app-redirect', (req, res) => {
   const paymentIntentId = req.query.payment_intent_id || "12345";
-  const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}`;  // Ensure the case is correct
+  const paymentStatus = req.query.status || "success";  // You can pass "success" or "fail" based on payment outcome
+  const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
   const fallbackUrl = 'https://yourwebsite.com';
 
   res.send(`
     <html>
       <head>
         <title>Redirecting...</title>
+        <style>
+          body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: white;
+            font-family: Arial, sans-serif;
+          }
+          .content {
+            text-align: center;
+          }
+          button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+          }
+          #fallback {
+            margin-top: 20px;
+          }
+        </style>
         <script type="text/javascript">
           function openApp() {
             let now = new Date().getTime();
@@ -67,7 +94,7 @@ app.get('/app-redirect', (req, res) => {
           }
 
           window.onload = function() {
-            // Adding a manual interaction fallback
+            openApp();  // Automatically trigger deep link when page loads
             let fallbackMessage = document.getElementById('fallback');
             setTimeout(() => {
               fallbackMessage.style.display = 'block';
@@ -77,13 +104,17 @@ app.get('/app-redirect', (req, res) => {
         </script>
       </head>
       <body>
-        <p>Redirecting to app...</p>
-        <button onclick="openApp()">Open App</button>
-        <p id="fallback" style="display:none;">If nothing happens, <a href="${appDeepLink}">click here</a>.</p>
+        <div class="content">
+          <p>Redirecting to app...</p>
+          <button onclick="openApp()">Open App</button>
+          <p id="fallback" style="display:none;">If nothing happens, <a href="${appDeepLink}">click here</a>.</p>
+        </div>
       </body>
     </html>
   `);
 });
+
+
 
 app.use(
   "/api/v2",
