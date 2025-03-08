@@ -39,31 +39,22 @@ app.use(cookieParser());
 
 const getPaymentStatus = async (paymentIntentId) => {
   try {
-    const { data } = await axios.get(`https://api.paymongo.com/v1/payments/${paymentIntentId}`, {
+    const { data } = await axios.get(`https://api.paymongo.com/v1/payment_intents/${paymentIntentId}`, {
       headers: {
         Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString('base64')}`, 
       },
     });
 
-    console.log('Payment response:', data.data.attributes.status);
-
-    // Check if the payment status exists and return it
-    if (data.data.attributes.status) {
-      return data.data.attributes.status; 
-    }
-    return null;
+    return data.data.attributes.payments[0].status || "failed"; 
   } catch (error) {
-    console.error('Error retrieving payment:', error);
-    return null;
+    console.error('Error retrieving payment intent:', error);
+    return "failed"; 
   }
 };
 
-app.get('/app-redirect', (req, res) => {
-  console.log(req)
-  console.log(res)
-  console.log(req.query)
+app.get('/app-redirect', async (req, res) => {
   const paymentIntentId = req.query.payment_intent_id || "12345";
-  const paymentStatus = getPaymentStatus(paymentIntentId) || "success"; 
+  const paymentStatus = await getPaymentStatus(paymentIntentId);
   const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
   const fallbackUrl = 'https://yourwebsite.com';
 
@@ -137,6 +128,7 @@ app.get('/app-redirect', (req, res) => {
     </html>
   `);
 });
+
 
 
 app.use(
