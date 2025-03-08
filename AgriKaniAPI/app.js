@@ -37,10 +37,30 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
+const getPaymentStatus = async (paymentIntentId) => {
+  try {
+    const { data } = await axios.get(`https://api.paymongo.com/v1/payments/${paymentIntentId}`, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString('base64')}`, 
+      },
+    });
+
+    console.log('Payment response:', data.data.attributes.status);
+
+    // Check if the payment status exists and return it
+    if (data.data.attributes.status) {
+      return data.data.attributes.status; 
+    }
+    return null;
+  } catch (error) {
+    console.error('Error retrieving payment:', error);
+    return null;
+  }
+};
 
 app.get('/app-redirect', (req, res) => {
   const paymentIntentId = req.query.payment_intent_id || "12345";
-  const paymentStatus = req.query.status || "success"; 
+  const paymentStatus = getPaymentStatus(paymentIntentId) || "success"; 
   const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
   const fallbackUrl = 'https://yourwebsite.com';
 
