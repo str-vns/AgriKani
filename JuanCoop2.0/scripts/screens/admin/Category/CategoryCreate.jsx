@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   imageButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#8f8e8b",
     padding: 12,
     alignItems: "center",
     borderRadius: 8,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
-    backgroundColor: "#28a745",
+    backgroundColor: "#FEC120",
     padding: 14,
     alignItems: "center",
     borderRadius: 8,
