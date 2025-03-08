@@ -14,12 +14,16 @@ export default StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    alignItems: "left",
+    padding: 20,
     backgroundColor: "#ffffff",
-    elevation: 4,
-    width: width,  // Adjust width based on screen size
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  backButton: {
+    marginRight: 10,
   },
   menuButton: {
     padding: 8,

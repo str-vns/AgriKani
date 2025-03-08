@@ -45,7 +45,6 @@ const Cooplist = () => {
     }, [dispatch, token])
   );
 
-
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -62,12 +61,12 @@ const Cooplist = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          <Ionicons name="menu-outline" size={34} color="black" />
+          <Ionicons name="arrow-back" size={28} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Coop List</Text>
+        <Text style={styles.headerTitle}>Cooperative List</Text>
       </View>
 
       <View style={styles.tabContainer}>
