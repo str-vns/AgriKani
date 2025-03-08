@@ -23,7 +23,10 @@ import {
   HISTORY_DELIVERY_COOP_FAIL,
   COOP_DASHBOARD_REQUEST, 
   COOP_DASHBOARD_SUCCESS, 
-  COOP_DASHBOARD_FAIL
+  COOP_DASHBOARD_FAIL,
+  OVERALL_DASHBOARD_REQUEST, 
+  OVERALL_DASHBOARD_SUCCESS, 
+  OVERALL_DASHBOARD_FAIL
 } from '../Constants/orderConstants';
 import baseURL from '@assets/commons/baseurl';
 
@@ -258,6 +261,27 @@ export const fetchCoopDashboardData = (userId, token) => async (dispatch) => {
     dispatch({
       type: COOP_DASHBOARD_FAIL,
       payload: error.response?error.response.data.message : error.message,
+    });
+  }
+};
+
+export const fetchOverallDashboardData = (token) => async (dispatch) => {
+  try {
+    dispatch({ type: OVERALL_DASHBOARD_REQUEST });
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.get(`${baseURL}overalldashboard`, config);
+
+    dispatch({ type: OVERALL_DASHBOARD_SUCCESS, payload: data.details });
+  } catch (error) {
+    dispatch({
+      type: OVERALL_DASHBOARD_FAIL,
+      payload: error.response ? error.response.data.message : error.message,
     });
   }
 };

@@ -17,6 +17,10 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
+      originalname: {
+        type: String,
+        required: true,
+      },
     },
   ],
   author: {
@@ -24,60 +28,46 @@ const postSchema = new mongoose.Schema({
     ref: "user",
     required: true,
   },
-  comment: [
+  numOfComments: {
+    type: Number,
+    default: 0,
+  },
+  comments: [
     {
       user: {
         type: mongoose.Schema.ObjectId,
         ref: "user",
         required: true,
       },
-      firstName: {
-        type: String,
-        required: true,
-      },
-      lastName: {
-        type: String,
-        required: true,
-      },
-      avatar: {
-        public_id: {
-          type: String,
-        },
-        url: {
-          type: String,
-        },
-        originalname: {
-          type: String,
-          required: true,
-        },
-      },
-      rating: {
-        type: Number,
-        required: true,
-      },
       comment: {
         type: String,
-        required: true,
+        required: [true, "Comment cannot be empty!"],
       },
-
-      image: [
-        {
-          public_id: {
-            type: String,
-            required: true,
-          },
-          url: {
-            type: String,
-            required: true,
-          },
-          originalname: {
-            type: String,
-            required: true,
-          },
-        },
-      ],
+      sentimentScore: {
+        type: Number,
+        default: 0,
+      },
+      sentimentLabel: {
+        type: String,
+        enum: ["positive", "negative", "neutral"],
+        default: "neutral",
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
   ],
+  totalSentimentScore: {
+    type: Number,
+    default: 0,
+  },
+  overallSentimentLabel: {
+    type: String,
+    // enum: ["positive", "negative", "neutral"],
+    default: "neutral",
+  },
+
   deletedAt: {
     type: Date,
     default: null,
@@ -96,13 +86,14 @@ const postSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'approved'],
-    default: 'pending',
+    enum: ["pending", "approved"],
+    default: "pending",
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
+
 
 module.exports = mongoose.model(RESOURCE.POST, postSchema);

@@ -33,7 +33,7 @@ exports.UpdatePost = [
     const post = await postProcess.UpdatePostInfo(req, req.params.id);
     return SuccessHandler(
       res,
-      `Post Name ${post?._id} has been Update Successfully`,
+      `Post with ID ${post?._id} has been updated successfully.`,
       post
     );
   }),
@@ -90,14 +90,19 @@ exports.UserPost = asyncHandler(async (req, res) => {
 });
 
 exports.LikePost = asyncHandler(async (req, res) => {
-  const post = await postProcess.likePost(req, req.params.id);
+  try {
+    const post = await postProcess.likePost(req, req.params.id);
 
-  return SuccessHandler(
-    res,
-    `Post ${post._id} has been liked Successfully`,
-    post
-  );
+    return SuccessHandler(
+      res,
+      `Post ${post._id} has been updated successfully`,
+      post
+    );
+  } catch (error) {
+    return ErrorHandler(res, 500, error.message);
+  }
 });
+
 
 // Approve Post
 exports.UpdateStatusPost = asyncHandler(async (req, res) => {
@@ -116,4 +121,43 @@ exports.GetApprovedPosts = asyncHandler(async (req, res, next) => {
   return approvedPosts?.length === 0
     ? next(new ErrorHandler("No Approved Posts Found"))
     : SuccessHandler(res, `Approved Posts fetched successfully`, approvedPosts);
+});
+
+// Add a comment to a post
+exports.AddComment = asyncHandler(async (req, res) => {
+  const post = await postProcess.AddCommentToPost(req, req.params.postId);
+  return SuccessHandler(res, "Comment added successfully", post);
+});
+
+// Get all comments for a post
+exports.GetComments = asyncHandler(async (req, res) => {
+  console.log("Fetching comments for post:", req.params.postId);
+
+  const allPosts = await postProcess.GetAllPostInfo();
+  const post = allPosts.find((p) => p._id.toString() === req.params.postId);
+
+  if (!post) {
+    return ErrorHandler(res, `Post not found with ID: ${req.params.postId}`, 404);
+  }
+
+  const comments = post.comments.map(({ sentimentScore, sentimentLabel, ...comment }) => comment);
+
+  return SuccessHandler(res, "Comments fetched successfully", {
+    comments,
+    totalSentimentScore: post.totalSentimentScore,
+    overallSentimentLabel: post.overallSentimentLabel,
+  });
+});
+
+exports.DeletePostImage = asyncHandler(async (req, res) => {
+  const product = await postProcess.deletePostImage(
+    req.params.postId,
+    req.params.imageId
+  );
+
+  return SuccessHandler(
+    res,
+    `Product Image has been deleted Successfully`,
+    post
+  );
 });

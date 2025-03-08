@@ -6,8 +6,8 @@ const Product = require("../models/product");
 const Farm = require("../models/farm");
 const Driver = require("../models/driver");
 const User = require("../models/user")
+const Post = require("../models/post");
 const ErrorHandler = require("../utils/errorHandler");
-const user = require("../models/user");
 const { analyzeMixedLanguage } = require("../utils/mixLanguage");
 
 exports.CreateProductReview = async (req) => {
@@ -248,3 +248,75 @@ exports.CreateCourierReview = async (req) => {
 
     return driver
 }
+
+exports.CreatePostComment = async (req) => {
+  console.log(req.body.user);
+  const userId = req.body.user;
+  const postId = req.body.post;
+
+  // Validate userId
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new Error(`Invalid User ID: ${userId}`);
+  }
+
+  // Validate postId
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    throw new Error(`Invalid Post ID: ${postId}`);
+  }
+
+  // Ensure post exists
+  const post = await Post.findById(postId)
+  if (!post) {
+    throw new Error(`Post not found with ID: ${postId}`);
+  }
+
+  // Ensure user exists
+  const users = await User.findById(userId);
+  if (!users) {
+    throw new Error(`User not found with ID: ${userId}`);
+  }
+
+  // Validate comment
+  if (!req.body.comment || typeof req.body.comment !== "string") {
+    throw new Error("Comment text is required and must be a string.");
+  }
+
+  var result = analyzeMixedLanguage(req.body.comment);
+  console.log(result);
+
+   post.comments.push({
+    comment: req.body.comment,
+    user: users._id,
+    sentimentScore: result.sentimentScore,
+    sentimentLabel: result.sentimentLabel,
+  });
+
+  // Update the number of comments
+  post.numOfComments = post.comments.length;
+
+  // Sentiment analysis calculation
+  const totalSentimentScore = post.comments.reduce((sum, comment) => sum + comment.sentimentScore, 0);
+  const overallScore = totalSentimentScore / post.comments.length;
+  post.totalSentimentScore = overallScore;
+
+  if (overallScore >= 15) {
+    post.overallSentimentLabel = "Mostly positive";
+    console.log("Mostly positive");
+  } else if (overallScore > 0) {
+    post.overallSentimentLabel = "positive";
+    console.log("positive");
+  } else if (overallScore <= -15) {
+    post.overallSentimentLabel = "Mostly negative";
+    console.log("Mostly negative");
+  } else if (overallScore < 0) {
+    post.overallSentimentLabel = "negative";
+    console.log("negative");
+  } else {
+    post.overallSentimentLabel = "neutral";
+    console.log("neutral");
+  }
+
+  await post.save({ validateBeforeSave: false });
+
+  return post;
+};

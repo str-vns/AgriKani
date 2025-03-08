@@ -22,7 +22,12 @@ import {
     HISTORY_DELIVERY_COOP_FAIL,
     COOP_DASHBOARD_REQUEST, 
     COOP_DASHBOARD_SUCCESS, 
-    COOP_DASHBOARD_FAIL
+    COOP_DASHBOARD_FAIL,
+
+    OVERALL_DASHBOARD_REQUEST, 
+    OVERALL_DASHBOARD_SUCCESS, 
+    OVERALL_DASHBOARD_FAIL
+
   } from '../Constants/orderConstants';
   
   const initialState = {
@@ -146,3 +151,16 @@ import {
         return state;
     }
   };  
+
+  export const overalldashboardReducer = (state = initialState, action) => {
+    switch (action.type) {
+      case OVERALL_DASHBOARD_REQUEST:
+        return { ...state, overalldashboardloading: true };
+      case OVERALL_DASHBOARD_SUCCESS:
+        return { ...state, overalldashboardloading: false, overalldashboards: action.payload };
+      case OVERALL_DASHBOARD_FAIL:
+        return { ...state, overalldashboardloading: false, overalldashboarderror: action.payload };
+      default:
+        return state;
+    }
+  };

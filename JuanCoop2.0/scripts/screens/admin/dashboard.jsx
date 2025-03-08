@@ -1,206 +1,156 @@
-import React, { useCallback, useState, useContext, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { getDailySales, getWeeklySales, getMonthlySales } from '../../redux/Actions/salesActions';
-import { View, Text, StyleSheet, RefreshControl, ActivityIndicator, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import AuthGlobal from "@redux/Store/AuthGlobal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BarChart, PieChart } from 'react-native-chart-kit';
+import { useNavigation } from '@react-navigation/native';
+import styles from '../Farmer/css/styles';
 import { Profileuser } from "@redux/Actions/userActions";
-import { useSocket } from "../../../SocketIo";
+import AuthGlobal from "@redux/Store/AuthGlobal";
+import { singleInventory } from '@redux/Actions/inventoryActions';
+import { fetchOverallDashboardData } from '@redux/Actions/orderActions';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from 'react-redux';
+
 const Dashboard = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
   const context = useContext(AuthGlobal);
-  const socket = useSocket();
   const userId = context?.stateUser?.userProfile?._id;
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const { dailySales, weeklySales, monthlySales } = useSelector((state) => state.sales);
-  const [refreshing, setRefreshing] = useState(false);
 
-   useEffect(() => {
-    if (!socket) {
-      console.warn("Socket is not initialized.");
-      return;
-    }
-  
+  const { overalldashboards: dashboard, overalldashboardloading: loading, overalldashboarderror: error } = useSelector(
+    (state) => state.overalldashboards || {}
+  );
 
-      if (userId) {
-        socket.emit("addUser", userId);
-      } else {
-        console.warn("User ID is missing.");
-      }
-    
-        socket.on("getUsers", (users) => {
-          const onlineUsers = users.filter(
-            (user) => user.online && user.userId !== null
-          );
-    
-          setOnlineUsers(onlineUsers);
-        });
-    
-        return () => {
-          socket.off("getUsers");
-        };
-      }, [socket, userId]);
+  const screenWidth = Dimensions.get('window').width;
+  const [token, setToken] = useState(null);
+  const [errors, setErrors] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const InventoryInfo = useSelector((state) => state.sinvent?.Invsuccess?.details);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      setLoading(true);
       try {
         const res = await AsyncStorage.getItem("jwt");
         if (res) {
           setToken(res);
-
-          dispatch(Profileuser(userId, res));
+          if (userId) {
+            dispatch(Profileuser(userId, res));
+            dispatch(singleInventory(userId, res));
+            dispatch(fetchOverallDashboardData(res));
+          } else {
+            setErrors('User ID is missing.');
+          }
         } else {
-          setErrors("No JWT token found.");
+          setErrors('No JWT token found.');
         }
       } catch (error) {
-        console.error("Error retrieving JWT:", error);
-        setErrors("Failed to retrieve JWT token.");
-      } finally {
-        setLoading(false);
+        console.error('Error retrieving JWT:', error);
+        setErrors('Failed to retrieve JWT token.');
       }
     };
 
     fetchUserData();
   }, [userId, dispatch]);
 
-  useFocusEffect(
-    useCallback(() => {
-      dispatch(getDailySales());
-      dispatch(getWeeklySales());
-      dispatch(getMonthlySales());
-      return () => {
-        console.log("Cleaning up on screen unfocus...");
-      };
-    }, [dispatch])
-  );
+  useEffect(() => {
+    let interval;
+    if (InventoryInfo?.length > 0) {
+      interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % InventoryInfo?.length);
+      }, 4000);
 
-  // Refresh sales data
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await dispatch(getDailySales());
-      await dispatch(getWeeklySales());
-      await dispatch(getMonthlySales());
-    } catch (err) {
-      console.error("Error refreshing sales:", err);
-    } finally {
-      setRefreshing(false);
+      return () => clearInterval(interval);
     }
-  }, [dispatch]);
+    return () => {};
+  }, [InventoryInfo?.length]);
 
-  const renderSales = (sales) => {
-    console.log("Rendering sales data:", JSON.stringify(sales.data, null, 2));  // Check the entire sales data
-    
-    if (sales.loading) {
-      return <ActivityIndicator size="small" color="blue" />;
-    }
-  
-    if (sales.error) {
-      return <Text style={{ color: 'red' }}>Error: {sales.error}</Text>;
-    }
-  
-    // Ensure sales.data.details exists and is not null
-    if (sales.data && sales.data.details && Array.isArray(sales.data.details) && sales.data.details.length > 0) {
-      const totalSales = sales.data.details.reduce((acc, sale) => {
-        return acc + (sale.totalRevenue || 0);
-      }, 0);
-  
-      return <Text>Total Sales: {totalSales > 0 ? totalSales : 'N/A'}</Text>;
-    }
-  
-    return <Text>No sales data available</Text>;
+  const salesTrends = dashboard?.salesTrends || { daily: 0, weekly: 0, monthly: 0 };
+  const rankedProducts = dashboard?.rankedProducts || [];
+
+  const salesTrendsData = {
+    labels: ["Daily", "Weekly", "Monthly"],
+    datasets: [
+      {
+        data: [salesTrends.daily || 0, salesTrends.weekly || 0, salesTrends.monthly || 0],
+      },
+    ],
   };
-  
-  
+
+  const topProductsData = rankedProducts.map((p) => ({
+    name: p.productName || "Unknown",
+    population: p.totalQuantitySold || 0,
+    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
+    legendFontColor: "#7F7F7F",
+    legendFontSize: 12,
+  }));
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
-      <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
-          <Ionicons name="menu-outline" size={34} color="black" />
+        <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={34} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Sales Dashboard</Text>
+        <Text style={styles.headerTitle}>Dashboard</Text>
       </View>
-
-      {/* Sales Content */}
-      <View style={styles.salesContainer}>
-        <View style={styles.salesCard}>
-          <Text style={styles.cardTitle}>Daily Sales</Text>
-          {renderSales(dailySales)}
+      
+      <View style={styles.statsContainer}>
+        <View style={styles.statCard}>
+          <Text style={styles.statTitle}>Daily Sales</Text>
+          <Text style={styles.statValue}>₱{salesTrends.daily}</Text>
         </View>
-
-        <View style={styles.salesCard}>
-          <Text style={styles.cardTitle}>Weekly Sales</Text>
-          {renderSales(weeklySales)}
+        <View style={styles.statCard}>
+          <Text style={styles.statTitle}>Weekly Sales</Text>
+          <Text style={styles.statValue}>₱{salesTrends.weekly}</Text>
         </View>
-
-        <View style={styles.salesCard}>
-          <Text style={styles.cardTitle}>Monthly Sales</Text>
-          {renderSales(monthlySales)}
+        <View style={styles.statCard}>
+          <Text style={styles.statTitle}>Monthly Sales</Text>
+          <Text style={styles.statValue}>₱{salesTrends.monthly}</Text>
         </View>
       </View>
 
-      <TouchableOpacity 
-        style={styles.navigateButton} 
-        onPress={() => navigation.navigate('barGraph')}
-      >
-        <Text style={styles.buttonText}>View Bar Graph</Text>
-      </TouchableOpacity>
-      {/* Refresh Control */}
-      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-    </View>
+      <View style={styles.totalOrdersCard}>
+        <Text style={styles.totalOrdersTitle}>Total Orders</Text>
+        <Text style={styles.totalOrdersValue}>{dashboard?.totalOrders ?? 0}</Text>
+      </View>
+
+      <View style={styles.chartsContainer}>
+        <View style={styles.chartCard}>
+          <Text style={styles.chartTitle}>Sales Trends</Text>
+          <BarChart
+            data={salesTrendsData}
+            width={screenWidth - 40}
+            height={220}
+            chartConfig={{
+              backgroundColor: "#fff",
+              backgroundGradientFrom: "#f5f5f5",
+              backgroundGradientTo: "#e5e5e5",
+              decimalPlaces: 0,
+              color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            }}
+            style={styles.chart}
+          />
+        </View>
+
+        <View style={styles.chartCard}>
+          <Text style={styles.chartTitle}>Top Selling Products</Text>
+          <PieChart
+            data={topProductsData}
+            width={screenWidth - 40}
+            height={220}
+            chartConfig={{
+              backgroundColor: "#fff",
+              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            }}
+            accessor={"population"}
+            backgroundColor={"transparent"}
+            paddingLeft={"15"}
+            absolute
+          />
+        </View>
+      </View>
+    </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f9f9f9",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: "#ffffff",
-    elevation: 4,
-  },
-  menuButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center", // Ensure the text is centered
-    width: "100%",  // Make the title take full width so it can be centered
-  },
-  salesContainer: {
-    paddingHorizontal: 16,
-    marginTop: 20,
-  },
-  salesCard: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 8,
-    marginVertical: 8,
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  navigateButton: {
-    backgroundColor: "#f7b900",
-    padding: 16,
-    margin: 16,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-});
 
 export default Dashboard;

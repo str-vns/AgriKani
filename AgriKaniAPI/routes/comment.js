@@ -23,7 +23,15 @@ const commentRoutes = [
     roles: [],
     handler: commentController.CreateCourierReview,
   },
+  {
+    method: METHOD.POST,
+    path: PATH.POST_ADD_COMMENT,
+    roles: [],
+    handler: commentController.CreatePostComment,
+  },
 ];
+
+
 
 commentRoutes.forEach((route) => {
   const { method, path, roles = [], handler } = route;
