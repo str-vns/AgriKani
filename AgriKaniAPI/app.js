@@ -40,7 +40,6 @@ app.use(cookieParser());
 app.get("/payment-redirect", (req, res) => {
   const paymentIntentId = req.query.payment_intent_id;
   const appDeepLink = `juanCoop://payment-success?payment_intent_id=${paymentIntentId}`;
-  const fallbackUrl = `https://your-website.com/payment-success?payment_intent_id=${paymentIntentId}`;
 
   res.send(`
     <html>
@@ -49,11 +48,7 @@ app.get("/payment-redirect", (req, res) => {
         <script type="text/javascript">
           setTimeout(function() {
             window.location.replace("${appDeepLink}");
-          }, 100); // Less aggressive than location.href
-
-          setTimeout(function() {
-            window.location.replace("${fallbackUrl}");
-          }, 3000); // If app is not installed, fallback after 3s
+          }, 100);
         </script>
       </head>
       <body>
