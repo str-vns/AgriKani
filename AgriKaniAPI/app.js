@@ -59,6 +59,9 @@ const getPaymentStatus = async (paymentIntentId) => {
 };
 
 app.get('/app-redirect', (req, res) => {
+  console.log(req)
+  console.log(res)
+  console.log(req.query)
   const paymentIntentId = req.query.payment_intent_id || "12345";
   const paymentStatus = getPaymentStatus(paymentIntentId) || "success"; 
   const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
