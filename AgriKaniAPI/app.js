@@ -39,18 +39,12 @@ app.use(cookieParser());
 
 app.get("/payment-redirect", (req, res) => {
   const paymentIntentId = req.query.payment_intent_id;
-  const appDeepLink = `juanCoop://payment-success?payment_intent_id=${paymentIntentId}`;
-  const fallbackUrl = `https://your-website.com/payment-success?payment_intent_id=${paymentIntentId}`;
-
+  const appDeepLink = `juanCoop://payment-success`;
+  // const fallbackUrl = `https://your-website.com/payment-success?payment_intent_id=${paymentIntentId}`;
   res.send(`
     <html>
       <head>
         <meta http-equiv="refresh" content="0;url=${appDeepLink}" />
-        <script>
-          setTimeout(() => {
-            window.location.href = "${fallbackUrl}";
-          }, 3000);
-        </script>
       </head>
       <body>
         <p>Redirecting to app... If nothing happens, <a href="${appDeepLink}">click here</a>.</p>
