@@ -30,10 +30,34 @@ const delivery = require("./routes/delivery")
 const cancelled = require("./routes/cancelled");
 const pwd = require("./routes/Discount/pwd");
 const senior = require("./routes/Discount/senior");
+const axios = require("axios");
+
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+app.get("/payment-redirect", (req, res) => {
+  const paymentIntentId = req.query.payment_intent_id;
+  const appDeepLink = `juanCoop://payment-success?payment_intent_id=${paymentIntentId}`;
+  const fallbackUrl = `https://your-website.com/payment-success?payment_intent_id=${paymentIntentId}`;
+
+  res.send(`
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="0;url=${appDeepLink}" />
+        <script>
+          setTimeout(() => {
+            window.location.href = "${fallbackUrl}";
+          }, 3000);
+        </script>
+      </head>
+      <body>
+        <p>Redirecting to app... If nothing happens, <a href="${appDeepLink}">click here</a>.</p>
+      </body>
+    </html>
+  `);
+});
 
 app.use(
   "/api/v2",
