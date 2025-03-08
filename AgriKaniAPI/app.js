@@ -31,16 +31,30 @@ const cancelled = require("./routes/cancelled");
 const pwd = require("./routes/Discount/pwd");
 const senior = require("./routes/Discount/senior");
 const axios = require("axios");
+const Paymongo = require('paymongo');
+const paymongoInstance = new Paymongo(process.env.PAYMONGO_SECRET_KEY);
 
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.get('/app-redirect', (req, res) => {
-  console.log(req);
-  const paymentIntentId = req.query.payment_intent_id || "12345";
-  const paymentStatus = req.query.status || "success";  // You can pass "success" or "fail" based on payment outcome
+const getPaymentStatus = async (paymentIntentId) => {
+  try {
+    const paymentIntent = await paymongoInstance.paymentIntents.retrieve(paymentIntentId);
+    if (paymentIntent.data) {
+      return paymentIntent.data.attributes.status; 
+    }
+  } catch (error) {
+    console.error('Error retrieving payment intent:', error);
+    return null;
+  }
+};
+
+app.get('/app-redirect', async (req, res) => {
+  const paymentIntentId = req.query.payment_intent_id || "12345"; 
+  const paymentStatus = await getPaymentStatus(paymentIntentId) || 'failed'; 
+  
   const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
   const fallbackUrl = 'https://yourwebsite.com';
 
