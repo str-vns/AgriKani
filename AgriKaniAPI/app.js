@@ -38,7 +38,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get('/app-redirect', (req, res) => {
-  console.log(req.query);
+  console.log(req);
   const paymentIntentId = req.query.payment_intent_id || "12345";
   const paymentStatus = req.query.status || "success";  // You can pass "success" or "fail" based on payment outcome
   const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
