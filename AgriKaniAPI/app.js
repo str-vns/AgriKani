@@ -37,9 +37,10 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/payment-redirect", (req, res) => {
-  const paymentIntentId = req.query.payment_intent_id;
-  const appDeepLink = `juanCoop://payment-success?payment_intent_id=${paymentIntentId}`;
+app.get('/app-redirect', (req, res) => {
+  const data = req.query.data; 
+  const appDeepLink = `juanCoop://return?data=${data}`; 
+  const fallbackUrl = 'https://yourwebsite.com'; 
 
   res.send(`
     <html>
@@ -49,6 +50,9 @@ app.get("/payment-redirect", (req, res) => {
           setTimeout(function() {
             window.location.replace("${appDeepLink}");
           }, 100);
+          setTimeout(function() {
+            window.location.replace("${fallbackUrl}");
+          }, 3000);
         </script>
       </head>
       <body>
