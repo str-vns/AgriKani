@@ -39,7 +39,7 @@ app.use(cookieParser());
 
 app.get('/app-redirect', (req, res) => {
   const data = req.query.data; 
-  const appDeepLink = `juanCoop://return?data=${data}`; 
+  const appDeepLink = `juanCoop://`;
   const fallbackUrl = 'https://yourwebsite.com'; 
 
   res.send(`
