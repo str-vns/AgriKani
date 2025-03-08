@@ -48,14 +48,11 @@ app.get('/app-redirect', (req, res) => {
         <title>Redirecting...</title>
         <script type="text/javascript">
           function openApp() {
-            // Try opening the app via iframe
             let now = new Date().getTime();
-            let iframe = document.createElement("iframe");
-            iframe.style.display = "none";
-            iframe.src = "${appDeepLink}";
-            document.body.appendChild(iframe);
+            // First, try to open the app via the deep link
+            window.location.href = "${appDeepLink}";
             
-            // If app doesn't open within 2.5s, redirect to fallback URL
+            // If the app doesn't open within 2.5s, redirect to fallback URL
             setTimeout(function() {
               let elapsed = new Date().getTime() - now;
               if (elapsed < 2500) {
