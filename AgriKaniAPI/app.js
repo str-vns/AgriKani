@@ -32,41 +32,18 @@ const pwd = require("./routes/Discount/pwd");
 const senior = require("./routes/Discount/senior");
 const axios = require("axios");
 
-
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-const getPaymentStatus = async (paymentId) => {
-  try {
-    const { data } = await axios.get(`https://api.paymongo.com/v1/payments/${paymentId}`, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString('base64')}`, 
-      },
-    });
 
-    console.log('Payment response:', data.data.attributes.status);
-
-    // Check if the payment status exists and return it
-    if (data.data.attributes.status) {
-      return data.data.attributes.status; 
-    }
-    return null;
-  } catch (error) {
-    console.error('Error retrieving payment:', error);
-    return null;
-  }
-};
-
-app.get('/app-redirect', async (req, res) => {
-  const paymentId = req.query.payment_intent_id || "pay_GgG1r41yypEt343J3QJqgK12"; 
-  // const paymentStatus = await getPaymentStatus(paymentId) || 'failed'; 
-
-  const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentId}`;
+app.get('/app-redirect', (req, res) => {
+  const paymentIntentId = req.query.payment_intent_id || "12345";
+  const paymentStatus = req.query.status || "success"; 
+  const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
   const fallbackUrl = 'https://yourwebsite.com';
 
-  console.log(appDeepLink)
   res.send(`
     <html>
       <head>
@@ -137,7 +114,6 @@ app.get('/app-redirect', async (req, res) => {
     </html>
   `);
 });
-
 
 
 app.use(
