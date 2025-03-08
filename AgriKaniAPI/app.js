@@ -63,7 +63,7 @@ app.get('/app-redirect', async (req, res) => {
   const paymentId = req.query.payment_intent_id || "12345"; 
   const paymentStatus = await getPaymentStatus(paymentId) || 'failed'; 
 
-  const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentIntentId}&status=${paymentStatus}`;
+  const appDeepLink = `myjuanapp://Review?payment_intent_id=${paymentId}&status=${paymentStatus}`;
   const fallbackUrl = 'https://yourwebsite.com';
 
   res.send(`
