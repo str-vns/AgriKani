@@ -31,14 +31,14 @@ export const categoryListReducer = (state = { loading: false, categories: [], er
 };
 
 // Reducer for creating a category
-export const categoryCreateReducer = (state = { loading: false, success: false, category: {}, error: null }, action) => {
+export const categoryCreateReducer = (state = {}, action) => {
   switch (action.type) {
     case CATEGORY_CREATE_REQUEST:
-      return { ...state, loading: true, success: false, category: {}, error: null };
+      return { loading: true };
     case CATEGORY_CREATE_SUCCESS:
-      return { ...state, loading: false, success: true, category: action.payload, error: null };
+      return { loading: false, success: true, category: action.payload };
     case CATEGORY_CREATE_FAIL:
-      return { ...state, loading: false, success: false, category: {}, error: action.payload || 'Something went wrong!' };
+      return { loading: false, error: action.payload };
     default:
       return state;
   }

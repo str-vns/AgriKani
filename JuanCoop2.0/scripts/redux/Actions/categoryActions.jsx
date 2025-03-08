@@ -36,88 +36,93 @@ export const categoryList = () => async (dispatch) => {
   }
 };
 
-export const categoryCreate = (categoryData) => async (dispatch) => {
+export const categoryCreate = (categoryData, image, token) => async (dispatch) => {
   try {
-    const response = await fetch('YOUR_API_ENDPOINT', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(categoryData),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create category');
-    }
-
-    const data = await response.json();
-    dispatch({
-      type: 'CATEGORY_CREATE_SUCCESS',
-      payload: data,
-    });
-  } catch (error) {
-    console.error("Error creating category:", error);
-    dispatch({
-      type: 'CATEGORY_CREATE_FAIL',
-      error: error.message,
-    });
-  }
-};
-
-
-export const categoryEdit = (id, categoryData) => async (dispatch) => {
-  try {
-    dispatch({ type: CATEGORY_EDIT_REQUEST });
-
-    const { categoryName, image } = categoryData;
-    if (!categoryName) {
-      throw new Error("Category name is required.");
-    }
+    dispatch({ type: CATEGORY_CREATE_REQUEST });
 
     const formData = new FormData();
-    formData.append("categoryName", categoryName);
+    formData.append("categoryName", categoryData.categoryName);
 
-    // Handle image if available
-    if (image) {
-      const imageUri = image.uri || image;  // Handle both object or string formats for image
-      const imageType = mime.getType(imageUri);
-      const imageName = imageUri.split("/").pop();
+    if (image?.uri) {
+     
+      const newImageUri = "file:///" + image.uri.split("file:/").join("");
 
-      const imageData = {
-        uri: imageUri,
-        type: imageType,
-        name: imageName,
-      };
-
-      formData.append("image", imageData);
-      console.log("Image Data being appended:", imageData);  // Debug log
+      formData.append("image", {
+        uri: newImageUri,
+        type: mime.getType(newImageUri), // Get MIME type dynamically
+        name: newImageUri.split("/").pop(), // Extract the file name
+      });
+    } else {
+      console.error("Invalid image file:", image);
+      throw new Error("Invalid image file.");
     }
 
     const config = {
       headers: {
+        Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
       },
     };
 
-    const { data } = await axios.put(
-      `${baseURL}category/edit/${id}`,
-      formData,
-      config
-    );
+    console.log("🚀 Sending category create request with image...");
+    const { data } = await axios.post(`${baseURL}category`, formData, config);
+    console.log("✅ Category created successfully:", data);
 
-    dispatch({
-      type: CATEGORY_EDIT_SUCCESS,
-      payload: data.details,  // Assuming `data.details` contains the updated category details
-    });
-    console.log("Category updated successfully:", data.details);  // Debug log
+    dispatch({ type: CATEGORY_CREATE_SUCCESS, payload: data });
 
   } catch (error) {
     const errorMessage = error.response?.data?.message || error.message;
+    console.error("❌ Error creating category:", errorMessage);
+
+    dispatch({
+      type: CATEGORY_CREATE_FAIL,
+      payload: errorMessage,
+    });
+  }
+};
+
+export const categoryEdit = (id, categoryData, image, token) => async (dispatch) => {
+  try {
+    dispatch({ type: CATEGORY_EDIT_REQUEST });
+
+    const formData = new FormData();
+    formData.append("categoryName", categoryData.categoryName);
+
+    if (image?.uri) {
+      // Ensure the image URI is correctly formatted for FormData
+      const newImageUri = "file:///" + image.uri.split("file:/").join("");
+
+      formData.append("image", {
+        uri: newImageUri,
+        type: mime.getType(newImageUri), // Get MIME type dynamically
+        name: newImageUri.split("/").pop(), // Extract file name
+      });
+    }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    console.log("🚀 Sending category edit request with image...");
+    const { data } = await axios.put(`${baseURL}category/${id}`, formData, config);
+    console.log("✅ Category updated successfully:", data);
+
+    dispatch({
+      type: CATEGORY_EDIT_SUCCESS,
+      payload: data,
+    });
+
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message;
+    console.error("❌ Error updating category:", errorMessage);
+
     dispatch({
       type: CATEGORY_EDIT_FAIL,
       payload: errorMessage,
     });
-    console.error("Category Edit Error:", errorMessage);  // Detailed error log
   }
 };
 

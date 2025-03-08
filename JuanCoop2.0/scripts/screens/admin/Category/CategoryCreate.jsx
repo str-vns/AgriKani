@@ -1,266 +1,155 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, Modal, ScrollView } from "react-native";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import * as ImagePicker from "expo-image-picker";
-import { useDispatch,useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { categoryCreate } from "@redux/Actions/categoryActions";
-const CategoryCreate = () => {
-  const [categoryName, setCategoryName] = useState(""); 
-  const [image, setImage] = useState(null); 
-  const [mainImage, setMainImage] = useState(""); 
-  const [modalVisible, setModalVisible] = useState(false); 
-  const [errors, setErrors] = useState(""); 
-  const dispatch = useDispatch(); 
-  const category = useSelector(state => state.category);
-  useEffect(() => {
-    (async () => {
-      const cameraRollStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (cameraRollStatus.status !== "granted") {
-        alert("Permission to access camera roll is required!");
-      }
-    })();
-  }, []);
+import { View, Text, TextInput, Button, Image, TouchableOpacity, StyleSheet } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import mime from "mime";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
-  const addImage = async () => {
+const CategoryCreate = ({ token }) => {
+  const [categoryName, setCategoryName] = useState("");
+  const [image, setImage] = useState(null);
+  const dispatch = useDispatch();
+  const categoryState = useSelector((state) => state.createCategories);
+  const navigation = useNavigation();
+
+  // Function to pick an image
+  const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1],
+      aspect: [4, 3],
       quality: 1,
     });
 
     if (!result.canceled) {
-      const selectedImageUri = result.assets[0].uri;
-      setImage(selectedImageUri);
-      setMainImage(selectedImageUri); // Correctly update the main image to display it
-      setModalVisible(false); 
+      const newImageUri = "file:///" + result.assets[0].uri.split("file:/").join("");
+      setImage({
+        uri: newImageUri,
+        type: mime.getType(newImageUri),
+        name: newImageUri.split("/").pop(),
+      });
     }
   };
 
-  const takePicture = async () => {
-    let result = await ImagePicker.launchCameraAsync({
-      aspect: [4, 3],
-      quality: 0.1,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const imageUri = result.assets[0].uri;
-      setImage(imageUri);
-      setMainImage(imageUri); // Correctly update the main image to display it
-    }
-  };
-
-  const saveCategory = () => {
-    if (!categoryName || !image) {
-      setErrors("Please provide both category name and an image.");
+  
+  const handleSubmit = async () => {
+    if (!image || !categoryName) {
+      alert("Please select an image and enter a category name.");
       return;
     }
-  
-    const categoryData = {
-      categoryName,
-      image,
-    };
-  
-    // Dispatch the categoryCreate action
-    dispatch(categoryCreate(categoryData));
-  
-    setCategoryName("");
-    setImage(null);
-    setMainImage("");
-    setErrors(""); // Clear errors after saving
+    
+    if (categoryState.success) {
+      alert("Category created successfully!");
+      navigation.navigate("CategoryList");  // Ensure 'CategoryList' is the correct screen name
+    }
+
+    dispatch(categoryCreate({ categoryName }, image, token));
   };
-  
+
   return (
-    <ScrollView contentContainerStyle={styles.contentContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Create New Category</Text>
-
-        {/* Modal for image selection */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalText}>Choose an option to get an image:</Text>
-              <View style={styles.buttonRow}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setModalVisible(false);
-                    takePicture();
-                  }}
-                >
-                  <Ionicons name="camera-outline" style={{ fontSize: 30 }} />
-                  <Text>Take Picture</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setModalVisible(false);
-                    addImage();
-                  }}
-                >
-                  <Ionicons name="image-outline" style={{ fontSize: 30 }} />
-                  <Text>Add Image</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setModalVisible(false)}
-                  style={{ marginTop: 5.5 }}
-                >
-                  <Text>CANCEL</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Category Image Upload */}
-        <TouchableOpacity
-          style={styles.uploadButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <View style={styles.uploadContent}>
-            {mainImage ? (
-              <Image
-                style={styles.image}
-                source={{ uri: mainImage }} // Display selected image
-              />
-            ) : (
-              <FontAwesome
-                name="photo"
-                size={34}
-                color="black"
-                style={styles.uploadIcon}
-              />
-            )}
-            <Text style={styles.uploadText}>Upload Category Image</Text>
-          </View>
+    <View style={styles.container}>
+      {/* Header with Back Navigation */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={28} color="black" />
         </TouchableOpacity>
-
-        {/* Category Name Input */}
-        <TextInput
-          placeholder="Category Name"
-          style={styles.input}
-          onChangeText={setCategoryName}
-          value={categoryName}
-        />
-
-        {/* Error Message */}
-        {errors && <Text style={styles.errorText}>{errors}</Text>}
-
-        {/* Save Button */}
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={saveCategory}
-        >
-          <Text style={styles.buttonText}>Save Category</Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Create Category</Text>
       </View>
-    </ScrollView>
+
+      {categoryState.error && <Text style={styles.error}>{categoryState.error}</Text>}
+      
+      <Text style={styles.label}>Category Name:</Text>
+      <TextInput
+        value={categoryName}
+        onChangeText={setCategoryName}
+        style={styles.input}
+        placeholder="Enter category name"
+      />
+
+      <Text style={styles.label}>Category Image:</Text>
+      <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+        <Text style={styles.imageButtonText}>Choose Image</Text>
+      </TouchableOpacity>
+
+      {image && <Image source={{ uri: image.uri }} style={styles.preview} />}
+
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Create Category</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
-const styles = {
-  contentContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f9f9f9',
-  },
+// **Styles**
+const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    maxWidth: 400,
-    backgroundColor: '#fff',
+    flex: 1,
+    backgroundColor: "#fff",
     padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 5 },
-    shadowRadius: 10,
-    elevation: 5,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
   },
   input: {
-    height: 50,
-    borderColor: '#ddd',
     borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
     borderRadius: 8,
-    paddingLeft: 15,
-    marginBottom: 20,
+    marginBottom: 15,
+  },
+  imageButton: {
+    backgroundColor: "#007BFF",
+    padding: 12,
+    alignItems: "center",
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  imageButtonText: {
+    color: "#fff",
     fontSize: 16,
-    color: '#333',
   },
-  uploadButton: {
-    backgroundColor: '#f0f0f0',
-    height: 150,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
+  preview: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#28a745",
+    padding: 14,
+    alignItems: "center",
     borderRadius: 8,
-    borderColor: '#ddd',
-    borderWidth: 1,
-  },
-  uploadContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  uploadIcon: {
-    fontSize: 40,
-    color: '#666',
-  },
-  uploadText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 10,
-  },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   buttonText: {
+    color: "#fff",
     fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-  errorText: {
-    color: 'red',
-    fontSize: 14,
-    marginBottom: 15,
-    textAlign: 'center',
+  success: {
+    color: "green",
+    textAlign: "center",
+    marginBottom: 10,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  error: {
+    color: "red",
+    textAlign: "center",
+    marginBottom: 10,
   },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: 300,
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 15,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-};
+});
 
 export default CategoryCreate;

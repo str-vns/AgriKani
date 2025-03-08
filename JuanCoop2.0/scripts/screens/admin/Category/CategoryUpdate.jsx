@@ -12,14 +12,21 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useDispatch, useSelector } from "react-redux";
 import { categoryEdit } from "@redux/Actions/categoryActions";
+import mime from "mime"; // Import mime for correct file type handling
+import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+
+
 
 const EditCategory = ({ route, navigation }) => {
   const { category } = route.params; // Passed from CategoryList
   const dispatch = useDispatch();
+  
+  const { loading, success, error } = useSelector((state) => state.updateCategories);
 
   const [categoryName, setCategoryName] = useState(category.categoryName || "");
   const [categoryImage, setCategoryImage] = useState(category.image ? category.image.url : null);
-  const { loading, success, error } = useSelector((state) => state.updateCategories);
+  const [loadingState, setLoading] = useState(false); // Fix: Declare setLoading state
 
   // Request permission and select image
   const pickImage = async () => {
@@ -48,42 +55,27 @@ const EditCategory = ({ route, navigation }) => {
       return;
     }
   
-    const formData = new FormData();
-    formData.append("categoryName", categoryName);
+    const categoryData = { categoryName };
   
-    // If image is selected and different from the current one
+    let imageData = null;
     if (categoryImage && categoryImage !== category.image?.url) {
-      const filename = categoryImage.split("/").pop();
-      const type = `image/${filename.split(".").pop()}`;
-  
-      
-      const imageData = {
-        uri: categoryImage,
-        name: filename,
-        type: type,
+      const newImageUri = "file:///" + categoryImage.split("file:/").join(""); // Fix file path
+      imageData = {
+        uri: newImageUri,
+        type: mime.getType(newImageUri),
+        name: newImageUri.split("/").pop(),
       };
-  
-     
-      formData.append("image", {
-        uri: categoryImage,
-        name: filename,
-        type: type,
-      });
-  
-      // Log the appended image data
-      console.log("Image Data being appended as File:", imageData);
     }
   
-    // Log the complete FormData to verify the contents
-    console.log("Form Data being sent:", formData);
+    console.log("🚀 Updating category:", categoryData, imageData);
   
     setLoading(true);
     try {
-      await dispatch(categoryEdit(category._id, formData)); // Dispatch category edit action
+      await dispatch(categoryEdit(category._id, categoryData, imageData, "your_token_here"));
       Alert.alert("Success", "Category updated successfully!");
       navigation.goBack();
     } catch (error) {
-      console.error("Error updating category:", error);
+      console.error("❌ Error updating category:", error);
       Alert.alert("Error", "Failed to update category.");
     } finally {
       setLoading(false);
@@ -91,14 +83,14 @@ const EditCategory = ({ route, navigation }) => {
   };
   
 
-  // Log any state changes, such as errors or success
-  console.log("Loading:", loading);
-  console.log("Success:", success);
-  console.log("Error:", error);
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Edit Category</Text>
+       <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={28} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Edit Category</Text>
+      </View>
       <Text style={styles.label}>Category Image</Text>
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
         {categoryImage ? (
@@ -117,9 +109,9 @@ const EditCategory = ({ route, navigation }) => {
       <TouchableOpacity
         style={styles.saveButton}
         onPress={handleUpdateCategory}
-        disabled={loading}
+        disabled={loadingState}
       >
-        {loading ? (
+        {loadingState ? (
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={styles.saveButtonText}>Save</Text>
@@ -132,15 +124,29 @@ const EditCategory = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
-    padding: 16,
+    backgroundColor: "#fff",
+    padding: 20,
   },
-  title: {
-    fontSize: 24,
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
   },
+  backButton: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+
   label: {
     fontSize: 16,
     fontWeight: "600",
@@ -159,13 +165,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 8,
-    height: 150,
+    height: 200,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
     backgroundColor: "#f5f5f5",
     width: 200,
-    height: 200,
     alignSelf: "center",
   },
   image: {
