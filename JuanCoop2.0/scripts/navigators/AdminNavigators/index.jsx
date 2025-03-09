@@ -29,6 +29,9 @@ import CategoryUpdate from "@screens/admin/Category/CategoryUpdate";
 import TypeList from "@screens/admin/Types/TypeList";
 import TypeCreate from "@screens/admin/Types/TypeCreate";
 import TypeUpdate from "@screens/admin/Types/TypeUpdate";
+import WithdrawsSuccess from "@screens/admin/Withdraws/WithdrawsSuccess";
+import WithdrawsSingle from "@screens/admin/Withdraws/WithdrawsSingle";
+import WithdrawsList from "@screens/admin/Withdraws/WithdrawsList";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -123,6 +126,18 @@ const Index = () => {
          <Stack.Screen
           name="TypeUpdate"
           component={TypeUpdate}
+        />
+            <Stack.Screen
+          name="WithdrawsList"
+          component={WithdrawsList}
+        />
+        <Stack.Screen
+          name="WithdrawsSuccess"
+          component={WithdrawsSuccess}
+        />
+        <Stack.Screen
+          name="WithdrawsSingle"
+          component={WithdrawsSingle}
         />
       </Stack.Navigator>
     </Box>

@@ -13,7 +13,8 @@ import CoopProductNavigators from "@navigators/CoopProductNavigators";
 import MessagesNavigators from "@navigators/MessagesNavigators";
 import BlogNavigators from "@navigators/BlogNavigators"
 import RiderNavigators from "@navigators/RiderNavigators"
-
+import WithdrawList from "@screens/Farmer/Withdraw/WithdrawList";
+import WithdrawsList from "@screens/admin/Withdraws/WithdrawsList";
 import Main from "../../../Main";
 import Sidebar from "@src/screens/Filter/UserSidebar";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -222,7 +223,23 @@ const context = useContext(AuthGlobal);
             component={CoopNavigators}
         />
         
-           
+        <Drawer.Screen
+        name="WithdrawList"
+        component={WithdrawList}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+
+      <Drawer.Screen
+        name="WithdrawsList"
+        component={WithdrawsList}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
         
 
       </Drawer.Navigator>

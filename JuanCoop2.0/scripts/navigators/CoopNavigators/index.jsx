@@ -22,10 +22,15 @@ import AssignLocation from "@src/screens/Rider/RiderAssignLoc";
 import MaxCapacity from "@src/screens/Rider/RiderCapacity";
 import Riderlist from "@src/screens/Rider/Riderlist";
 import History from "@src/screens/Rider/History";
-import Reason from "@screens/Cancelled/ReasonCancelled"
+import Reason from "@screens/Cancelled/ReasonCancelled";
 import WithdrawList from "@screens/Farmer/Withdraw/WithdrawList";
 import Register from "@src/screens/Rider/Register";
 import Otp from "@src/screens/Rider/Otp";
+import PaymentMethod from "@screens/Farmer/Withdraw/PaymentWithdraw";
+import PaymayaWithdraw from "@screens/Farmer/Withdraw/PaymayaWithdrawForm";
+import GcashWithdraw from "@screens/Farmer/Withdraw/GcashWithdrawForm";
+import CreateWithdraw from "@screens/Farmer/Withdraw/CreateWithdraw";
+
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -142,18 +147,19 @@ const Index = () => {
         }}
       />
 
-<Stack.Screen
+      <Stack.Screen
         name="Riderlist"
         component={Riderlist}
         options={{ headerShown: false }}
       />
-       <Stack.Screen
-              name="Register"
-              component={Register}
-              options={{ headerShown: false }}
-          />
       <Stack.Screen
-        name= "RiderDetails"
+        name="Register"
+        component={Register}
+        options={{ headerShown: false }}
+      />
+
+      <Stack.Screen
+        name="RiderDetails"
         component={RiderDetails}
         options={{ headerShown: false }}
       />
@@ -174,12 +180,12 @@ const Index = () => {
         options={{ headerShown: false }}
       />
 
-   <Stack.Screen
+      <Stack.Screen
         name="Assign"
         component={Assign}
         options={{ headerShown: false }}
       />
-      
+
       <Stack.Screen
         name="InfoCancelled"
         component={InfoCancelled}
@@ -198,11 +204,11 @@ const Index = () => {
         }}
       />
 
-        <Stack.Screen
-              name="OtpRider"
-              component={Otp}
-              options={{ headerShown: false }}
-            />
+      <Stack.Screen
+        name="OtpRider"
+        component={Otp}
+        options={{ headerShown: false }}
+      />
 
       <Stack.Screen
         name="WithdrawList"
@@ -213,6 +219,41 @@ const Index = () => {
         }}
       />
 
+      <Stack.Screen
+        name="PaymentMethod"
+        component={PaymentMethod}
+        options={{
+          headerShown: true,
+          tabBarShowLabel: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="PaymayaWithdraw"
+        component={PaymayaWithdraw}
+        options={{
+          headerShown: true,
+          tabBarShowLabel: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="GcashWithdraw"
+        component={GcashWithdraw}
+        options={{
+          headerShown: true,
+          tabBarShowLabel: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="CreateWithdraw"
+        component={CreateWithdraw}
+        options={{
+          headerShown: true,
+          tabBarShowLabel: false,
+        }}
+      />
       
     </Stack.Navigator>
   );
