@@ -18,7 +18,7 @@ const paymongoInstance = new Paymongo(process.env.PAYMONGO_SECRET_KEY);
 const axios = require("axios");
 
 // Create a new order
-exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice,shippingPrice, user,  }) => {
+exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice,shippingPrice, user, payStatus  }) => {
   if (!orderItems || orderItems.length === 0) {
     throw new ErrorHandler("No order items provided", 400);
   }
