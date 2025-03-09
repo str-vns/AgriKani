@@ -11,6 +11,7 @@ const ClientCancelled = (props) => {
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const orderItemId = props?.route?.params?.order?._id;
+  console.log("orderItemId", orderItemId)
   const orderItems = props?.route?.params?.order;
   const { loading, response, error } = useSelector((state) => state.cancelled);
   const [token, setToken] = useState(null);
@@ -28,13 +29,12 @@ const ClientCancelled = (props) => {
   
   },[])
 
-  
    useFocusEffect(
      useCallback(() => {
         if(token) {
           dispatch(SingleCancelled(orderItemId, token))
         }
-     }, [])
+     }, [orderItemId, token])
    )
   
 

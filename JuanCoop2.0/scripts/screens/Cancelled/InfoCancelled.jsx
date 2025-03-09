@@ -35,7 +35,7 @@ useEffect(() => {
       if(token) {
         dispatch(SingleCancelled(deliveryId, token))
       }
-   }, [])
+   }, [deliveryId, token])
  )
 
   return (
