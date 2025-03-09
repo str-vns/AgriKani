@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   View,
@@ -14,11 +14,16 @@ import {
   approvePost,
   deletePost,
 } from '@src/redux/Actions/postActions';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from "@expo/vector-icons";
 
 const PostList = () => {
   const dispatch = useDispatch();
   const postState = useSelector((state) => state.post);
   const { loading, posts } = postState;
+  const navigation = useNavigation(); // Get navigation object
+  
+  const [selectedTab, setSelectedTab] = useState("Pending");
 
   useEffect(() => {
     dispatch(getPost());
@@ -29,6 +34,10 @@ const PostList = () => {
     alert('Post Approved Successfully!');
     dispatch(getPost());
   };
+  useEffect(() => {
+    navigation.setOptions({ headerShown: false }); // Hide the header
+    dispatch(getPost());
+  }, [dispatch, navigation]);
 
   const handleDecline = async (postId) => {
     try {
@@ -41,75 +50,96 @@ const PostList = () => {
         dispatch(getPost());
     }
   };
+  const filteredPosts = posts?.filter(post => 
+    selectedTab === "Pending" ? post.status !== "approved" : post.status === "approved"
+  );
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-    >
-      {loading && (
-        <ActivityIndicator
-          size="large"
-          color="#4CAF50"
-          style={styles.loadingIndicator}
-        />
-      )}
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <View style={styles.header}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back" size={28} color="black" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle}>Post List</Text>
+    </View>
 
-      {posts && posts.length > 0 ? (
-        posts.map((post) => (
-          <View key={post._id} style={styles.postCard}>
-            <View style={styles.imageAndContent}>
-              <Image
-                source={
-                  post.image && post.image.length > 0
-                    ? { uri: post.image[0].url }
-                    : require('@assets/img/buyer.png')
-                }
-                style={styles.postImage}
-              />
-              <View style={styles.postDetails}>
-                <Text style={styles.postContent}>
-                  {post.content || 'No content available'}
-                </Text>
-                <Text style={styles.postDate}>
-                  Posted on: {new Date(post.createdAt).toLocaleDateString()}
-                </Text>
-              </View>
+    {/* ✅ Tab Buttons for Switching Views */}
+    <View style={styles.tabContainer}>
+      <TouchableOpacity
+        style={[styles.tabButton, selectedTab === "Pending" && styles.activeTab]}
+        onPress={() => setSelectedTab("Pending")}
+      >
+        <Text style={[styles.tabText, selectedTab === "Pending" && styles.activeTabText]}>
+          Not Approved
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.tabButton, selectedTab === "Approved" && styles.activeTab]}
+        onPress={() => setSelectedTab("Approved")}
+      >
+        <Text style={[styles.tabText, selectedTab === "Approved" && styles.activeTabText]}>
+          Approved
+        </Text>
+      </TouchableOpacity>
+    </View>
+
+    {/* ✅ Display Filtered Posts */}
+    {loading && (
+      <ActivityIndicator size="large" color="#4CAF50" style={styles.loadingIndicator} />
+    )}
+
+    {filteredPosts && filteredPosts.length > 0 ? (
+      filteredPosts.map((post) => (
+        <View key={post._id} style={styles.postCard}>
+          <View style={styles.imageAndContent}>
+            <Image
+              source={post.image?.length > 0 ? { uri: post.image[0].url } : require('@assets/img/buyer.png')}
+              style={styles.postImage}
+            />
+            <View style={styles.postDetails}>
+              <Text style={styles.postContent}>{post.content || 'No content available'}</Text>
+              <Text style={styles.postDate}>Posted on: {new Date(post.createdAt).toLocaleDateString()}</Text>
             </View>
-
-            {post.status !== 'approved' && (
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                    style={[styles.button, styles.approveButton]}
-                    onPress={() => handleApprove(post._id)}
-                    >
-                    <Text style={styles.buttonText}>Approve</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                    style={[styles.button, styles.declineButton]}
-                    onPress={() => handleDecline(post._id)}
-                    >
-                    <Text style={styles.buttonText}>Decline</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-
           </View>
-        ))
-      ) : (
-        !loading && (
-          <Text style={styles.noPostsText}>No posts available.</Text>
-        )
-      )}
-    </ScrollView>
+
+          {selectedTab === "Pending" && (
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={[styles.button, styles.approveButton]} onPress={() => handleApprove(post._id)}>
+                <Text style={styles.buttonText}>Approve</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={[styles.button, styles.declineButton]} onPress={() => handleDecline(post._id)}>
+                <Text style={styles.buttonText}>Decline</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      ))
+    ) : (
+      !loading && <Text style={styles.noPostsText}>No posts available.</Text>
+    )}
+  </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: "#fff",
+    padding: 20,
+    
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
   },
   contentContainer: {
     paddingHorizontal: 20,
@@ -183,6 +213,27 @@ const styles = StyleSheet.create({
     color: '#555',
     textAlign: 'center',
     marginTop: 30,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  tabButton: {
+    padding: 10,
+    marginHorizontal: 10,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  activeTab: {
+    borderBottomColor: '#FFA500',
+  },
+  tabText: {
+    fontSize: 16,
+    color: '#888',
+  },
+  activeTabText: {
+    color: '#FFA500', 
   },
 });
 
