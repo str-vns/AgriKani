@@ -25,6 +25,8 @@ import {
   import { driverApiReducer, driverListReducer, onlyApprovedDriverReducer, driverProfileReducer } from "@redux/Reducers/driverReducer";
   import { deliveryListReducer, deliveryApiReducer, deliveryCompleteReducer, deliveryHistoryReducer } from "@redux/Reducers/deliveryReducers";
   import { cancelledReducerApi, cancelledReducer } from "@redux/Reducers/cancelledReducer";
+  import { walletReducer } from "@redux/Reducers/walletReducer";
+  import { transactionReducer, transactionAPIReducer } from "@redux/Reducers/transactionReducer";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
@@ -102,6 +104,9 @@ import {
     cancelledApi: cancelledReducerApi,
     onlinePay: onlinePaymentReducer,
     getPayment: getPaymentReducer,
+    getWallet: walletReducer,
+    transaction: transactionReducer,
+    transactionAPI: transactionAPIReducer,
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));
