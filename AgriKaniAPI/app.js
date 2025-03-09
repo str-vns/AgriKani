@@ -30,6 +30,8 @@ const delivery = require("./routes/delivery")
 const cancelled = require("./routes/cancelled");
 const pwd = require("./routes/Discount/pwd");
 const senior = require("./routes/Discount/senior");
+const wallet = require("./routes/wallets");
+const transaction = require("./routes/transaction")
 const axios = require("axios");
 
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
@@ -156,7 +158,9 @@ app.use(
   delivery,
   cancelled,
   pwd,
-  senior
+  senior,
+  wallet,
+  transaction
 );
 
 module.exports = app;

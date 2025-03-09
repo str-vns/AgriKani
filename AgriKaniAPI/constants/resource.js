@@ -30,4 +30,6 @@ module.exports = {
     SENIOR: "senior",
     PWD: "pwd",
     WALLET: "wallet",
+    REFUND: "refund",
+    TRANSACTION: "transaction",
 }

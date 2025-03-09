@@ -213,4 +213,16 @@ module.exports = {
 
   ONLINE_PAYMENT: "/pay",
   ONLINE_PAYMENT_ID: "/pay/:id",
+
+  WALLET: "/wallet",
+  WALLET_ID: "/wallet/:id",
+  TRANSACTION: "/transaction",
+  TRANSACTION_ID: "/transaction/:id",
+  TRANSACTION_PENDING: "/transaction/pending",
+  TRANSACTION_SUCCESS: "/transaction/success",
+  TRANSACTION_USER_ID: "/transaction/user/:id",
+  REFUND: "/refund",
+  REFUND_ID: "/refund/:id",
+  
 };
+
