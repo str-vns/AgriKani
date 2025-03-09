@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const Order = require("../models/order");
+const Wallet = require("../models/wallets");
 const Notification = require("../models/notification");
 const Member = require("../models/members");
 const User = require("../models/user");
@@ -284,6 +285,7 @@ exports.updateOrderStatusCoop = async (id, req) => {
     throw new ErrorHandler("Invalid status", 400);
   }
 
+  
   const order = await Order.findById(id)
   .populate({ path: "orderItems.inventoryProduct", select: "metricUnit unitName price" })
   .populate({ path: "orderItems.product", select: "coop productName image.url" })
@@ -305,12 +307,40 @@ exports.updateOrderStatusCoop = async (id, req) => {
       const product = await Product.findById(matchedItem.product._id);
       const farm = await Farm.findById(product.coop);
     
+   
       matchedItem.orderStatus = req.body.orderStatus;
     
       if (req.body.orderStatus === 'Processing') {
-        inventory.quantity -= matchedItem.quantity;
+        // inventory.quantity -= matchedItem.quantity;
+        const isMember = await Member.exists({ userId: order.user._id, coopId: farm._id });
 
-    const totalPrice = order.orderItems.reduce((acc, item) => acc + item.quantity * item.inventoryProduct.price, 0);
+        const filteredItems = order.orderItems.filter(item => 
+          item.coopUser.toString() === farm._id.toString()
+        );
+
+        const totalItem = filteredItems.reduce((acc, item) => 
+          item.orderStatus !== "Cancelled" ? acc + item.price * item.quantity : acc, 0
+        );
+  
+        const uniqueCoops = new Set(filteredItems.map(item => item.coopUser.toString()));
+        const shippingFee = uniqueCoops.size * 75;
+  
+        const taxRate = isMember ? 0 : 0.12;
+        const tax = totalItem * taxRate;
+
+    // const totalPrice = order.orderItems.reduce((acc, item) => acc + item.quantity * item.inventoryProduct.price, 0);
+
+    const totalPrice = totalItem + shippingFee + tax
+
+    if( order.paymentMethod === "paymaya" || order.paymentMethod === "gcash" ){
+      await Wallet.findOneAndUpdate(
+        { user: farm.user },
+        { 
+          $inc: { balance: totalPrice } 
+        }
+      );
+    }
+
     const receiptFolder = path.join(__dirname, "../receipts");
     if (!fs.existsSync(receiptFolder)) {
       fs.mkdirSync(receiptFolder);
@@ -318,7 +348,6 @@ exports.updateOrderStatusCoop = async (id, req) => {
     const receiptPath = path.join(receiptFolder, `${order._id}.pdf`);
     await generateReceiptPDF(order, receiptPath);
    
-    // Send receipt via email
     const email = order.user.email;
     const mailOptions = {
       to: email,
@@ -357,10 +386,12 @@ exports.updateOrderStatusCoop = async (id, req) => {
    
       }
   
+      console.log(farm.user)
       if (req.body.orderStatus === 'Delivered') {
         matchedItem.deliveredAt = Date.now();
       }
-  
+      
+      
     }
   }
 
