@@ -14,24 +14,6 @@ const walletSchema = new mongoose.Schema({
         type: Number,
         default: 0, 
       },
-      transactions: [
-        {
-          type: {
-            type: String,
-            enum: ["EARN", "WITHDRAW", "REFUND"],
-            required: true,
-          },
-          amount: {
-            type: Number,
-            required: true,
-          },
-          date: {
-            type: Date,
-            default: Date.now,
-          },
-          referenceId: String, 
-        },
-      ],
       createdAt: {
         type: Date,
         default: Date.now,
