@@ -60,6 +60,16 @@ const deliverySchema = new mongoose.Schema({
         enum: ["pending", "delivering", "cancelled", "re-deliver", "failed", "delivered"],
         default: "pending"
      },
+     payStatus: {
+        type: String,
+        enum: ["Paid", "Unpaid"],
+        default: "Unpaid",
+     },
+     paymentMethod: {
+        type: String,
+        required: true,
+        enum: ["COD", "gcash", "paymaya"],
+    },
      assignedTo: {
         type: mongoose.Schema.ObjectId,
         ref: RESOURCE.DRIVER,

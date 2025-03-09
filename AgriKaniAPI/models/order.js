@@ -62,7 +62,13 @@ const orderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ["COD", "Credit Card", "PayPal"],
+    enum: ["COD", "gcash", "paymaya"],
+  },
+  payStatus: {
+    type: String,
+    required: true,
+    enum: ["Paid", "Unpaid"],
+    default: "Unpaid",
   },
   totalPrice: {
     type: Number,

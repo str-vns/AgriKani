@@ -6,7 +6,7 @@ const { STATUSCODE } = require("../constants/index");
 
 // Create a new order
 exports.createOrder = asyncHandler(async (req, res, next) => {
-  const { orderItems, shippingAddress, paymentMethod, totalPrice, shippingPrice, user } = req.body;
+  const { orderItems, shippingAddress, paymentMethod, totalPrice, shippingPrice, user, payStatus } = req.body;
   console.log("orderItems", orderItems);
   try {
     const createdOrder = await orderProcess.createOrderProcess({
@@ -14,6 +14,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
       orderItems,
       shippingAddress,
       paymentMethod,
+      payStatus,
       shippingPrice,
       totalPrice,
     });
@@ -176,6 +177,26 @@ exports.getOverallDashboardData = asyncHandler(async (req, res, next) => {
     }
 
     return SuccessHandler(res, "Dashboard data fetched successfully", dashboardData);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+exports.onlinePayment = asyncHandler(async (req, res, next) => {
+  try {
+    const paymentUrl = await orderProcess.onlinePaymentProcess(req);
+
+    return SuccessHandler(res, "Payment URL generated successfully", paymentUrl);
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+exports.paymentStatus = asyncHandler(async (req, res, next) => {
+  try {
+    const paymentStatus = await orderProcess.getPaymentIntentProcess(req.params.id);
+
+    return SuccessHandler(res, "Payment status fetched successfully", paymentStatus);
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));
   }

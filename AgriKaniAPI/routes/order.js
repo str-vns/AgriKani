@@ -53,7 +53,19 @@ const orderRoutes = [
     path: PATH.COOP_SHIPPING,
     roles: [],
     handler: orderController.getShippedOrders,
-  }
+  },
+  {
+    method: METHOD.POST,
+    path: PATH.ONLINE_PAYMENT,
+    roles: [],
+    handler: orderController.onlinePayment,
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.ONLINE_PAYMENT_ID,
+    roles: [],
+    handler: orderController.paymentStatus,
+  },
 ]; 
 
 orderRoutes.forEach((route) => {

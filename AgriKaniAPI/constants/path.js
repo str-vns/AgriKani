@@ -210,4 +210,7 @@ module.exports = {
   POST_GET_COMMENT: "/post/:postId",
   // POST_UPDATE_COMMENT: "/post/:postId/comments/update/:commentId",
   // POST_DELETE_COMMENT: "/post/:postId/comments/delete/:commentId",
+
+  ONLINE_PAYMENT: "/pay",
+  ONLINE_PAYMENT_ID: "/pay/:id",
 };

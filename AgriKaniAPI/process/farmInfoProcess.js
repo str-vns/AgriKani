@@ -7,6 +7,7 @@ const Farm = require("../models/farm");
 const User = require("../models/user");
 const Orders = require("../models/order");
 const { sendEmail } = require("../utils/sendMail");
+const Wallet = require("../models/wallets");
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -48,6 +49,13 @@ exports.CreateFarmProcess = async (req) => {
       tinNumber: req.body.tinNumber,
     },
   });
+
+  const wallet = await Wallet.create({
+    user: req.body.user,
+    balance: 0,
+  });
+  
+  if (!wallet) throw new ErrorHandler("Wallet not created");
 
   return farm;
 };

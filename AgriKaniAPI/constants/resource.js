@@ -29,4 +29,5 @@ module.exports = {
     CANCELLED: "cancelled",
     SENIOR: "senior",
     PWD: "pwd",
+    WALLET: "wallet",
 }

@@ -39,7 +39,7 @@ exports.createDeliveryProcess = async (req) => {
         .sort({ createdAt: -1 })
         .lean()
         .exec();
-
+   
         const filteredItems = orders.orderItems.filter(item => 
             item.coopUser.toString() === coopid._id.toString()
         );
@@ -103,6 +103,8 @@ exports.createDeliveryProcess = async (req) => {
             Latitude: filteredOrder.shippingAddress.latitude,
             Longitude: filteredOrder.shippingAddress.longitude,
         },
+           paymentMethod: orderid.paymentMethod,
+        payStatus: orderid.payStatus,
         totalAmount: req.body.totalAmount,
         assignedTo: assignedCourier._id,
     });

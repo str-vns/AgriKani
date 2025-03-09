@@ -99,6 +99,24 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+
+  paymentInfo: {
+    method: {
+      type: String,
+      enum: ["GCash", "PayMaya"],
+      required: false,
+    },
+    accountName: {
+      type: String,
+      required: false, 
+    },
+    accountNumber: {
+      type: String,
+      required: false,
+      unique: true, 
+    },
+  },
+  
   deviceToken: [
     {
       type: String,

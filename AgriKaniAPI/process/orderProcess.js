@@ -13,9 +13,12 @@ const path = require("path");
 const fs = require("fs");
 const { sendEmail } = require("../utils/sendMail");
 const admin = require('firebase-admin');
+const Paymongo = require('paymongo');
+const paymongoInstance = new Paymongo(process.env.PAYMONGO_SECRET_KEY);
+const axios = require("axios");
 
 // Create a new order
-exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice,shippingPrice, user }) => {
+exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice,shippingPrice, user,  }) => {
   if (!orderItems || orderItems.length === 0) {
     throw new ErrorHandler("No order items provided", 400);
   }
@@ -85,6 +88,7 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
     orderItems,
     shippingAddress,
     paymentMethod,
+    payStatus,
     shippingPrice,
     totalPrice,
   });
@@ -207,21 +211,29 @@ order.totalPrice -= deductedAmount;
   }
 
   order.orderItems.forEach((item) => {
-  
+    // Match the order item by inventory product
     if (item.inventoryProduct.toString() === req.body.inventoryProduct) {
       console.log(item, "Matched Order Item");
   
+      // If the order status has changed
       if (item.orderStatus !== req.body.orderStatus) {
         item.orderStatus = req.body.orderStatus;
   
+        // If the new status is 'Delivered', set the deliveredAt timestamp
         if (req.body.orderStatus === 'Delivered') {
           item.deliveredAt = Date.now();
         }
       }
     }
   });
-  
 
+  const allItemsDelivered = order.orderItems.every(item => item.orderStatus === 'Delivered');
+  
+  if (allItemsDelivered) {
+    order.payStatus = 'Paid';
+    order.paymentAt = Date.now(); 
+  }
+  
   await order.save();
 
  return order
@@ -825,3 +837,111 @@ exports.getOverallDashboardData = async () => {
     throw new Error("Error processing dashboard data");
   }
 };
+
+exports.onlinePaymentProcess = async (req, res) => {
+  console.log("Request Body:", req.body);
+
+  try {
+    const { type, amount, email, name, phone, isMobile } = req.body;
+
+    // ✅ Validate payment type
+    if (!type || !["gcash", "paymaya"].includes(type)) {
+      return res.status(400).json({ message: "Invalid payment method" });
+    }
+
+    // ✅ Convert and validate amount
+    const amountNumber = parseFloat(amount);
+    if (isNaN(amountNumber) || amountNumber <= 0) {
+      return res.status(400).json({ message: "Invalid amount" });
+    }
+
+    // ✅ Create payment method
+    const paymentMethodResponse = await paymongoInstance.paymentMethods.create({
+      data: {
+        attributes: {
+          type,
+          billing: {
+            name: name || "Unknown User",
+            email: email || "noemail@example.com",
+            phone: phone || "09123456789",
+          },
+        },
+      },
+    });
+
+    if (!paymentMethodResponse?.data?.id) {
+      console.error("Payment method creation failed:", paymentMethodResponse);
+      return res.status(500).json({ message: "Failed to create payment method" });
+    }
+
+    const paymentMethodId = paymentMethodResponse.data.id;
+
+    // ✅ Create payment intent
+    const paymentIntentResponse = await paymongoInstance.paymentIntents.create({
+      data: {
+        attributes: {
+          amount: amountNumber * 100, // Convert to cents
+          currency: 'PHP',
+          payment_method_allowed: ['gcash', 'paymaya'],
+          capture_type: 'automatic',
+        },
+      },
+    });
+
+    if (!paymentIntentResponse?.data?.id) {
+      console.error("Payment intent creation failed:", paymentIntentResponse);
+      return res.status(500).json({ message: "Failed to create payment intent" });
+    }
+
+    const paymentIntentId = paymentIntentResponse.data.id;
+
+    
+    // ✅ Attach Payment Method to Payment Intent
+    const attachResponse = await paymongoInstance.paymentIntents.attach(paymentIntentId, {
+      data: {
+        attributes: {
+          payment_method: paymentMethodId,
+          return_url: "https://agrikani.onrender.com/app-redirect",
+        },
+      },
+    });
+
+    console.log("Attach Response:", attachResponse);
+    if (!attachResponse?.data) {
+      console.error("Failed to attach payment method:", attachResponse);
+      return res.status(500).json({ message: "Failed to attach payment method" });
+    }
+
+    return(attachResponse.data);
+
+  } catch (error) {
+    console.error("Paymongo error:", error);
+
+    // ✅ Improved error handling
+    if (error.response?.data) {
+      throw new ErrorHandler(error.response.data, error.response.status);
+    } else if (error.type === "AuthenticationError") {
+      throw new ErrorHandler("Authentication failed", 401);
+    } else if (error.type === "InvalidRequestError") {
+      throw new ErrorHandler(error.errors, 400);
+    } else {
+      throw new ErrorHandler("An unexpected error occurred", 500);
+    }
+  }
+};
+
+ 
+exports.getPaymentIntentProcess = async (id) => {
+    try {
+      const { data } = await axios.get(`https://api.paymongo.com/v1/payment_intents/${id}`, {
+        headers: {
+          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString('base64')}`, 
+        },
+      });
+      console.log("Payment Intent Data:", data);
+      return data?.data?.attributes?.payments[0]?.attributes?.status || "failed"; 
+    } catch (error) {
+      console.error('Error retrieving payment intent:', error);
+      return "failed"; 
+    }
+  };
