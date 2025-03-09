@@ -55,6 +55,7 @@ const UserSidebar = () => {
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
     { label: "Notifications", icon: "notifications-outline", key: "notifications" },
     { label: "Rider", icon: "car-outline", key: "rider" },
+    { label: "Wallet", icon: "wallet-outline", key: "wallet" },
     { label: "Members", icon: "people-outline", key: "members" },
     { label: "Reviews", icon: "star-outline", key: "reviews" },
     { label: "News", icon: "newspaper-outline", key: "news" },
@@ -72,7 +73,8 @@ const UserSidebar = () => {
     { label: "Community", icon: "people-outline", key: "community" },
     { label: "Categories", icon: "list-outline", key: "category" },
     { label: "Types", icon: "layers-outline", key: "types" },
-    
+    { label: "Withdraws", icon: "wallet-outline", key: "withdraws" },
+   
   ];
 
   const NoItems = [
@@ -150,6 +152,8 @@ const UserSidebar = () => {
       navigation.navigate("ReviewList");
     } else if (key === "inventory"){
       navigation.navigate("InventoryList");
+    } else if (key === "wallet"){
+      navigation.navigate("WithdrawList")
     }
     
 
@@ -177,6 +181,8 @@ const UserSidebar = () => {
       navigation.navigate("CategoryList");
     }else if (key === "types") {
       navigation.navigate("TypeList");
+    } else if (key === "withdraws"){
+      navigation.navigate("WithdrawsList")
     }
   };
 
