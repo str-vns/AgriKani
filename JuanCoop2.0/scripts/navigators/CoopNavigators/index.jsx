@@ -25,6 +25,7 @@ import History from "@src/screens/Rider/History";
 import Reason from "@screens/Cancelled/ReasonCancelled"
 import WithdrawList from "@screens/Farmer/Withdraw/WithdrawList";
 import Register from "@src/screens/Rider/Register";
+import Otp from "@src/screens/Rider/Otp";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -196,7 +197,13 @@ const Index = () => {
           tabBarShowLabel: false,
         }}
       />
-      
+
+        <Stack.Screen
+              name="OtpRider"
+              component={Otp}
+              options={{ headerShown: false }}
+            />
+
       <Stack.Screen
         name="WithdrawList"
         component={WithdrawList}

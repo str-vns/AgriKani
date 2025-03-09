@@ -10,8 +10,6 @@ import QrScan from "@src/screens/Rider/QrScan";
 import RiderCancelled from "@src/screens/Cancelled/Rider_Cancelled"
 import CoopDashboard from "@screens/Farmer/FarmerDashboard";
 // Coop part for rider
-import Register from "@src/screens/Rider/Register";
-import Otp from "@src/screens/Rider/Otp";
 
 const Stack = createNativeStackNavigator();
 
@@ -38,11 +36,7 @@ const RiderNavigators = () => {
         component={Dropoff}
         options={{ headerShown: false }}
       />  
-        <Stack.Screen
-        name="OtpRider"
-        component={Otp}
-        options={{ headerShown: false }}
-      />
+
       <Stack.Screen
         name="Completed"
         component={Completed}
