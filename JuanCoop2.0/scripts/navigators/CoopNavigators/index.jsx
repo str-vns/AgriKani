@@ -23,7 +23,8 @@ import MaxCapacity from "@src/screens/Rider/RiderCapacity";
 import Riderlist from "@src/screens/Rider/Riderlist";
 import History from "@src/screens/Rider/History";
 import Reason from "@screens/Cancelled/ReasonCancelled"
-
+import WithdrawList from "@screens/Farmer/Withdraw/WithdrawList";
+import Register from "@src/screens/Rider/Register";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -145,6 +146,11 @@ const Index = () => {
         component={Riderlist}
         options={{ headerShown: false }}
       />
+       <Stack.Screen
+              name="Register"
+              component={Register}
+              options={{ headerShown: false }}
+          />
       <Stack.Screen
         name= "RiderDetails"
         component={RiderDetails}
@@ -190,6 +196,16 @@ const Index = () => {
           tabBarShowLabel: false,
         }}
       />
+      
+      <Stack.Screen
+        name="WithdrawList"
+        component={WithdrawList}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+
       
     </Stack.Navigator>
   );

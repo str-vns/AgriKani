@@ -37,13 +37,7 @@ const RiderNavigators = () => {
         name="Dropoff"
         component={Dropoff}
         options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="Register"
-        component={Register}
-        options={{ headerShown: false }}
-      />
+      />  
         <Stack.Screen
         name="OtpRider"
         component={Otp}
