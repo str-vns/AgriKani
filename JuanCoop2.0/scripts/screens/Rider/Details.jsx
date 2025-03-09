@@ -114,7 +114,10 @@ const Details = (props) => {
       {/* Payment Details */}
       <View style={styles.paymentDetails}>
         <Text style={styles.text}>
-          <Text style={styles.label}>Mode of Payment:</Text> {getPaymentMethodDisplay(deliveryDetails?.orderId?.paymentMethod)}
+          <Text style={styles.label}>Mode of Payment:</Text> {getPaymentMethodDisplay(deliveryDetails?.orderId?.paymentMethod )}
+        </Text>
+        <Text style={styles.text}>
+          <Text style={styles.label}>Payment Status:</Text> {getPaymentMethodDisplay(deliveryDetails?.payStatus === "Paid" ? "Paid" : "Unpaid")}
         </Text>
         <Text style={styles.text}>
           <Text style={styles.label}>To Pay:</Text> ₱ {deliveryDetails?.totalAmount}

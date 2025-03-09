@@ -285,6 +285,13 @@ Duration: {altRoute?.legs?.[0]?.duration
             {deliverInfo?.userId?.firstName} {deliverInfo?.userId?.lastName}
           </Text>
           <Text style={styles.driverName}>Total Price: ₱ {deliverInfo?.totalAmount}</Text>
+          <Text style={styles.driverName}>
+  Mode of Payment: {""}
+  {deliverInfo?.paymentMethod === "paymaya" ? "Paymaya" 
+    : deliverInfo?.paymentMethod === "gcash" ? "Gcash" 
+    : "COD"}
+</Text>
+          <Text style={styles.driverName}>Payment Status: {deliverInfo?.payStatus === "Paid" ? "Paid" : "Unpaid"}</Text>
           <Text style={styles.driverPhone}>Order# {deliverInfo?.orderId?._id}</Text>
         </View>
       </View>

@@ -24,9 +24,15 @@ import {
   COOP_DASHBOARD_REQUEST, 
   COOP_DASHBOARD_SUCCESS, 
   COOP_DASHBOARD_FAIL,
+  ONLINE_PAYMENT_REQUEST,
+  ONLINE_PAYMENT_SUCCESS,
+  ONLINE_PAYMENT_FAIL,
   OVERALL_DASHBOARD_REQUEST, 
   OVERALL_DASHBOARD_SUCCESS, 
-  OVERALL_DASHBOARD_FAIL
+  OVERALL_DASHBOARD_FAIL,
+  GET_PAYMENT_REQUEST,
+  GET_PAYMENT_SUCCESS,
+  GET_PAYMENT_FAIL
 } from '../Constants/orderConstants';
 import baseURL from '@assets/commons/baseurl';
 
@@ -55,7 +61,7 @@ export const createOrder = (orderData, token) => async (dispatch) => {
       payload: { order },
     });
 
-    return { order };
+    return true;
   } catch (error) {
     dispatch({
       type: ORDER_CREATE_FAIL,
@@ -285,3 +291,54 @@ export const fetchOverallDashboardData = (token) => async (dispatch) => {
     });
   }
 };
+
+export const onlinePayment = (payData, token) => async (dispatch) => {
+  console.log(
+    "payData: ", payData
+  )
+  try {
+    dispatch({ type: ONLINE_PAYMENT_REQUEST });
+  
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.post(`${baseURL}pay`, payData, config);
+  
+    dispatch({ type: ONLINE_PAYMENT_SUCCESS, payload: data.details });
+    return(data.details);
+  } catch (error) {
+
+    dispatch({
+      type: ONLINE_PAYMENT_FAIL,
+      payload: error.response ? error.response.data.message : error.message,
+    });
+
+    console.error("Error processing online payment ", error);
+  }
+}
+
+export const getPayment = (paymentId, token) => async (dispatch) => {
+  try {
+    dispatch({ type: GET_PAYMENT_REQUEST });
+  
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.get(`${baseURL}pay/${paymentId}`, config);
+    
+    dispatch({ type: GET_PAYMENT_SUCCESS, payload: data.details });
+    console.log("data.details", data.details);
+    return data.details;
+  } catch (error) {
+    dispatch({
+      type: GET_PAYMENT_FAIL,
+      payload: error.response ? error.response.data.message : error.message,
+    });
+  }
+}

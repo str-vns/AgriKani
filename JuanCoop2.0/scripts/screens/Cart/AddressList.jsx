@@ -15,7 +15,7 @@ const AddressList = ({ route, navigation }) => {
   const loading = useSelector((state) => state.addresses.loading);
   const error = useSelector((state) => state.addresses.error);
   const [selectedAddress, setSelectedAddress] = useState(null);
-console.log("address",addresses)
+  
 useFocusEffect(
   useCallback(() => {
     if (userId) {

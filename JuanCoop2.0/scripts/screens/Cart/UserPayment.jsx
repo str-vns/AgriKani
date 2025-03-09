@@ -7,7 +7,15 @@ const Payment = ({ route, navigation }) => {
 
   const handleSelectPaymentMethod = (method) => {
     setPaymentMethod(method);
+
+    if(method === "COD") {
     navigation.navigate("Review", { cartItems, addressData, paymentMethod: method });
+    } else if (method === "paymaya") {
+      navigation.navigate("Paymaya", { cartItems, addressData, paymentMethod: method });
+      // alert("This payment method is not yet supported.");
+    } else if (method === "gcash") {
+      navigation.navigate("Gcash", { cartItems, addressData, paymentMethod: method });
+    }
   };
 
   return (
@@ -25,17 +33,17 @@ const Payment = ({ route, navigation }) => {
       {/* Credit Card Button */}
       <TouchableOpacity
         style={[styles.button, styles.cardButton]}
-        onPress={() => handleSelectPaymentMethod("Credit Card")}
+        onPress={() => handleSelectPaymentMethod("paymaya")}
       >
-        <Text style={styles.buttonText}>Credit Card</Text>
+        <Text style={styles.buttonText}>Paymaya</Text>
       </TouchableOpacity>
       
       {/* PayPal Button */}
       <TouchableOpacity
         style={[styles.button, styles.paypalButton]}
-        onPress={() => handleSelectPaymentMethod("PayPal")}
+        onPress={() => handleSelectPaymentMethod("gcash")}
       >
-        <Text style={styles.buttonText}>PayPal</Text>
+        <Text style={styles.buttonText}>Gcash</Text>
       </TouchableOpacity>
     </View>
   );

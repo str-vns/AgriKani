@@ -188,7 +188,7 @@ const getStatusColor = (status) => {
 
             
 
-              { currentDriverRoute?.geometry?.coordinates?.length > 0 && arrivedData.status === 'delivering' && arrivedData.deliveryId === deliveries._id ? (
+{/* { currentDriverRoute?.geometry?.coordinates?.length > 0 && arrivedData.status === 'delivering' && arrivedData.deliveryId === deliveries._id ? (
                 <MapboxGL.ShapeSource
                   id="shapeSource"
                   shape={{
@@ -209,7 +209,7 @@ const getStatusColor = (status) => {
                     style={{ lineWidth: 5, lineColor: '#ff0000' }}
                   />
                 </MapboxGL.ShapeSource>
-              ) : null }
+              ) : null } */}
 
               </MapboxGL.MapView>
         </View>

@@ -8,8 +8,9 @@ import { clearCart } from "@src/redux/Actions/cartActions";
 import { memberDetails } from "@redux/Actions/memberActions";
 
 const Review = ({ route, navigation }) => {
+  console.log(route.params,"route.params");
   const dispatch = useDispatch();
-  const { cartItems, addressData, paymentMethod } = route.params;
+  const { cartItems, addressData, paymentMethod, paymentData } = route.params;
   const { loading, members, error } = useSelector((state) => state.memberList);
   const context = useContext(AuthGlobal);
   const approvedMember = members?.find(member => member.approvedAt !== null);
@@ -17,6 +18,7 @@ const Review = ({ route, navigation }) => {
   const userId = context?.stateUser?.userProfile?._id;
   const [token, setToken] = useState("");
 
+  console.log("paymentData: ", paymentData);
   const calculateShipping = () => {
     const uniqueCoops = new Set();
   
@@ -31,7 +33,6 @@ const Review = ({ route, navigation }) => {
     return shippingCost;
   };
   
-
   const calculatedTax = () => {
     let hasNonMemberItem = false; 
 
@@ -91,12 +92,22 @@ const calculateFinalTotal = () => {
       dispatch(memberDetails(userId, token));
     }
   }, [userId]);
+
   const handleConfirmOrder = async () => {
     if (!userId || !token) {
       Alert.alert("Error", "User not authenticated. Please log in.");
       return;
     }
   
+  let payStatus;
+
+  if (paymentData?.payStatus === "Paid") {
+    payStatus = "Paid";
+  } else {
+    payStatus = "Unpaid";
+  }
+
+  console.log("Payment Status: ", payStatus);
     const outOfStockItems = cartItems.filter(item => item.stock < item.quantity);
     if (outOfStockItems.length > 0) {
       Alert.alert(
@@ -121,23 +132,34 @@ const calculateFinalTotal = () => {
       
       shippingAddress: addressData._id,
       paymentMethod,
+      payStatus: payStatus,
       shippingPrice: calculateShipping(),
       totalPrice: calculateFinalTotal(),
     };
   
     try {
       const orderCreationResult = await dispatch(createOrder(orderData, token));
-  
-      if (orderCreationResult?.order) {
+    
+      if (orderCreationResult === true) {
         Alert.alert("Success", "Your order has been successfully placed!", [
           {
             text: "OK",
-            onPress: () =>
-              navigation.navigate("OrderConfirmation", {
-                cartItems,     
-                addressData,   
-                paymentMethod,   
-              }),
+            onPress: () => {
+              // Reset the navigation stack and navigate to OrderConfirmation
+              navigation.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: "OrderConfirmation",
+                    params: {
+                      cartItems,
+                      addressData,
+                      paymentMethod,
+                    },
+                  },
+                ],
+              });
+            },
           },
         ]);
         dispatch(clearCart());

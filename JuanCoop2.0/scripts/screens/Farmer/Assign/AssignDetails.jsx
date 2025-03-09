@@ -162,6 +162,9 @@ const AssignDetails = (props) => {
           <Text style={styles.label}>Mode of Payment:</Text> {getPaymentMethodDisplay(AssingInfo?.paymentMethod)}
         </Text>
         <Text style={styles.text}>
+          <Text style={styles.label}>Payment Status:</Text> {getPaymentMethodDisplay(AssingInfo?.payStatus === "Paid" ? "Paid" : "Unpaid")}
+        </Text>
+        <Text style={styles.text}>
           <Text style={styles.label}>To Pay:</Text> ₱ {AssingInfo?.totalAmount}
         </Text>
       </View>
