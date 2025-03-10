@@ -40,6 +40,18 @@ const transactionSchema = [
         path: PATH.TRANSACTION_USER_ID,
         roles: [],
         handler: transactionController.getUserWithdraws
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.REFUND_PENDING,
+        roles: [],
+        handler: transactionController.getAllRefunds,
+    },
+    {
+        method: METHOD.GET,
+        path: PATH.REFUND_SUCCESS,
+        roles: [],
+        handler: transactionController.getAllSuccessRefund,
     }
 ];
 
