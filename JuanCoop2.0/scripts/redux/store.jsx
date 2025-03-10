@@ -26,7 +26,7 @@ import {
   import { deliveryListReducer, deliveryApiReducer, deliveryCompleteReducer, deliveryHistoryReducer } from "@redux/Reducers/deliveryReducers";
   import { cancelledReducerApi, cancelledReducer } from "@redux/Reducers/cancelledReducer";
   import { walletReducer } from "@redux/Reducers/walletReducer";
-  import { transactionReducer, transactionAPIReducer } from "@redux/Reducers/transactionReducer";
+  import { transactionReducer, transactionAPIReducer, refundReducer } from "@redux/Reducers/transactionReducer";
   import postReducer from "./Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
@@ -107,6 +107,7 @@ import {
     getWallet: walletReducer,
     transaction: transactionReducer,
     transactionAPI: transactionAPIReducer,
+    refund: refundReducer
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));

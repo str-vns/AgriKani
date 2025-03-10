@@ -12,6 +12,10 @@ import MembersRegistration from "@screens/UserRegis/MemberRegistration";
 import UserTracking from "@screens/User/UserTracking";
 import QrGenerate from "@screens/User/QrGenerate";
 import ClientCancelled from "@screens/Cancelled/Client_Cancelled";
+import ConfirmCancelled from "@screens/Cancelled/Confirm_Cancelled";
+import GcashCancelled from "@screens/Cancelled/Gcash_Refund";
+import PaymayaCancelled from "@screens/Cancelled/Paymaya_Refund";
+import OnlinePayCancelled from "@screens/Cancelled/OnlinePay_Refund";
 import MemberList from "@screens/UserRegis/MemberList";
 import CoopFarmProfile from "@screens/Farmer/FarmerProfile";
 const Stack = createNativeStackNavigator();
@@ -62,7 +66,7 @@ const UserNavigation = () => {
           tabBarShowLabel: false,
         }}
       />
-      < Stack.Screen
+      <Stack.Screen
         name="MemberList"
         component={MemberList}
         options={{
@@ -71,14 +75,14 @@ const UserNavigation = () => {
         }}
       />
 
-<Stack.Screen
-          name="CoopFarmProfile"
-          options={{
-            headerShown: false,
-            tabBarShowLabel: false,
-          }}
-          component={CoopFarmProfile}
-        />
+      <Stack.Screen
+        name="CoopFarmProfile"
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+        component={CoopFarmProfile}
+      />
 
       <Stack.Screen
         name="MembersRegistration"
@@ -88,7 +92,7 @@ const UserNavigation = () => {
           tabBarShowLabel: false,
         }}
       />
-      
+
       <Stack.Screen
         name="EditFarm"
         options={{
@@ -119,7 +123,7 @@ const UserNavigation = () => {
           headerShown: false,
         }}
       />
-      
+
       <Stack.Screen
         name="QrGenerate"
         component={QrGenerate}
@@ -127,11 +131,47 @@ const UserNavigation = () => {
           headerShown: false,
         }}
       />
-      < Stack.Screen
+      <Stack.Screen
         name="Client_Cancelled"
         component={ClientCancelled}
         options={{
           headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="OnlinePay_Cancelled"
+        component={OnlinePayCancelled}
+        options={{
+          headerShown: true,
+          title: "Refund",
+        }}
+      />
+
+      <Stack.Screen
+        name="Gcash_Cancelled"
+        component={GcashCancelled}
+        options={{
+          headerShown: true,
+          title: "Gcash Information",
+        }}
+      />
+
+      <Stack.Screen
+        name="Paymaya_Cancelled"
+        component={PaymayaCancelled}
+        options={{
+          headerShown: true,
+          title: "Paymaya Information",
+        }}
+      />
+
+      <Stack.Screen
+        name="Confirm_Cancelled"
+        component={ConfirmCancelled}
+        options={{
+          headerShown: true,
+          title: "Refund",
         }}
       />
     </Stack.Navigator>

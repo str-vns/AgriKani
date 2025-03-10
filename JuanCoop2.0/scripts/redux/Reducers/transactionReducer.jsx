@@ -18,6 +18,12 @@ import
     GET_USER_WITHDRAWS_REQUEST,
     GET_USER_WITHDRAWS_SUCCESS,
     GET_USER_WITHDRAWS_FAIL,
+    REFUND_PENDING_REQUEST,
+    REFUND_PENDING_SUCCESS,
+    REFUND_PENDING_FAIL,
+    REFUND_SUCCESS_REQUEST,
+    REFUND_SUCCESS_SUCCESS,
+    REFUND_SUCCESS_FAIL,
 } from '../Constants/transactionConstants';
 
 export const transactionAPIReducer = (state = { transactions: [] }, action) => {
@@ -54,6 +60,22 @@ export const transactionReducer = (state = { transactions: [] }, action) => {
                 case GET_USER_WITHDRAWS_FAIL:
                     case GET_SINGLE_TRANSACTION_FAIL:
             return { withdrawloading: false, withdrawerror: action.payload }
+        default:
+            return state
+    }
+}
+
+export const refundReducer = (state = { transactions: [] }, action) => {
+    switch(action.type) {
+        case REFUND_PENDING_REQUEST:
+            case REFUND_SUCCESS_REQUEST:
+            return { refundloading: true }
+        case REFUND_PENDING_SUCCESS:
+            case REFUND_SUCCESS_SUCCESS:
+            return { refundloading: false, refund: action.payload }
+        case REFUND_PENDING_FAIL:
+            case REFUND_SUCCESS_FAIL:
+            return { refundloading: false, refunderror: action.payload }
         default:
             return state
     }

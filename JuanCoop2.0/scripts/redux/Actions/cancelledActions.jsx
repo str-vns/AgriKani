@@ -21,6 +21,8 @@ export const createCancelled = (cancelled, token) => async (dispatch) => {
         });
         
         dispatch({ type: CREATE_CANCELLED_SUCCESS, payload: response.data });
+
+        return response.data.details;
     }
     catch (error) {
         dispatch({ type: CREATE_CANCELLED_FAIL, payload: error });

@@ -15,6 +15,7 @@ import BlogNavigators from "@navigators/BlogNavigators"
 import RiderNavigators from "@navigators/RiderNavigators"
 import WithdrawList from "@screens/Farmer/Withdraw/WithdrawList";
 import WithdrawsList from "@screens/admin/Withdraws/WithdrawsList";
+import RefundProcess from "@screens/admin/Refund/RefundProcess";
 import Main from "../../../Main";
 import Sidebar from "@src/screens/Filter/UserSidebar";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -240,7 +241,15 @@ const context = useContext(AuthGlobal);
           tabBarShowLabel: false,
         }}
       />
-        
+      
+      <Drawer.Screen
+        name="RefundProcess"
+        component={RefundProcess}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />  
 
       </Drawer.Navigator>
     </Box>

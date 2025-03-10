@@ -74,6 +74,7 @@ const UserSidebar = () => {
     { label: "Categories", icon: "list-outline", key: "category" },
     { label: "Types", icon: "layers-outline", key: "types" },
     { label: "Withdraws", icon: "wallet-outline", key: "withdraws" },
+    { label: "Refund", icon: "refresh-outline", key: "refund" }
    
   ];
 
@@ -183,6 +184,8 @@ const UserSidebar = () => {
       navigation.navigate("TypeList");
     } else if (key === "withdraws"){
       navigation.navigate("WithdrawsList")
+    } else if (key === "refund"){
+      navigation.navigate("RefundProcess")
     }
   };
 
@@ -368,6 +371,7 @@ const UserSidebar = () => {
         userslogin?.roles[0] &&
         userslogin?.roles[0]?.includes("Admin") ? (
         <>
+        <ScrollView>
           <View style={styles.menuContainer}>
             {AdminItems.map((item) => (
               <TouchableOpacity
@@ -396,6 +400,7 @@ const UserSidebar = () => {
               </TouchableOpacity>
             ))}
           </View>
+          </ScrollView>
           <View style={styles.footerContainer}>
             <TouchableOpacity
               style={[styles.menuItem, styles.logoutButton]}

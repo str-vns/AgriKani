@@ -51,9 +51,9 @@ const UserOrderList = () => {
   
   }, [userId, token, dispatch]);
 
-  const handleCancelOrder = (orderId, inventortId, orderItemId, coopUser) => {
+  const handleCancelOrder = (orderId, inventortId, orderItemId, coopUser, paymentMethod) => {
 
-  navigation.navigate("Client_Cancelled", { orderId, inventortId, orderItemId, coopUser });
+  navigation.navigate("Client_Cancelled", { orderId, inventortId, orderItemId, coopUser, paymentMethod });
   //   setRefresh(true);
   //   try {
 
@@ -157,7 +157,7 @@ const UserOrderList = () => {
             {orderItem.orderStatus === "Pending" && (
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => handleCancelOrder(item?._id, orderItem.inventoryProduct?._id, orderItem?._id, orderItem?.coopUser)}
+                onPress={() => handleCancelOrder(item?._id, orderItem.inventoryProduct?._id, orderItem?._id, orderItem?.coopUser, item?.paymentMethod)}
               >
                 <Icon name="cancel" size={20} color="#fff" />
                 <Text style={styles.buttonText}>Cancel</Text>
@@ -220,7 +220,7 @@ const UserOrderList = () => {
               {orderItem.orderStatus === "Pending" && (
                 <TouchableOpacity
                   style={[styles.button, styles.cancelButton]}
-                  onPress={() => handleCancelOrder(item?._id, orderItem.inventoryProduct?._id, orderItem?._id, orderItem?.coopUser)}
+                  onPress={() => handleCancelOrder(item?._id, orderItem.inventoryProduct?._id, orderItem?._id, orderItem?.coopUser, item?.paymentMethod)}
                 >
                   <Icon name="cancel" size={20} color="#fff" />
                   <Text style={styles.buttonText}>Cancel</Text>

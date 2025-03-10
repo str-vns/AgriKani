@@ -23,6 +23,7 @@ const Client_Cancelled = (props) => {
      const orderId = cancelled.orderId;
      const orderItemId = cancelled.orderItemId;
      const coops = cancelled.coopUser;
+     const paymentMethod = cancelled.paymentMethod;
      const userName = context.stateUser.userProfile?.firstName;
      const lastName = context.stateUser.userProfile?.lastName;  
      const [selectedReason, setSelectedReason] = useState(null);
@@ -77,68 +78,132 @@ const Client_Cancelled = (props) => {
       
       const proceedWithCancellation = () => {
         if (selectedReason === "Other") {
-          if (otherReason === "") {
-            alert("Please specify your reason");
-            return;
-          }
-      
-          const cancel = {
-            cancelledId: orderItemId,
-            cancelledBy: context.stateUser.userProfile._id,
-            content: otherReason,
-          };
-      
-          dispatch(createCancelled(cancel, token));
+            if (otherReason === "") {
+                alert("Please specify your reason");
+                return;
+            }
+            if (paymentMethod === "paymaya" || paymentMethod === "gcash") {
+               const cancelledInfo = {
+                    cancelledId: orderItemId,
+                    cancelledBy: context.stateUser.userProfile._id,
+                    content: otherReason,
+               }
+               const otherInfo ={
+                    coopUser: coop?.user?._id,
+                    fcmToken: fcmToken,
+                    userName: userName,
+                    lastName: lastName,
+                    inventoryProduct: inventoryId,
+                    orderId: orderId,
+               }
+
+                navigation.navigate("OnlinePay_Cancelled", { cancelledData: cancelledInfo, others: otherInfo });
+            } else {
+
+                const cancel = {
+                    cancelledId: orderItemId,
+                    cancelledBy: context.stateUser.userProfile._id,
+                    content: otherReason,
+                };
+                dispatch(createCancelled(cancel, token));
+
+                setRefresh(true);
+                try {
+                    const status = {
+                        orderStatus: "Cancelled",
+                        inventoryProduct: inventoryId,
+                    };
+                    dispatch(updateOrderStatus(orderId, status, token));
+                    
+                    const notification = {
+                        title: `Order Cancelled`,
+                        content: `The order has been cancelled by the User ${userName} ${lastName}.`,
+                        user: coop?.user?._id,
+                        fcmToken: fcmToken,
+                        type: "order",
+                    };
+                    
+                    socket.emit("sendNotification", {
+                        senderName: userName,
+                        receiverName: coop?.user?._id,
+                        type: "order",
+                    });
+                    
+                    dispatch(sendNotifications(notification, token));
+                    alert("Your order has been successfully cancelled.");
+                } catch (error) {
+                    console.error("Error deleting or refreshing orders:", error);
+                    alert("An error occurred while cancelling your order. Please try again.");
+                } finally {
+                    setRefresh(false);
+                    navigation.goBack();
+                }
+            }
         } else {
-          if (selectedReason === null) {
-            alert("Please select a reason");
-            return;
-          }
-      
-          const cancel = {
-            cancelledId: orderItemId,
-            cancelledBy: context.stateUser.userProfile._id,
-            content: selectedReason,
-          };
-      
-          dispatch(createCancelled(cancel, token));
-        }
-      
-        setRefresh(true);
-      
-        try {
-          const status = {
-            orderStatus: "Cancelled",
-            inventoryProduct: inventoryId,
-          };
-      
-          dispatch(updateOrderStatus(orderId, status, token));
-      
-          const notification = {
-            title: `Order Cancelled`,
-            content: `The order has been cancelled by the User ${userName} ${lastName}.`,
-            user: coop?.user?._id,
+            if (selectedReason === null) {
+                alert("Please select a reason");
+                return;
+            }
+            if (paymentMethod === "paymaya" || paymentMethod === "gcash") {
+              const cancelledInfo = {
+                cancelledId: orderItemId,
+                cancelledBy: context.stateUser.userProfile._id,
+                content: selectedReason,
+           }
+
+           const otherInfo ={
+            coopUser: coop?.user?._id,
             fcmToken: fcmToken,
-            type: "order",
-          };
-      
-          socket.emit("sendNotification", {
-            senderName: userName,
-            receiverName: coop?.user?._id,
-            type: "order",
-          });
-      
-          dispatch(sendNotifications(notification, token));
-      
-          alert("Your order has been successfully cancelled.");
-        } catch (error) {
-          console.error("Error deleting or refreshing orders:", error);
-          alert("An error occurred while cancelling your order. Please try again.");
-        } finally {
-          setRefresh(false);
-          navigation.goBack()
+            userName: userName,
+            lastName: lastName,
+            inventoryProduct: inventoryId,
+            orderId: orderId,
+       }
+              navigation.navigate("OnlinePay_Cancelled", { cancelledData: cancelledInfo, others: otherInfo });
+            } else {
+                const cancel = {
+                    cancelledId: orderItemId,
+                    cancelledBy: context.stateUser.userProfile._id,
+                    content: selectedReason,
+                };
+                dispatch(createCancelled(cancel, token));
+
+                setRefresh(true);
+                try {
+                    const status = {
+                        orderStatus: "Cancelled",
+                        inventoryProduct: inventoryId,
+                    };
+                    dispatch(updateOrderStatus(orderId, status, token));
+                    
+                    const notification = {
+                        title: `Order Cancelled`,
+                        content: `The order has been cancelled by the User ${userName} ${lastName}.`,
+                        user: coop?.user?._id,
+                        fcmToken: fcmToken,
+                        type: "order",
+                    };
+                    
+                    socket.emit("sendNotification", {
+                        senderName: userName,
+                        receiverName: coop?.user?._id,
+                        type: "order",
+                    });
+                    
+                    dispatch(sendNotifications(notification, token));
+                    alert("Your order has been successfully cancelled.");
+                } catch (error) {
+                    console.error("Error deleting or refreshing orders:", error);
+                    alert("An error occurred while cancelling your order. Please try again.");
+                } finally {
+                    setRefresh(false);
+                    navigation.goBack();
+                }
+            }
         }
-      };
+        
+      
+    };
 
      return (
         <ScrollView>

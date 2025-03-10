@@ -18,6 +18,12 @@ import
     GET_USER_WITHDRAWS_REQUEST,
     GET_USER_WITHDRAWS_SUCCESS,
     GET_USER_WITHDRAWS_FAIL,
+    REFUND_PENDING_REQUEST,
+    REFUND_PENDING_SUCCESS,
+    REFUND_PENDING_FAIL,
+    REFUND_SUCCESS_REQUEST,
+    REFUND_SUCCESS_SUCCESS,
+    REFUND_SUCCESS_FAIL,
 } from '../Constants/transactionConstants';
 import axios from 'axios';
 import baseURL from '@assets/commons/baseurl'
@@ -159,3 +165,56 @@ export const updateWithdraw = (transactionId,transData, token) => async (dispatc
     }
 }
 
+export const getPendingRefund = (token) => async (dispatch) => {
+    try {
+        dispatch({ type: REFUND_PENDING_REQUEST });
+
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+        }
+
+        const { data } = await axios.get(`${baseURL}refund/pending`, config)
+
+        dispatch({
+            type: REFUND_PENDING_SUCCESS,
+            payload: data.details
+        })
+
+        return data.details
+    } catch (error) {
+        dispatch({
+            type: REFUND_PENDING_FAIL,
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message
+        })
+    }
+}
+
+export const getSuccessRefund = (token) => async (dispatch) => {
+    try {
+        dispatch({ type: REFUND_SUCCESS_REQUEST });
+
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+        }
+
+        const { data } = await axios.get(`${baseURL}refund/success`, config)
+
+        dispatch({
+            type: REFUND_SUCCESS_SUCCESS,
+            payload: data.details
+        })
+
+        return data.details
+    } catch (error) {
+        dispatch({
+            type: REFUND_SUCCESS_FAIL,
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message
+        })
+    }
+}

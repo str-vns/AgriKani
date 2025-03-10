@@ -8,15 +8,14 @@ import * as Linking from 'expo-linking';
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getWallet } from "@redux/Actions/walletActions";
 
-const GcashWithdrawForm = (props) => {
-  const { paymentMethod } = props.route.params;
+const Paymaya_Refund = (props) => {
+  const { paymentMethod, cancelledData, others } = props.route.params;
   const navigation = useNavigation()
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
    const { loading, wallet, error } = useSelector((state) => state.getWallet);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [amount, setAmount] = useState("");
   const userId = context?.stateUser?.userProfile?._id;
   const [token, setToken] = useState("");
 
@@ -44,7 +43,7 @@ const GcashWithdrawForm = (props) => {
   
   const handleConfirm = () => {
 
-    if (!name || !phone || !amount) {
+    if (!name || !phone ) {
         Alert.alert("Validation Error", "Please fill in all fields.");
         return;
     }
@@ -63,20 +62,10 @@ const GcashWithdrawForm = (props) => {
       return;
     }
     
-    if ( wallet?.balance === 0 ) {
-        Alert.alert("Insufficient Balance", "You have insufficient balance to proceed with payment.");
-        return
-    }
-
-    if ( amount > wallet?.balance ) {
-        Alert.alert("Insufficient Balance", "Your Amount exceeds your current balance.");
-        setAmount(wallet?.balance.toString())
-        return
-    }
 
     Alert.alert(
       "Confirm Payment",
-      `Are you sure you want to proceed with payment of ₱ ${amount}?`,
+      `Are you sure you want to proceed with payment?`,
       [
         {
           text: "Cancel",
@@ -88,9 +77,8 @@ const GcashWithdrawForm = (props) => {
             const paymentData = {
                 name,
                 phone,
-                amount,
             }
-            navigation.navigate("CreateWithdraw", { paymentMethod: paymentMethod, paymentData: paymentData });
+            navigation.navigate("Confirm_Cancelled", { paymentMethod: paymentMethod, cancelledData: cancelledData,  paymentData: paymentData, others: others });
           },
         },
       ]
@@ -117,14 +105,6 @@ const GcashWithdrawForm = (props) => {
         onChangeText={setPhone}
       />
 
-      <Text style={styles.label}>Amount:</Text>
-      <TextInput
-        style={[styles.input]}
-        placeholder="Enter amount"
-        keyboardType="numeric"
-        value={amount}
-        onChangeText={setAmount}
-      />
 
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
         <Text style={styles.buttonText}>Confirm</Text>
@@ -186,4 +166,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GcashWithdrawForm;
+export default Paymaya_Refund;
