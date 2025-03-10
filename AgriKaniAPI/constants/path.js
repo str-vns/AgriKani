@@ -221,8 +221,8 @@ module.exports = {
   TRANSACTION_PENDING: "/transaction/pending",
   TRANSACTION_SUCCESS: "/transaction/success",
   TRANSACTION_USER_ID: "/transaction/user/:id",
-  REFUND: "/refund",
+  REFUND_PENDING: "/refund/pending",
+  REFUND_SUCCESS: "/refund/success",
   REFUND_ID: "/refund/:id",
-  
 };
 

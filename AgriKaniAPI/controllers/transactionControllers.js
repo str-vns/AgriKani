@@ -75,3 +75,23 @@ exports.getUserWithdraws = asyncHandler(async (req, res, next) => {
         withdraws
     )
 })
+
+exports.getAllRefunds = asyncHandler(async (req, res, next) => {
+    const refunds = await transcationProcess.getAllRefundProcess();
+
+    return SuccessHandler(
+        res,
+        `Refunds for user ${refunds?.user} has been fetched Successfully`,
+        refunds
+    )
+})
+
+exports.getAllSuccessRefund = asyncHandler(async (req, res, next) => {
+    const refunds = await transcationProcess.getAllSuccessRefundProcess();
+
+    return SuccessHandler(
+        res,
+        `Refunds for user ${refunds?.user} has been fetched Successfully`,
+        refunds
+    )
+})

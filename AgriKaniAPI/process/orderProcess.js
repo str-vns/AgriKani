@@ -5,6 +5,7 @@ const Notification = require("../models/notification");
 const Member = require("../models/members");
 const User = require("../models/user");
 const Product = require("../models/product")
+const Transaction = require("../models/transaction");
 const ErrorHandler = require("../utils/errorHandler");
 const mongoose = require("mongoose");
 const Inventory = require("../models/inventoryM");
@@ -178,10 +179,11 @@ exports.updateOrderStatusProcess = async (id, req) => {
         );
 
         console.log("Remaining items in coop:", remainingItemsInCoop.length);
-
+        let shippingAddition = 0; 
         if (remainingItemsInCoop.length === 0) {
           order.totalPrice -= 75; 
           order.shippingPrice -= 75;
+          shippingAddition = 75;
         }
 
         const member = await Member.findOne({ userId: order.user, coopId: matchedOrderItem.coopUser });
@@ -190,7 +192,20 @@ exports.updateOrderStatusProcess = async (id, req) => {
 
         const deductedAmount = parseFloat((matchedOrderItem.price * matchedOrderItem.quantity * (1 + taxMultiplier)).toFixed(2));
 
-      
+      if( order.paymentMethod === "paymaya" || order.paymentMethod === "gcash" ){
+        await Transaction.create({
+          user: order.user,
+          type: "REFUND",
+          amount: deductedAmount + shippingAddition,
+          paymentMethod: req.body.paymentMethod,
+          accountName: req.body.accountName,
+          accountNumber: req.body.accountNumber,
+          transactionStatus: "PENDING",
+          cancelledId: req.body.cancelledId,
+        })
+      }
+
+
 order.totalPrice -= deductedAmount;
 
 // const remainingTaxableTotal = order.orderItems
