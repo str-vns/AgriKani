@@ -677,128 +677,617 @@ exports.getMonthlySalesReport = async () => {
   ]);
 };
 
-exports.getCoopDashboardData = async (id) => {
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new ErrorHandler(`Invalid Cooperative ID: ${id}`, 400);
+// exports.getCoopDashboardData = async (id) => {
+//   if (!mongoose.Types.ObjectId.isValid(id)) {
+//     throw new ErrorHandler(`Invalid Cooperative ID: ${id}`, 400);
+//   }
+
+//   const coopInfo = await Farm.findOne({ user: id });
+//   if (!coopInfo) {
+//     throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
+//   }
+
+//   console.log("Cooperative ID:", coopInfo._id);
+
+//   try {
+//     // Fetch Orders
+//     const orders = await Order.find({ "orderItems.coopUser": coopInfo._id })
+//       .populate("orderItems.product")
+//       .lean();
+
+//     console.log("Fetched Orders:", orders.length);
+
+//     // 📊 **Total Sales Revenue**
+//     const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+
+//     // 📦 **Total Orders**
+//     const totalOrders = orders.length;
+
+//     // 💲 **Average Order Value (AOV)**
+//     const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
+
+//     // **Sales Trends Calculation**
+//     const currentDate = new Date();
+//     const startOfDay = new Date().setHours(0, 0, 0, 0);
+//     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+//     const sevenDaysAgo = new Date().setDate(currentDate.getDate() - 7);
+
+//     // Helper Function to Get Sales Revenue for a Time Period
+//     const getSalesRevenue = async (startDate) => {
+//       const sales = await Order.aggregate([
+//         { 
+//           $match: { 
+//             "orderItems.orderStatus": "Delivered",
+//             createdAt: { $gte: new Date(startDate) }
+//           } 
+//         },
+//         { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
+//       ]);
+//       return sales[0]?.revenue || 0;
+//     };
+
+//     // 📅 **Sales Over Time**
+//     const dailySales = await getSalesRevenue(startOfDay);
+//     const weeklySales = await getSalesRevenue(sevenDaysAgo);
+//     const monthlySales = await getSalesRevenue(startOfMonth);
+
+//     // 📈 **Sales Comparison (Current vs. Previous Periods)**
+//     const prevMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+//     const prevMonthSales = await getSalesRevenue(prevMonthStart);
+
+//     const salesComparison = {
+//       currentMonth: monthlySales,
+//       previousMonth: prevMonthSales,
+//       percentageChange: prevMonthSales > 0 
+//         ? (((monthlySales - prevMonthSales) / prevMonthSales) * 100).toFixed(2) 
+//         : 100,
+//     };
+
+//     // 🔥 **Top-Selling & Low-Performing Products**
+//     const productSales = await Order.aggregate([
+//       { $unwind: "$orderItems" },
+//       { 
+//         $match: { 
+//           "orderItems.coopUser": coopInfo._id,
+//           "orderItems.orderStatus": "Delivered" 
+//         } 
+//       },
+//       {
+//         $group: {
+//           _id: "$orderItems.product",
+//           totalQuantitySold: { $sum: "$orderItems.quantity" },
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "products",
+//           localField: "_id",
+//           foreignField: "_id",
+//           as: "productDetails",
+//         },
+//       },
+//       { $unwind: "$productDetails" },
+//       {
+//         $project: {
+//           _id: 0,
+//           productId: "$_id",
+//           productName: "$productDetails.productName",
+//           totalQuantitySold: 1,
+//         },
+//       },
+//       { $sort: { totalQuantitySold: -1 } },
+//     ]);
+
+//     const topSellingProducts = productSales.slice(0, 5);
+//     const lowPerformingProducts = productSales.slice(-5);
+
+//     console.log("Top-Selling Products:", topSellingProducts);
+//     console.log("Low-Performing Products:", lowPerformingProducts);
+
+//     return {
+//       totalRevenue,
+//       totalOrders,
+//       averageOrderValue,
+//       salesTrends: {
+//         daily: dailySales,
+//         weekly: weeklySales,
+//         monthly: monthlySales,
+//       },
+//       salesComparison,
+//       topSellingProducts,
+//       lowPerformingProducts,
+//     };
+//   } catch (error) {
+//     console.error("Error fetching dashboard data:", error);
+//     throw new ErrorHandler("Error processing dashboard data", 500);
+//   }
+// };
+
+
+//correct
+// exports.getCoopDashboardData = async (id) => {
+//   if (!mongoose.Types.ObjectId.isValid(id)) {
+//     throw new ErrorHandler(`Invalid Cooperative ID: ${id}`, 400);
+//   }
+
+//   const coopInfo = await Farm.findOne({ user: id });
+//   if (!coopInfo) {
+//     throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
+//   }
+
+//   console.log("Cooperative ID:", coopInfo._id);
+
+//   try {
+//     const orders = await Order.find({ 
+//       "orderItems.coopUser": coopInfo._id, 
+//       "orderItems.orderStatus": "Shipping" 
+//     })
+//       .populate("orderItems.product")
+//       .lean();
+
+//     const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+//     const totalOrders = orders.length;
+
+//     // Top-selling products
+//     const rankedProducts = await Order.aggregate([
+//       { $unwind: "$orderItems" },
+//       { 
+//         $match: { 
+//           "orderItems.coopUser": coopInfo._id,
+//           "orderItems.orderStatus": "Shipping" 
+//         } 
+//       },
+//       {
+//         $group: {
+//           _id: "$orderItems.product",
+//           totalQuantitySold: { $sum: "$orderItems.quantity" },
+//         },
+//       },
+//       {
+//         $sort: { totalQuantitySold: -1 },
+//       },
+//       {
+//         $lookup: {
+//           from: "products",
+//           localField: "_id",
+//           foreignField: "_id",
+//           as: "productDetails",
+//         },
+//       },
+//       { $unwind: "$productDetails" },
+//       {
+//         $project: {
+//           _id: 0,
+//           productId: "$_id",
+//           productName: "$productDetails.productName",
+//           totalQuantitySold: 1,
+//         },
+//       },
+//     ]);
+
+//     // Group sales by day, week, and month
+//     const dailySales = await Order.aggregate([
+//       {
+//         $match: {
+//           "orderItems.orderStatus": "Shipping",
+//           "orderItems.coopUser": coopInfo._id,
+//           createdAt: {
+//             $gte: new Date(new Date().setDate(new Date().getDate() - 7)), // Only last 7 days
+//           },
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: { $dayOfWeek: "$createdAt" }, // Group by day of the week (1 = Sunday, 7 = Saturday)
+//           revenue: { $sum: "$totalPrice" },
+//         },
+//       },
+//       {
+//         $sort: { "_id": 1 }, // Sort by day of the week
+//       },
+//       {
+//         $project: {
+//           day: {
+//             $switch: {
+//               branches: [
+//                 { case: { $eq: ["$_id", 1] }, then: "Sunday" },
+//                 { case: { $eq: ["$_id", 2] }, then: "Monday" },
+//                 { case: { $eq: ["$_id", 3] }, then: "Tuesday" },
+//                 { case: { $eq: ["$_id", 4] }, then: "Wednesday" },
+//                 { case: { $eq: ["$_id", 5] }, then: "Thursday" },
+//                 { case: { $eq: ["$_id", 6] }, then: "Friday" },
+//                 { case: { $eq: ["$_id", 7] }, then: "Saturday" },
+//               ],
+//               default: "Unknown",
+//             },
+//           },
+//           revenue: 1,
+//         },
+//       },
+//     ]);
+    
+
+//     const weeklySales = await Order.aggregate([
+//       { 
+//         $match: { 
+//           "orderItems.orderStatus": "Shipping",
+//           "orderItems.coopUser": coopInfo._id,
+//         }
+//       },
+//       {
+//         $group: {
+//           _id: { $isoWeek: "$createdAt" },
+//           revenue: { $sum: "$totalPrice" },
+//         }
+//       },
+//       { $sort: { "_id": 1 } }
+//     ]);
+
+//     const monthlySales = await Order.aggregate([
+//       { 
+//         $match: { 
+//           "orderItems.orderStatus": "Shipping",
+//           "orderItems.coopUser": coopInfo._id,
+//         }
+//       },
+//       {
+//         $group: {
+//           _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+//           revenue: { $sum: "$totalPrice" },
+//         }
+//       },
+//       { $sort: { "_id": 1 } }
+//     ]);
+
+//     return {
+//       totalRevenue,
+//       totalOrders,
+//       rankedProducts,
+//       salesTrends: {
+//         daily: dailySales,
+//         weekly: weeklySales,
+//         monthly: monthlySales,
+//       },
+//     };
+//   } catch (error) {
+//     console.error("Error fetching dashboard data:", error);
+//     throw new ErrorHandler("Error processing dashboard data", 500);
+//   }
+// };
+
+// exports.getCoopDashboardData = async (id) => {
+//   if (!mongoose.Types.ObjectId.isValid(id)) {
+//     throw new ErrorHandler(`Invalid Cooperative ID: ${id}`, 400);
+//   }
+
+//   const coopInfo = await Farm.findOne({ user: id });
+//   if (!coopInfo) {
+//     throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
+//   }
+
+//   console.log("✅ Cooperative ID:", coopInfo._id);
+
+//   try {
+//     // Fetch Orders
+//     const orders = await Order.find({ "orderItems.coopUser": coopInfo._id })
+//       .populate("orderItems.product")
+//       .lean();
+
+//     console.log("📦 Fetched Orders:", orders.length);
+
+//     // Total Sales Revenue
+//     const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+//     console.log("💰 Total Revenue:", totalRevenue);
+
+//     // Total Orders
+//     const totalOrders = orders.length;
+//     console.log("📊 Total Orders:", totalOrders);
+
+//     // Average Order Value (AOV)
+//     const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
+//     console.log("📉 Average Order Value:", averageOrderValue);
+
+//     // Total Customers
+//     const totalCustomers = new Set(orders.map(order => order.user.toString())).size;
+//     console.log("👥 Total Customers:", totalCustomers);
+
+//     // Order Status Breakdown
+//     const orderStatusCounts = orders.reduce((acc, order) => {
+//       acc[order.orderStatus] = (acc[order.orderStatus] || 0) + 1;
+//       return acc;
+//     }, {});
+
+//     const orderStatus = {
+//       completed: orderStatusCounts["Delivered"] || 0,
+//       cancelled: orderStatusCounts["Cancelled"] || 0,
+//       refunded: orderStatusCounts["Refunded"] || 0,
+//       failed: orderStatusCounts["Failed"] || 0,
+//     };
+
+//     console.log("📌 Order Status Breakdown:", orderStatus);
+
+//     // Sales Over Time (Daily for the past month)
+//     const salesOverTime = await Order.aggregate([
+//       {
+//         $match: {
+//           "orderItems.coopUser": coopInfo._id,
+//           "orderItems.orderStatus": "Delivered",
+//           createdAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 30)) }
+//         }
+//       },
+//       {
+//         $group: {
+//           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+//           totalSales: { $sum: "$totalPrice" },
+//           totalOrders: { $sum: 1 }
+//         }
+//       },
+//       { $sort: { _id: 1 } }
+//     ]);
+
+//     console.log("📆 Sales Over Time (Daily):", salesOverTime);
+
+//     // Cumulative Sales Over Time
+//     let cumulativeSales = 0;
+//     let cumulativeOrders = 0;
+//     const cumulativeSalesOverTime = salesOverTime.map((day) => {
+//       cumulativeSales += day.totalSales;
+//       cumulativeOrders += day.totalOrders;
+//       return { date: day._id, totalSales: cumulativeSales, totalOrders: cumulativeOrders };
+//     });
+
+//     console.log("📈 Cumulative Sales Over Time:", cumulativeSalesOverTime);
+
+//     // Top 5 Selling Products
+//     const productSales = await Order.aggregate([
+//       { $unwind: "$orderItems" },
+//       { $match: { "orderItems.coopUser": coopInfo._id, "orderItems.orderStatus": "Delivered" } },
+//       {
+//         $group: {
+//           _id: "$orderItems.product",
+//           totalQuantitySold: { $sum: "$orderItems.quantity" },
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "products",
+//           localField: "_id",
+//           foreignField: "_id",
+//           as: "productDetails",
+//         },
+//       },
+//       { $unwind: "$productDetails" },
+//       {
+//         $project: {
+//           productId: "$_id",
+//           productName: "$productDetails.productName",
+//           totalQuantitySold: 1,
+//         },
+//       },
+//       { $sort: { totalQuantitySold: -1 } },
+//       { $limit: 5 }
+//     ]);
+
+//     console.log("🔥 Top 5 Selling Products:", productSales);
+
+//     return {
+//       totalRevenue,
+//       totalOrders,
+//       averageOrderValue,
+//       totalCustomers,
+//       orderStatus,
+//       salesOverTime,
+//       cumulativeSalesOverTime,
+//       topSellingProducts: productSales,
+//     };
+//   } catch (error) {
+//     console.error("❌ Error fetching dashboard data:", error);
+//     throw new ErrorHandler("Error processing dashboard data", 500);
+//   }
+// };
+
+exports.getCoopDashboardData = async (userId) => {
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    throw new ErrorHandler(`Invalid User ID: ${userId}`, 400);
   }
 
-  const coopInfo = await Farm.findOne({ user: id });
+  const coopInfo = await Farm.findOne({ user: userId });
   if (!coopInfo) {
-    throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
+    throw new ErrorHandler(`Cooperative not found for this user`, 404);
   }
 
-  console.log("Cooperative ID:", coopInfo._id);
+  console.log("✅ Cooperative ID:", coopInfo._id);
 
-  // Filter orders by status "Shipping"
   try {
-    const orders = await Order.find({ 
-      "orderItems.coopUser": coopInfo._id, 
-      "orderItems.orderStatus": "Shipping" 
-    })
+    const orders = await Order.find({ "orderItems.coopUser": coopInfo._id })
       .populate("orderItems.product")
       .lean();
 
-    console.log("Fetched Orders:", orders.length);
+    // Filter only delivered orders
+    const deliveredOrders = orders.filter(order =>
+      order.orderItems.every(item => item.orderStatus === "Delivered")
+    );        
 
-    const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+    // Total Revenue (only from Delivered orders)
+    const totalRevenue = deliveredOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+    console.log("💰 Total Revenue:", totalRevenue);
+
+    // Total Orders
     const totalOrders = orders.length;
+    console.log("📊 Total Orders:", totalOrders);
 
-    // Top-selling products (only for delivered orders)
-    const rankedProducts = await Order.aggregate([
-      { $unwind: "$orderItems" },
-      { 
-        $match: { 
+    // Total Customers
+    const totalCustomers = new Set(orders.map(order => order.user.toString())).size;
+    console.log("👥 Total Customers:", totalCustomers);
+
+    // Get total count of each order status
+    const orderStatusCounts = orders.reduce((counts, order) => {
+      order.orderItems.forEach(item => {
+        counts[item.orderStatus] = (counts[item.orderStatus] || 0) + 1;
+      });
+      return counts;
+    }, {});
+
+    console.log("📌 Order Status Counts:", orderStatusCounts);
+
+
+    // Date calculations
+    const today = new Date();
+
+    // Start of current week (Sunday)
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    // Start of last week (Sunday of last week)
+    const startOfLastWeek = new Date(startOfWeek);
+    startOfLastWeek.setDate(startOfWeek.getDate() - 7);
+
+    // Start and end of the current month
+    const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    endOfCurrentMonth.setHours(23, 59, 59, 999); // Ensure it includes the whole last day
+
+    // Revenue this week (only Delivered orders)
+    const revenueThisWeek = deliveredOrders
+      .filter(order => new Date(order.createdAt) >= startOfWeek)
+      .reduce((sum, order) => sum + order.totalPrice, 0);
+
+    console.log("📅 Revenue This Week:", revenueThisWeek);
+
+    // Revenue last week (only Delivered orders)
+    const revenueLastWeek = deliveredOrders
+      .filter(order => new Date(order.createdAt) >= startOfLastWeek && new Date(order.createdAt) < startOfWeek)
+      .reduce((sum, order) => sum + order.totalPrice, 0);
+
+    console.log("📅 Revenue Last Week:", revenueLastWeek);
+
+    const salesPerDay = await Order.aggregate([
+      {
+        $match: {
           "orderItems.coopUser": coopInfo._id,
-          "orderItems.orderStatus": "Shipping" 
-        } 
+          "orderItems.orderStatus": "Delivered",
+          createdAt: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          totalSales: { $sum: "$totalPrice" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+    console.log("📆 Sales Per Day (Current Month):", salesPerDay);
+
+    // Sales per week (Only in the current month)
+    const salesPerWeek = await Order.aggregate([
+      {
+        $match: {
+          "orderItems.coopUser": coopInfo._id,
+          "orderItems.orderStatus": "Delivered",
+          createdAt: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%U", date: "$createdAt" } }, // Group by week
+          totalSales: { $sum: "$totalPrice" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+    console.log("📆 Sales Per Week (Current Month):", salesPerWeek);
+
+    // Sales per month
+    const salesPerMonth = await Order.aggregate([
+      {
+        $match: {
+          "orderItems.coopUser": coopInfo._id,
+          "orderItems.orderStatus": "Delivered"
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          totalSales: { $sum: "$totalPrice" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+    console.log("📆 Sales Per Month:", salesPerMonth);
+
+    // Sales per year
+    const salesPerYear = await Order.aggregate([
+      {
+        $match: {
+          "orderItems.coopUser": coopInfo._id,
+          "orderItems.orderStatus": "Delivered"
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y", date: "$createdAt" } },
+          totalSales: { $sum: "$totalPrice" } // Use totalPrice instead of multiplying manually
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);    
+
+    console.log("📆 Sales Per Year:", salesPerYear);
+
+    // Top 5 Selling Products (Only Delivered Orders)
+    const productSales = await Order.aggregate([
+      { $unwind: "$orderItems" },
+      {
+        $match: {
+          "orderItems.coopUser": coopInfo._id,
+          "orderItems.orderStatus": "Delivered"
+        }
       },
       {
         $group: {
           _id: "$orderItems.product",
-          totalQuantitySold: { $sum: "$orderItems.quantity" },
-        },
-      },
-      {
-        $sort: { totalQuantitySold: -1 },
+          totalQuantitySold: { $sum: "$orderItems.quantity" }
+        }
       },
       {
         $lookup: {
           from: "products",
           localField: "_id",
           foreignField: "_id",
-          as: "productDetails",
-        },
+          as: "productDetails"
+        }
       },
       { $unwind: "$productDetails" },
       {
         $project: {
-          _id: 0,
           productId: "$_id",
           productName: "$productDetails.productName",
-          totalQuantitySold: 1,
-        },
+          totalQuantitySold: 1
+        }
       },
+      { $sort: { totalQuantitySold: -1 } },
+      { $limit: 5 }
     ]);
+    console.log("🔥 Top 5 Selling Products:", productSales);
 
-    console.log("Ranked Products:", rankedProducts);
-
-    // Sales trends (only for delivered orders)
-    // Sales trends (only for delivered orders)
-const currentDate = new Date();
-const startOfDay = new Date();
-startOfDay.setHours(0, 0, 0, 0);
-
-const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-const sevenDaysAgo = new Date();
-sevenDaysAgo.setDate(currentDate.getDate() - 7);
-sevenDaysAgo.setHours(0, 0, 0, 0);
-
-const dailySales = await Order.aggregate([
-  { 
-    $match: { 
-      "orderItems.orderStatus": "Shipping",
-      createdAt: { $gte: startOfDay }
-    } 
-  },
-  { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
-]);
-
-const weeklySales = await Order.aggregate([
-  { 
-    $match: { 
-      "orderItems.orderStatus": "Shipping",
-      createdAt: { $gte: sevenDaysAgo }
-    } 
-  },
-  { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
-]);
-
-const monthlySales = await Order.aggregate([
-  { 
-    $match: { 
-      "orderItems.orderStatus": "Shipping",
-      createdAt: { $gte: startOfMonth }
-    } 
-  },
-  { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
-]);
-
-    console.log("Daily Sales:", dailySales);
-    console.log("Weekly Sales:", weeklySales);
-    console.log("Monthly Sales:", monthlySales);
 
     return {
       totalRevenue,
       totalOrders,
-      rankedProducts,
-      salesTrends: {
-        daily: dailySales[0]?.revenue || 0,
-        weekly: weeklySales[0]?.revenue || 0,
-        monthly: monthlySales[0]?.revenue || 0,
-      },
+      totalCustomers,
+      orderStatusCounts,
+      revenueThisWeek,
+      revenueLastWeek,
+      salesPerDay,
+      salesPerWeek,
+      salesPerMonth,
+      salesPerYear,
+      topSellingProducts: productSales,
     };
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
+    console.error("❌ Error fetching dashboard data:", error);
     throw new ErrorHandler("Error processing dashboard data", 500);
   }
 };
@@ -992,3 +1481,4 @@ exports.getPaymentIntentProcess = async (id) => {
       return "failed"; 
     }
   };
+
