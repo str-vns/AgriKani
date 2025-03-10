@@ -59,9 +59,10 @@ const styles = StyleSheet.create({
     width: 80,
   },
   categoryIcon: {
-    width: 40,
-    height: 40,
-    marginBottom: 8,
+    width: 60, // Adjust size as needed
+    height: 50, 
+    resizeMode: 'contain', // Ensures the image fits properly
+    marginBottom: 5,
   },
   categoryText: {
     fontSize: 14,
@@ -69,12 +70,14 @@ const styles = StyleSheet.create({
      width: '100%',
     overflow: 'hidden', 
     textOverflow: 'ellipsis', 
+    textAlign: "center",
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
     paddingHorizontal: 16,
+    
   },
   productContainer: {
     flexDirection: "row",

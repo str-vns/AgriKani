@@ -100,7 +100,7 @@ export default StyleSheet.create({
     color: "#888",
   },
   totalContainer: {
-    padding: scale(40),
+    padding: scale(20),
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: scale(20), 
     borderTopRightRadius: scale(20), 
@@ -117,6 +117,22 @@ export default StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
+  infoIcon: {
+    marginLeft: 5, 
+    marginRight: 5, 
+},
+rowContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center", // Centers items horizontally
+  width: "100%",
+  gap: 5, // Adjusts minimal space between elements
+},
+
+infoIcon: {
+  marginLeft: 5,
+},
+
   checkoutButton: {
     backgroundColor: "#f7b900",
     borderRadius: scale(10), 

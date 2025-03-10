@@ -18,6 +18,7 @@ import { memberDetails } from "@redux/Actions/memberActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import baseURL from "@assets/commons/baseurl";
+import { Alert } from "react-native";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -136,6 +137,7 @@ const Cart = () => {
     }
   };
 
+
   const renderItem = ({ item }) => {
     const totalPrice = item.pricing * item.quantity;
     return (
@@ -176,7 +178,6 @@ const Cart = () => {
     return shippingCost;
   };
   
-
   const calculatedTax = () => {
     let hasNonMemberItem = false; 
 
@@ -188,10 +189,16 @@ const Cart = () => {
 
     return hasNonMemberItem ? 0.12 : 0; 
 };
-
   const calculateTotalPrice = () => {
     return cartItems.reduce((total, item) => total + item.pricing * item.quantity, 0);
   };
+  const handleTaxInfo = () => {
+    Alert.alert(
+        "Tax Information",
+        "This tax applies to non-members of the cooperative. If you want to save on future purchases, consider registering as a member.",
+        [{ text: "OK", style: "cancel" }]
+    );
+};
 
 const calculateFinalTotal = () => {
     const shippingCost = calculateShipping();
@@ -238,6 +245,13 @@ const calculateFinalTotal = () => {
         <View style={styles.totalContainer}>
           <Text style={styles.ShippingFeeText}>Overall Item: ₱ {calculateTotalPrice() }</Text>
           <Text style={styles.ShippingFeeText}>Shipping Fee: ₱ {calculateShipping() }</Text>
+          <View style={styles.rowContainer}>
+        <Text style={styles.ShippingFeeText}>Tax: ₱ {(calculateTotalPrice() * calculatedTax()).toFixed(2)}</Text>
+        <TouchableOpacity onPress={handleTaxInfo}>
+            <Icon name="info" type="material" color="#007BFF" size={15} style={styles.infoIcon} />
+        </TouchableOpacity>
+    </View>
+
           <Text style={styles.totalText}>Total: ₱ {calculateFinalTotal() }</Text>
           {errors ? <Text style={styles.errorText}>{errors}</Text> : null}
           <TouchableOpacity
