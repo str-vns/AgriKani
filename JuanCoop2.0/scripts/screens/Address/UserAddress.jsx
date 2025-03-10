@@ -49,8 +49,8 @@ useFocusEffect(
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>Your Addresses</Text>
-          <Ionicons name="add-circle-outline" size={24} color="#fff" />
-          <Text style={styles.addButtonText}>Add New Address</Text>
+          <Ionicons name="add-circle-outline" size={24} color="#000000" />
+          {/* <Text style={styles.addButtonText}>Add</Text> */}
       </View>
 
       {loading && <Text style={styles.loadingText}>Loading...</Text>}
@@ -117,9 +117,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 6,
+    
   },
   addButtonText: {
-    color: "#fff",
+    color: "#000000",
     fontWeight: "600",
     marginLeft: 8,
   },
