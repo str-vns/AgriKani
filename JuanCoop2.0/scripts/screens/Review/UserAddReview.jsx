@@ -82,23 +82,53 @@ const UserAddReview = (props) => {
       setErrorMessage("Please rate the product");
       return;
     }
+    if (dStars === 0) {
+      setErrorMessage("Please rate the delivery service");
+      return;
+    }
+    if (sStars === 0) {
+      setErrorMessage("Please rate the seller's service");
+      return;
+    }
+  
     const comment = {
       user: userId,
       order: transactionId,
       productId: productId.product._id,
-      rating: stars,
-      driverRating: dStars,
-      serviceRating: sStars,
+      rating: stars,         // Product Quality Rating
+      driverRating: dStars,  // Delivery Speed Rating
+      serviceRating: sStars, // Seller Service Rating
       comment: review,
     };
-
-    dispatch(createComment(comment, token));
+  
+    console.log("📌 Submitting Review:", comment);
+  
+    dispatch(createComment(comment, token))
+      .then((response) => {
+        console.log("✅ Review Saved Successfully:", response);
+      })
+      .catch((error) => {
+        console.error("❌ Error Saving Review:", error);
+      });
+  
     navigation.navigate("UserOrderList");
     setReview("");
     setStars(0);
+    setDStars(0);
+    setSStars(0);
     setErrorMessage("");
   };
-
+  
+  useEffect(() => {
+    if (isReview) {
+      console.log("🔄 Existing Review Found:", isReview);
+      if (isReview.comment) setReview(isReview.comment);
+      if (isReview.rating) setStars(isReview.rating);
+      if (isReview.driverRating) setDStars(isReview.driverRating);
+      if (isReview.serviceRating) setSStars(isReview.serviceRating);
+    }
+  }, [isReview]);
+  
   const handleBack = () => {
     console.log("Navigating back");
     navigation.navigate("UserOrderList");
