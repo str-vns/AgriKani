@@ -43,7 +43,7 @@ const UserSidebar = () => {
     { label: "Community Forum", icon: "create-outline", key: "Forum" } : null,
     { label: "Track Order", icon: "location-outline", key: "track-order" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
-    { label: "About Us", icon: "information-circle-outline", key: "about-us" },
+    { label: "About Us", icon: "information-circle-outline", key: "AboutUs" },
   ].filter(item => item !== null);
 
   const CoopItems = [
@@ -82,7 +82,7 @@ const UserSidebar = () => {
     { label: "Home", icon: "home-outline", key: "home" },
     { label: "Distance", icon: "navigate-outline", key: "CoopDistance" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
-    { label: "About Us", icon: "information-circle-outline", key: "about-us" },
+    { label: "About Us", icon: "information-circle-outline", key: "AboutUs" },
   ];
 
   const DriverItems = [
@@ -110,6 +110,10 @@ const UserSidebar = () => {
       navigation.navigate("Home", { screen: "NotificationList" })
     } else if (key === "Forum") {
       navigation.navigate("CommunityForum");
+    } else if (key === "tutorial") {
+      navigation.navigate("Tutorial");
+    } else if (key === "AboutUs") {
+      navigation.navigate("AboutUs");
     }
   };
 
