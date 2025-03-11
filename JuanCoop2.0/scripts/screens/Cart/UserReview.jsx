@@ -13,8 +13,8 @@ const Review = ({ route, navigation }) => {
   const { cartItems, addressData, paymentMethod, paymentData } = route.params;
   const { loading, members, error } = useSelector((state) => state.memberList);
   const context = useContext(AuthGlobal);
-  const approvedMember = members?.find(member => member.approvedAt !== null);
-  const coopId = approvedMember?.coopId?._id;
+  const approvedMember = members?.filter(member => member.approvedAt !== null);
+  const coopId = approvedMember?.map(member => member.coopId?._id) || [];
   const userId = context?.stateUser?.userProfile?._id;
   const [token, setToken] = useState("");
 
@@ -54,16 +54,17 @@ const calculateFinalTotal = () => {
 
     let taxableTotal = 0;
     let nonTaxableTotal = 0;
-
+    
     cartItems.forEach((item) => {
-        const itemTotal = item.pricing * item.quantity;
-        console.log("Item Total: ", itemTotal);
-        if (item?.coop?._id !== coopId) {
-            taxableTotal += itemTotal;  
-        } else {
-            nonTaxableTotal += itemTotal;  
-        }
-    });
+      const itemTotal = item.pricing * item.quantity;
+      console.log("Item Total: ", itemTotal);
+  
+      if (!coopId.includes(item?.coop?._id)) {
+          taxableTotal += itemTotal;  
+      } else {
+          nonTaxableTotal += itemTotal;  
+      }
+  });
 
     const taxAmount = taxableTotal * 0.12; 
     const finalTotal = taxableTotal + nonTaxableTotal + taxAmount + shippingCost;

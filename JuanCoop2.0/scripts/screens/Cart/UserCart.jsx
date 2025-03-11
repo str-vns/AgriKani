@@ -26,13 +26,13 @@ const Cart = () => {
   const { loading, members, error } = useSelector((state) => state.memberList);
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
-  const approvedMember = members?.find(member => member.approvedAt !== null);
-  const coopId = approvedMember?.coopId?._id;
+  const approvedMember = members?.filter(member => member.approvedAt !== null);
+  const coopId = approvedMember?.map(member => member.coopId?._id) || [];
   const userId = context?.stateUser?.userProfile?._id;
   const isLogin = context?.stateUser?.isAuthenticated;
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState("");
-
+  console.log("coopId: ", coopId);
   useEffect(() => {
     const fetchJwt = async () => {
         try {
@@ -166,7 +166,6 @@ const Cart = () => {
   
   const calculateShipping = () => {
     const uniqueCoops = new Set();
-  
     cartItems.forEach((item) => {
       if (item?.coop?._id) {
         uniqueCoops.add(item.coop._id);
@@ -179,16 +178,15 @@ const Cart = () => {
   };
   
   const calculatedTax = () => {
-    let hasNonMemberItem = false; 
-
-    cartItems.forEach((item) => {
-        if (item?.coop?._id !== coopId) {
-            hasNonMemberItem = true; 
-        }
-    });
-
-    return hasNonMemberItem ? 0.12 : 0; 
+    const hasNonMemberItem = cartItems.some(item => 
+      item?.coop?._id && !coopId.includes(item.coop._id)
+  );
+    return hasNonMemberItem ? 0.12 : 0;
+    
 };
+
+
+
   const calculateTotalPrice = () => {
     return cartItems.reduce((total, item) => total + item.pricing * item.quantity, 0);
   };
@@ -206,15 +204,17 @@ const calculateFinalTotal = () => {
     let taxableTotal = 0;
     let nonTaxableTotal = 0;
 
+
     cartItems.forEach((item) => {
-        const itemTotal = item.pricing * item.quantity;
-        console.log("Item Total: ", itemTotal);
-        if (item?.coop?._id !== coopId) {
-            taxableTotal += itemTotal;  
-        } else {
-            nonTaxableTotal += itemTotal;  
-        }
-    });
+      const itemTotal = item.pricing * item.quantity;
+      console.log("Item Total: ", itemTotal);
+  
+      if (!coopId.includes(item?.coop?._id)) {
+          taxableTotal += itemTotal;  
+      } else {
+          nonTaxableTotal += itemTotal;  
+      }
+  });
 
     const taxAmount = taxableTotal * 0.12; 
     const finalTotal = taxableTotal + nonTaxableTotal + taxAmount + shippingCost;
