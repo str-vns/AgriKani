@@ -18,12 +18,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { driverApproved, driverRejected } from "@redux/Actions/driverActions";
 import { updateWithdraw } from "@redux/Actions/transactionActions";
 import messaging from "@react-native-firebase/messaging";
+import { sendNotifications } from "@redux/Actions/notificationActions";
+import { useSocket } from "../../../../SocketIo";
 
 const WithdrawsSingle = (props) => {
   const trans = props.route.params.withdrawData;
   console.log("Driver: ", trans);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const socket = useSocket();
   const [selectedImage, setSelectedImage] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,6 +67,23 @@ const WithdrawsSingle = (props) => {
                 fcmToken: fcmToken,
               }
               dispatch(updateWithdraw(transId, transData,  token));
+              const notification = {
+                              title: `Withdraw Success`,
+                              content: `Hi! ${trans?.user?.firstName} your Withdraw request ₱ ${trans?.amount ? trans.amount.toFixed(2) : "0.00"} 
+                              has been sent to your ${trans?.paymentMethod}. Please check your account.`,
+                              user: trans?.user?._id,
+                              fcmToken: fcmToken,
+                              type: "order",
+                            };
+              
+                            socket.emit("sendNotification", {
+                              senderName: "Admin",
+                              receiverName: trans?.user?._id,
+                              type: "order",
+                            });
+                          
+                           
+                            dispatch(sendNotifications(notification, token));
               navigation.navigate("WithdrawsList");
             } finally {
               setIsLoading(false);
@@ -93,6 +113,24 @@ const WithdrawsSingle = (props) => {
                 fcmToken: fcmToken,
               }
               dispatch(updateWithdraw(transId, transData,  token));
+              
+              const notification = {
+                title: `Withdraw Failed`,
+                content: `Hi! ${trans?.user?.firstName} your Withdraw request is declined. 
+                Please contact the admin for more information.`,
+                user: trans?.user?._id,
+                fcmToken: fcmToken,
+                type: "order",
+              };
+
+              socket.emit("sendNotification", {
+                senderName: "Admin",
+                receiverName: trans?.user?._id,
+                type: "order",
+              });
+            
+             
+              dispatch(sendNotifications(notification, token));
               navigation.navigate("WithdrawsList");
             } finally {
               setIsLoading(false);
@@ -126,7 +164,7 @@ const WithdrawsSingle = (props) => {
           >
             <Ionicons name="arrow-back" size={28} color="black" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Driver Details</Text>
+          <Text style={styles.headerTitle}>Withdraw Details</Text>
         </View>
 
         <View style={styles.coopContainer}>
@@ -174,7 +212,7 @@ const WithdrawsSingle = (props) => {
             {/* Decline Button */}
             <TouchableOpacity
               style={styles.approvedButton}
-              onPress={() => handleDelete(driver?._id)}
+              onPress={() => handleDelete(trans?._id)}
               disabled={isLoading}
             >
               {isLoading ? (
