@@ -207,4 +207,46 @@ export default StyleSheet.create({
       justifyContent: 'center',
       marginBottom: 20,
     },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0,0,0,0.5)", // Dim background effect
+    },
+    modalContent: {
+      width: "85%",
+      height: "60%", // Adjust modal height to fit screen
+      backgroundColor: "white",
+      padding: 20,
+      borderRadius: 10,
+      alignItems: "center",
+    },
+    modalText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 10,
+    },
+    termsTextContainer: {
+      flex: 1, // Allows scrolling inside modal
+      maxHeight: "70%", // Limit height for scrolling
+      width: "100%",
+
+    },
+    termsText: {
+      fontSize: 14,
+      textAlign: "justify",
+      paddingHorizontal: 5,
+    },
+    closeButton: {
+      marginTop: 10,
+      padding: 10,
+      backgroundColor: "#2196F3",
+      borderRadius: 5,
+      alignSelf: "center", // Center button
+      paddingTop: 10,
+    },
+    buttonText: {
+      color: "white",
+      fontWeight: "bold",
+    },
   });
