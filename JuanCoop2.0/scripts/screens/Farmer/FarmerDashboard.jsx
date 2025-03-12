@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, FlatList, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, FlatList, Image, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { useFocusEffect, useNavigation } from '@react-navigation/native'; // Assuming navigation is set up
@@ -15,6 +15,7 @@ import { useWeather } from '../../../CurrentWeather';
 import { useSocket } from "../../../SocketIo";
 import messaging from '@react-native-firebase/messaging';
 import Constants from "expo-constants";
+import RNPickerSelect from "react-native-picker-select";
 
 const FarmerDashboard = () => {
   const weather = useWeather();
@@ -188,27 +189,33 @@ const FarmerDashboard = () => {
     }
   }, [dispatch, userId]);
 
-  const salesTrends = dashboard?.salesTrends || { daily: 0, weekly: 0, monthly: 0 };
-  const rankedProducts = dashboard?.rankedProducts || [];
+  const [selectedRange, setSelectedRange] = useState("day");
 
-  const salesTrendsData = {
-    labels: ["Daily", "Weekly", "Monthly"],
-    datasets: [
-      {
-        data: [salesTrends.daily || 0, salesTrends.weekly || 0, salesTrends.monthly || 0],
-      },
-    ],
+  const salesData = {
+    day: dashboard?.salesPerDay || [],
+    week: dashboard?.salesPerWeek || [],
+    month: dashboard?.salesPerMonth || [],
+    year: dashboard?.salesPerYear || [],
   };
-  console.log("salesTrendsData:", salesTrends);
-  console.log("rankedProducts:", rankedProducts);
 
-  const topProductsData = rankedProducts.map((p) => ({
-    name: p.productName || "Unknown",
-    population: p.totalQuantitySold || 0,
-    color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-    legendFontColor: "#7F7F7F",
-    legendFontSize: 12,
-  }));
+  const currentSales = salesData[selectedRange];
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#4CAF50" />
+        <Text>Loading Dashboard...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -243,107 +250,102 @@ const FarmerDashboard = () => {
             showsHorizontalScrollIndicator={false}
           />
       </View>
-      {/* <View style={styles.weatherContainer}>
-        <View style={styles.weatherBox}>
-          <Image 
-            blurRadius={70}
-            source={require("@assets/img/bg.jpg")}
-            style={styles.backgroundImage}
-          />
-
-          <View style={styles.overlay}>
-          <Image
-    source={weatherIcons[weather?.data[0]?.weather?.icon] || weatherIcons['default']}
-    style={styles.cloudImage}
-  />
-    
-            <Text style={styles.weatherText}>City: {weather?.data[0].city_name}</Text>
-            <Text style={styles.weatherText}>Temperature: {weather?.data[0].temp}°C</Text>
-            <Text style={styles.weatherText}>Weather: {weather?.data[0].weather.description}</Text>
-            <Text style={styles.weatherText}>Wind Speed: {weather?.data[0].wind_spd} m/s</Text>
-          </View>
-        </View>
-
-  <ScrollView horizontal={true} >
-        {dailyWeather?.data?.map((item, index) => (
-        <View key={item._id || index} style={styles.dailyWeatherContainer}>
-        <View style={styles.dailyWeatherBox}>
-        <Image
-            blurRadius={70}
-            source={require("../../../assets/img/bg.jpg")}
-            style={styles.backgroundImageDaily}
-          />
-          <View style={styles.dailyOverlay}>
-
-            <Text style={styles.dailyWeatherDate}>{item.valid_date}</Text>
       
-            <Image
-              source={weatherIcons[item?.weather?.icon] || weatherIcons['default']}
-              style={styles.dailyWeatherCloudImage}
-            />
-      
-            <Text style={styles.dailyWeatherText} ellipsizeMode='tail'  numberOfLines={1}>{item.weather.description}</Text>
-            <Text style={styles.dailyWeatherTempText}>{item.temp}°C</Text>
+      <View style={styles.coopdatacontainer}>
+      <Text style={styles.coopdatatitle}>Cooperative Dashboard</Text>
+
+      {/* Summary Cards */}
+      <View style={styles.coopdatasummaryContainer}>
+        {[
+          { title: "💰 Sales", value: `₱${dashboard?.totalRevenue?.toLocaleString()}` },
+          { title: "📊 Orders", value: dashboard?.totalOrders },
+          { title: "👥 Customers", value: dashboard?.totalCustomers },
+        ].map((item, index) => (
+          <View key={index} style={styles.coopdatasummaryCard}>
+            <Text style={styles.coopdatasummaryTitle}>{item.title}</Text>
+            <Text style={styles.coopdatasummaryValue}>{item.value}</Text>
           </View>
-        </View>
-      </View>
         ))}
-      </ScrollView>
-      </View> */}
-      
-      <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Daily Sales</Text>
-            <Text style={styles.statValue}>₱{salesTrends.daily}</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Weekly Sales</Text>
-            <Text style={styles.statValue}>₱{salesTrends.weekly}</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statTitle}>Monthly Sales</Text>
-            <Text style={styles.statValue}>₱{salesTrends.monthly}</Text>
-          </View>
+      </View>
+
+      {/* Order Status Breakdown */}
+      {dashboard?.orderStatusCounts && (
+        <PieChart
+          data={Object.entries(dashboard.orderStatusCounts).map(([status, count], index) => ({
+            name: status,
+            population: count,
+            color: ["#FFD700", "#FFB703", "#FB8500", "#219EBC"][index % 4],
+            legendFontColor: "#333",
+            legendFontSize: 12,
+          }))}
+          width={screenWidth - 20}
+          height={220}
+          chartConfig={{
+            backgroundGradientFrom: "#fff",
+            backgroundGradientTo: "#fff",
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(255, 99, 71, ${opacity})`,
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+          paddingLeft="15"
+        />
+      )}
+
+<View style={styles.coopdataContainer}>
+      <View style={styles.coopdataheader}>
+        <Text style={styles.coopdataTitle}>📊 Sales Overview</Text>
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedRange(value)}
+          items={[
+            { label: "Day", value: "day" },
+            { label: "Week", value: "week" },
+            { label: "Month", value: "month" },
+            { label: "Year", value: "year" },
+          ]}
+          style={{
+            inputIOS: styles.coopdatadropdown,
+            inputAndroid: styles.coopdatadropdown,
+          }}
+          value={selectedRange}
+        />
+      </View>
+
+      {currentSales.length > 0 ? (
+        <BarChart
+          data={{
+            labels: currentSales.map((entry) => entry._id),
+            datasets: [{ data: currentSales.map((entry) => entry.totalSales) }],
+          }}
+          width={screenWidth - 50}
+          height={220}
+          yAxisLabel="₱"
+          chartConfig={{
+            backgroundGradientFrom: "white",
+            backgroundGradientTo: "white",
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(11, 9, 1, ${opacity})`, // Orange-Yellow Tint
+          }}
+          style={styles.coopdataChart}
+        />
+      ) : (
+        <Text style={styles.coopdatanoDataText}>No sales data available for this period.</Text>
+      )}
+    </View>
+
+      {/* Top Selling Products */}
+      {dashboard?.topSellingProducts?.length > 0 && (
+        <View style={styles.coopdatatopProductsContainer}>
+          <Text style={styles.coopdatatopProductsTitle}>🔥 Top 5 Selling Products</Text>
+          {dashboard.topSellingProducts.map((product, index) => (
+            <View key={product.productId} style={styles.coopdatatopProductRow}>
+              <Text style={styles.coopdatatopProductText}>{index + 1}. {product.productName}</Text>
+              <Text style={styles.coopdatatopProductText}>{product.totalSold} sold</Text>
+            </View>
+          ))}
         </View>
-        <View style={styles.totalOrdersCard}>
-          <Text style={styles.totalOrdersTitle}>Total Orders</Text>
-          <Text style={styles.totalOrdersValue}>{dashboard?.totalOrders ?? 0}</Text>
-        </View>
-        <View style={styles.chartsContainer}>
-          <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Sales Trends</Text>
-            <BarChart
-              data={salesTrendsData}
-              width={screenWidth - 40}
-              height={220}
-              chartConfig={{
-                backgroundColor: "#fff",
-                backgroundGradientFrom: "#f5f5f5",
-                backgroundGradientTo: "#e5e5e5",
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              }}
-              style={styles.chart}
-            />
-          </View>
-          <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Top Selling Products</Text>
-            <PieChart
-              data={topProductsData}
-              width={screenWidth - 40}
-              height={220}
-              chartConfig={{
-                backgroundColor: "#fff",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              }}
-              accessor={"population"}
-              backgroundColor={"transparent"}
-              paddingLeft={"15"}
-              absolute
-            />
-          </View>
-        </View>
+      )}
+    </View>
     </ScrollView>
   );
 };
