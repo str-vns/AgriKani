@@ -30,6 +30,15 @@ import {
   FETCH_APPROVED_POSTS_REQUEST,
   FETCH_APPROVED_POSTS_SUCCESS,
   FETCH_APPROVED_POSTS_FAIL,
+  ADD_COMMENT_REQUEST,
+  ADD_COMMENT_SUCCESS,
+  ADD_COMMENT_FAIL,
+  GET_COMMENTS_REQUEST,
+  GET_COMMENTS_SUCCESS,
+  GET_COMMENTS_FAIL,
+  POST_IMAGE_DELETE_REQUEST,
+  POST_IMAGE_DELETE_SUCCESS,
+  POST_IMAGE_DELETE_FAIL,
   CLEAR_ERRORS,
 } from "../Constants/postConstants";
 import baseURL from "@assets/commons/baseurl";
@@ -44,7 +53,7 @@ export const createPost = (formData) => async (dispatch) => {
       },
     };
 
-    const { data } = await axios.post(`${baseURL}p`, formData, config);
+    const { data } = await axios.post(`${baseURL}p/create`, formData, config);
 
     dispatch({
       type: POST_SUCCESS,
@@ -132,7 +141,7 @@ export const updatePost = (id, postData) => async (dispatch) => {
     });
 
     // Send FormData to server
-    const { data } = await axios.put(`${baseURL}p/${id}`, formData, {
+    const { data } = await axios.put(`${baseURL}p/update/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data", // Required for FormData
       },
@@ -208,17 +217,17 @@ export const likePost = (id, userId) => async (dispatch) => {
   try {
     dispatch({ type: POST_LIKE_REQUEST });
 
-    // Making API request to the backend
-    const response = await axios.post(`${baseURL}p/${id}`, { user: userId });
+    // Ensure the correct backend endpoint
+    const response = await axios.post(`${baseURL}p/like/${id}`, { user: userId });
 
     dispatch({
       type: POST_LIKE_SUCCESS,
-      payload: response.data, // Assuming backend returns updated post data
+      payload: response.data, // Backend should return updated post data
     });
   } catch (error) {
     dispatch({
       type: POST_LIKE_FAIL,
-      payload: error.response ? error.response.data.message : error.message,
+      payload: error.response?.data?.message || error.message,
     });
   }
 };
@@ -236,6 +245,88 @@ export const approvePost = (id) => async (dispatch) => {
     dispatch({
       type: POST_APPROVE_FAILURE,
       payload: error.response ? error.response.data.message : error.message,
+    });
+  }
+};
+
+// ADD COMMENT
+export const addComment = (comment, token) => async (dispatch) => {
+  console.log("Comment function triggered. Data:", comment);
+  
+  try {
+    dispatch({ type: ADD_COMMENT_REQUEST });
+
+    const commentData = {
+      user: comment.user,
+      post: comment.post,
+      comment: comment.comment,
+    };
+
+    console.log("Sending commentData:", commentData);
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const { data } = await axios.post(`${baseURL}post/comment`, commentData, config);
+
+    console.log("Response received:", data);
+
+    if (data.success) {
+      dispatch({
+        type: ADD_COMMENT_SUCCESS,
+        payload: data.details,
+      });
+      return { success: true, comment: data.details };
+    } else {
+      dispatch({
+        type: ADD_COMMENT_FAIL,
+        payload: data.message,
+      });
+    }
+
+  } catch (error) {
+    console.error("Error submitting comment:", error.response?.data || error.message);
+    dispatch({
+      type: ADD_COMMENT_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+  }
+};
+
+// GET COMMENTS
+export const getComments = (postId) => async (dispatch) => {
+  try {
+    dispatch({ type: GET_COMMENTS_REQUEST });
+
+    const { data } = await axios.get(`${baseURL}post/${postId}`);
+
+    dispatch({ type: GET_COMMENTS_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: GET_COMMENTS_FAIL,
+      payload: error.response?.data?.message || error.message,
+    });
+  }
+};
+
+export const imagePostDel = (postId, imageId) => async (dispatch) => {
+  try {
+    dispatch({ type: POST_IMAGE_DELETE_REQUEST });
+
+    const { data } = await axios.put(`${baseURL}p/image/${postId}/${imageId}`);
+    
+    dispatch({ 
+      type: POST_IMAGE_DELETE_SUCCESS,
+      payload: data 
+    });
+  } catch (error) {
+    dispatch({
+      type: POST_IMAGE_DELETE_FAIL,
+      payload: error.response?.data?.message || error.message,
     });
   }
 };

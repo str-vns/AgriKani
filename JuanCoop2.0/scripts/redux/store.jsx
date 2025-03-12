@@ -11,7 +11,7 @@ import {
     userDeviceTokenReducer,  checkEmailReducer, otpForgotPasswordReducer, googleLoginReducer } from "@redux/Reducers/userReducers";
   import { reducerProduct, reducerCoop, reducerCoopProduct, reducerCreateProduct, reducerEditProduct, reducerDelResProduct } from "@redux/Reducers/productReducers";
   import { HereMapReducer, MapBoxRouteReducer } from "@redux/Reducers/locationReducers";
-  import { coopReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
+  import { coopYReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
   import { addressReducer } from "@redux/Reducers/addressReducer";
   import { typeListReducer,typeCreateReducer,typeUpdateReducer,typeDeleteReducer } from "@redux/Reducers/typeReducers";
   import { categoryListReducer,categoryCreateReducer,categoryEditReducer,categoryDeleteReducer} from "@redux/Reducers/categoryReducers";
@@ -27,7 +27,7 @@ import {
   import { cancelledReducerApi, cancelledReducer } from "@redux/Reducers/cancelledReducer";
   import { walletReducer } from "@redux/Reducers/walletReducer";
   import { transactionReducer, transactionAPIReducer, refundReducer } from "@redux/Reducers/transactionReducer";
-  import postReducer from "./Reducers/postReducer";
+  import { postReducer, addCommentReducer, getCommentsReducer, postLikeReducer } from "@redux/Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
 
@@ -42,7 +42,7 @@ import {
     userOnly: userReducer,
     EditProfile: EditProfileReducer,
     Geolocation: HereMapReducer,
-    Coop: coopReducer,
+    Coop: coopYReducer,
     CoopProduct: reducerCoopProduct,
     addresses: addressReducer,
     types: typeListReducer,
@@ -74,6 +74,9 @@ import {
     coopdashboards: coopdashboardReducer,
     overalldashboards: overalldashboardReducer,
     post: postReducer,
+    AddComment: addCommentReducer,
+    getComments: getCommentsReducer,
+    postLike: postLikeReducer,
     sales: salesReducer,
     rank: rankedReducer,
     udeviceToken: userDeviceTokenReducer,

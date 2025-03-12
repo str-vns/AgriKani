@@ -48,7 +48,10 @@ const UserPostList = () => {
       </TouchableOpacity>
 
       {posts && posts.length > 0 ? (
-        posts.map((post) => (
+        posts
+        .slice() // Create a copy of the posts array to avoid mutating the original state
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .map((post) => (
           <View key={post._id} style={styles.postCard}>
             <Text style={styles.postTitle}>{post.title}</Text>
             <Text style={styles.postContent}>{post.content}</Text>

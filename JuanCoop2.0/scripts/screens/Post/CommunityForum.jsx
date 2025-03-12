@@ -1,44 +1,113 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchApprovedPosts, likePost } from '@src/redux/Actions/postActions';
+import { fetchApprovedPosts, likePost, addComment } from '@src/redux/Actions/postActions';
 import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import AuthGlobal from "@redux/Store/AuthGlobal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import messaging from '@react-native-firebase/messaging';
 
-const CommunityForum = ({ navigation }) => {
+const CommunityForum = ({ navigation, HandleLike }) => {
   const dispatch = useDispatch();
   const { stateUser } = useContext(AuthGlobal);
+  const [token, setToken] = useState(null);
+  const [fcmToken, setFcmToken] = useState(null);
   const userId = stateUser?.userProfile?._id;
-  const [comments, setComments] = useState({});
+  const context = useContext(AuthGlobal);
+  const { user } = useSelector((state) => state.userOnly);
+  const userslogin = context.stateUser?.userProfile || null;
+  
   const { posts, loading } = useSelector((state) => state.post);
+  const [comments, setComments] = useState({});
+  const [showComments, setShowComments] = useState({});
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
     dispatch(fetchApprovedPosts());
   }, [dispatch]);
 
-  const handleLike = (postId, userId) => {
-    dispatch(likePost(postId, userId)); // Dispatch like action
-    dispatch(fetchApprovedPosts()); // Re-fetch posts to reflect updated like count
-    alert("Like a Post successfully!");
-  };  
+  useEffect(() => {
+    const fetchJwt = async () => {
+      try {
+        const res = await AsyncStorage.getItem("jwt");
+        setToken(res);
+        messaging().getToken().then((token) => {
+          setFcmToken(token);
+        });
+      } catch (error) {
+        console.error("Error retrieving JWT: ", error);
+      }
+    };
 
-  const handleShare = (postId) => {
-    console.log('Shared post with ID:', postId);
+    fetchJwt();
+  }, []);
+
+  useEffect(() => {
+    if (posts.length > 0) {
+      const likedPosts = {};
+      posts.forEach((post) => {
+        likedPosts[post._id] = post.likes?.some((like) => like.user === userId);
+      });
+      setIsLiked(likedPosts);
+    }
+  }, [posts, userId]);
+  
+
+  const toggleLike = (postId) => {
+    handleLike(postId);
+    setIsLiked((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
+
+  const toggleComments = (postId) => {
+    setShowComments((prevState) => ({
+      ...prevState,
+      [postId]: !prevState[postId],
+    }));
+  };
+  
+  const handleLike = async (postId) => {
+    try {
+      await dispatch(likePost(postId, userId));
+      dispatch(fetchApprovedPosts());  // Ensure updated data is fetched
+    } catch (error) {
+      console.error("Error liking post:", error);
+    }
+  };
+  
+  const handleCommentChange = (postId, value) => {
+    setComments((prevComments) => ({
+      ...prevComments,
+      [postId]: value,
+    }));
   };
 
   const handleComment = (postId) => {
-    const comment = comments[postId];
-    if (comment) {
-      console.log(`Comment on Post ${postId}: ${comment}`);
+    if (!comments[postId]) {
+      alert("Please enter a comment.");
+      return;
     }
-  };
 
-  const handleCommentChange = (postId, value) => {
-    setComments({
-      ...comments,
-      [postId]: value,
+    const commentData = {
+      user: userId,
+      post: postId,
+      comment: comments[postId],
+    };
+
+    dispatch(addComment(commentData, token)).then(() => {
+      alert("Comment added successfully!");
+      setComments((prevComments) => ({
+        ...prevComments,
+        [postId]: "",
+      }));
+      dispatch(fetchApprovedPosts());
     });
   };
+
+  const isCooperative = userslogin?.roles?.includes("Cooperative");
 
   if (loading) {
     return (
@@ -52,90 +121,136 @@ const CommunityForum = ({ navigation }) => {
   return (
     <View > 
        <View style={styles.header2}>
-                        <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
-                          <Ionicons name="menu" size={34} color="black" />
-                        </TouchableOpacity>
-                
-                        <Text style={styles.headerTitle2}>Profile</Text>
-                      </View>
-
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Community Forum</Text>
-        <TouchableOpacity style={styles.userPostsButton} onPress={() => navigation.navigate("UserPostList")}>
-          <Text style={styles.userPostsButtonText}>View My Posts</Text>
-        </TouchableOpacity>
-      </View>
-      {posts &&
-        posts.map((post) => (
-          <View key={post._id} style={styles.postCard}>
-            <View style={styles.postHeader}>
-              <Text style={styles.postContent}>{post.content}</Text>
-              {post.image &&
-                post.image.map((img, idx) => (
-                  <Image
-                    key={idx}
-                    source={{ uri: img.url }}
-                    style={styles.postImage}
-                  />
-                ))}
-            </View>
-            <View style={styles.postAuthor}>
-              <Text style={styles.authorText}>Author: {post.author?.firstName} {post.author?.lastName}</Text>
-            </View>
-
-            <View style={styles.postActions}>
-              <TouchableOpacity onPress={() => handleLike(post._id, userId)} style={styles.actionButton}>
-                <FontAwesome5 name="heart" size={20} color="#E63946" />
-                <Text style={styles.actionText}>Like ({post.likeCount})</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => handleShare(post._id)} style={styles.actionButton}>
-                <Ionicons name="share-social-outline" size={20} color="#007bff" />
-                <Text style={styles.actionText}>Share</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.commentsSection}>
-              <Text style={styles.commentsHeader}>Comments</Text>
-              {post.comment &&
-                post.comment.map((comment, idx) => (
-                  <View key={idx} style={styles.commentCard}>
-                    <View style={styles.commentHeader}>
+          <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
+            <Ionicons name="menu" size={34} color="black" />
+          </TouchableOpacity>
+          {/* <Text style={styles.headerTitle2}>Discussion</Text> */}
+        </View>
+        <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Discussions</Text>
+          {isCooperative && ( // Render button only if user has "Cooperative" role
+            <TouchableOpacity 
+              style={styles.userPostsButton} 
+              onPress={() => navigation.navigate("UserPostList")}
+            >
+              <Text style={styles.userPostsButtonText}>View My Posts</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+          {posts &&
+            posts.map((post) => (
+              <View key={post._id} style={styles.postCard}>
+                <View style={styles.postHeader}>
+                  <Text style={styles.postContent}>{post.content}</Text>
+                  {post.image &&
+                    post.image
+                    .map((img, idx) => (
                       <Image
-                        source={{ uri: comment.avatar?.url }}
-                        style={styles.commentAvatar}
+                        key={idx}
+                        source={{ uri: img.url }}
+                        style={styles.postImage}
                       />
-                      <Text style={styles.commentName}>{comment.firstName} {comment.lastName}</Text>
-                      <Text style={styles.commentRating}>Rating: {comment.rating}</Text>
-                    </View>
-                    <Text style={styles.commentText}>{comment.comment}</Text>
-                    {comment.image &&
-                      comment.image.map((img, idx) => (
-                        <Image
-                          key={idx}
-                          source={{ uri: img.url }}
-                          style={styles.commentImage}
-                        />
-                      ))}
-                  </View>
-                ))}
-              <View style={styles.addComment}>
-                <TextInput
-                  style={styles.commentInput}
-                  value={comments[post._id] || ''}
-                  onChangeText={(text) => handleCommentChange(post._id, text)}
-                  placeholder="Add a comment..."
-                  placeholderTextColor="#999"
-                />
-                <TouchableOpacity onPress={() => handleComment(post._id)} style={styles.addCommentButton}>
-                  <Text style={styles.addCommentButtonText}>Add Comment</Text>
+                    ))}
+                </View>
+                <View style={styles.postAuthor}>
+                  <Text style={styles.authorText}>Author: {post.author?.firstName} {post.author?.lastName}</Text>
+                  <Text style={styles.authorText}>Date: 
+                    {post.createdAt
+                        ? new Date(post.createdAt).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : "Unknown Date"}
+                  </Text>
+                </View>
+
+                <View style={styles.postActions}>
+                  <TouchableOpacity onPress={() => handleLike(post._id)} style={styles.actionButton}>
+                    <FontAwesome5 
+                      name="heart" 
+                      size={20} 
+                      color={isLiked[post._id] ? "red" : "#E63946"} 
+                    />
+                    <Text style={styles.actionText}>
+                      Like ({post.likeCount})
+                    </Text>
                 </TouchableOpacity>
+                  <TouchableOpacity onPress={() => toggleComments(post._id)} style={styles.actionButton}>
+                    <FontAwesome5 
+                      name="comment" 
+                      size={20} 
+                      color="orange" />
+                    <Text style={styles.actionText}>Comment ({post.comments?.length})</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {showComments[post._id] && (
+                  <View style={styles.forumlistCoopComments}>
+                    <Text style={styles.forumlistCoopTitle}>Comments</Text>
+                    {post.comments?.length > 0 ? (
+                      [...post.comments] // Create a copy to avoid mutating original data
+                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by date (most recent first)
+                        .map((comment, index) => (
+                          <View key={index} style={styles.forumlistCoopCommentItem}>
+                            {/* Row: Name, Comment, and Sentiment Label */}
+                            <View style={styles.forumlistCoopCommentContent}>
+                              <Text>
+                                <Text style={styles.commentUser}>
+                                  {comment.user?.firstName} {comment.user?.lastName}:
+                                </Text>{" "}
+                                {comment.comment}
+                              </Text>
+
+                              {/* Sentiment Label */}
+                              <View style={styles.sentimentLabel}>
+                                {comment.sentimentLabel === "positive" && (
+                                  <FontAwesome5 name="laugh-beam" size={24} color="green" />
+                                )}
+                                {comment.sentimentLabel === "neutral" && (
+                                  <FontAwesome5 name="meh" size={24} color="yellow" />
+                                )}
+                                {comment.sentimentLabel === "negative" && (
+                                  <FontAwesome5 name="angry" size={24} color="red" />
+                                )}
+                              </View>
+                            </View>
+
+                            {/* Date below */}
+                            <Text style={styles.commentDate}>
+                              {comment.createdAt
+                                ? new Date(comment.createdAt).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })
+                                : "Unknown Date"}
+                            </Text>
+                          </View>
+                        ))
+                    ) : (
+                      <Text>No comments yet.</Text>
+                    )}
+                  </View>
+                )}
+                <View style={styles.commentsSection}>
+                  <View style={styles.addComment}>
+                    <TextInput
+                      style={styles.commentInput}
+                      value={comments[post._id] || ""}
+                      onChangeText={(text) => handleCommentChange(post._id, text)}
+                      placeholder="Add a comment..."
+                      placeholderTextColor="#999"
+                    />
+                    <TouchableOpacity onPress={() => handleComment(post._id)} style={styles.addCommentButton}>
+                      <Text style={styles.addCommentButtonText}>Add Comment</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
-            </View>
-          </View>
-        ))}
-    </ScrollView>
+            ))}
+        </ScrollView>
     </View>
   );
 };
@@ -310,6 +425,41 @@ headerTitle2: {
     flex: 1,
     textAlign: 'center',
     color: '#333',
+},
+forumlistCoopComments: {
+  padding: 10,
+  backgroundColor: "#FFF9C4", // Light yellow background
+  borderRadius: 10,
+  marginVertical: 10,
+},
+forumlistCoopTitle: {
+  fontSize: 18,
+  fontWeight: "bold",
+  color: "#333",
+  marginBottom: 5,
+},
+forumlistCoopCommentItem: {
+  borderBottomWidth: 1,
+  borderBottomColor: "#E0C200",
+  paddingVertical: 8,
+},
+forumlistCoopCommentContent: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+},
+commentUser: {
+  fontWeight: "bold",
+  color: "#444",
+},
+sentimentLabel: {
+  padding: 5,
+  borderRadius: 5,
+},
+commentDate: {
+  fontSize: 12,
+  color: "#666",
+  marginTop: 3,
 },
 });
 

@@ -127,6 +127,16 @@ const UserPostScreen = () => {
       });
     }
   };
+
+  const [sortedPosts, setSortedPosts] = useState([]);
+
+  useEffect(() => {
+    if (posts && posts.length > 0) {
+      // Sort posts in descending order by date (most recent first)
+      const sorted = [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setSortedPosts(sorted);
+    }
+  }, [posts]);
   
   return (
     <ScrollView style={{ flex: 1, padding: 20, backgroundColor: "#f5f5f5" }}>
