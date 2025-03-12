@@ -1446,7 +1446,7 @@ exports.onlinePaymentProcess = async (req, res) => {
 
     const paymentIntentId = paymentIntentResponse.data.id;
 
-    const returnUrl = isMobile ? "https://agrikani.onrender.com/app-redirect" : "https://agrikani.onrender.com/checkout";
+    const returnUrl = isMobile ? process.env.MOBILE_URL_NAVIGATE : process.env.WEB_URL_NAVIGATE;
     
     // ✅ Attach Payment Method to Payment Intent
     const attachResponse = await paymongoInstance.paymentIntents.attach(paymentIntentId, {
