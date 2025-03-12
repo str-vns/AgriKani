@@ -96,14 +96,31 @@ const Gcash_Refund = (props) => {
         onChangeText={setName}
       />
 
-      <Text style={styles.label}>Phone Number:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter phone number"
-        keyboardType="phone-pad"
-        value={phone}
-        onChangeText={setPhone}
-      />
+<Text style={styles.label}>Phone Number:</Text>
+<TextInput
+  style={styles.input}
+  placeholder="Enter phone number"
+  keyboardType="phone-pad"
+  value={phone}
+  onChangeText={(text) => {
+    // Remove non-numeric characters
+    let formattedText = text.replace(/[^0-9]/g, '');
+
+    // Ensure it starts with '09'
+    if (!formattedText.startsWith("09")) {
+      formattedText = "09";
+    }
+
+    // Limit to 11 digits
+    if (formattedText.length > 11) {
+      formattedText = formattedText.slice(0, 11);
+    }
+
+    setPhone(formattedText);
+  }}
+  maxLength={11} // Prevents additional input
+/>
+
 
 
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>

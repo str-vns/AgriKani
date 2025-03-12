@@ -2,76 +2,71 @@ import { StyleSheet, Dimensions } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
-const scale = (size) => (width / 375) * size; 
-
 export default StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#f3f4f6",
-        padding: scale(16),
-        top: scale(30),
-    },
-    card: {
-        backgroundColor: "white",
-        padding: scale(20),
-        borderRadius: scale(16),
-        width: "90%",
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: scale(4),
-        elevation: scale(5),
-    },
-    title: {
-        fontSize: scale(20),
-        fontWeight: "bold",
-        color: "#1f2937",
-        marginBottom: scale(10),
-    },
-    description: {
-        color: "#6b7280",
-        marginBottom: scale(10),
-        fontSize: scale(14),
-    },
-    reasonButton: {
-        padding: scale(10),
-        borderWidth: scale(1),
-        borderColor: "#d1d5db",
-        borderRadius: scale(8),
-        marginBottom: scale(8),
-        width: "100%",
-        alignItems: "center",
-    },
-    selectedReason: {
-        backgroundColor: "#d1d5db",
-    },
-    reasonText: {
-        color: "#374151",
-        fontSize: scale(14),
-    },
-    bigInput: {
-        marginTop: scale(10),
-        borderWidth: scale(1),
-        borderColor: "#d1d5db",
-        borderRadius: scale(8),
-        padding: scale(10),
-        width: "100%",
-        backgroundColor: "#fff",
-        height: scale(100),
-        textAlignVertical: "top",
-        fontSize: scale(14),
-    },
-    buttonGroup: {
-        flexDirection: "row",
-        marginTop: scale(16),
-        gap: scale(10),
-    },
-    button: {
-        padding: scale(10),
-        backgroundColor: "#ddd",
-        borderRadius: scale(8),
-        alignItems: "center",
-    },
+  container: {
+    flex: 1,
+    minHeight: height,  // Ensures full screen coverage
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    justifyContent: "center",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+    color: "#333",
+  },
+  description: {
+    fontSize: 16,
+    textAlign: "center",
+    color: "#666",
+    marginBottom: 20,
+  },
+  reasonButton: {
+    backgroundColor: "#ffffff",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  selectedReason: {
+    backgroundColor: "#007bff",
+    borderColor: "#0056b3",
+  },
+  reasonText: {
+    fontSize: 16,
+    color: "#333",
+    textAlign: "center",
+  },
+  bigInput: {
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    marginTop: 10,
+  },
+  buttonGroup: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  button: {
+    flex: 1,
+    backgroundColor: "#FFFFFF", // Changed to white to remove gray padding
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: 5,
+    borderWidth: 1,  // Optional: Keep a subtle border
+    borderColor: "#ccc",
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "#007bff",
+    fontWeight: "bold",
+  },
 });

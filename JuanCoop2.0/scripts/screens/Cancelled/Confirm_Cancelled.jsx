@@ -128,36 +128,51 @@ const Confirm_Cancelled = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: "#f8f9fa",
+    padding: 24,
+    backgroundColor: "#ffffff", // Clean white background for a formal look
   },
   label: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 10,
-    color: "#333",
+    fontWeight: "600", // Slightly lighter than bold for a refined look
+    marginTop: 12,
+    color: "#2c3e50", // Dark blue-gray for a professional feel
   },
   info: {
-    fontSize: 18,
-    paddingVertical: 5,
-    color: "#555",
+    fontSize: 17,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    color: "#4a4a4a", // Dark gray for readability
+    backgroundColor: "#f7f7f7", // Light gray background for contrast
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#dcdcdc", // Subtle border for a structured look
   },
   buttonContainer: {
-    marginTop: 20,
+    marginTop: 30,
+    alignItems: "center",
   },
   confirmButton: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    backgroundColor: "#0056b3", // Deep blue for a formal look
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5, // Slight shadow for a premium touch
   },
   buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "#ffffff",
+    fontSize: 17,
+    fontWeight: "600",
+    textTransform: "uppercase", // Adds a structured and serious tone
+    letterSpacing: 1, // Creates a polished appearance
   },
 });
+
+
 
 export default Confirm_Cancelled;

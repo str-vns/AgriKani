@@ -9,7 +9,7 @@ import {
   FlatList,
 } from "react-native";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import styles from "./css/styles";
+import styles from "../stylesheets/Coop/coopProfile";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { getCoopProducts } from "@redux/Actions/productActions";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +20,7 @@ import { createConversation } from "@redux/Actions/converstationActions";
 import { conversationList } from "@redux/Actions/converstationActions";
 import { getUsers } from "@redux/Actions/userActions";
 import { useSocket } from "../../../SocketIo";
+
 
 const FarmerProfile = (props) => {
   const dispatch = useDispatch();
@@ -192,9 +193,9 @@ const FarmerProfile = (props) => {
         />
       )}
       <Text style={styles.profileName}>{cooperative?.farmName}</Text>
-      <TouchableOpacity style={styles.editProfile} onPress={() => chatNow()}>
-        <Text style={styles.editProfile}>Chat Now</Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.emailIcon} onPress={() => chatNow()}>
+  <Ionicons name="mail-outline" size={20} color="black" />
+</TouchableOpacity>
     </View>
   );
 

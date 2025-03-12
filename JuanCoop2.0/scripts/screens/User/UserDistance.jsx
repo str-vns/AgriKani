@@ -1,5 +1,6 @@
 
 import React, {useEffect, useRef, useState, useContext, useCallback } from 'react'
+import { ScrollView, KeyboardAvoidingView,Platform } from "react-native";
 import * as Location from 'expo-location'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
@@ -245,56 +246,61 @@ const UserDistance = () => {
   }
   
   return (
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : null}>
     <View style={styles.overallContainer}>
-    <View style={styles.mapContainer}>
+      {/* Map Container */}
+      <View style={styles.mapContainer}>
         <WebView
-        ref={webViewRef}
-        originWhitelist={['*']}
-        source={{ html: mapHtml }}
-        javaScriptEnabled={true}
-  domStorageEnabled={true}
-        scrollEnabled={false}
-        onMessage={handleWebViewMessage}
-      />
-
-
-    </View>
-    {filterCoops && filterCoops.length > 0 ? (
-  filterCoops.map((coop, index) => (
-    <View style={styles.cardContainer} key={index}>
-      <View style={styles.imageContainer}>
-        <Image
-          src={coop?.user?.image?.url}
-          style={styles.image}
-          resizeMode="cover"
+          ref={webViewRef}
+          originWhitelist={["*"]}
+          source={{ html: mapHtml }}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          scrollEnabled={false}
+          onMessage={handleWebViewMessage}
         />
       </View>
 
-      <View style={styles.detailsContainer}>
-        <Text style={styles.farmName} numberOfLines={2} ellipsizeMode="tail">
-          {coop.farmName || "FARMNAME..."}
-        </Text>
-        <Text style={styles.address} numberOfLines={2} ellipsizeMode="tail">
-          {coop.address || "No Address Available"}
-        </Text>
-      </View>
+      {/* Scrollable List */}
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer} 
+        keyboardShouldPersistTaps="handled"
+      >
+        {filterCoops && filterCoops.length > 0 ? (
+          filterCoops.map((coop, index) => (
+            <View style={styles.cardContainer} key={index}>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{ uri: coop?.user?.image?.url }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              </View>
 
-      <TouchableOpacity style={styles.viewButton} onPress={() =>
- handleCoopProfile(coop)}>
-        <Text style={styles.buttonText}>View Profile</Text>
-      </TouchableOpacity>
-    </View>
-  ))
-) : (
-  <View style={styles.cardContainer} >
-     <View style={styles.detailContainerNull}>
-      <Text style={styles.textNullDetail}>Click the Marker to Choose a Cooperative</Text>
-     </View>
+              <View style={styles.detailsContainer}>
+                <Text style={styles.farmName} numberOfLines={2} ellipsizeMode="tail">
+                  {coop.farmName || "FARMNAME..."}
+                </Text>
+                <Text style={styles.address} numberOfLines={2} ellipsizeMode="tail">
+                  {coop.address || "No Address Available"}
+                </Text>
+              </View>
 
-    </View>
-)}
-    
+              <TouchableOpacity style={styles.viewButton} onPress={() => handleCoopProfile(coop)}>
+                <Text style={styles.buttonText}>View Profile</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        ) : (
+          <View style={styles.cardContainer}>
+            <View style={styles.detailContainerNull}>
+              <Text style={styles.textNullDetail}>Click the Marker to Choose a Cooperative</Text>
+            </View>
           </View>
+        )}
+      </ScrollView>
+    </View>
+  </KeyboardAvoidingView>
   )
 }
 

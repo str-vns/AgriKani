@@ -60,7 +60,7 @@ useFocusEffect(
           onPress={() => navigation.navigate('AddressForm')}
         >
           <Ionicons name="add-circle-outline" size={24} color="#fff" />
-          <Text style={styles.addButtonText}>Add New Address</Text>
+          <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
       </View>
 

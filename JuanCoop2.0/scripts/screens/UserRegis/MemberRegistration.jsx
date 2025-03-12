@@ -276,7 +276,7 @@ function MemberRegistration() {
   style={styles.pickerStyle}
   onValueChange={(itemValue) => setCoopId(itemValue)}
 >
-  <Picker.Item label="Select Cooperative" value="" enabled={false} />
+  {/* <Picker.Item label="Select Cooperative" value="" enabled={false} />
   {coops && coops.length > 0 ? (
     coops
     .filter(coop => !members.some(member => member.coopId?._id === coop._id))
@@ -291,7 +291,24 @@ function MemberRegistration() {
   ) : (
     <Text>No Cooperative</Text>
   )}
+</Picker> */}
+<Picker.Item label="Select Cooperative" value="" enabled={false} />
+{coops && coops.length > 0 ? (
+  coops
+    .filter(coop => !(members?.some(member => member.coopId?._id === coop._id) ?? false)) // Ensures it works even if members is undefined
+    .map((coop, index) => (
+      <Picker.Item
+        key={index}
+        label={coop.farmName || "None"}
+        value={{ coopId: coop._id, userId: coop.user._id }}
+        style={styles.pickerText}
+      />
+    ))
+) : (
+  <Text>No Cooperative</Text>
+)}
 </Picker>
+
         </View>
 
         <Text style={styles.imageText}>Barangay Clearance</Text>

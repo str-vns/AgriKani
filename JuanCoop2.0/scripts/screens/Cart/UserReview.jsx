@@ -186,7 +186,7 @@ const calculateFinalTotal = () => {
               <Text style={styles.itemName}>{item.productName}</Text>
               <Text style={styles.itemUnit}>{item.unitName} {item.metricUnit}</Text>
               <Text style={styles.itemText}>Quantity: {item.quantity}</Text>
-              <Text style={styles.itemText}>Price: ${item.pricing.toFixed(2)}</Text>
+              <Text style={styles.itemText}>Price: ₱{item.pricing.toFixed(2)}</Text>
             </View>
           </View>
         )}
@@ -271,7 +271,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     borderRadius: 30,
     alignItems: "center",
-    marginTop: 20,
     elevation: 4,
   },
   confirmButtonText: {

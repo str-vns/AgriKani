@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { printToFileAsync } from 'expo-print';
+import { Platform } from "react-native";
 
 const handleDownloadReceipt = async (cartItems, addressData, paymentMethod, setLoading) => {
   try {
@@ -15,26 +16,81 @@ const handleDownloadReceipt = async (cartItems, addressData, paymentMethod, setL
     // Create HTML content for receipt
     const htmlContent = `
       <html>
-        <body>
-          <h1>Order Receipt</h1>
-          <p><b>Date:</b> ${new Date().toLocaleDateString('en-US')}</p>
-          <p><b>Total Price:</b> ₱${totalPrice}</p>
-          <h3>Items:</h3>
-          <ul>
-            ${cartItems
-              .map(
-                (item) =>
-                  `<li>${item.productName || "N/A"} - Quantity: ${item.quantity || 0} - Price: ₱${item.pricing || "0.00"}</li>`
-              )
-              .join("")}
-          </ul>
-          <p><b>Shipping Address:</b></p>
-          <p>${addressData?.fullName || "N/A"}<br>
-             ${addressData?.address || "N/A"}, ${addressData?.city || "N/A"}<br>
-             ${addressData?.postalCode || "N/A"}</p>
-          <p><b>Payment Method:</b> ${paymentMethod || "N/A"}</p>
-        </body>
-      </html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 20px;
+        border: 2px solid #000;
+        max-width: 600px;
+      }
+      h1 {
+        text-align: center;
+        font-size: 24px;
+        text-transform: uppercase;
+      }
+      .info {
+        margin-bottom: 15px;
+      }
+      .info p {
+        margin: 5px 0;
+      }
+      .items {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .items th, .items td {
+        border: 1px solid #000;
+        padding: 8px;
+        text-align: left;
+      }
+      .items th {
+        background-color: #f2f2f2;
+      }
+      .total {
+        font-size: 18px;
+        font-weight: bold;
+        text-align: right;
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Order Receipt</h1>
+    <div class="info">
+      <p><b>Date:</b> ${new Date().toLocaleDateString('en-US')}</p>
+      <p><b>Payment Method:</b> ${paymentMethod || "N/A"}</p>
+    </div>
+    
+    <h2>Order Details</h2>
+    <table class="items">
+      <tr>
+        <th>Item Name</th>
+        <th>Quantity</th>
+        <th>Price</th>
+      </tr>
+      ${cartItems
+        .map(
+          (item) =>
+            `<tr>
+              <td>${item.productName || "N/A"}</td>
+              <td>${item.quantity || 0}</td>
+              <td>₱${item.pricing || "0.00"}</td>
+            </tr>`
+        )
+        .join("")}
+    </table>
+
+    <p class="total">Total Price: ₱${totalPrice}</p>
+
+    <h2>Shipping Address</h2>
+    <p>$
+       ${addressData?.address || "N/A"}, ${addressData?.city || "N/A"}<br>
+       ${addressData?.postalCode || "N/A"}</p>
+  </body>
+</html>
+
     `;
 
     const { uri } = await printToFileAsync({
@@ -42,22 +98,43 @@ const handleDownloadReceipt = async (cartItems, addressData, paymentMethod, setL
       base64: false,
     });
 
-    // Use Expo FileSystem to make sure the file is accessible
-    const fileUri = uri;
+    if (Platform.OS === "android") {
+      // Use StorageAccessFramework for saving to Downloads on Android
+      const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (!permissions.granted) {
+        alert("Permission to access storage is required to download the receipt.");
+        return;
+      }
 
-    // Option 1: Open the file with Sharing
-    await Sharing.shareAsync(fileUri).catch((err) => alert('Failed to open receipt: ' + err.message));
+      const fileName = "order_receipt.pdf";
+      const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+        permissions.directoryUri,
+        fileName,
+        "application/pdf"
+      );
 
-    // Option 2: Open the file directly (if it's a supported format like PDF)
-    // Linking.openURL(fileUri).catch((err) => alert('Failed to open receipt: ' + err.message));
+      const fileContent = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+      await FileSystem.writeAsStringAsync(fileUri, fileContent, { encoding: FileSystem.EncodingType.Base64 });
 
-    alert(`Receipt generated successfully! File saved at: ${fileUri}`);
+      alert("Receipt saved successfully in your Downloads folder!");
+    } else {
+      // For iOS, move the file to a readable location
+      const fileUri = `${FileSystem.documentDirectory}order_receipt.pdf`;
+      await FileSystem.moveAsync({
+        from: uri,
+        to: fileUri,
+      });
+
+      await Sharing.shareAsync(fileUri);
+      alert("Receipt saved successfully!");
+    }
   } catch (error) {
     alert(`Failed to generate receipt: ${error.message}`);
   } finally {
     setLoading(false);
   }
 };
+
 
 const OrderConfirmation = ({ route }) => {
   const { cartItems, addressData, paymentMethod } = route.params;

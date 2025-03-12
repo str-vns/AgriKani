@@ -49,8 +49,9 @@ useFocusEffect(
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.header}>Your Addresses</Text>
-          <Ionicons name="add-circle-outline" size={24} color="#000000" />
-          {/* <Text style={styles.addButtonText}>Add</Text> */}
+          <TouchableOpacity onPress={() => navigation.navigate("UserAddressFormScreen")}>
+            <Ionicons name="add-circle-outline" size={24} color="#000000" />
+          </TouchableOpacity>
       </View>
 
       {loading && <Text style={styles.loadingText}>Loading...</Text>}
