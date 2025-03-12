@@ -1237,19 +1237,27 @@ exports.getCoopDashboardData = async (userId) => {
     console.log("📆 Sales Per Year:", salesPerYear);
 
     // Top 5 Selling Products (Only Delivered Orders)
-    const productSales = await Order.aggregate([
-      { $unwind: "$orderItems" },
+    const topSellingProducts = await Order.aggregate([
+      {
+        $unwind: "$orderItems" // Break down order items array
+      },
       {
         $match: {
-          "orderItems.coopUser": coopInfo._id,
+          "orderItems.coopUser": coopInfo._id, // Ensure only products from the logged-in user's cooperative
           "orderItems.orderStatus": "Delivered"
         }
       },
       {
         $group: {
-          _id: "$orderItems.product",
-          totalQuantitySold: { $sum: "$orderItems.quantity" }
+          _id: "$orderItems.product", // Group by product
+          totalSold: { $sum: "$orderItems.quantity" } // Sum up quantities sold
         }
+      },
+      {
+        $sort: { totalSold: -1 } // Sort by most sold
+      },
+      {
+        $limit: 5 // Get only the top 5
       },
       {
         $lookup: {
@@ -1259,18 +1267,25 @@ exports.getCoopDashboardData = async (userId) => {
           as: "productDetails"
         }
       },
-      { $unwind: "$productDetails" },
       {
-        $project: {
-          productId: "$_id",
-          productName: "$productDetails.productName",
-          totalQuantitySold: 1
+        $unwind: "$productDetails" // Flatten productDetails array
+      },
+      {
+        $match: {
+          "productDetails.coop": coopInfo._id // Extra filtering for safety
         }
       },
-      { $sort: { totalQuantitySold: -1 } },
-      { $limit: 5 }
+      {
+        $project: {
+          _id: 1,
+          productName: "$productDetails.productName",
+          totalSold: 1,
+          image: "$productDetails.image"
+        }
+      }
     ]);
-    console.log("🔥 Top 5 Selling Products:", productSales);
+    
+    console.log("🏆 Filtered Top 5 Best-Selling Products:", topSellingProducts);    
 
 
     return {
@@ -1284,8 +1299,9 @@ exports.getCoopDashboardData = async (userId) => {
       salesPerWeek,
       salesPerMonth,
       salesPerYear,
-      topSellingProducts: productSales,
+      topSellingProducts
     };
+    
   } catch (error) {
     console.error("❌ Error fetching dashboard data:", error);
     throw new ErrorHandler("Error processing dashboard data", 500);
