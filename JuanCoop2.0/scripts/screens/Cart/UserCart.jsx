@@ -198,6 +198,21 @@ const Cart = () => {
     );
 };
 
+const subtax = () => {
+
+  let taxableTotal = 0;
+
+cartItems.forEach((item) => {
+    
+    const itemTotal = item.pricing * item.quantity;
+    if (!coopId.includes(item.coop)) {
+      taxableTotal += itemTotal;
+    } 
+  });
+
+ return taxableTotal;
+}
+
 const calculateFinalTotal = () => {
     const shippingCost = calculateShipping();
 
@@ -246,7 +261,7 @@ const calculateFinalTotal = () => {
           <Text style={styles.ShippingFeeText}>Overall Item: ₱ {calculateTotalPrice() }</Text>
           <Text style={styles.ShippingFeeText}>Shipping Fee: ₱ {calculateShipping() }</Text>
           <View style={styles.rowContainer}>
-        <Text style={styles.ShippingFeeText}>Tax: ₱ {(calculateTotalPrice() * calculatedTax()).toFixed(2)}</Text>
+        <Text style={styles.ShippingFeeText}>Tax: ₱ {(subtax() * calculatedTax()).toFixed(2)}</Text>
         <TouchableOpacity onPress={handleTaxInfo}>
             <Icon name="info" type="material" color="#007BFF" size={15} style={styles.infoIcon} />
         </TouchableOpacity>
