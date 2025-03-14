@@ -28,7 +28,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 
 GoogleSignin.configure({
-  webClientId: "239225060602-onmhk6p6a374mhh2n6p8gmbcmp79vbao.apps.googleusercontent.com",
+  webClientId: Constants?.expoConfig?.extra?.GOOGLE_LOGIN_WEB,
   scopes: ['https://www.googleapis.com/auth/drive.readonly'],
   offlineAccess: true,
   forceCodeForRefreshToken: true,
