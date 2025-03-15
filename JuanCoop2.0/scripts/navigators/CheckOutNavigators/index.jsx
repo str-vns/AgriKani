@@ -53,7 +53,7 @@ const Index = () => {
       <Stack.Screen
         name="AddressList"
         component={AddressList}
-        options={{ headerShown: true }}
+        options={{ headerShown: true, title:"Address List" }}
       />
       <Stack.Screen
         name="AddressForm"
@@ -91,6 +91,7 @@ const Index = () => {
         options={{
           headerShown: true,
           gestureEnabled: false, 
+          title:"Order Confirmation",
           headerLeft: () => null,
         }}
       />

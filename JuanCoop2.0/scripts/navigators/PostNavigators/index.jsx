@@ -13,7 +13,7 @@ const Index = () => {
        <Stack.Screen
         name="UserPostList"
         component={UserPostList}
-        options={{ headerShown: true }}
+        options={{ headerShown: true , title:"Your Post"}}
       />
        <Stack.Screen
         name="PostList"
@@ -28,7 +28,8 @@ const Index = () => {
       <Stack.Screen
         name="CommunityForum"
         component={CommunityForum}
-        options={{ headerShown: false }}
+        options={{ headerShown:true,title:"Disccusion Board" }}
+        
       />
     </Stack.Navigator>
   );

@@ -11,17 +11,18 @@ const Index = () => {
       <Stack.Screen
         name="UserAddress"
         component={UserAddress}
-        options={{ headerShown: true }}
+        options={{ headerShown: true,title: "User Address"  }}
       />
       <Stack.Screen
         name="UserAddressFormScreen"
         component={UserAddressFormScreen}
-        options={{ headerShown: true }}
+        options={{headerShown: true,title: "Add Address"}}
       />
+
       <Stack.Screen
         name="UserAddressEdit"
         component={UserAddressEdit}
-        options={{ headerShown: true }}
+        options={{ headerShown: true,title: "Edit Address" }}
       />
     </Stack.Navigator>
   );

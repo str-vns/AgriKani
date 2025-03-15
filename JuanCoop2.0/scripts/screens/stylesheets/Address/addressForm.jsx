@@ -4,13 +4,7 @@ var { width, height } = Dimensions.get("window");
 export default StyleSheet.create({
   formContainer: {
     padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0 / 1.2, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
+    backgroundColor: "#f9f9f9",
   },
   title: {
     fontSize: 24,

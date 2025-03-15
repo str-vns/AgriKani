@@ -235,7 +235,7 @@ function MemberRegistration() {
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.container}>
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
           <TouchableOpacity
             style={styles.drawerButton}
             onPress={() => navigation.openDrawer()}
@@ -244,7 +244,7 @@ function MemberRegistration() {
           </TouchableOpacity>
 
           <Text style={styles.headerTitle}>Member Registration</Text>
-        </View>
+        </View> */}
         <Image source={require("@assets/img/logo.png")} style={styles.logo} />
         <Text style={styles.textHeaderInput}>Address</Text>
         <TextInput

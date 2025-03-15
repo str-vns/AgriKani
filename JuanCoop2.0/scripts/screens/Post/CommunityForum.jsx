@@ -120,15 +120,16 @@ const CommunityForum = ({ navigation, HandleLike }) => {
 
   return (
     <View > 
-       <View style={styles.header2}>
+       {/* <View style={styles.header2}>
           <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
             <Ionicons name="menu" size={34} color="black" />
           </TouchableOpacity>
-          {/* <Text style={styles.headerTitle2}>Discussion</Text> */}
-        </View>
+          <Text style={styles.headerTitle2}>Discussion</Text>
+        </View> */}
+        
         <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Discussions</Text>
+          {/* <Text style={styles.headerText}>Discussions</Text> */}
           {isCooperative && ( // Render button only if user has "Cooperative" role
             <TouchableOpacity 
               style={styles.userPostsButton} 
@@ -206,13 +207,13 @@ const CommunityForum = ({ navigation, HandleLike }) => {
                               {/* Sentiment Label */}
                               <View style={styles.sentimentLabel}>
                                 {comment.sentimentLabel === "positive" && (
-                                  <FontAwesome5 name="laugh-beam" size={24} color="green" />
+                                  <FontAwesome5 name="laugh-beam" size={24} color="#2ECC71" /> // Vibrant green
                                 )}
                                 {comment.sentimentLabel === "neutral" && (
-                                  <FontAwesome5 name="meh" size={24} color="yellow" />
+                                  <FontAwesome5 name="meh" size={24} color="#F1C40F" /> // Warm yellow
                                 )}
                                 {comment.sentimentLabel === "negative" && (
-                                  <FontAwesome5 name="angry" size={24} color="red" />
+                                  <FontAwesome5 name="angry" size={24} color="#E74C3C" /> // Strong red
                                 )}
                               </View>
                             </View>
@@ -354,6 +355,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 10,
   },
+
   commentHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -428,7 +430,7 @@ headerTitle2: {
 },
 forumlistCoopComments: {
   padding: 10,
-  backgroundColor: "#FFF9C4", // Light yellow background
+  backgroundColor: "#FFFFFF", // Light yellow background
   borderRadius: 10,
   marginVertical: 10,
 },

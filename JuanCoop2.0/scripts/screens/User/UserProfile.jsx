@@ -98,15 +98,17 @@ const UserProfile = () => {
         contentContainerStyle={{ flexGrow: 1 }} // Ensures full height for scrolling
         keyboardShouldPersistTaps="handled" // Allows tapping outside to dismiss keyboard
       >
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.drawerButton}
-            onPress={() => navigation.openDrawer()}
-          >
-            <Ionicons name="menu" size={34} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profile</Text>
-        </View>
+ {/* <View style={styles.header}>
+  <TouchableOpacity
+    style={styles.backButton}
+    onPress={() => navigation.goBack()}
+  >
+    <Ionicons name="arrow-back" size={34} color="black" />
+  </TouchableOpacity>
+
+  <Text style={styles.headerTitle}>User Profile</Text>
+</View> */}
+
   
         <View style={styles.container}>
           {/* Profile Image Section */}
@@ -214,6 +216,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
+  
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "left",
+    width: "auto", // Keeps it natural width
+    marginLeft: 10, // Moves it further left if needed
+  },
+  
   profileSection: {
     alignItems: "center",
     marginBottom: 20,

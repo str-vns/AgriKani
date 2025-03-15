@@ -27,7 +27,7 @@ const UserNavigation = () => {
         name="Profile"
         component={Profile}
         options={{
-          headerShown: false,
+          headerShown: true,title: "User Profile",
           tabBarShowLabel: false,
         }}
       />
@@ -36,7 +36,7 @@ const UserNavigation = () => {
         name="EditProfile"
         component={EditProfile}
         options={{
-          headerShown: false,
+          headerShown: true,title: "Edit Profile",
           tabBarShowLabel: false,
         }}
       />
@@ -54,7 +54,7 @@ const UserNavigation = () => {
         name="CoopRegistration"
         component={CoopRegistration}
         options={{
-          headerShown: false,
+          headerShown: true,title:"Coop Registration",
           tabBarShowLabel: false,
         }}
       />
@@ -88,7 +88,7 @@ const UserNavigation = () => {
         name="MembersRegistration"
         component={MembersRegistration}
         options={{
-          headerShown: false,
+          headerShown: true,title: "Member Registration",
           tabBarShowLabel: false,
         }}
       />
@@ -105,7 +105,7 @@ const UserNavigation = () => {
       <Stack.Screen
         name="UserOrderList"
         component={UserOrderList}
-        options={{ headerShown: true }}
+        options={{ headerShown: true,title:"Order List" }}
       />
 
       <Stack.Screen

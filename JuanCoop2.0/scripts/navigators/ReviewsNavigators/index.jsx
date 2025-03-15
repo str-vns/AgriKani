@@ -10,7 +10,7 @@ const ReviewsNavigators = () => {
       <Stack.Screen
         name="AddReviews"
         component={AddReviews}
-        options={{ headerShown: false }}
+        options={{ headerShown: true,title:"Add Review" }}
       />
     </Stack.Navigator>
   );

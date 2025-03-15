@@ -132,6 +132,7 @@ const UserSignIn = () => {
     return unsubscribe;
   }, []);
 
+  console.log("User Info: ",context?.stateUser?.userProfile );
   useEffect(() => {
     if (
       context?.stateUser?.isAuthenticated &&
@@ -199,11 +200,20 @@ const UserSignIn = () => {
       setIsLoading(false);
       console.log("Navigating to Home");
       navigation.navigate("Deliveries");
+    }else if(  context?.stateUser?.userProfile === "Your email or password is incorrect. Please try again." ){
+     
+    
+      setError(
+        context?.stateUser?.userProfile === "" || context?.stateUser?.userProfile === null || context?.stateUser?.userProfile === undefined
+          ? null
+          : "Invalid email or password"
+      );
+    setIsLoading(false);
     }
   }, [context?.stateUser?.isAuthenticated, googleUser?.user?.email,]);
   
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setIsLoading(true);
     try {
       if (email === "" || password === "") {
@@ -214,12 +224,8 @@ const UserSignIn = () => {
         setError("Please provide a valid email address.");
       } else {
         const user = { email, password };
-        const error = await loginUser(user, context.dispatch);
-
-        if (error === false) {
-          setError("Your email or password is incorrect. Please try again.");
-          setIsLoading(false);
-        }
+        loginUser(user, context.dispatch);
+        setIsLoading(false);
       } 
     }catch(error){
       setIsLoading(false);

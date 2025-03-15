@@ -53,7 +53,9 @@ const HomeNavigation = () => {
       <Stack.Screen
         name="NotificationList"
         component={NotificationList}
-        options={{ headerShown: false }}
+        options={{ headerShown: true,title: "Notification"
+
+        }}
       />
 
         <Stack.Screen
@@ -102,8 +104,8 @@ const HomeNavigation = () => {
         <Stack.Screen
           name="CoopFarmProfile"
           options={{
-            headerShown: false,
-            tabBarShowLabel: false,
+            headerShown: true,
+            tabBarShowLabel: false,title:"Cooperative Profile"
           }}
           component={CoopFarmProfile}
         />
@@ -117,7 +119,7 @@ const HomeNavigation = () => {
         <Stack.Screen
           name="SearchProduct"
           component={SearchProduct}
-          options={{ headerShown: false, tabBarShowLabel: false }}
+          options={{ headerShown: true, title:"Search Result",tabBarShowLabel: false }}
         />
 
         <Stack.Screen

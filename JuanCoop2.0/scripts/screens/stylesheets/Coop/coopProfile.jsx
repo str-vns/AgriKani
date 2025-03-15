@@ -11,9 +11,12 @@ export default StyleSheet.create({
     },
 
     headerTitle: {
+        width: '100%', 
+        alignItems: 'flex-start', // Aligns content to the left
+        justifyContent: 'center',
+        paddingHorizontal: 16, 
         fontSize: 22, // Slightly smaller for a formal look
         fontWeight: "bold",
-        color: "#333", 
     },
 
     profileContainer: {

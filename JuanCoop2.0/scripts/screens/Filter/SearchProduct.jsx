@@ -96,14 +96,14 @@ const SearchProduct = (props) => {
 
   return (
     <View style={style.productContainer}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.drawerButton}
           onPress={() => navigation.openDrawer()}
         >
           <Ionicons name="menu" size={34} color="black" />
         </TouchableOpacity>
-      </View>
+      </View> */}
       {/* Coops Section */}
       {coops && coops.length > 0 ? (
         <ScrollView
@@ -129,7 +129,9 @@ const SearchProduct = (props) => {
                 }}
                 style={style.coopImage}
               />
-              <Text style={style.coopName}>{coop?.farmName}</Text>
+             <Text style={style.coopName}>
+              {coop?.farmName?.length > 25 ? `${coop.farmName.slice(0, 25)}...` : coop.farmName}
+            </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>

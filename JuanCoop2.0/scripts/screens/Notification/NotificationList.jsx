@@ -114,7 +114,7 @@ const NotificationList = ({ navigation }) => {
 
   return (
     <View style={userRole}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.drawerButton}
           onPress={() => navigation.toggleDrawer()}
@@ -122,8 +122,8 @@ const NotificationList = ({ navigation }) => {
           <Ionicons name="menu" size={34} color="black" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Notification</Text>
-      </View>
+        <Text style={styles.headerTitle}>Notificmmmation</Text>
+      </View> */}
       <TouchableOpacity
       onPress={() => handleReadAll()}
     >

@@ -34,7 +34,7 @@ import {
   COOP_DELETE_SUCCESS,
 } from "../Constants/coopConstants";
 
-export const coopYReducer = (state = { coop: {} }, action) => {
+export const coopReducer = (state = { coop: {} }, action) => {
   switch (action.type) {
     case COOP_REGISTER_REQUEST:
     case COOP_IMAGE_DELETE_REQUEST:

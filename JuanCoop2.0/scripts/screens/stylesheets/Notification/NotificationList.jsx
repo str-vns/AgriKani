@@ -1,15 +1,15 @@
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-    container: {
-        backgroundColor: "#fffee9",
-        flex: 1,
-        marginBottom: 60,
-    },
-     containerCooP :{
-      backgroundColor: "#fffee9",
-      flex: 1,
-     },
+  container: {
+    backgroundColor: "#FFFFFF",
+    flex: 1,
+    marginBottom: 60,
+  },
+  containerCooP: {
+    backgroundColor: "#fffee9",
+    flex: 1,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -35,67 +35,65 @@ export default StyleSheet.create({
 
   notificationsContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'space-between',
-  
-},
-notificationSection: {
+    backgroundColor: "#fff",
+    justifyContent: "space-between",
+  },
+  notificationSection: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc', // Adjust border color as needed
-},
-notifDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-},
-notifImageContainer: {
+    borderBottomColor: "#ccc", // Adjust border color as needed
+  },
+  notifDetails: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  notifImageContainer: {
     marginRight: 16,
-},
-notifImage: {
+  },
+  notifImage: {
     width: 40,
     height: 40,
     borderRadius: 20,
-},
-notifTextContainer: {
+  },
+  notifTextContainer: {
     flex: 1,
-},
-timestamp: {
+  },
+  timestamp: {
     fontSize: 12,
-    color: '#999',
-    textAlign: 'right',
-},
-notificationHeader: {
-    fontWeight: 'bold',
+    color: "#999",
+    textAlign: "right",
+  },
+  notificationHeader: {
+    fontWeight: "bold",
     fontSize: 16,
-    flex: 1
-},
-notificationLine: {
+    flex: 1,
+  },
+  notificationLine: {
     fontSize: 14,
-},
-notifHeaderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  },
+  notifHeaderContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 5,
-},
-readNotification: {
-    backgroundColor: 'white',
+  },
+  readNotification: {
+    backgroundColor: "white",
   },
 
   unreadNotification: {
-    backgroundColor: '#FFFBC8',
+    backgroundColor: "#FFFBC8",
   },
   ReadAllText: {
-    color: '#FFA500',
+    color: "#FFA500",
     fontSize: 16,
-    textAlign: 'right',
+    textAlign: "right",
     padding: 10,
     marginRight: 10,
   },
   noOrdersText: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 16,
-    color: 'gray',
+    color: "gray",
     marginTop: 20,
   },
 });
-

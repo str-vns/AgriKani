@@ -11,7 +11,7 @@ import {
     userDeviceTokenReducer,  checkEmailReducer, otpForgotPasswordReducer, googleLoginReducer } from "@redux/Reducers/userReducers";
   import { reducerProduct, reducerCoop, reducerCoopProduct, reducerCreateProduct, reducerEditProduct, reducerDelResProduct } from "@redux/Reducers/productReducers";
   import { HereMapReducer, MapBoxRouteReducer } from "@redux/Reducers/locationReducers";
-  import { coopYReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
+  import { coopReducer, coopAllReducer, coopOrderReducer, coopOrderUpdateReducer, coopActiveReducer } from "@redux/Reducers/coopReducers";
   import { addressReducer } from "@redux/Reducers/addressReducer";
   import { typeListReducer,typeCreateReducer,typeUpdateReducer,typeDeleteReducer } from "@redux/Reducers/typeReducers";
   import { categoryListReducer,categoryCreateReducer,categoryEditReducer,categoryDeleteReducer} from "@redux/Reducers/categoryReducers";
@@ -42,7 +42,7 @@ import {
     userOnly: userReducer,
     EditProfile: EditProfileReducer,
     Geolocation: HereMapReducer,
-    Coop: coopYReducer,
+    Coop: coopReducer,
     CoopProduct: reducerCoopProduct,
     addresses: addressReducer,
     types: typeListReducer,

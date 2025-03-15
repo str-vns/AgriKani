@@ -201,7 +201,7 @@ const FarmerProfile = (props) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.drawerButton}
           onPress={() => navigation.openDrawer()}
@@ -209,7 +209,7 @@ const FarmerProfile = (props) => {
           <Ionicons name="menu" size={34} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Cooperative Profile </Text>
-      </View>
+      </View> */}
       <FlatList
         ListHeaderComponent={renderProfileHeader}
         data={coopProducts}

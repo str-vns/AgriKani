@@ -154,7 +154,7 @@ export default StyleSheet.create({
     productDescription: {
       marginHorizontal: 16,
       marginVertical: 8,
-      fontSize: 16, // Reduced text size
+      fontSize: 14, // Reduced text size
       color: "#666",
       lineHeight: 22,
     },

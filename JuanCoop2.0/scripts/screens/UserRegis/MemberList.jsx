@@ -75,9 +75,10 @@ console.log("members: ", members);
   return (
     <View style={styles.container}>
     <View style={styles.header}>
-      <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
-        <Ionicons name="menu-outline" size={34} color="black" />
-      </TouchableOpacity>
+    <TouchableOpacity style={styles.menuButton} onPress={() => navigation.goBack()}>
+      <Ionicons name="arrow-back" size={34} color="black" />
+    </TouchableOpacity>
+
       <Text style={styles.headerTitle}>Member List</Text>
       <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('MembersRegistration')}>
         <Ionicons name="add-circle-outline" size={24} color="#fff" />

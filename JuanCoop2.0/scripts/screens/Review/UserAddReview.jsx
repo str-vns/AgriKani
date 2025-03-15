@@ -136,11 +136,11 @@ const UserAddReview = (props) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <TouchableOpacity style={styles.backArrow} onPress={() => handleBack()}>
+      {/* <TouchableOpacity style={styles.backArrow} onPress={() => handleBack()}>
         <Icon name="arrow-back-outline" size={24} color="#000" />
       </TouchableOpacity>
 
-      <Text style={styles.title}>Product Ratings</Text>
+      <Text style={styles.title}>Product Ratings</Text> */}
 
       <Image
         source={require("@assets/img/yey.png")}
