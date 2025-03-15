@@ -162,12 +162,12 @@ exports.updateOrderStatusProcess = async (id, req) => {
       try {
         const inventory = await Inventory.findById(req.body.inventoryProduct);
 
-        // if (!inventory) {
-        //   console.warn(`Product with ID ${req.body.inventoryProduct} not found.`);
-        // } else {
-        //   inventory.quantity += matchedOrderItem.quantity;
-        //   await inventory.save();
-        // }
+        if (!inventory) {
+          console.warn(`Product with ID ${req.body.inventoryProduct} not found.`);
+        } else {
+          inventory.quantity += matchedOrderItem.quantity;
+          await inventory.save();
+        }
 
         // order.totalPrice -= matchedOrderItem.price * matchedOrderItem.quantity;
 
