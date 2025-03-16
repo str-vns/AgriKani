@@ -46,7 +46,7 @@ const RatingandReview = (props) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
       <View style={styles.header}>
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Ionicons name="arrow-back" size={28} color="black" />
@@ -54,7 +54,7 @@ const RatingandReview = (props) => {
 
             </View>
         <Text style={styles.headerTitle}>Review Summary</Text>
-      </View>
+      </View> */}
 
       <ScrollView>
         {/* Overall Ratings Section */}

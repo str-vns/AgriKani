@@ -118,7 +118,7 @@ const Index = () => {
       <Stack.Screen
         name="Reviews"
         component={Reviews}
-        options={{ headerShown: false }}
+        options={{ headerShown: true,title:"Review Summary" }}
       />
 
       <Stack.Screen
