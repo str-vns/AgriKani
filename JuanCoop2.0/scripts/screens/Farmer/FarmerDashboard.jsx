@@ -15,7 +15,8 @@ import { useWeather } from '../../../CurrentWeather';
 import { useSocket } from "../../../SocketIo";
 import messaging from '@react-native-firebase/messaging';
 import Constants from "expo-constants";
-import RNPickerSelect from "react-native-picker-select";
+import { Picker } from "@react-native-picker/picker";
+
 
 const FarmerDashboard = () => {
   const weather = useWeather();
@@ -251,101 +252,101 @@ const FarmerDashboard = () => {
           />
       </View>
       
-      <View style={styles.coopdatacontainer}>
-      <Text style={styles.coopdatatitle}>Cooperative Dashboard</Text>
+      <View style={styles.coopdashboardContainer}>
+        {/* Dashboard Header */}
+        <View style={styles.coopdashboardHeader}>
+          <Text style={styles.coopdashboardTitle}>🚀 Cooperative Dashboard</Text>
+        </View>
 
-      {/* Summary Cards */}
-      <View style={styles.coopdatasummaryContainer}>
-        {[
-          { title: "💰 Sales", value: `₱${dashboard?.totalRevenue?.toLocaleString()}` },
-          { title: "📊 Orders", value: dashboard?.totalOrders },
-          { title: "👥 Customers", value: dashboard?.totalCustomers },
-        ].map((item, index) => (
-          <View key={index} style={styles.coopdatasummaryCard}>
-            <Text style={styles.coopdatasummaryTitle}>{item.title}</Text>
-            <Text style={styles.coopdatasummaryValue}>{item.value}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Order Status Breakdown */}
-      {dashboard?.orderStatusCounts && (
-        <PieChart
-          data={Object.entries(dashboard.orderStatusCounts).map(([status, count], index) => ({
-            name: status,
-            population: count,
-            color: ["#FFD700", "#FFB703", "#FB8500", "#219EBC"][index % 4],
-            legendFontColor: "#333",
-            legendFontSize: 12,
-          }))}
-          width={screenWidth - 20}
-          height={220}
-          chartConfig={{
-            backgroundGradientFrom: "#fff",
-            backgroundGradientTo: "#fff",
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(255, 99, 71, ${opacity})`,
-          }}
-          accessor="population"
-          backgroundColor="transparent"
-          paddingLeft="15"
-        />
-      )}
-
-<View style={styles.coopdataContainer}>
-      <View style={styles.coopdataheader}>
-        <Text style={styles.coopdataTitle}>📊 Sales Overview</Text>
-        <RNPickerSelect
-          onValueChange={(value) => setSelectedRange(value)}
-          items={[
-            { label: "Day", value: "day" },
-            { label: "Week", value: "week" },
-            { label: "Month", value: "month" },
-            { label: "Year", value: "year" },
-          ]}
-          style={{
-            inputIOS: styles.coopdatadropdown,
-            inputAndroid: styles.coopdatadropdown,
-          }}
-          value={selectedRange}
-        />
-      </View>
-
-      {currentSales.length > 0 ? (
-        <BarChart
-          data={{
-            labels: currentSales.map((entry) => entry._id),
-            datasets: [{ data: currentSales.map((entry) => entry.totalSales) }],
-          }}
-          width={screenWidth - 50}
-          height={220}
-          yAxisLabel="₱"
-          chartConfig={{
-            backgroundGradientFrom: "white",
-            backgroundGradientTo: "white",
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(11, 9, 1, ${opacity})`, // Orange-Yellow Tint
-          }}
-          style={styles.coopdataChart}
-        />
-      ) : (
-        <Text style={styles.coopdatanoDataText}>No sales data available for this period.</Text>
-      )}
-    </View>
-
-      {/* Top Selling Products */}
-      {dashboard?.topSellingProducts?.length > 0 && (
-        <View style={styles.coopdatatopProductsContainer}>
-          <Text style={styles.coopdatatopProductsTitle}>🔥 Top 5 Selling Products</Text>
-          {dashboard.topSellingProducts.map((product, index) => (
-            <View key={product.productId} style={styles.coopdatatopProductRow}>
-              <Text style={styles.coopdatatopProductText}>{index + 1}. {product.productName}</Text>
-              <Text style={styles.coopdatatopProductText}>{product.totalSold} sold</Text>
+        {/* Summary Cards */}
+        <View style={styles.coopdashboardSummaryContainer}>
+          {[
+            { title: "💰 Sales", value: `₱${dashboard?.totalRevenue?.toLocaleString()}` },
+            { title: "📊 Orders", value: dashboard?.totalOrders },
+            { title: "👥 Customers", value: dashboard?.totalCustomers },
+          ].map((item, index) => (
+            <View key={index} style={styles.coopdashboardSummaryCard}>
+              <Text style={styles.coopdashboardSummaryTitle}>{item.title}</Text>
+              <Text style={styles.coopdashboardSummaryValue}>{item.value}</Text>
             </View>
           ))}
         </View>
-      )}
-    </View>
+
+        {/* Order Status Breakdown */}
+        {dashboard?.orderStatusCounts && (
+          <PieChart
+            data={Object.entries(dashboard.orderStatusCounts).map(([status, count], index) => ({
+              name: status,
+              population: count,
+              color: ["#FFD700", "#FFB703", "#FB8500", "#219EBC"][index % 4],
+              legendFontColor: "#333",
+              legendFontSize: 12,
+            }))}
+            width={screenWidth - 20}
+            height={220}
+            chartConfig={{
+              backgroundGradientFrom: "#fff",
+              backgroundGradientTo: "#fff",
+              decimalPlaces: 0,
+              color: (opacity = 1) => `rgba(255, 99, 71, ${opacity})`,
+            }}
+            accessor="population"
+            backgroundColor="transparent"
+            paddingLeft="15"
+          />
+        )}
+
+        {/* Sales Overview */}
+        <View style={styles.coopdashboardSalesContainer}>
+          <View style={styles.coopdashboardHeader}>
+            <Text style={styles.coopdashboardSalesTitle}>📊 Sales Overview</Text>
+            <Picker
+              selectedValue={selectedRange}
+              style={styles.coopdashboardPicker}
+              onValueChange={(itemValue) => setSelectedRange(itemValue)}
+            >
+              <Picker.Item label="Daily" value="day" />
+              <Picker.Item label="Weekly" value="week" />
+              <Picker.Item label="Monthly" value="month" />
+              <Picker.Item label="Yearly" value="year" />
+            </Picker>
+          </View>
+
+          {currentSales.length > 0 ? (
+            <BarChart
+              data={{
+                labels: currentSales.map((entry) => entry._id),
+                datasets: [{ data: currentSales.map((entry) => entry.totalSales) }],
+              }}
+              width={screenWidth - 50}
+              height={220}
+              yAxisLabel="₱"
+              chartConfig={{
+                backgroundGradientFrom: "white",
+                backgroundGradientTo: "white",
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(255, 165, 0, ${opacity})`, // Orange Tint
+              }}
+              style={styles.coopdashboardChart}
+            />
+          ) : (
+            <Text style={styles.coopdashboardNoDataText}>No sales data available for this period.</Text>
+          )}
+        </View>
+
+        {/* Top Selling Products */}
+        {dashboard?.topSellingProducts?.length > 0 && (
+          <View style={styles.coopdashboardTopProductsContainer}>
+            <Text style={styles.coopdashboardTopProductsTitle}>🔥 Top 5 Selling Products</Text>
+            {dashboard.topSellingProducts.map((product, index) => (
+              <View key={product.productId} style={styles.coopdashboardTopProductRow}>
+                <Text style={styles.coopdashboardTopProductText}>{index + 1}. {product.productName}</Text>
+                <Text style={styles.coopdashboardTopProductText}>{product.totalSold} sold</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>;
     </ScrollView>
   );
 };

@@ -2,7 +2,106 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-
+  coopdashboardContainer: {
+    flex: 1,
+    backgroundColor: "#FFF8E1", // Light Yellow Background
+    padding: 20,
+  },
+  coopdashboardHeader: {
+    backgroundColor: "#FFD700", // Gold Header
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 15,
+    elevation: 4, // Android Shadow
+    shadowColor: "#000", // iOS Shadow
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  coopdashboardTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  coopdashboardSummaryContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  coopdashboardSummaryCard: {
+    flex: 1,
+    backgroundColor: "#FFD700",
+    borderRadius: 12,
+    padding: 15,
+    alignItems: "center",
+    marginHorizontal: 5,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 3 },
+  },
+  coopdashboardSummaryTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
+  coopdashboardSummaryValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginTop: 5,
+  },
+  coopdashboardSalesContainer: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 12,
+    marginVertical: 10,
+    elevation: 3,
+  },
+  coopdashboardSalesTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  coopdashboardPicker: {
+    height: 50,
+    width: 150,
+  },
+  coopdashboardChart: {
+    marginTop: 10,
+    borderRadius: 10,
+  },
+  coopdashboardNoDataText: {
+    textAlign: "center",
+    color: "#888",
+    fontSize: 14,
+    marginTop: 10,
+  },
+  coopdashboardTopProductsContainer: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    elevation: 3,
+  },
+  coopdashboardTopProductsTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+  },
+  coopdashboardTopProductRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEE",
+  },
+  coopdashboardTopProductText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#333",
+  },
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
