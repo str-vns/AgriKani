@@ -38,7 +38,6 @@ exports.registerDriverProcess = async (req) => {
       email: req.body.email,
       otp: req.body.otp,
     })
-      .sort({ createdAt: -1 })
       .limit(1)
       .lean()
       .exec();
@@ -106,11 +105,11 @@ exports.getDriverDisapproveProcess = async () => {
 exports.getDriverByIdProcess = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Cooperative ID: ${id}`);
-
+  
   const coopExist = await Farm.findOne({ user: id })
     .lean()
     .exec()
-    .sort({ createdAt: -1 });
+    
   if (!coopExist) throw new ErrorHandler("Coop not exist");
 
   const driver = await Driver.find({ coopId: coopExist._id })
@@ -603,7 +602,6 @@ exports.getSingleDriverProcess = async (id) => {
     throw new ErrorHandler(`Invalid Driver ID: ${id}`);
 
   const driver = await Driver.findOne({ userId: id })
-    .sort({ createdAt: -1 })
     .lean()
     .exec();
   if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);

@@ -4,7 +4,7 @@
     "slug": "JuanCoop",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/img/logo.png",
+    "icon": "./assets/images/icond.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -14,8 +14,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/adaptive-icon-1.png",
+        "backgroundColor": "#f8e881"
       },
       "package": "com.steb11.JuanCoop",
       "googleServicesFile": "./google-services.json"
@@ -51,10 +51,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splash-icon-1.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#f8e881"
         }
       ],
       "expo-build-properties"

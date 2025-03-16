@@ -32,9 +32,8 @@ export const loginUser = async (user, dispatch) => {
             },
             body: JSON.stringify(user),
         });
-
         if (!response.ok) {
-            // throw new Error('Your email or password is incorrect. Please try again.');
+
             return false;
         }
 
