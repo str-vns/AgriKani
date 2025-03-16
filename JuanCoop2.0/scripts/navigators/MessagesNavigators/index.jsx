@@ -21,7 +21,8 @@ const Index = () => {
       <Stack.Screen
         name="Messages"
         component={Messages}
-        options={{ headerShown: false }}
+        options={{ headerShown: true, headerBackTitleVisible: true }}
+        
       />
     <Stack.Screen
         name="ChatMessaging"

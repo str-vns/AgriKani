@@ -39,19 +39,20 @@ const Index = () => {
       <Stack.Screen
         name="CoopDashboard"
         component={CoopDashboard}
-        options={{ headerShown: false, tabBarShowLabel: false }}
+        options={{ headerShown: false,title:"Coop Dashboard", tabBarShowLabel: false }}
       />
 
       <Stack.Screen
         name="FNotificationList"
         component={FNotificationList}
-        options={{ headerShown: false, tabBarShowLabel: false }}
+        options={{ headerShown: true, title:"Notification",headerBackTitleVisible: true , tabBarShowLabel: false }}
       />
 
       <Stack.Screen
         name="OrderList"
         options={{
-          headerShown: false,
+          headerShown: true,
+          title:"Order List",
           tabBarShowLabel: false,
         }}
         component={OrderCoop}
@@ -60,7 +61,8 @@ const Index = () => {
       <Stack.Screen
         name="MemberList"
         options={{
-          headerShown: false,
+          headerShown: true,
+          title:"Member List",
           tabBarShowLabel: false,
         }}
         component={MemberList}
@@ -69,7 +71,8 @@ const Index = () => {
       <Stack.Screen
         name="MemberActive"
         options={{
-          headerShown: false,
+          headerShown: true,
+          title:"Member List",
           tabBarShowLabel: false,
         }}
         component={MemberActive}
@@ -78,7 +81,8 @@ const Index = () => {
       <Stack.Screen
         name="MemberSingle"
         options={{
-          headerShown: false,
+          headerShown:true,
+          title:"Details",
           tabBarShowLabel: false,
         }}
         component={MemberSingle}
@@ -108,7 +112,7 @@ const Index = () => {
       <Stack.Screen
         name="ReviewList"
         component={ReviewList}
-        options={{ headerShown: false }}
+        options={{ headerShown: true,   title:"Review List" }}
       />
 
       <Stack.Screen
@@ -120,7 +124,7 @@ const Index = () => {
       <Stack.Screen
         name="InventoryList"
         component={InventoryList}
-        options={{ headerShown: false }}
+        options={{ headerShown: true,title:"Inventory List" }}
       />
 
       <Stack.Screen
@@ -155,13 +159,13 @@ const Index = () => {
       <Stack.Screen
         name="Register"
         component={Register}
-        options={{ headerShown: false }}
+        options={{ headerShown: true }}
       />
 
       <Stack.Screen
         name="RiderDetails"
         component={RiderDetails}
-        options={{ headerShown: false }}
+        options={{ headerShown: true , title:"Rider Details"}}
       />
       <Stack.Screen
         name="AssignLocation"
@@ -183,7 +187,7 @@ const Index = () => {
       <Stack.Screen
         name="Assign"
         component={Assign}
-        options={{ headerShown: false }}
+        options={{ headerShown: true, title:"Assigned Orders" }}
       />
 
       <Stack.Screen
@@ -214,7 +218,8 @@ const Index = () => {
         name="WithdrawList"
         component={WithdrawList}
         options={{
-          headerShown: false,
+          headerShown: true,
+          title:"Wallet",
           tabBarShowLabel: false,
         }}
       />

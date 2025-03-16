@@ -21,7 +21,8 @@ const Index = () => {
           name="ProductsCreate"
           component={ProductsCreate}
           options={{
-            headerShown: false,
+            headerShown: true,
+            title:"Create Product",
             tabBarShowLabel: false,
           }}
         />
@@ -29,7 +30,8 @@ const Index = () => {
           name="productEdit"
           component={productEdit}
           options={{
-            headerShown: false,
+            headerShown: true,
+            title:"Update Product",
             tabBarShowLabel: false,
           }}
         />
@@ -37,8 +39,11 @@ const Index = () => {
           name="productArchive"
           component={productArchive}
           options={{
-            headerShown: false,
-            tabBarShowLabel: false,
+            
+            headerShown:true,
+            title:"Product Archive",
+            headerBackTitleVisible: true,
+        
           }}
         />
       

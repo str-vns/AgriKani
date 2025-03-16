@@ -94,12 +94,12 @@ const ProductArchive = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
           <Ionicons name="menu-outline" size={34} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Product Archive List</Text>
-      </View>
+      </View> */}
 
       {/* List of products */}
       {coopProducts.length === 0 ? (

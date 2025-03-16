@@ -43,8 +43,8 @@ const Index = () => {
         <Stack.Screen name="AdminDashboards" component={Dashboards} />
         <Stack.Screen name="Forum" component={Forum} />
         <Stack.Screen name="BlogList" component={BlogList} />
-        <Stack.Screen name="BlogCreate" component={BlogCreate} />
-        <Stack.Screen name="BlogUpdate" component={BlogUpdate} />
+        <Stack.Screen name="BlogCreate" component={BlogCreate} options={{ headerShown: true,   title:"Create Blog" }} />
+        <Stack.Screen name="BlogUpdate" component={BlogUpdate} options={{ headerShown: true,   title:"Update Blog" }}/>
         <Stack.Screen name="BlogCard" component={BlogCard} />
         <Stack.Screen name="UserList" component={UserList} />
         <Stack.Screen name="CoopList" component={CoopLists} />

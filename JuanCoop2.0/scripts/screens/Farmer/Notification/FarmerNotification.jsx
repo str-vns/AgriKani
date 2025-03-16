@@ -115,7 +115,7 @@ const FarmerNotification = ({ navigation }) => {
 
   return (
     <View style={userRole}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.drawerButton}
           onPress={() => navigation.toggleDrawer()}
@@ -124,7 +124,7 @@ const FarmerNotification = ({ navigation }) => {
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Notification</Text>
-      </View>
+      </View> */}
       <TouchableOpacity
       onPress={() => handleReadAll()}
     >

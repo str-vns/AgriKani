@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchApprovedPosts, likePost, addComment } from '@src/redux/Actions/postActions';
-import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Image, ScrollView, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -22,6 +22,7 @@ const CommunityForum = ({ navigation, HandleLike }) => {
   const [showComments, setShowComments] = useState({});
   const [selectedPost, setSelectedPost] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     dispatch(fetchApprovedPosts());
@@ -109,6 +110,11 @@ const CommunityForum = ({ navigation, HandleLike }) => {
 
   const isCooperative = userslogin?.roles?.includes("Cooperative");
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    dispatch(fetchApprovedPosts()).then(() => setRefreshing(false));
+  };
+
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -127,7 +133,12 @@ const CommunityForum = ({ navigation, HandleLike }) => {
           <Text style={styles.headerTitle2}>Discussion</Text>
         </View> */}
         
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView 
+          contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
         <View style={styles.header}>
           {/* <Text style={styles.headerText}>Discussions</Text> */}
           {isCooperative && ( // Render button only if user has "Cooperative" role

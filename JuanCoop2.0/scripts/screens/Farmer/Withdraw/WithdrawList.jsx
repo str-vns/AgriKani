@@ -50,13 +50,13 @@ const WithdrawList = () => {
     }
   return (
     <View style={styles.container2}>
-           <View style={styles.header}>
+           {/* <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
           <Ionicons name="menu-outline" size={34} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Wallet</Text>
        
-      </View>
+      </View> */}
     <View style={styles.container}>
 
       <View style={styles.balanceContainer}>

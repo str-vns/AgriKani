@@ -59,7 +59,7 @@ const Memberlist = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => navigation.openDrawer()}
@@ -67,7 +67,7 @@ const Memberlist = () => {
           <Ionicons name="menu-outline" size={34} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Members List</Text>
-      </View>
+      </View> */}
 
       <View style={styles.tabContainer}>
         <TouchableOpacity

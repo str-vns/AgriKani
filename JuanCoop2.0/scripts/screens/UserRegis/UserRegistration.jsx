@@ -388,119 +388,78 @@ const UserRegistration = () => {
 
     {/* Scrollable Content */}
     <ScrollView style={{ padding: 20 }}>
-      <Text style={{ fontSize: 18, fontWeight: "bold" }}>JuanKooP Terms and Conditions</Text>
+      <Text style={{ fontSize: 18, fontWeight: "bold" }}>JuanKooP Rider Terms and Conditions</Text>
       <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 10 }}>Effective Date:</Text>
-      <Text>March 3,2025</Text>
+      <Text>March 3, 2025</Text>
       <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 10 }}>Last Updated:</Text>
-      <Text>March 3,2025</Text>
+      <Text>March 3, 2025</Text>
 
       <Text style={{ marginTop: 15 }}>
-        Welcome to JuanKooP. By accessing and using our platform, you agree to comply with and be bound by the following terms and conditions. Please read them carefully.
+        By registering as a cooperative-affiliated rider in the JuanKooP platform, the cooperative and rider agree to comply with the following terms and conditions.
       </Text>
 
-      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>1. Definitions</Text>
+      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>1. Rider Registration and Eligibility</Text>
       <Text>
-        <Text style={{ fontWeight: "bold" }}>• “Platform”</Text> refers to JuanKooP’s website and mobile application.{"\n"}
-        <Text style={{ fontWeight: "bold" }}>• “User”</Text> refers to any individual, cooperative, or association accessing or using JuanKooP.{"\n"}
-        <Text style={{ fontWeight: "bold" }}>• “Cooperative”</Text> refers to any registered cooperative or association using the platform to sell products, access services, or engage in discussions.{"\n"}
-        <Text style={{ fontWeight: "bold" }}>• “Buyer”</Text> refers to any individual or entity purchasing products from cooperatives through the platform.{"\n"}
-        <Text style={{ fontWeight: "bold" }}>• “Seller”</Text> refers to cooperatives listing and selling products on the platform.{"\n"}
-        <Text style={{ fontWeight: "bold" }}>• “Third-party Services”</Text> refers to payment gateways, logistics providers, and any external services integrated into JuanKooP.{"\n"}
-        <Text style={{ fontWeight: "bold" }}>• “Content”</Text> includes all text, images, videos, data, and materials posted by users.{"\n"}
+        • Must be at least 18 years old.{"\n"}
+        • Must possess a valid driver’s license (for motorized vehicles).{"\n"}
+        • Must have a clean driving record with no pending transportation-related legal cases.{"\n"}
+        • Must be physically fit to perform delivery tasks.{"\n"}
+        • Cooperatives must provide accurate rider details and proof of eligibility.{"\n"}
       </Text>
 
-      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>2. User Eligibility & Registration</Text>
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>2.1 General Requirements</Text>
+      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>2. Responsibilities of the Cooperative</Text>
       <Text>
-        • Users must be at least 18 years old to register.{"\n"}
-        • Cooperatives must be legally registered entities with supporting documentation.{"\n"}
-        • Each user must provide accurate and complete information.{"\n"}
+        • Ensure riders comply with JuanKooP’s delivery and safety policies.{"\n"}
+        • Manage disputes related to rider performance.{"\n"}
+        • Provide safety equipment such as helmets and protective gear.{"\n"}
+        • Update rider details in case of resignation, suspension, or replacement.{"\n"}
       </Text>
 
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>2.2 Account Registration</Text>
+      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>3. Rider Conduct and Compliance</Text>
       <Text>
-        • Users must create an account and maintain its security.{"\n"}
-        • JuanKooP reserves the right to suspend or terminate accounts for fraudulent activity.{"\n"}
-        • Users are responsible for maintaining the confidentiality of their login credentials.{"\n"}
+        Riders must:{"\n"}
+        • Deliver orders promptly and professionally.{"\n"}
+        • Follow all traffic laws and safety guidelines.{"\n"}
+        • Treat customers with courtesy and respect.{"\n"}
+        • Maintain the confidentiality of customer data.{"\n"}
+        • Violations may result in suspension or removal from the platform.{"\n"}
       </Text>
 
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>2.3 Account Verification</Text>
+      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>4. Liability and Insurance</Text>
       <Text>
-        • Cooperatives must submit valid government-issued identification and business registration documents.{"\n"}
-        • Buyers may need to verify their identity for security purposes.{"\n"}
+        • Cooperatives are responsible for ensuring riders have valid insurance.{"\n"}
+        • JuanKooP is not liable for accidents, theft, or damages during deliveries.{"\n"}
       </Text>
 
-      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>3. Use of the Platform</Text>
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>3.1 Permitted Activities</Text>
+      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>5. Termination and Suspension</Text>
       <Text>
-        Users are allowed to:{"\n"}
-        • List, sell, and purchase products.{"\n"}
-        • Access community forums, reviews, and rating systems.{"\n"}
-        • Use JuanKooP’s features for cooperative management and networking.{"\n"}
+        JuanKooP may suspend or terminate a rider for:{"\n"}
+        • Providing false information during registration.{"\n"}
+        • Repeated customer complaints or safety violations.{"\n"}
+        • Engaging in fraudulent or unsafe delivery practices.{"\n"}
       </Text>
 
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>3.2 Prohibited Activities</Text>
+      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>6. Data Privacy and Confidentiality</Text>
       <Text>
-        Users are NOT allowed to:{"\n"}
-        • Engage in fraudulent transactions or misrepresent their identity.{"\n"}
-        • Post false or misleading product information.{"\n"}
-        • Use the platform for illegal, unethical, or prohibited activities.{"\n"}
-        • Upload harmful or offensive content.{"\n"}
-        • Circumvent platform fees or policies.{"\n"}
+        • Cooperatives must protect rider and customer data as per legal regulations.{"\n"}
+        • Rider details will only be used for delivery operations and not shared with unauthorized parties.{"\n"}
       </Text>
 
-      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>4. Product Listings & Transactions</Text>
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>4.1 Product Listings</Text>
+      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>7. Amendments and Updates</Text>
       <Text>
-        • Sellers must ensure all product descriptions, images, and prices are accurate.{"\n"}
-        • Listings must comply with government regulations, especially for food and perishable goods.{"\n"}
+        • JuanKooP reserves the right to modify these terms at any time.{"\n"}
+        • Continued participation means acceptance of any updates.{"\n"}
       </Text>
 
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>4.2 Transactions & Payments</Text>
-      <Text>
-        • All payments must be processed through JuanKooP’s authorized payment channels.{"\n"}
-        • JuanKooP does not guarantee the availability of any product.{"\n"}
-      </Text>
-
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>4.3 Order Fulfillment & Delivery</Text>
-      <Text>
-        • Sellers are responsible for fulfilling orders within the agreed timeframe.{"\n"}
-        • Delivery fees will be computed based on distance and logistics provider rates.{"\n"}
-        • Buyers must provide accurate shipping information to avoid delays.{"\n"}
-      </Text>
-
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>4.4 Returns & Refunds</Text>
-      <Text>
-        • Any request for returns, exchanges, or refunds must be communicated directly with the cooperative from which the product was purchased.{"\n"}
-        • JuanKooP does not facilitate returns, refunds, or dispute resolutions regarding product quality or delivery issues.{"\n"}
-        • Cooperatives are responsible for setting their own return policies and handling customer complaints.{"\n"}
-      </Text>
-
-      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>10. Termination & Suspension</Text>
-      <Text style={{ fontSize: 15, fontWeight: "bold", marginTop: 10 }}>10.1 Grounds for Termination</Text>
-      <Text>
-        JuanKooP may terminate or suspend accounts for:{"\n"}
-        • Violation of terms and conditions.{"\n"}
-        • Fraudulent or illegal activities.{"\n"}
-        • Repeated negative feedback or unresolved disputes.{"\n"}
-      </Text>
-
-      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>12. Governing Law & Dispute Resolution</Text>
-      <Text>
-        • These terms are governed by the laws of the Republic of the Philippines.{"\n"}
-        • Disputes shall be resolved through mediation before pursuing legal action.{"\n"}
-      </Text>
-
-      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>13. Contact Information</Text>
+      <Text style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}>8. Contact Information</Text>
       <Text>
         For inquiries or concerns, contact us at:{"\n"}
         <Text style={{ fontWeight: "bold" }}>Email:</Text> agrikaani@gmail.com{"\n"}
         <Text style={{ fontWeight: "bold" }}>Phone:</Text> 09932211743{"\n"}
-        <Text style={{ fontWeight: "bold" }}>Phone:</Text> 09932211743{"\n"}
       </Text>
     </ScrollView>
 
-    {/* Close Button - Fix Extra Space */}
+    {/* Close Button */}
     <TouchableOpacity
       style={styles.closeButton}
       onPress={() => setTermsModalVisible(false)}

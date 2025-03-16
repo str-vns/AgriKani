@@ -141,15 +141,15 @@ const ProductCreate = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.navigate("ProductsList")}
         >
           <Ionicons name="arrow-back-outline" size={34} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add New Product</Text>
-      </View>
+        <Text style={styles.headerTitle}>Add New Prxxoduct</Text>
+      </View> */}
 
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <Text style={styles.label}>Name</Text>

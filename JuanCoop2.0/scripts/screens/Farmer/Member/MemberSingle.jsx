@@ -70,7 +70,7 @@ const MemberSingle = (props) => {
   return (
   
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.menuButton}
           onPress={() => navigation.openDrawer()}
@@ -78,7 +78,7 @@ const MemberSingle = (props) => {
           <Ionicons name="menu-outline" size={34} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Members Details</Text>
-      </View>
+      </View> */}
       <ScrollView>
       <View style={styles.coopContainer}>
 

@@ -192,7 +192,7 @@ useEffect(() => {
 
   return (
      <View style = {styles.detailsContainer}>
-        <View style={styles.header2}>
+        {/* <View style={styles.header2}>
         <TouchableOpacity
           style={styles.drawerButton}
           onPress={() => navigation.openDrawer()}
@@ -200,7 +200,7 @@ useEffect(() => {
           <Ionicons name="menu" size={34} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle2}>Messages</Text>
-      </View>
+      </View> */}
     <View style={styles.container}>
       <FlatList
         ref={scrollRef}

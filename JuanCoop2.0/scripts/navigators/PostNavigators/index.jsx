@@ -23,7 +23,7 @@ const Index = () => {
       <Stack.Screen
         name="UserPostScreen"
         component={UserPostScreen}
-        options={{ headerShown: true }}
+        options={{ headerShown: true,title:"Create Post" }}
       />
       <Stack.Screen
         name="CommunityForum"

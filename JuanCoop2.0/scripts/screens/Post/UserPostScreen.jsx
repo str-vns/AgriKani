@@ -26,7 +26,7 @@ const UserPostScreen = () => {
   const { action, post } = route.params; // Get action and post from route params
 
   const postId = post?._id || route.params?.postId; // Get post ID for editing
-  const { loading, error } = useSelector((state) => state.post);
+  const { loading, error, posts } = useSelector((state) => state.post); // Add posts to the selector
 
   const [content, setContent] = useState("");
   const [images, setImages] = useState([]); // Store uploaded images

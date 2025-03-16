@@ -188,7 +188,7 @@ const handleCreateProduct = (item) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => backButton()}
@@ -196,7 +196,7 @@ const handleCreateProduct = (item) => {
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Update Product</Text>
-      </View>
+      </View> */}
 
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <Text style={styles.label}>Name</Text>

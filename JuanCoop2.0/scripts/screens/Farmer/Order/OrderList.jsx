@@ -14,7 +14,8 @@ import {
 import { allCoopOrders } from "@redux/Actions/coopActions";
 import { fetchCoopOrders } from "@redux/Actions/orderActions";
 import { Ionicons } from "@expo/vector-icons";
-import styles from "../css/styles";
+// import styles from "../css/styles";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -298,19 +299,20 @@ const OrderList = ({ navigation }) => {
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
-        return { color: "#FFCC00" };
+        return { color: "#E6A500" }; // Yellow
       case "Processing":
-        return { color: "blue" };
+        return { color: "#0057D9" }; // Darker Blue
       case "Shipping":
-        return { color: "lightblue" };
+        return { color: "#007AFF" }; // Darker Light Blue
       case "Delivered":
-        return { color: "green" };
+        return { color: "#2E8B57" }; // Dark Green
       case "Cancelled":
-        return { color: "red" };
+        return { color: "#D32F2F" }; // Dark Red
       default:
-        return { color: "gray" };
+        return { color: "#555555" }; // Darker Gray
     }
   };
+  
 
   const renderOrder = ({ item }) => {
     const formattedDate = new Date(item?.createdAt).toLocaleDateString("en-US", {
@@ -325,19 +327,18 @@ const OrderList = ({ navigation }) => {
           <View style={styles.orderDetails}>
             <Text style={styles.orderId}>Order #{item?._id}</Text>
             <Text style={styles.customerName}>
-              Customer: {item?.user?.firstName} {item?.user?.lastName}
+            <Text style={styles.label}>Customer:</Text>  {item?.user?.firstName} {item?.user?.lastName}
             </Text>
-            <Text style={styles.orderDate}>Date: {formattedDate}</Text>
+            <Text style={styles.orderDate}><Text style={styles.label}>Date</Text>  {formattedDate}</Text>
             { item?.totalAmount !== 0 && 
             (
             <Text style={styles.orderInfo}>
-              Total Price: ₱ {item?.totalAmount}
+              <Text style={styles.label}>Total Price:</Text>  ₱ {item?.totalAmount}
             </Text>
             )
             }
             <Text style={styles.orderInfo}>
-              {" "}
-              Delivery Address: {item?.shippingAddress?.address},{" "}
+            <Text style={styles.label}>Address:</Text> {item?.shippingAddress?.address},{" "}
               {item?.shippingAddress?.city}
             </Text>
             <Text
@@ -412,12 +413,12 @@ const OrderList = ({ navigation }) => {
 
               <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                  style={[styles.button, styles.reviewButton]}
+                  style={[styles.button, styles.chatButton]}
                   disabled={loading}
                   onPress={() => chatNow(item)}
                 >
                   <Icon name="rate-review" size={20} color="#fff" />
-                  <Text style={styles.buttonText}>Chat</Text>
+                  <Text style={styles.chatButtonText}>Chat</Text>
                 </TouchableOpacity>
 
                 {item?.orderItems?.length > 0 &&
@@ -497,7 +498,7 @@ const OrderList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.drawerButton}
           onPress={() => navigation.toggleDrawer()}
@@ -506,7 +507,7 @@ const OrderList = ({ navigation }) => {
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Order List</Text>
-      </View>
+      </View> */}
       {orderloading ? (
         <ActivityIndicator size="large" color="black" style={styles.loader} />
       ) : (
@@ -532,5 +533,154 @@ const OrderList = ({ navigation }) => {
     </View>
   );
 };
+const styles = StyleSheet.create({
+  orderCard: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 12,
+    marginHorizontal: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  chatButton: {
+    backgroundColor: "#008CBA", // A professional blueish color
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  chatButtonText: {
+    fontSize: 14,
+    color: "#fff",
+    fontWeight: "600",
+  },
+  orderContent: {
+    flex: 1,
+  },
+  orderDetails: {
+    marginBottom: 12,
+  },
+  orderId: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#222",
+  },
+  customerName: {
+    fontSize: 14,
+    color: "#444",
+    marginVertical: 3,
+  },
+  orderDate: {
+    fontSize: 14,
+    color: "#666",
+  },
+  orderInfo: {
+    fontSize: 14,
+    color: "#333",
+    marginVertical: 3,
+  },
+  label: {
+    fontWeight: "bold",
+    color: "#111",
+  },
+  paymentStatus: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  paidStatus: {
+    color: "#228B22", // Darker green for a classier look
+  },
+  unpaidStatus: {
+    color: "#D32F2F",
+  },
+  orderItemContainer: {
+    flexDirection: "row",
+    backgroundColor: "#F4F4F4",
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  imageAndTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  orderImage: {
+    width: 55,
+    height: 55,
+    borderRadius: 10,
+    marginRight: 12,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  orderItemName: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#222",
+  },
+  orderItemPrice: {
+    fontSize: 14,
+    color: "#555",
+  },
+  orderItemQuantity: {
+    fontSize: 14,
+    color: "#777",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+  button: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FF9800", // More professional orange
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  reviewButton: {
+    backgroundColor: "#2E7D32", // A deeper, premium green
+  },
+  ShippingButton: {
+    backgroundColor: "#1565C0", // Professional navy blue
+  },
+  buttonText: {
+    fontSize: 14,
+    color: "#fff",
+    fontWeight: "600",
+    marginLeft: 6,
+  },
+  buttonCancelled: {
+    backgroundColor: "#B71C1C", // Darker red for a refined cancellation button
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  buttonTextCancelled: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "bold",
+  },
+});
+
+
+
+
 
 export default OrderList;

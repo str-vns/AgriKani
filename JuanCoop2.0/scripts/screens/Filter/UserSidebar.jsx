@@ -50,6 +50,7 @@ const UserSidebar = () => {
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Product", icon: "cube-outline", key: "product" },
+    { label: "Product Archive", icon: "archive-outline", key: "productArchive" },
     { label: "Inventory", icon: "archive-outline", key: "inventory" },
     { label: "Orders", icon: "clipboard-outline", key: "orders" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
@@ -60,7 +61,7 @@ const UserSidebar = () => {
     { label: "Reviews", icon: "star-outline", key: "reviews" },
     { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Community Forum", icon: "create-outline", key: "Forum" },
-    { label: "Product Archive", icon: "archive-outline", key: "productArchive" },
+    
    
   ]
 

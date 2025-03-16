@@ -68,14 +68,14 @@ const BlogCreate = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Back Icon */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => navigation.navigate("BlogList")}
         style={styles.backButton}
       >
         <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
-      <Text style={styles.title}>Create New Blog</Text>
+      {/* <Text style={styles.title}>Create New Blog</Text> */}
 
       <ScrollView>
         {/* Title Input */}

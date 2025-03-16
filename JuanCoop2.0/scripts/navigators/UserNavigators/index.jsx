@@ -28,7 +28,7 @@ const UserNavigation = () => {
         component={Profile}
         options={{
           headerShown: true,title: "User Profile",
-          tabBarShowLabel: false,
+        headerBackTitleVisible: true
         }}
       />
 
@@ -96,7 +96,8 @@ const UserNavigation = () => {
       <Stack.Screen
         name="EditFarm"
         options={{
-          headerShown: false,
+          headerShown: true,
+          title:"Edit Farm",
           tabBarShowLabel: false,
         }}
         component={EditFarm}

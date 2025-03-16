@@ -59,12 +59,12 @@ const RatingList = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={28} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Product Review List</Text>
-      </View>
+      </View> */}
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
       ) : (
