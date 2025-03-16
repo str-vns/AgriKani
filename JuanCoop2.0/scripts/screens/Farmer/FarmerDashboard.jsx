@@ -346,7 +346,7 @@ const FarmerDashboard = () => {
             ))}
           </View>
         )}
-      </View>;
+      </View>
     </ScrollView>
   );
 };

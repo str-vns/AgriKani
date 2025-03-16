@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   View,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
   StyleSheet,
+  RefreshControl, // Import RefreshControl
 } from 'react-native';
 import {
   getPost,
@@ -24,6 +25,7 @@ const PostList = () => {
   const navigation = useNavigation(); // Get navigation object
   
   const [selectedTab, setSelectedTab] = useState("Pending");
+  const [refreshing, setRefreshing] = useState(false); // State for refresh control
 
   useEffect(() => {
     dispatch(getPost());
@@ -34,6 +36,7 @@ const PostList = () => {
     alert('Post Approved Successfully!');
     dispatch(getPost());
   };
+
   useEffect(() => {
     navigation.setOptions({ headerShown: false }); // Hide the header
     dispatch(getPost());
@@ -45,80 +48,92 @@ const PostList = () => {
       alert('Post deleted successfully!');
       dispatch(getPost());
     } catch (error) {
-        await dispatch(deletePost(postId));
-        alert('Post deleted successfully!');
-        dispatch(getPost());
+      await dispatch(deletePost(postId));
+      alert('Post deleted successfully!');
+      dispatch(getPost());
     }
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(getPost()).finally(() => setRefreshing(false));
+  }, [dispatch]);
+
   const filteredPosts = posts?.filter(post => 
     selectedTab === "Pending" ? post.status !== "approved" : post.status === "approved"
   );
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-    <View style={styles.header}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={28} color="black" />
-      </TouchableOpacity>
-      <Text style={styles.headerTitle}>Post List</Text>
-    </View>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      {/* <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={28} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Post List</Text>
+      </View> */}
 
-    {/* ✅ Tab Buttons for Switching Views */}
-    <View style={styles.tabContainer}>
-      <TouchableOpacity
-        style={[styles.tabButton, selectedTab === "Pending" && styles.activeTab]}
-        onPress={() => setSelectedTab("Pending")}
-      >
-        <Text style={[styles.tabText, selectedTab === "Pending" && styles.activeTabText]}>
-          Not Approved
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tabButton, selectedTab === "Approved" && styles.activeTab]}
-        onPress={() => setSelectedTab("Approved")}
-      >
-        <Text style={[styles.tabText, selectedTab === "Approved" && styles.activeTabText]}>
-          Approved
-        </Text>
-      </TouchableOpacity>
-    </View>
+      {/* ✅ Tab Buttons for Switching Views */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tabButton, selectedTab === "Pending" && styles.activeTab]}
+          onPress={() => setSelectedTab("Pending")}
+        >
+          <Text style={[styles.tabText, selectedTab === "Pending" && styles.activeTabText]}>
+            Not Approved
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, selectedTab === "Approved" && styles.activeTab]}
+          onPress={() => setSelectedTab("Approved")}
+        >
+          <Text style={[styles.tabText, selectedTab === "Approved" && styles.activeTabText]}>
+            Approved
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-    {/* ✅ Display Filtered Posts */}
-    {loading && (
-      <ActivityIndicator size="large" color="#4CAF50" style={styles.loadingIndicator} />
-    )}
+      {/* ✅ Display Filtered Posts */}
+      {loading && (
+        <ActivityIndicator size="large" color="#4CAF50" style={styles.loadingIndicator} />
+      )}
 
-    {filteredPosts && filteredPosts.length > 0 ? (
-      filteredPosts.map((post) => (
-        <View key={post._id} style={styles.postCard}>
-          <View style={styles.imageAndContent}>
-            <Image
-              source={post.image?.length > 0 ? { uri: post.image[0].url } : require('@assets/img/buyer.png')}
-              style={styles.postImage}
-            />
-            <View style={styles.postDetails}>
-              <Text style={styles.postContent}>{post.content || 'No content available'}</Text>
-              <Text style={styles.postDate}>Posted on: {new Date(post.createdAt).toLocaleDateString()}</Text>
+      {filteredPosts && filteredPosts.length > 0 ? (
+        filteredPosts.map((post) => (
+          <View key={post._id} style={styles.postCard}>
+            <View style={styles.imageAndContent}>
+              <Image
+                source={post.image?.length > 0 ? { uri: post.image[0].url } : require('@assets/img/buyer.png')}
+                style={styles.postImage}
+              />
+              <View style={styles.postDetails}>
+                <Text style={styles.postContent}>{post.content || 'No content available'}</Text>
+                <Text style={styles.postDate}>Posted on: {new Date(post.createdAt).toLocaleDateString()}</Text>
+              </View>
             </View>
+
+            {selectedTab === "Pending" && (
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={[styles.button, styles.approveButton]} onPress={() => handleApprove(post._id)}>
+                  <Text style={styles.buttonText}>Approve</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.button, styles.declineButton]} onPress={() => handleDecline(post._id)}>
+                  <Text style={styles.buttonText}>Decline</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
-
-          {selectedTab === "Pending" && (
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={[styles.button, styles.approveButton]} onPress={() => handleApprove(post._id)}>
-                <Text style={styles.buttonText}>Approve</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={[styles.button, styles.declineButton]} onPress={() => handleDecline(post._id)}>
-                <Text style={styles.buttonText}>Decline</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </View>
-      ))
-    ) : (
-      !loading && <Text style={styles.noPostsText}>No posts available.</Text>
-    )}
-  </ScrollView>
+        ))
+      ) : (
+        !loading && <Text style={styles.noPostsText}>No posts available.</Text>
+      )}
+    </ScrollView>
   );
 };
 

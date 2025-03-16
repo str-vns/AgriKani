@@ -42,7 +42,7 @@ const CategoryCreate = ({ token }) => {
     
     if (categoryState.success) {
       alert("Category created successfully!");
-      navigation.navigate("CategoryList");  // Ensure 'CategoryList' is the correct screen name
+      navigation.goBack(); // Ensure 'CategoryList' is the correct screen name
     }
 
     dispatch(categoryCreate({ categoryName }, image, token));
@@ -51,12 +51,12 @@ const CategoryCreate = ({ token }) => {
   return (
     <View style={styles.container}>
       {/* Header with Back Navigation */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={28} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Category</Text>
-      </View>
+      </View> */}
 
       {categoryState.error && <Text style={styles.error}>{categoryState.error}</Text>}
       

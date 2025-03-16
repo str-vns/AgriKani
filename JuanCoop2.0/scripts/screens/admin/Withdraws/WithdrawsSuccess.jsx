@@ -52,7 +52,7 @@ const WithdrawsSuccess = () => {
     return (
       <View style={styles.container}>
   
-        <View style={styles.header}>
+        {/* <View style={styles.header}>
                 <TouchableOpacity
                   style={styles.backButton}
                   onPress={() => navigation.goBack()}
@@ -60,7 +60,7 @@ const WithdrawsSuccess = () => {
                   <Ionicons name="arrow-back" size={28} color="black" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Withdraw Request List</Text>
-            </View>
+            </View> */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[

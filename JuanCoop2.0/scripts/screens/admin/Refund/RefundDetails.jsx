@@ -53,7 +53,7 @@ const RefundDetails = (props) => {
   const handleApprove = async (transId) => {
     Alert.alert(
       "Withdrawal Success",
-      "Did You Send the Money to the User?",
+      "Are you sure you want to send the money to the user?",
       [
         {
           text: "Yes",
@@ -144,16 +144,9 @@ const RefundDetails = (props) => {
   return (
     <ScrollView>
       <View style={styles.container}>
+      
+      
         {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Driver Details</Text>
-      </View> */}
-        <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -161,7 +154,7 @@ const RefundDetails = (props) => {
             <Ionicons name="arrow-back" size={28} color="black" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Refund Details</Text>
-        </View>
+        </View> */}
 
         <View style={styles.coopContainer}>
        
@@ -186,7 +179,7 @@ const RefundDetails = (props) => {
               ]}> {trans?.transactionStatus}
               </Text>
                </Text>
-               <Text style={styles.address}>Reason of Refund: ₱ {trans?.cancelledId?.content}</Text>
+               <Text style={styles.address}>Reason of Refund:{trans?.cancelledId?.content}</Text>
           </View>
          
         </View>

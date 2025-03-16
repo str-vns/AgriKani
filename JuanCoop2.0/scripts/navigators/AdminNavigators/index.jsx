@@ -46,30 +46,30 @@ const Index = () => {
         <Stack.Screen name="BlogCreate" component={BlogCreate} options={{ headerShown: true,   title:"Create Blog" }} />
         <Stack.Screen name="BlogUpdate" component={BlogUpdate} options={{ headerShown: true,   title:"Update Blog" }}/>
         <Stack.Screen name="BlogCard" component={BlogCard} />
-        <Stack.Screen name="UserList" component={UserList} />
-        <Stack.Screen name="CoopList" component={CoopLists} />
-        <Stack.Screen name="CoopActive" component={CoopActive} />
-        <Stack.Screen name="CoopDetails" component={CoopDetails} />
-        <Stack.Screen name="DriverList" component={DriverList} />
-        <Stack.Screen name="DriverDetails" component={DriverDetails} />
-        <Stack.Screen name="DriverActive" component={DriverActive} />
+        <Stack.Screen name="UserList" component={UserList} options={{ headerShown: true,   title:"User List" }}/>
+        <Stack.Screen name="CoopList" component={CoopLists} options={{ headerShown: true,   title:"Cooperative List" }}/>
+        <Stack.Screen name="CoopActive" component={CoopActive} options={{ headerShown: true,   title:"Cooperative List" }}/>
+        <Stack.Screen name="CoopDetails" component={CoopDetails} options={{ headerShown: true,   title:"Cooperative Details" }}/>
+        <Stack.Screen name="DriverList" component={DriverList} options={{ headerShown: true,   title:"Driver List" }}/>
+        <Stack.Screen name="DriverDetails" component={DriverDetails}options={{ headerShown: true,   title:"Driver Details" }} />
+        <Stack.Screen name="DriverActive" component={DriverActive} options={{ headerShown: true,   title:"Driver List" }}/>
 
         <Stack.Screen name="barGraph" component={barGraph} />
 
         <Stack.Screen name="CategoryList" component={CategoryList} />
-        <Stack.Screen name="CategoryCreate" component={CategoryCreate} />
-        <Stack.Screen name="CategoryUpdate" component={CategoryUpdate} />
+        <Stack.Screen name="CategoryCreate" component={CategoryCreate} options={{ headerShown: true,   title:"Create Category" }}/>
+        <Stack.Screen name="CategoryUpdate" component={CategoryUpdate} options={{ headerShown: true,   title:"Update Category" }}/>
 
         <Stack.Screen name="TypeList" component={TypeList} />
 
         <Stack.Screen name="TypeCreate" component={TypeCreate} />
         <Stack.Screen name="TypeUpdate" component={TypeUpdate} />
-        <Stack.Screen name="WithdrawsList" component={WithdrawsList} />
-        <Stack.Screen name="WithdrawsSuccess" component={WithdrawsSuccess} />
-        <Stack.Screen name="WithdrawsSingle" component={WithdrawsSingle} />
+        <Stack.Screen name="WithdrawsList" component={WithdrawsList} options={{ headerShown: true,   title:"Withdraw Request" }}/>
+        <Stack.Screen name="WithdrawsSuccess" component={WithdrawsSuccess} options={{ headerShown: true,   title:"Withdraw Request" }}/>
+        <Stack.Screen name="WithdrawsSingle" component={WithdrawsSingle} options={{ headerShown: true,   title:"Withdraw Details" }} />
         <Stack.Screen name="RefundProcess" component={RefundProcess} />
         <Stack.Screen name="RefundSuccess" component={RefundSuccess} />
-        <Stack.Screen name="RefundDetails" component={RefundDetails} />
+        <Stack.Screen name="RefundDetails" component={RefundDetails} options={{ headerShown: true,   title:"Refund Details" }}/>
       </Stack.Navigator>
     </Box>
   );

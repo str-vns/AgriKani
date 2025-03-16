@@ -151,7 +151,7 @@ const context = useContext(AuthGlobal);
         <Drawer.Screen
           name="PostList"
           initialParams={{ screen: "PostList" }}
-          options={{ headerShown: false, tabBarShowLabel: false }}
+          options={{ headerShown: true, tabBarShowLabel: false,title:"Post List" }}
           component={PostNavigators}
         />
 

@@ -59,15 +59,15 @@ const Cooplist = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
           <Ionicons name="arrow-back" size={28} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Cooperative List</Text>
-      </View>
+        <Text style={styles.headerTitle}>Cooperatives List</Text>
+      </View> */}
 
       <View style={styles.tabContainer}>
         <TouchableOpacity

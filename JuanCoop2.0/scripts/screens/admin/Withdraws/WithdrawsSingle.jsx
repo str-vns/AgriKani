@@ -149,15 +149,6 @@ const WithdrawsSingle = (props) => {
     <ScrollView>
       <View style={styles.container}>
         {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Driver Details</Text>
-      </View> */}
-        <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.goBack()}
@@ -165,7 +156,7 @@ const WithdrawsSingle = (props) => {
             <Ionicons name="arrow-back" size={28} color="black" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Withdraw Details</Text>
-        </View>
+        </View> */}
 
         <View style={styles.coopContainer}>
        
@@ -228,5 +219,6 @@ const WithdrawsSingle = (props) => {
     </ScrollView>
   );
 };
+
 
 export default WithdrawsSingle;

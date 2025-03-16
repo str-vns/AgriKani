@@ -60,12 +60,12 @@ const UserList = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-       <View style={styles.header}>
+       {/* <View style={styles.header}>
               <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Ionicons name="arrow-back" size={28} color="black" />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>User List</Text>
-            </View>
+            </View> */}
 
       {/* Content */}
       {loading ? (

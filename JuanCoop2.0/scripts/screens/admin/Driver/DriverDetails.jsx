@@ -9,11 +9,12 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  StyleSheet,
+  RefreshControl, // Import RefreshControl
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ImageViewer from "react-native-image-zoom-viewer";
 import { driverApproved, driverRejected } from "@redux/Actions/driverActions";
@@ -28,6 +29,7 @@ const DriverDetails = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState(null);
   const [fcmToken, setFcmToken] = useState(null);
+  const [refreshing, setRefreshing] = useState(false); // State for refresh control
 
   useEffect(() => {
     const fetchJwt = async () => {
@@ -102,8 +104,21 @@ const DriverDetails = (props) => {
     );
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Add your refresh logic here
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   return (
-    <ScrollView>
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.container}>
         {/* <View style={styles.header}>
         <TouchableOpacity
@@ -114,15 +129,6 @@ const DriverDetails = (props) => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Driver Details</Text>
       </View> */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={28} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Driver Details</Text>
-        </View>
 
         <View style={styles.coopContainer}>
           <Image
@@ -168,8 +174,7 @@ const DriverDetails = (props) => {
             >
               <Image
                 source={{
-                  uri:
-                    driver?.driversLicenseImage?.url
+                  uri: driver?.driversLicenseImage?.url,
                 }}
                 style={styles.imageLook}
               />
@@ -205,22 +210,7 @@ const DriverDetails = (props) => {
               )}
             </TouchableOpacity>
           </View>
-        ) : null
-        //   <View style={styles.buttonContainer}>
-        //     {/* Only Decline Button if already approved */}
-        //     <TouchableOpacity
-        //       style={styles.approvedButton}
-        //       onPress={() => handleRemove(driver?._id)}
-        //       disabled={isLoading}
-        //     >
-        //       {isLoading ? (
-        //         <ActivityIndicator size="small" color="black" />
-        //       ) : (
-        //         <Text style={styles.buttonApproveText}>Remove</Text>
-        //       )}
-        //     </TouchableOpacity>
-        //   </View>
-        }
+        ) : null}
 
         <Modal
           visible={modalVisible}
@@ -242,5 +232,31 @@ const DriverDetails = (props) => {
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  scrollContainer: { paddingVertical: 20 },
+  container: { flex: 1, padding: 20, backgroundColor: "#FFFFFF" },
+  header: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
+  backButton: { marginRight: 10 },
+  headerTitle: { fontSize: 20, fontWeight: "bold" },
+  coopContainer: { alignItems: "center", marginBottom: 20 },
+  coopImage: { width: 120, height: 120, borderRadius: 60, marginBottom: 10 },
+  coopDetails: { alignItems: "center" },
+  coopName: { fontSize: 18, fontWeight: "bold" },
+  coopEmail: { fontSize: 14, color: "gray" },
+  address: { fontSize: 14, color: "gray" },
+  status: { fontSize: 14, fontWeight: "bold", marginTop: 10 },
+  approved: { color: "green" },
+  notApproved: { color: "red" },
+  containerFileAll: { marginTop: 20 },
+  requirement: { fontSize: 16, fontWeight: "bold", marginBottom: 10 },
+  imageContainer: { alignItems: "center" },
+  imageLook: { width: 200, height: 200, marginBottom: 10 },
+  buttonContainer: { flexDirection: "row", justifyContent: "space-between", marginTop: 20 },
+  approvedButton: { flex: 1, backgroundColor: "#28a745", padding: 10, borderRadius: 5, alignItems: "center", marginRight: 10 },
+  buttonApproveText: { color: "white", fontSize: 14, fontWeight: "bold" },
+  modalContainer: { flex: 1, backgroundColor: "rgba(0,0,0,0.9)", justifyContent: "center", alignItems: "center" },
+  imageShow: { width: "100%", height: "100%" },
+});
 
 export default DriverDetails;

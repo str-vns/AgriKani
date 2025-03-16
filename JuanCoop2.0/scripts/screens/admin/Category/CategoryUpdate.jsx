@@ -85,12 +85,12 @@ const EditCategory = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-       <View style={styles.header}>
+       {/* <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={28} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Category</Text>
-      </View>
+      </View> */}
       <Text style={styles.label}>Category Image</Text>
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
         {categoryImage ? (
