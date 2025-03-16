@@ -1310,17 +1310,18 @@ exports.getCoopDashboardData = async (userId) => {
 
 exports.getOverallDashboardData = async () => {
   try {
-    // Your existing logic to fetch dashboard data
-    const orders = await Order.find({ "orderItems.orderStatus": "Shipping" })
+    // Fetch only delivered orders
+    const orders = await Order.find({ "orderItems.orderStatus": "Delivered" })
       .populate("orderItems.product")
       .lean();
 
     const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
     const totalOrders = orders.length;
 
+    // Top 5 best-selling products based on delivered orders
     const rankedProducts = await Order.aggregate([
       { $unwind: "$orderItems" },
-      { $match: { "orderItems.orderStatus": "Shipping" } },
+      { $match: { "orderItems.orderStatus": "Delivered" } },
       {
         $group: {
           _id: "$orderItems.product",
@@ -1328,7 +1329,7 @@ exports.getOverallDashboardData = async () => {
         },
       },
       { $sort: { totalQuantitySold: -1 } },
-  { $limit: 5 }, 
+      { $limit: 5 },
       {
         $lookup: {
           from: "products",
@@ -1344,7 +1345,6 @@ exports.getOverallDashboardData = async () => {
           productId: "$_id",
           productName: "$productDetails.productName",
           totalQuantitySold: 1,
-        
         },
       },
     ]);
@@ -1358,18 +1358,19 @@ exports.getOverallDashboardData = async () => {
     sevenDaysAgo.setDate(currentDate.getDate() - 7);
     sevenDaysAgo.setHours(0, 0, 0, 0);
 
+    // Sales trends (only delivered orders)
     const dailySales = await Order.aggregate([
-      { $match: { "orderItems.orderStatus": "Shipping", createdAt: { $gte: startOfDay } } },
+      { $match: { "orderItems.orderStatus": "Delivered", createdAt: { $gte: startOfDay } } },
       { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
     ]);
 
     const weeklySales = await Order.aggregate([
-      { $match: { "orderItems.orderStatus": "Shipping", createdAt: { $gte: sevenDaysAgo } } },
+      { $match: { "orderItems.orderStatus": "Delivered", createdAt: { $gte: sevenDaysAgo } } },
       { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
     ]);
 
     const monthlySales = await Order.aggregate([
-      { $match: { "orderItems.orderStatus": "Shipping", createdAt: { $gte: startOfMonth } } },
+      { $match: { "orderItems.orderStatus": "Delivered", createdAt: { $gte: startOfMonth } } },
       { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
     ]);
 
