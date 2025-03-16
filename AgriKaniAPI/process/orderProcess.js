@@ -161,7 +161,7 @@ exports.updateOrderStatusProcess = async (id, req) => {
     if (matchedOrderItem && matchedOrderItem.orderStatus !== 'Cancelled') {
       try {
         const inventory = await Inventory.findById(req.body.inventoryProduct);
-
+        console.log("Inventory:", inventory);
         if (!inventory) {
           console.warn(`Product with ID ${req.body.inventoryProduct} not found.`);
         } else {
