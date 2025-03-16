@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import styles from "@screens/stylesheets/Filter/UserSidebar"
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native"; 
+import { useFocusEffect, useNavigation } from "@react-navigation/native"; 
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { logoutUser } from "@redux/Actions/Auth.actions";
@@ -211,6 +211,8 @@ const UserSidebar = () => {
     socket.emit("removeUser", socket?.id);
     console.log("User disconnected from socket.");
   };
+
+
 
   return (
     <View style={styles.container}>

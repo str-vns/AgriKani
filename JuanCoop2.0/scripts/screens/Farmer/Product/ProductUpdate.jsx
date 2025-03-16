@@ -83,18 +83,20 @@ const ProductUpdate = (props) => {
     fetchJwt();
   }, []);
 
+  console.log("newImage: ", newImage);
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaType,
       allowsEditing: true, 
       aspect: [4, 3],
       quality: 1,
-
+      allowsMultipleSelection: true,
     });
   
     if (!result.canceled
    && result.assets && result.assets.length > 0) {
       const newImages = [];
+      console.log("Image selected: ", result.assets);
       result.assets.forEach((asset) => {
         // Check for duplicates and add only if not found
         if (!image.some(existingImage => existingImage.uri === asset.uri)) {

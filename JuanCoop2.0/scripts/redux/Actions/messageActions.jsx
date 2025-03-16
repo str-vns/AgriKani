@@ -22,11 +22,13 @@ export const listMessages = (id, token) => async (dispatch) => {
         }
 
         const { data } = await axios.get(`${baseURL}m/${id}`, config);
-        console.log("data", data);
+  
         dispatch({
         type: MESSAGE_LIST_SUCCESS,
         payload: data.details,
         });
+
+        return data.details;
     } catch (error) {
         dispatch({
         type: MESSAGE_LIST_FAIL,

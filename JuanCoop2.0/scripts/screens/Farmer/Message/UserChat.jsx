@@ -149,10 +149,10 @@ if (!isOnlinerUser ) {
 
   return (
     <View style={styles.container}>
-      {messages && Array.isArray(messages) && messages.length > 0 ? (
+       {messages || arrivedMessages &&  messages.length > 0 || arrivedMessages.length > 0 ? (
        <FlatList
        ref={scrollRef}
-       data={[...(messages || []), ...arrivedMessages]} 
+       data={[...messages, ...arrivedMessages]} 
        renderItem={({ item, index }) => (
          <Message key={index} messages={item} own={item.sender === UserId} />
        )}

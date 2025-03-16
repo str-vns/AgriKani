@@ -243,27 +243,20 @@ export const ProfileEdit = (userDataId, token, userData) => async (dispatch) => 
     };
 
     const { data } = await axios.put(`${baseURL}users/${userDataId}`, formData, config);
-
-
-    dispatch({
-        type: EDIT_PROFILE_SUCCESS,
-        payload: data.details,
-    });
     
     const userInfo = data.details.user;
     const TokiToken = data.details.accessToken;
-    console.log("User Info:", userInfo);
+
     await AsyncStorage.setItem("user", JSON.stringify(userInfo));
     await AsyncStorage.setItem("jwt", TokiToken);
     const decoded = token;
     
     dispatch(setCurrentUser(decoded, userInfo ));
- 
-    Toast.show({
-        topOffset: 60,
-        type: "success",
-        text1: "Profile Updated Successfully",
-    });
+    
+    dispatch({
+      type: EDIT_PROFILE_SUCCESS,
+      payload: data.details,
+  });
 
 } catch (error) {
     console.error("Error updating profile:", error);

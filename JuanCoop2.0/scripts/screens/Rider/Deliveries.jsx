@@ -12,12 +12,18 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { Profileuser } from "@redux/Actions/userActions";
-import { getDeliveryDriver, updateDeliveryStatus } from "@redux/Actions/deliveryActions";
-import { Picker } from '@react-native-picker/picker';
-import { driverProfile, updateAvailability } from "@redux/Actions/driverActions";
+import {
+  getDeliveryDriver,
+  updateDeliveryStatus,
+} from "@redux/Actions/deliveryActions";
+import { Picker } from "@react-native-picker/picker";
+import {
+  driverProfile,
+  updateAvailability,
+} from "@redux/Actions/driverActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Location from 'expo-location'
+import * as Location from "expo-location";
 import { Alert } from "react-native";
 import { useSocket } from "@SocketIo";
 
@@ -27,49 +33,53 @@ const Deliveries = () => {
   const navigation = useNavigation();
   const socket = useSocket();
   const userId = context?.stateUser?.userProfile?._id;
-  const { Deliveryloading, deliveries, Deliveryerror } = useSelector( state => state.deliveryList);
-  const { Profileloading, Profiledriver, ProfileError } = useSelector((state) => state.driverProfile);
+  const { Deliveryloading, deliveries, Deliveryerror } = useSelector(
+    (state) => state.deliveryList
+  );
+  const { Profileloading, Profiledriver, ProfileError } = useSelector(
+    (state) => state.driverProfile
+  );
   const [activeTab, setActiveTab] = useState("Deliveries");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
   const [markerCoordinate, setMarkerCoordinate] = useState(null);
-   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
-useEffect(() => {
-       const getCurrentLocation = async () => {
-              let { status } = await Location.requestForegroundPermissionsAsync();
-              if (status !== "granted") {
-                alert("Permission to access location was denied");
-                return;
-              }
-        
-              try {
-                const location = await Location.getCurrentPositionAsync({
-                  accuracy: Location.Accuracy.High,
-                  timeInterval: 3000, 
-                  distanceInterval: 3, 
-                }); 
-          
-                const { latitude, longitude } = location.coords;
-                setMarkerCoordinate({ lat: latitude, lng: longitude });
-              } catch (error) {
-                console.error("Error getting Location:", error);
-              }
-            };
-           
-            getCurrentLocation();
+  useEffect(() => {
+    const getCurrentLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to access location was denied");
+        return;
+      }
+
+      try {
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+          timeInterval: 3000,
+          distanceInterval: 3,
+        });
+
+        const { latitude, longitude } = location.coords;
+        setMarkerCoordinate({ lat: latitude, lng: longitude });
+      } catch (error) {
+        console.error("Error getting Location:", error);
+      }
+    };
+
+    getCurrentLocation();
   }, []);
-  
+
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
         if (!markerCoordinate) {
           console.warn("Marker coordinate is not set yet.");
-          return; 
+          return;
         }
-  
+
         setLoading(true);
         try {
           const res = await AsyncStorage.getItem("jwt");
@@ -77,7 +87,7 @@ useEffect(() => {
             setToken(res);
             if (userId) {
               dispatch(Profileuser(userId, res));
-              dispatch(driverProfile(userId, res))
+              dispatch(driverProfile(userId, res));
 
               const mark = {
                 latitude: markerCoordinate?.lat,
@@ -85,37 +95,35 @@ useEffect(() => {
               };
               dispatch(getDeliveryDriver(userId, mark, res));
             } else {
-              setErrors('User ID is missing.');
+              setErrors("User ID is missing.");
             }
           } else {
-            setErrors('No JWT token found.');
+            setErrors("No JWT token found.");
           }
         } catch (error) {
-          console.error('Error retrieving JWT:', error);
-          setErrors('Failed to retrieve JWT token.');
+          console.error("Error retrieving JWT:", error);
+          setErrors("Failed to retrieve JWT token.");
         } finally {
           setLoading(false);
         }
       };
-  
+
       fetchData();
     }, [userId, dispatch, markerCoordinate])
   );
-  
+
   useEffect(() => {
     if (!socket) {
       console.warn("Socket is not initialized.");
       return;
     }
-  
 
-      if (userId) {
-        socket.emit("addUser", userId);
-      } else {
-        console.warn("User ID is missing.");
-      }
-    
-  
+    if (userId) {
+      socket.emit("addUser", userId);
+    } else {
+      console.warn("User ID is missing.");
+    }
+
     socket.on("getUsers", (users) => {
       const onlineUsers = users.filter(
         (user) => user?.online && user?.userId !== null
@@ -123,106 +131,109 @@ useEffect(() => {
       console.log("Online users: ", onlineUsers);
       setOnlineUsers(onlineUsers);
     });
-  
+
     return () => {
       socket.off("getUsers");
     };
   }, [socket, userId]);
 
-    const onRefresh = useCallback(async () => {
-      setRefreshing(true);
-      try {
-        
-        const mark = {
-          latitude: markerCoordinate?.lat,
-          longitude: markerCoordinate?.lng,
-        };
-        
-        dispatch(getDeliveryDriver(userId, mark, token));
-         dispatch(driverProfile(userId, token))
-      } catch (err) {
-        console.error("Error refreshing users:", err);
-      } finally {
-        setRefreshing(false);
-      }
-    }, [ userId, token]);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const mark = {
+        latitude: markerCoordinate?.lat,
+        longitude: markerCoordinate?.lng,
+      };
 
-    const getStatusColor = (status) => {
-      switch (status) {
-        case "pending":
-          return "orange";
-        case "delivering":
-          return "blue";
-        case "cancelled":
-          return "red";
-        case "re-deliver":
-          return "purple";
-        case "failed":
-          return "gray";
-        case "delivered":
-          return "green";
-        default:
-          return "black"; 
-      }
-    };
+      dispatch(getDeliveryDriver(userId, mark, token));
+      dispatch(driverProfile(userId, token));
+    } catch (err) {
+      console.error("Error refreshing users:", err);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [userId, token]);
 
-    const capitalizeFirstLetter = (text) => {
-      if (!text) return ""; 
-      return text.charAt(0).toUpperCase() + text.slice(1);
-    };
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending":
+        return "orange";
+      case "delivering":
+        return "blue";
+      case "cancelled":
+        return "red";
+      case "re-deliver":
+        return "purple";
+      case "failed":
+        return "gray";
+      case "delivered":
+        return "green";
+      default:
+        return "black";
+    }
+  };
 
-    const deliveryNow = (item) => {
-      Alert.alert("Delivery", "Are you sure you want to deliver this item?", [
-        {
-          text: "No",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => {
-            console.log("Deliver Pressed");
-            if(item.status === "pending") {
+  const capitalizeFirstLetter = (text) => {
+    if (!text) return "";
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
+
+  const deliveryNow = (item) => {
+    Alert.alert("Delivery", "Are you sure you want to deliver this item?", [
+      {
+        text: "No",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+      {
+        text: "Yes",
+        onPress: () => {
+          console.log("Deliver Pressed");
+          if (item.status === "pending") {
             dispatch(updateDeliveryStatus(item?._id, "delivering", token));
-            navigation.navigate("Dropoff",  { deliveryItem: item})
-            } else {
-              navigation.navigate("Dropoff",  { deliveryItem: item})
-            }
-          },
+            navigation.navigate("Dropoff", { deliveryItem: item });
+          } else {
+            navigation.navigate("Dropoff", { deliveryItem: item });
+          }
         },
-      ]);
-      }
+      },
+    ]);
+  };
 
-  const renderOrderItem = ({ item }) => ( 
- 
+  const renderOrderItem = ({ item }) => (
     <View style={styles.orderCard}>
       <View style={styles.orderInfo}>
-        <Text style={styles.name}>{item.userId.firstName} {item?.userId?.lastName}</Text>
+        <Text style={styles.name}>
+          {item.userId.firstName} {item?.userId?.lastName}
+        </Text>
         <Text style={styles.orderNumber}>Order # {item?.orderId?._id}</Text>
-        <Text>Status:  <Text style={[styles.status, { color: getStatusColor(item?.status) }]}>
-        {capitalizeFirstLetter(item?.status)}
-  </Text>
-</Text>
+        <Text>
+          Status:{" "}
+          <Text
+            style={[styles.status, { color: getStatusColor(item?.status) }]}
+          >
+            {capitalizeFirstLetter(item?.status)}
+          </Text>
+        </Text>
       </View>
       {item.status === "failed" ? null : (
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.deliverButton}
-           onPress={() => deliveryNow(item)}
+          <TouchableOpacity
+            style={styles.deliverButton}
+            onPress={() => deliveryNow(item)}
           >
             <Text style={styles.buttonText}>Deliver now</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.detailsButton}
-            onPress={() => navigation.navigate("Details", { deliveryId: item})}
+            onPress={() => navigation.navigate("Details", { deliveryId: item })}
           >
             <Text style={styles.detailsText}>View Details</Text>
           </TouchableOpacity>
-          
         </View>
       )}
     </View>
   );
-
 
   const handleChange = () => {
     Alert.alert(
@@ -240,8 +251,8 @@ useEffect(() => {
             try {
               dispatch(updateAvailability(userId, token));
               setTimeout(() => {
-                onRefresh()
-              }, 1000)
+                onRefresh();
+              }, 1000);
               console.log("Availability updated successfully");
             } catch (error) {
               console.error("Error updating availability: ", error);
@@ -250,43 +261,59 @@ useEffect(() => {
         },
       ]
     );
-  }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header2}>
-          <TouchableOpacity
-            style={styles.drawerButton}
-            onPress={() => navigation.openDrawer()}
-          >
-            <Ionicons name="menu" size={34} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle2}>Delivery List</Text>
-          <View style={styles.drawerContainer}>
-          <Text style={styles.TextTop}>Availability </Text>
-          {Profileloading ? (  <View style={[styles.circle, { backgroundColor: 'gray' }]} >
-        <Text style={styles.circleText}></Text>
-      </View>) : (<View style={[styles.circle, { backgroundColor: Profiledriver?.isAvailable ? 'green' : 'gray' }]} >
-        <Text style={styles.circleText}></Text>
-      </View>)}
-         
-      </View>
-      {/* Picker for toggling availability */}
-      <View style={styles.pickerContainer}>
-       
-        <Picker
-          selectedValue={Profiledriver?.isAvailable ? 'true' : 'false'}
-          onValueChange={handleChange}
-          style={styles.picker}
+        <TouchableOpacity
+          style={styles.drawerButton}
+          onPress={() => navigation.openDrawer()}
         >
-          <Picker.Item label="Update Availability Status" value=""  enabled={false}/>
-          { Profiledriver?.isAvailable ? <Picker.Item label="Not Available" value="false" /> 
-          : <Picker.Item label="Available" value="true" /> }
-
-        </Picker>
-      </View>
-  
+          <Ionicons name="menu" size={34} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle2}>Delivery List</Text>
+        <View style={styles.drawerContainer}>
+          <Text style={styles.TextTop}>Availability </Text>
+          {Profileloading ? (
+            <View style={[styles.circle, { backgroundColor: "gray" }]}>
+              <Text style={styles.circleText}></Text>
+            </View>
+          ) : (
+            <View
+              style={[
+                styles.circle,
+                {
+                  backgroundColor: Profiledriver?.isAvailable
+                    ? "green"
+                    : "gray",
+                },
+              ]}
+            >
+              <Text style={styles.circleText}></Text>
+            </View>
+          )}
         </View>
+        {/* Picker for toggling availability */}
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={Profiledriver?.isAvailable ? "true" : "false"}
+            onValueChange={handleChange}
+            style={styles.picker}
+          >
+            <Picker.Item
+              label="Update Availability Status"
+              value=""
+              enabled={false}
+            />
+            {Profiledriver?.isAvailable ? (
+              <Picker.Item label="Not Available" value="false" />
+            ) : (
+              <Picker.Item label="Available" value="true" />
+            )}
+          </Picker>
+        </View>
+      </View>
       <View style={styles.header}>
         <TouchableOpacity
           style={[
@@ -294,7 +321,6 @@ useEffect(() => {
             activeTab === "Deliveries" && styles.activeTab,
           ]}
           onPress={() => setActiveTab("Deliveries")}
-
         >
           <Text
             style={[
@@ -323,9 +349,9 @@ useEffect(() => {
         </TouchableOpacity>
       </View>
 
-       {Deliveryloading ? (
+      {Deliveryloading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : deliveries && deliveries?.length === 0 || Deliveryerror ? (
+      ) : (deliveries && deliveries?.length === 0) || Deliveryerror ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No Deliveries found.</Text>
         </View>
@@ -351,26 +377,26 @@ const styles = StyleSheet.create({
   },
 
   header2: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 15,
     paddingBottom: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
     elevation: 3,
-},
-headerTitle2: {
+  },
+  headerTitle2: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     flex: 1,
-    textAlign: 'center',
-    color: '#333',
-},
-drawerButton: {
-  marginRight: 10,
-},
+    textAlign: "center",
+    color: "#333",
+  },
+  drawerButton: {
+    marginRight: 10,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "center",
@@ -465,35 +491,34 @@ drawerButton: {
     width: 20,
     height: 20,
     borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     left: 36,
-   
   },
   circleText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   pickerContainer: {
     marginTop: 10,
-    width: '10%',
-    alignSelf: 'flex-end', 
+    width: "10%",
+    alignSelf: "flex-end",
   },
   picker: {
     height: 20,
-    width: '100%',
-    backgroundColor: '#fff',
+    width: "100%",
+    backgroundColor: "#fff",
     borderRadius: 5,
   },
   TextTop: {
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     left: 15,
     marginTop: 10,
     marginBottom: 5,
   },
   drawerContainer: {
-    flexDirection: 'column'
+    flexDirection: "column",
   },
 });
 

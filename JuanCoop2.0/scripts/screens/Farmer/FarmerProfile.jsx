@@ -42,7 +42,7 @@ const FarmerProfile = (props) => {
       convo.members.includes(cooperative?.user?._id) &&
       convo.members.includes(userId)
   );
-  console.log(success);
+
   const [token, setToken] = useState(null);
   const conversationExists = Boolean(existConvo);
 
@@ -117,7 +117,7 @@ const FarmerProfile = (props) => {
       }
   }, [users, onlineUsers]);
 
-
+console.log(conversations, "conversations");
   const chatNow = async () => {
     const cooperativeUserId = cooperative?.user?._id;
     const currentUserId = userId;
@@ -137,11 +137,12 @@ const FarmerProfile = (props) => {
           };
 
            const response = await dispatch(createConversation(newConvo, token));
-           if (response) {
+           const response2 = await dispatch(conversationList(userId, token));
+           if (response && response2) {
             setTimeout(() => {
               navigation.navigate("ChatMessages", {
                   item: userItem,
-                  conversations: conversations,
+                  conversations: response2,
                   isOnline: onlineUsers,
               });
             }, 5000);

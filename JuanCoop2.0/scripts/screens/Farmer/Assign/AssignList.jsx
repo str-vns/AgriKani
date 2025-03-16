@@ -29,20 +29,19 @@ const AssignList = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
   const checkIfDelivered = (orderItems) => {
-    const today = new Date();
+    if (!Array.isArray(deliveries) || deliveries.length === 0) {
+      return false; 
+    }
   
-    const isSameDay = (date1, date2) => {
-      return (
-        date1.getFullYear() === date2.getFullYear() &&
-        date1.getMonth() === date2.getMonth() &&
-        date1.getDate() === date2.getDate()
-      );
-    };
+    const today = new Date();
+    const isSameDay = (date1, date2) =>
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate();
   
     return deliveries.some((delivery) =>
       orderItems.some((orderItem) => {
         const deliveryDate = new Date(delivery.createdAt);
-  
         return (
           delivery._id === orderItem.deliveryId &&
           isSameDay(deliveryDate, today) &&

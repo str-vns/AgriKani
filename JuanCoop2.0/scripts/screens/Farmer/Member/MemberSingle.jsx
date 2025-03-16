@@ -65,7 +65,7 @@ const MemberSingle = (props) => {
     navigation.navigate("MemberList");
   }
 
- 
+ console.log(members);
 
   return (
   
@@ -112,14 +112,14 @@ const MemberSingle = (props) => {
      
      <Text style={styles.requirement}>Barangay Clearance</Text>
      <View style={styles.imageContainer}>
-      <TouchableOpacity onPress={() => handleImageClick(members?.barangayClearance?.url)}>
+      <TouchableOpacity onPress={() => handleImageClick(members?.barangayClearance?.url)} style={styles.imageLook}>
        <Image source={{ uri: members?.barangayClearance?.url || "https://via.placeholder.com/150" }} style={styles.imageLook} />
        </TouchableOpacity>
       </View>
     
       <Text style={styles.requirement}>Valid ID</Text>
      <View style={styles.imageContainer}>
-      <TouchableOpacity onPress={() => handleImageClick(members?.validId?.url)}>
+      <TouchableOpacity onPress={() => handleImageClick(members?.validId?.url)} style={styles.imageLook}>
        <Image source={{ uri: members?.validId?.url || "https://via.placeholder.com/150" }} style={styles.imageLook} />
        </TouchableOpacity>
       </View>

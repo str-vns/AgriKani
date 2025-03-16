@@ -35,7 +35,7 @@ const ProductCreate = ({ navigation }) => {
   const [image, setImage] = useState([]);
   const [token, setToken] = useState("");
   const [errorsmess, setErrorsMess] = useState("");
-  const [mainImage, setMainImage] = useState("");
+  const [newImage, setNewImage] = useState([]);
   const [modalVisibleCat, setModalVisibleCat] = useState(false);
   const [modalVisibleType, setModalVisibleType] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,22 +65,42 @@ const ProductCreate = ({ navigation }) => {
     fetchJwt();
   }, []);
 
+  console.log("setImage", image);
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaType,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
+      allowsMultipleSelection: true,
     });
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const uri = result.assets[0].uri;
+    if (!result.canceled
+      && result.assets && result.assets.length > 0) {
+         const newImages = [];
+         console.log("Image selected: ", result.assets);
+         result.assets.forEach((asset) => {
+           // Check for duplicates and add only if not found
+           if (!image.some(existingImage => existingImage.uri === asset.uri)) {
+             newImages.push(asset.uri);
+           }
+         });
+     
+         // Update the state with the new images, merging with existing ones
+         setImage([...image, ...newImages]);
+         setNewImage(newImages);
+       } else {
+         console.log("No image selected or an error occurred.");
+       }
+       
+    // if (!result.canceled && result.assets && result.assets.length > 0) {
+    //   const uri = result.assets[0].uri;
 
-      setMainImage((prevImages) => [...prevImages, uri]);
-      setImage((prevImages) => [...prevImages, uri]);
-    } else {
-      console.log("No image selected or an error occurred.");
-    }
+    //   setMainImage((prevImages) => [...prevImages, uri]);
+    //   setImage((prevImages) => [...prevImages, uri]);
+    // } else {
+    //   console.log("No image selected or an error occurred.");
+    // }
   };
 
   const deleteImage = (index) => {

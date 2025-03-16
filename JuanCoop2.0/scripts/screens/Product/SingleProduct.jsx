@@ -21,6 +21,7 @@ import styles from "@screens/stylesheets/singleProduct";
 
 const SingleProduct = ({ route }) => {
   const product = route.params.item;
+  console.log("Product: ", product);
   const [quantity, setQuantity] = useState(1);
   const dispatch = useDispatch();
   const { coop } = useSelector((state) => state.singleCoop);
@@ -55,15 +56,15 @@ const SingleProduct = ({ route }) => {
     try {
       if (product?.stock?.length === 1) {
         const cartItem = {
-          inventoryId: product.stock[0]._id,
-          id: product._id,
-          productName: product.productName,
-          pricing: product?.stock[0].price,
+          inventoryId: product?.stock[0]?._id,
+          id: product?._id,
+          productName: product?.productName,
+          pricing: product?.stock[0]?.price,
           quantity: quantity ,
-          metricUnit: product.stock[0].metricUnit,
-          unitName: product.stock[0].unitName,
-          coop: product.coop,
-          image: product.image[0]?.url,
+          metricUnit: product?.stock[0]?.metricUnit,
+          unitName: product?.stock[0]?.unitName,
+          coop: product?.coop,
+          image: product?.image[0]?.url,
           maxQuantity: product?.stock[0]?.quantity,
         };
   
@@ -75,15 +76,15 @@ const SingleProduct = ({ route }) => {
       } else if (selectedSize) {
         const cartItem = {
           inventoryId: selectedSize?._id,
-          id: product._id,
-          productName: product.productName,
+          id: product?._id,
+          productName: product?.productName,
           pricing: selectedSize?.price,
           quantity: quantity ,
           metricUnit: selectedSize?.metricUnit,
           unitName: selectedSize?.unitName,
-          coop: product.coop,
-          user: product.user,
-          image: product.image[0]?.url,
+          coop: product?.coop,
+          user: product?.user,
+          image: product?.image[0]?.url,
           maxQuantity: selectedSize?.quantity,
         };
   
@@ -100,8 +101,8 @@ const SingleProduct = ({ route }) => {
 
   useFocusEffect(
     useCallback(() => {
-      if (product && product.coop?._id) {
-        dispatch(getCoop(product.coop?._id));
+      if (product && product?.coop?._id) {
+        dispatch(getCoop(product?.coop?._id));
       }
     },[dispatch, product])
 
@@ -117,7 +118,7 @@ const SingleProduct = ({ route }) => {
       console.warn("Image URL is missing: ", item);
       return null; 
     }
-    return <Image source={{ uri: item.url }} style={styles.carouselImage} />;
+    return <Image source={{ uri: item?.url }} style={styles.carouselImage} />;
   };
 
   return (
@@ -126,7 +127,7 @@ const SingleProduct = ({ route }) => {
        
         <View style={styles.imageContainer}>
           <Carousel
-            data={product.image || []}
+            data={product?.image || []}
             width={SLIDER_WIDTH}
             height={250}
             renderItem={({ item }) => renderImageItem({ item })}
@@ -134,14 +135,14 @@ const SingleProduct = ({ route }) => {
         </View>
 
         <Text style={styles.productName}>{product?.productName}</Text>
-            { product?.stock.length === 1 ? 
+            { product?.stock?.length === 1 ? 
             
             (
               <>
               <View style={styles.priceAndQuantity}>
-              <Text style={styles.price}>₱ {product?.stock[0].price}</Text>
+              <Text style={styles.price}>₱ {product?.stock[0]?.price}</Text>
               <View style={styles.quantityContainer2}>
-              <Text style={styles.stock}>Stock: {product?.stock[0].quantity} {product?.stock[0].unitName} {product?.stock[0].metricUnit}</Text>
+              <Text style={styles.stock}>Stock: {product?.stock[0]?.quantity} {product?.stock[0]?.unitName} {product?.stock[0]?.metricUnit}</Text>
               < View style={styles.quantityContainer2}>
               <TouchableOpacity
                 onPress={decrement}
@@ -171,7 +172,7 @@ const SingleProduct = ({ route }) => {
     <ScrollView horizontal={true}>
     {product?.stock.map((item, index) => {
         const isSelected = item === selectedSize; 
-        const stockCardStyle = isSelected ? styles.stockCardSelected : styles.stockCard;
+        const stockCardStyle = isSelected ? styles?.stockCardSelected : styles?.stockCard;
 
         return (
           <TouchableOpacity
@@ -180,7 +181,7 @@ const SingleProduct = ({ route }) => {
             onPress={() => handleSelectSize(item)} // Call function on press
           >
             <Text style={styles.stock}>
-              {item.unitName} {item.metricUnit}
+              {item?.unitName} {item?.metricUnit}
             </Text>
           </TouchableOpacity>
         );
@@ -207,7 +208,7 @@ const SingleProduct = ({ route }) => {
         {/* <Text style={styles.productHeading}>Description</Text> */}
 
         {/* Product Description */}
-        <Text style={styles.productDescription}>{product.description}</Text>
+        <Text style={styles.productDescription}>{product?.description}</Text>
 
         {/* Farmer Info */}
 
@@ -223,7 +224,7 @@ const SingleProduct = ({ route }) => {
           >
             {coop?.user?.image?.url ? (
               <Image
-                source={{ uri: coop.user.image.url }}
+                source={{ uri: coop?.user?.image?.url }}
                 style={styles.farmerImage}
               />
             ) : (
@@ -259,14 +260,14 @@ const SingleProduct = ({ route }) => {
 
         {/* Reviews */}
         <Text style={styles.reviewsHeader}>Product Reviews</Text>
-        {product.reviews.length > 0 ? (
-          product.reviews.map((review, index) => (
+        {product?.reviews?.length > 0 ? (
+          product?.reviews?.map((review, index) => (
             <ScrollView>
               <View key={index} style={styles.review}>
                 <Image
                   source={
-                    review.user?.image.url
-                      ? { uri: review.user?.image.url }
+                    review.user?.image?.url
+                      ? { uri: review?.user?.image?.url }
                       : require("@assets/img/sample.png")
                   }
                   style={styles.reviewProfile}

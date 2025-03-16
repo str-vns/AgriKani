@@ -1,5 +1,5 @@
-import React, { useCallback, useContext, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert } from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ScrollView, Image, ActivityIndicator, Alert,RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Ensure you have @expo/vector-icons installed
 import styles from '../css/styles.js';
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -13,7 +13,8 @@ const ProductList = ({ navigation }) => {
   const context = useContext(AuthGlobal)
   const dispatch = useDispatch()
   const {loading, coopProducts, error } = useSelector((state) => state.CoopProduct)
-  const [refresh, setRefresh] = React.useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = React.useState(null);
   const Coopid = context?.stateUser?.userProfile?._id
   // console.log(context.stateUser.userProfile._id)
@@ -37,6 +38,7 @@ const ProductList = ({ navigation }) => {
      }
     , [Coopid])
   )
+
 
   const onRefresh = useCallback(async () => {
     setRefresh(true);
@@ -125,6 +127,7 @@ const ProductList = ({ navigation }) => {
         contentContainerStyle={styles.scrollViewContainer}
         data={coopProducts}
         keyExtractor={(item) => item._id}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         renderItem={({ item }) => (
           <View style={styles.productItem}>
             {/* Product images */}

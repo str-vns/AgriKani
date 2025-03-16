@@ -22,8 +22,7 @@ import messaging from "@react-native-firebase/messaging";
 import { useNavigation } from "@react-navigation/native";
 const UserChat = (props) => {
   const { item, conversations, isOnline } = props.route.params;
-  console.log("isOnline", item);
-    const navigation = useNavigation();
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const socket = useSocket();
   const scrollRef = useRef(null);
@@ -109,49 +108,60 @@ const UserChat = (props) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (newMessage.trim() || images.length) {
+      // Ensure conversation exists
+      if (!myConvo) {
+        console.log("Conversation does not exist yet.");
+        return;
+      }
+  
       const message = {
         sender: UserId,
         text: newMessage,
         conversationId: myConvo._id,
         image: images,
       };
-
+  
+      // Emit message via socket
       socket.emit("sendMessage", {
         senderId: UserId,
         receiverId: myConvo.members.find((member) => member !== UserId),
         text: newMessage,
-        image: images, 
+        image: images,
       });
-
-if (!isOnlinerUser ) {
-      const notification = {
-        title: `New message`, 
-        content: `You have a new message from ${context?.stateUser?.userProfile?.firstName} ${context?.stateUser?.userProfile?.lastName}`,
-        user: item._id,
-        url: item.image.url,
-        fcmToken: fcmToken,
-        type: "message",
+  
+      // Send notification if the receiver is offline
+      if (!isOnlinerUser) {
+        const notification = {
+          title: `New message`,
+          content: `You have a new message from ${context?.stateUser?.userProfile?.firstName} ${context?.stateUser?.userProfile?.lastName}`,
+          user: item._id,
+          url: item.image.url,
+          fcmToken: fcmToken,
+          type: "message",
+        };
+        dispatch(sendNotifications(notification, token));
       }
-      dispatch(sendNotifications(notification , token))
-}
-
+  
+      // Dispatch the message to Redux
       dispatch(sendingMessage(message, token));
+  
+      // Update the state to immediately reflect the new message
+      setArrivedMessages((prev) => [...prev, message]);
+  
+      // Reset input
       setNewMessage("");
       setImages([]);
-      setArrivedMessages((prev) => [...prev, message]);
-
-      // console.log("Message sent:", message); // Check if the message is added to arrivedMessages
     }
   };
 
   return (
     <View style={styles.container}>
-      {messages && Array.isArray(messages) && messages.length > 0 ? (
+      {messages || arrivedMessages &&  messages.length > 0 || arrivedMessages.length > 0 ? (
         <FlatList
           ref={scrollRef}
-          data={[...messages, ...arrivedMessages]} // Combine messages from Redux and new arrived messages
+          data={[...messages, ...arrivedMessages]} 
           renderItem={({ item, index }) => (
             <Message key={index} messages={item} own={item.sender === UserId} />
           )}

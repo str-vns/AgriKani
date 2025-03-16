@@ -24,7 +24,7 @@ const UserWishlist = () => {
   const Users = useSelector((state) => state.userOnly);
   const userId = context?.stateUser?.userProfile?._id;
   const productIds = user?.wishlist?.map((item) => item.product?._id);
-  const wishlist = user?.wishlist?.map((item) => item.product);
+  const wishlist = user?.wishlist?.map((item) => item.product) || [];
   // const productId =
   const [token, setToken] = useState("");
   const [refresh, setRefresh] = React.useState(false);
@@ -99,10 +99,13 @@ const UserWishlist = () => {
   };
 
   const renderItem = ({ item }) => (
+
     <TouchableOpacity 
       style={styles.productCard} 
-      onPress={() => navigation.navigate("SingleProduct", { item })}
-    >
+      onPress={() => navigation.navigate("SingleProduct", { item: item })}
+      // onPress={() => console.log("SingleProduct", { item: item })}
+    >    
+
       {/* Not working */}
       {/* Product Image */}
       {item?.image?.[0]?.url ? (
@@ -136,17 +139,17 @@ const UserWishlist = () => {
   
   return (
     <View style={styles.container}>
-      {wishlist?.length > 0 ? (
-        <FlatList
-          data={wishlist}
-          keyExtractor={(item) => item?._id || item?.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.flatListContent} // Ensure items are scrollable
-          showsVerticalScrollIndicator={false} // Hide scroll bar
-        />
-      ) : (
-        <Text>No items in wishlist</Text>
-      )}
+      {wishlist && wishlist.length > 0 ? (
+      <FlatList
+        data={wishlist}
+        keyExtractor={(item) => item?._id || item?.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.flatListContent}
+        showsVerticalScrollIndicator={false}
+      />
+    ) : (
+      <Text>No items in wishlist</Text>
+    )}
     </View>
   );
 };

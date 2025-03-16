@@ -21,6 +21,7 @@ import { matchCooperative } from "@redux/Actions/coopActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { memberAllList } from "@redux/Actions/memberActions";
+import { Profileuser } from "@redux/Actions/userActions";
 
 const UserProfile = () => {
   const context = useContext(AuthGlobal);
@@ -72,6 +73,7 @@ const UserProfile = () => {
     const fetchJwt = async () => {
       try {
         const res = await AsyncStorage.getItem("jwt");
+         await AsyncStorage.getItem("user");
         setToken(res);
       } catch (error) {
         console.error("Error retrieving JWT: ", error);
@@ -85,7 +87,8 @@ const UserProfile = () => {
     useCallback(() => {
       dispatch(matchCooperative(token));
       dispatch(memberAllList(token));
-    }, [dispatch])
+      dispatch(Profileuser(userId, token));
+    }, [dispatch, userId, token])
   );
 
   return (

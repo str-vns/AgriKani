@@ -164,12 +164,12 @@ const DriverDetails = (props) => {
           <View style={styles.imageContainer}>
             <TouchableOpacity
               onPress={() => handleImageClick(driver?.driversLicenseImage?.url)}
+              style={styles.imageLook}
             >
               <Image
                 source={{
                   uri:
-                    driver?.driversLicenseImage?.url ||
-                    "https://via.placeholder.com/150",
+                    driver?.driversLicenseImage?.url
                 }}
                 style={styles.imageLook}
               />

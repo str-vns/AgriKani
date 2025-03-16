@@ -25,6 +25,8 @@ import {
         type: CONVERSATION_LIST_SUCCESS,
         payload: data.details,
       });
+
+      return data.details;
     } catch (error) {
       dispatch({
         type: CONVERSATION_LIST_FAIL,
