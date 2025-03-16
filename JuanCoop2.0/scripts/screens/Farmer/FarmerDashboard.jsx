@@ -226,6 +226,53 @@ const FarmerDashboard = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Dashboard</Text>
       </View>
+      <View style={styles.weatherContainer}>
+        <View style={styles.weatherBox}>
+          <Image 
+            blurRadius={70}
+            source={require("@assets/img/bg.jpg")}
+            style={styles.backgroundImage}
+          />
+
+          <View style={styles.overlay}>
+          <Image
+    source={weatherIcons[weather?.data[0]?.weather?.icon] || weatherIcons['default']}
+    style={styles.cloudImage}
+  />
+    
+            <Text style={styles.weatherText}>City: {weather?.data[0].city_name}</Text>
+            <Text style={styles.weatherText}>Temperature: {weather?.data[0].temp}°C</Text>
+            <Text style={styles.weatherText}>Weather: {weather?.data[0].weather.description}</Text>
+            <Text style={styles.weatherText}>Wind Speed: {weather?.data[0].wind_spd} m/s</Text>
+          </View>
+        </View>
+
+  <ScrollView horizontal={true} >
+        {dailyWeather?.data?.map((item, index) => (
+        <View key={item._id || index} style={styles.dailyWeatherContainer}>
+        <View style={styles.dailyWeatherBox}>
+        <Image
+            blurRadius={70}
+            source={require("../../../assets/img/bg.jpg")}
+            style={styles.backgroundImageDaily}
+          />
+          <View style={styles.dailyOverlay}>
+
+            <Text style={styles.dailyWeatherDate}>{item.valid_date}</Text>
+      
+            <Image
+              source={weatherIcons[item?.weather?.icon] || weatherIcons['default']}
+              style={styles.dailyWeatherCloudImage}
+            />
+      
+            <Text style={styles.dailyWeatherText} ellipsizeMode='tail'  numberOfLines={1}>{item.weather.description}</Text>
+            <Text style={styles.dailyWeatherTempText}>{item.temp}°C</Text>
+          </View>
+        </View>
+      </View>
+        ))}
+      </ScrollView>
+      </View>
       <View style={styles.bannerContainer}>
         <Text style={styles.bannerText}>⚠️ Out of Stock:</Text>
           <FlatList
