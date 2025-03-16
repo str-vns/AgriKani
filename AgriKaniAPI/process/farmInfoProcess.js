@@ -143,6 +143,9 @@ exports.DeleteFarmInfo = async (id) => {
   const farmExist = await Farm.findOne({ _id: id });
   if (!farmExist) throw new ErrorHandler(`Farm not exist with ID: ${id}`);
 
+  const farmExistUser = farmExist.user;
+
+  await Wallet.deleteOne({ user: farmExistUser }).lean().exec();
   const publicIds = farmExist.image.public_id;
 
   await Promise.all([

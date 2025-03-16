@@ -33,6 +33,8 @@ const senior = require("./routes/Discount/senior");
 const wallet = require("./routes/wallets");
 const transaction = require("./routes/transaction")
 const axios = require("axios");
+const { sendEmail } = require("./utils/sendMail");
+
 
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));
@@ -132,6 +134,26 @@ app.get('/app-redirect', async (req, res) => {
   `);
 });
 
+app.post('/send-email', async (req, res) => {
+  const email = req.body.email;
+
+  if (!email) return res.status(400).json({ error: 'Email is required' });
+    const mailOptions = {
+      to: email,
+      subject: `Test`,
+      html: `
+      <p>Dear Test,</p>
+  <p>This is Test only.</p>
+      `,
+      };
+
+  try {
+      await sendEmail(mailOptions);
+      res.status(200).json({ message: 'Email sent successfully!' });
+  } catch (error) {
+      res.status(500).json({ error: 'Failed to send email', details: error.message });
+  }
+});
 
 
 app.use(

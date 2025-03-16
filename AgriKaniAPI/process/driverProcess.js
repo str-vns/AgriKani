@@ -11,7 +11,7 @@ const { cloudinary } = require("../utils/cloudinary");
 const { sendEmail } = require("../utils/sendMail");
 const { id } = require("date-fns/locale");
 const { bufferedPageRange } = require("pdfkit");
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 
 exports.registerDriverProcess = async (req) => {
   try {
@@ -19,9 +19,9 @@ exports.registerDriverProcess = async (req) => {
       .collation({ locale: "en" })
       .lean()
       .exec();
-  
+
     if (duplicateEmail) throw new ErrorHandler("Email is already exist");
-  
+
     const phone = req.body.phoneNum;
     if (!phone.match(/^\d{11}$/))
       throw new ErrorHandler("Phone Number must be 11 Digits");
@@ -29,11 +29,11 @@ exports.registerDriverProcess = async (req) => {
       throw new ErrorHandler("Phone Number must be start with 09");
     else if (!phone === STATUSCODE.ZERO)
       throw new ErrorHandler("Phone Number is Required");
-  
+
     const age = req.body.age;
     if (age < 18 || age > 100)
       throw new ErrorHandler("Age must be between 18 and 100");
-  
+
     const response = await Otp.findOne({
       email: req.body.email,
       otp: req.body.otp,
@@ -42,77 +42,89 @@ exports.registerDriverProcess = async (req) => {
       .limit(1)
       .lean()
       .exec();
-  
+
     if (!response) {
       throw new ErrorHandler("Otp is not Valid or Email is not Match");
     }
-    
+
     const coopExist = await Farm.findOne({ user: req.body.user }).lean().exec();
     if (!coopExist) throw new ErrorHandler("Coop not exist");
-    
+
     let images = {};
-  
+
     if (req.files.image) {
       images = await uploadImageSingle(req.files.image[0]);
     }
     if (!images) throw new ErrorHandler("At least one image is required");
-  
+
     let driversLicenseImages = {};
-  
+
     if (req.files.driversLicenseImage) {
-      driversLicenseImages = await uploadImageSingle(req.files.driversLicenseImage[0]);
+      driversLicenseImages = await uploadImageSingle(
+        req.files.driversLicenseImage[0]
+      );
     }
 
-    if (!driversLicenseImages) throw new ErrorHandler("At least one image is required");
- 
+    if (!driversLicenseImages)
+      throw new ErrorHandler("At least one image is required");
+
     const gender = req.body.gender ? req.body.gender : GENDER.PNTS;
-  
+
     const driver = await Driver.create({
       ...req.body,
       password: await bcrypt.hash(req.body.password, Number(process.env.SALT)),
       gender: gender,
       image: images,
       driversLicenseImage: driversLicenseImages,
-      coopId: coopExist._id,  
+      coopId: coopExist._id,
     });
-  
+
     return driver;
   } catch (error) {
     throw new ErrorHandler(error.message);
   }
-
-  };
+};
 
 exports.getDriverProcess = async () => {
-    const driver = await Driver.find({ approvedAt: { $ne: null } })
+  const driver = await Driver.find({ approvedAt: { $ne: null } })
+    .sort({ createdAt: -1 })
     .populate("coopId")
-    .lean().exec();
-    return driver;
+    .lean()
+    .exec();
+  return driver;
 };
 
 exports.getDriverDisapproveProcess = async () => {
-    const driver = await Driver.find({ approvedAt: null })
+  const driver = await Driver.find({ approvedAt: null })
+    .sort({ createdAt: -1 })
     .populate("coopId")
-    .lean().exec();
-    return driver;
-}
-   
+    .lean()
+    .exec();
+  return driver;
+};
+
 exports.getDriverByIdProcess = async (id) => {
-    if (!mongoose.Types.ObjectId.isValid(id))
-        throw new ErrorHandler(`Invalid Cooperative ID: ${id}`);
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid Cooperative ID: ${id}`);
 
-    const coopExist = await Farm.findOne({ user: id }).lean().exec();
-    if (!coopExist) throw new ErrorHandler("Coop not exist"); 
+  const coopExist = await Farm.findOne({ user: id })
+    .lean()
+    .exec()
+    .sort({ createdAt: -1 });
+  if (!coopExist) throw new ErrorHandler("Coop not exist");
 
-    const driver = await Driver.find({ coopId: coopExist._id }).sort({ createdAt: -1 }).lean().exec();
-    return driver;
+  const driver = await Driver.find({ coopId: coopExist._id })
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
+  return driver;
 };
 
 exports.approveDriverProcess = async (id, req) => {
   if (!mongoose.Types.ObjectId.isValid(id))
     throw new ErrorHandler(`Invalid Driver ID: ${id}`);
 
-  const driver = await Driver.findById(id).select('+password').exec();
+  const driver = await Driver.findById(id).select("+password").exec();
 
   if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
   driver.isAvailable = true;
@@ -120,32 +132,32 @@ exports.approveDriverProcess = async (id, req) => {
 
   const user = await Farm.findById(driver.coopId).lean().exec();
 
-     const role = ROLE.DRIVER;
+  const role = ROLE.DRIVER;
 
-    const newUser = await User.create({
-      email: driver.email,
-      password: driver.password,
-      firstName: driver.firstName,
-      lastName: driver.lastName,
-      age: driver.age,
-      image: {
-        public_id: driver.image.public_id,
-        url: driver.image.url,
-        originalname: driver.image.originalname,
-      },
-      phoneNum: driver.phoneNum,
-      gender: driver.gender,
-      roles: role,
-    });
+  const newUser = await User.create({
+    email: driver.email,
+    password: driver.password,
+    firstName: driver.firstName,
+    lastName: driver.lastName,
+    age: driver.age,
+    image: {
+      public_id: driver.image.public_id,
+      url: driver.image.url,
+      originalname: driver.image.originalname,
+    },
+    phoneNum: driver.phoneNum,
+    gender: driver.gender,
+    roles: role,
+  });
 
-    driver.userId = newUser._id;
-    await driver.save();
+  driver.userId = newUser._id;
+  await driver.save();
 
-    const email = driver.email;
-    const mailOptions = {
-      to: email,
-      subject: "Driver Approved",
-      html: `
+  const email = driver.email;
+  const mailOptions = {
+    to: email,
+    subject: "Driver Approved",
+    html: `
       <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -222,46 +234,50 @@ exports.approveDriverProcess = async (id, req) => {
         </body>
         </html>
       `,
-      };
-      
-      await sendEmail(mailOptions);
-      await sendFcmNotification(
-        user, "Driver Approved", 
-        "Your driver account has been approved",
-        req.body.fcmToken
-      );
+  };
 
-    return driver;
+  await sendEmail(mailOptions);
+  await sendFcmNotification(
+    user,
+    "Driver Approved",
+    "Your driver account has been approved",
+    req.body.fcmToken
+  );
+
+  return driver;
 };
 
 exports.getCoopDriverProcess = async (id) => {
-    const driver = await Driver.find({ coopId: id, approvedAt: { $ne: null } })
-    .lean().exec(); 
+  const driver = await Driver.find({ coopId: id, approvedAt: { $ne: null } })
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
 
-    return driver;
+  return driver;
 };
 
 exports.disapproveDriverProcess = async (id, req) => {
-    try {
-        if (!mongoose.Types.ObjectId.isValid(id))
-            throw new ErrorHandler(`Invalid Driver ID: ${id}`);
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new ErrorHandler(`Invalid Driver ID: ${id}`);
 
-        const driver = await Driver.findById(id).lean().exec();
-        if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
+    const driver = await Driver.findById(id).lean().exec();
+    if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
 
-        const user = await Farm.findById(driver.coopId).lean().exec();
+    const user = await Farm.findById(driver.coopId).lean().exec();
 
-        await sendFcmNotification(
-          user, "Driver Disapproved",
-          "Your driver account has been disapproved due to incomplete information or not meeting the required criteria", 
-          req.body.fcmToken
-        );
-        
+    await sendFcmNotification(
+      user,
+      "Driver Disapproved",
+      "Your driver account has been disapproved due to incomplete information or not meeting the required criteria",
+      req.body.fcmToken
+    );
+
     const email = driver.email;
-  const mailOptions = {
-    to: email,
-    subject: "Driver Not Approved",
-    html: `
+    const mailOptions = {
+      to: email,
+      subject: "Driver Not Approved",
+      html: `
     <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -338,38 +354,37 @@ exports.disapproveDriverProcess = async (id, req) => {
       </body>
       </html>
     `,
-  };
+    };
 
-  await sendEmail(mailOptions);
+    await sendEmail(mailOptions);
 
     const publicIds = driver.image.public_id;
     const publicIds2 = driver.driversLicenseImage.public_id;
 
-        await Promise.all([
-            Driver.deleteOne({ _id: id }).lean().exec(),
-          cloudinary.uploader.destroy(publicIds),
-          cloudinary.uploader.destroy(publicIds2),
-        ]);
+    await Promise.all([
+      Driver.deleteOne({ _id: id }).lean().exec(),
+      cloudinary.uploader.destroy(publicIds),
+      cloudinary.uploader.destroy(publicIds2),
+    ]);
 
     return driver;
-
-    } catch (error) {
-        throw new ErrorHandler(error.message);
-    }
-}
+  } catch (error) {
+    throw new ErrorHandler(error.message);
+  }
+};
 
 exports.deleteDriverProcess = async (id) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(id))
-        throw new ErrorHandler(`Invalid Driver ID: ${id}`);
+      throw new ErrorHandler(`Invalid Driver ID: ${id}`);
 
     const driver = await Driver.findById(id).lean().exec();
     if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
-const email = driver.email;
-const mailOptions = {
-to: email,
-subject: "Driver Not Approved",
-html: `
+    const email = driver.email;
+    const mailOptions = {
+      to: email,
+      subject: "Driver Not Approved",
+      html: `
 <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -446,12 +461,12 @@ html: `
   </body>
   </html>
 `,
-};
+    };
 
-await sendEmail(mailOptions);
+    await sendEmail(mailOptions);
 
-const publicIds = driver.image.public_id;
-const publicIds2 = driver.driversLicenseImage.public_id;
+    const publicIds = driver.image.public_id;
+    const publicIds2 = driver.driversLicenseImage.public_id;
 
     await Promise.all([
       Driver.deleteOne({ _id: id }).lean().exec(),
@@ -460,39 +475,46 @@ const publicIds2 = driver.driversLicenseImage.public_id;
       cloudinary.uploader.destroy(publicIds2),
     ]);
 
-return driver;
-
-} catch (error) {
+    return driver;
+  } catch (error) {
     throw new ErrorHandler(error.message);
-}
-}
+  }
+};
 
 exports.getDriverByIdApproveProcess = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
-      throw new ErrorHandler(`Invalid Cooperative ID: ${id}`);
+    throw new ErrorHandler(`Invalid Cooperative ID: ${id}`);
 
   const coopExist = await Farm.findOne({ user: id }).lean().exec();
-  if (!coopExist) throw new ErrorHandler("Coop not exist"); 
+  if (!coopExist) throw new ErrorHandler("Coop not exist");
 
-  const driver = await Driver.find({ coopId: coopExist._id, approvedAt: { $ne: null }}).lean().exec();
+  const driver = await Driver.find({
+    coopId: coopExist._id,
+    approvedAt: { $ne: null },
+  })
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
 
   return driver;
 };
 
 exports.createAssignedLocationProcess = async (req, id) => {
   try {
-    const driver = await Driver.findById(id).lean().exec()
+    const driver = await Driver.findById(id).lean().exec();
     if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
 
     const coopExist = await Farm.findById(driver.coopId).lean().exec();
     if (!coopExist) throw new ErrorHandler("Coop not exist");
 
     const locationExists = driver.assignedLocation.some(
-      (location) => location.barangay === req.body.barangay && location.city === req.body.city
+      (location) =>
+        location.barangay === req.body.barangay &&
+        location.city === req.body.city
     );
-    
+
     if (locationExists) {
-      return driver; 
+      return driver;
     } else {
       const assignedLocation = await Driver.updateOne(
         { _id: id },
@@ -500,23 +522,21 @@ exports.createAssignedLocationProcess = async (req, id) => {
           $push: {
             assignedLocation: {
               barangay: req.body.barangay,
-              city: req.body.city
-            }
-          }
+              city: req.body.city,
+            },
+          },
         }
       );
       return assignedLocation;
     }
-
   } catch (error) {
     throw new ErrorHandler(error.message);
   }
-}
+};
 
 exports.removeAssignedLocationProcess = async (req, id) => {
   try {
-    const driver = await Driver.findById(id).lean().
-    exec();
+    const driver = await Driver.findById(id).lean().exec();
     if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
 
     const coopExist = await Farm.findById(driver.coopId).lean().exec();
@@ -528,25 +548,22 @@ exports.removeAssignedLocationProcess = async (req, id) => {
       {
         $pull: {
           assignedLocation: {
-            _id: req.body.locationId
-          }
-        }
+            _id: req.body.locationId,
+          },
+        },
       }
     );
-  
+
     return assignedLocation;
-
   } catch (error) {
-
     throw new ErrorHandler(error.message);
   }
-}
+};
 
 exports.updateAvailabilityProcess = async (id) => {
   try {
     const user = await User.findById(id).lean().exec();
-    const driver = await Driver.findOne({userId: user._id}).
-    exec();
+    const driver = await Driver.findOne({ userId: user._id }).exec();
 
     if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
 
@@ -554,23 +571,20 @@ exports.updateAvailabilityProcess = async (id) => {
     await driver.save();
 
     return driver;
-
   } catch (error) {
     throw new ErrorHandler(error.message);
   }
-}
+};
 
 exports.maxCapacityProcess = async (req, id) => {
- 
   try {
-    const driver = await Driver.findById(id).lean().
-    exec();
+    const driver = await Driver.findById(id).lean().exec();
     if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
 
     if (driver.maxCapacity === STATUSCODE.ZERO)
       throw new ErrorHandler("Max Capacity is Required");
 
-    if(driver.maxCapacity >= 100)
+    if (driver.maxCapacity >= 100)
       throw new ErrorHandler("Max Capacity must be not greater than 100");
 
     const drivers = await Driver.updateOne(
@@ -578,23 +592,24 @@ exports.maxCapacityProcess = async (req, id) => {
       { $set: { maxCapacity: req.body.capacity } }
     );
 
-
     return drivers;
-
   } catch (error) {
     throw new ErrorHandler(error.message);
   }
-}
+};
 
 exports.getSingleDriverProcess = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id))
-      throw new ErrorHandler(`Invalid Driver ID: ${id}`);
+    throw new ErrorHandler(`Invalid Driver ID: ${id}`);
 
-  const driver = await Driver.findOne({ userId: id }).lean().exec();
+  const driver = await Driver.findOne({ userId: id })
+    .sort({ createdAt: -1 })
+    .lean()
+    .exec();
   if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
 
   return driver;
-}
+};
 
 const sendFcmNotification = async (user, title, content, fcmToken) => {
   if (!user.deviceToken || user.deviceToken.length === 0) {
@@ -631,7 +646,7 @@ const sendFcmNotification = async (user, title, content, fcmToken) => {
         },
       },
     },
-    tokens: registrationTokens, 
+    tokens: registrationTokens,
   };
 
   try {

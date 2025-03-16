@@ -267,8 +267,6 @@ exports.getBlacklistedTokens = () => {
 };
 
 exports.wishlistProduct = async (productId, id) => {
-  console.log(productId);
-  console.log(id);
   const product = await Product.findById(productId);
   if (!product) {
     throw new ErrorHandler("Product not found");
@@ -301,16 +299,21 @@ exports.wishlistProductGet = async (id) => {
   }
 
   const userWish = await User.findById(id)
-    .populate({
-      path: "wishlist.product", // Correct path to populate product
-      select: "productName pricing price image.url description stock user",
-    })
+  .populate({
+    path: "wishlist.product", 
+    select: "productName pricing price image.url description stock user",
+    populate: {
+      path: "stock", 
+      select: "quantity metricUnit unitName price status",
+    },
+  })
     .populate({
       path: "wishlist.product.reviews",
       select: "firstName lastName comment rating",
     })
     .lean()
     .exec();
+    console.log(userWish.wishlist[0].product, "userWish")
   if (!userWish) {
     throw new ErrorHandler("User not found");
   }
