@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
 //container
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF', // Background color
+        backgroundColor: '#FFF8E1', // Background color
     },
     scrollViewContainer: {
         padding: 20,
@@ -968,7 +968,7 @@ initiativesContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "#FFF8E1",
     padding: 10,
   },
   weatherTitle: {
@@ -1100,6 +1100,11 @@ initiativesContainer: {
     color: "white",
     fontWeight: "bold",
   },
+
+  UnavailableText: {
+    fontWeight: "bold",
+    fontSize: 16,
+  }
 });
 
 
