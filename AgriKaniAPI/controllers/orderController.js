@@ -7,7 +7,7 @@ const { STATUSCODE } = require("../constants/index");
 // Create a new order
 exports.createOrder = asyncHandler(async (req, res, next) => {
   const { orderItems, shippingAddress, paymentMethod, totalPrice, shippingPrice, user, payStatus } = req.body;
-  console.log("orderItems", orderItems);
+  console.log("orderItems", req.body);
   try {
     const createdOrder = await orderProcess.createOrderProcess({
       user,
@@ -31,7 +31,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     // }
     return SuccessHandler(res, "Order created and receipt sent successfully", createdOrder);
   } catch (error) {
-    return next(new ErrorHandler(error.message, 500));
+    return next(new ErrorHandler(error.message, STATUSCODE.SERVER_ERROR));
   }
 });
 

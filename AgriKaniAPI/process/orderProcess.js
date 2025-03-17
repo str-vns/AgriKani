@@ -21,6 +21,7 @@ const axios = require("axios");
 
 // Create a new order
 exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice,shippingPrice, user, payStatus  }) => {
+  console.log(user)
   if (!orderItems || orderItems.length === 0) {
     throw new ErrorHandler("No order items provided", 400);
   }
@@ -38,7 +39,7 @@ exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod
       const product = await Product.findById(item.product);
 
     if (!singleUser) {
-      throw new ErrorHandler(STATUSCODE.NOT_FOUND, "User not found");
+      throw new ErrorHandler( "User not found", 404);
     }
 
     if (!inventory) {
@@ -1447,7 +1448,7 @@ exports.onlinePaymentProcess = async (req, res) => {
 
     const paymentIntentId = paymentIntentResponse.data.id;
 
-    const returnUrl = isMobile ? process.env.MOBILE_URL_NAVIGATE : process.env.WEB_URL_NAVIGATE;
+    const returnUrl = isMobile ? process.env.MOBILE_URL_NAVIGATE : process.env.TEST_URL_NAVIGATE;
     
     // ✅ Attach Payment Method to Payment Intent
     const attachResponse = await paymongoInstance.paymentIntents.attach(paymentIntentId, {
