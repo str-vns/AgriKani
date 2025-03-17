@@ -296,6 +296,6 @@ exports.InventoryCheckStock = async (req) => {
             updatedOrderItems: orderItems,
         });
     } catch (error) {
-        return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+        return next(new ErrorHandler(error.message, STATUSCODE.SERVER_ERROR));
     }
 };

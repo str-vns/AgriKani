@@ -31,7 +31,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     // }
     return SuccessHandler(res, "Order created and receipt sent successfully", createdOrder);
   } catch (error) {
-    return next(new ErrorHandler(error.message, STATUSCODE.SERVER_ERROR));
+    return next(new ErrorHandler(error.message, 500));
   }
 });
 
@@ -41,7 +41,7 @@ exports.updateOrderStatus = asyncHandler(async (req, res, next) => {
     const updatedOrder = await orderProcess.updateOrderStatusProcess(req.params.id, req);
     return SuccessHandler(res, "Order status updated successfully", updatedOrder);
   } catch (error) {
-    return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, error.statusCode || 500));
   }
 });
 
@@ -53,7 +53,7 @@ exports.deleteOrder = asyncHandler(async (req, res, next) => {
     await orderProcess.deleteOrderProcess(orderId);
     return SuccessHandler(res, "Order deleted successfully");
   } catch (error) {
-    return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, error.statusCode || 500));
   }
 });
 
@@ -72,7 +72,7 @@ exports.updateOrderStatusCoop = asyncHandler(async (req, res, next) => {
     const updatedOrder = await orderProcess.updateOrderStatusCoop(req.params.id, req);
     return SuccessHandler(res, "Order status updated successfully", updatedOrder);
   } catch (error) {
-    return next(new ErrorHandler(error.message, error.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, error.statusCode || 500));
   }
 });
 
@@ -81,7 +81,7 @@ exports.getShippedOrders = asyncHandler(async (req, res, next) => {
     const shippedOrders = await orderProcess.getShippedOrdersProcess(req.params.id);
     return SuccessHandler(res, "Shipped orders fetched successfully", shippedOrders);
   } catch (error) {
-    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, 500));
   }
 });
 
@@ -121,7 +121,7 @@ exports.getDailySalesReport = asyncHandler(async (req, res, next) => {
 
     return SuccessHandler(res, "Daily sales report fetched successfully", report);
   } catch (error) {
-    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, 500));
   }
 });
 
@@ -135,7 +135,7 @@ exports.getWeeklySalesReport = asyncHandler(async (req, res, next) => {
 
     return SuccessHandler(res, "Weekly sales report fetched successfully", report);
   } catch (error) {
-    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, 500));
   }
 });
 
@@ -149,7 +149,7 @@ exports.getMonthlySalesReport = asyncHandler(async (req, res, next) => {
 
     return SuccessHandler(res, "Monthly sales report fetched successfully", report);
   } catch (error) {
-    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, 500));
   }
 });
 

@@ -142,7 +142,7 @@ exports.getUserTypeCount = asyncHandler(async (req, res, next) => {
 
     return SuccessHandler(res, "User type countss1s fetched successfully", userTypeCount);
   } catch (error) {
-    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, STATUSCODE.SERVER_ERROR));
   }
 });
 
