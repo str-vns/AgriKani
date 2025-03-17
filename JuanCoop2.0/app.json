@@ -76,6 +76,11 @@
       "GOOGLE_LOGIN_ANDROID": "239225060602-pihukt1obheffea1oi4oionma7kspflp.apps.googleusercontent.com",
       "GOOGLE_LOGIN_IOS": "239225060602-qrl55rsrqs11sjcmph550ojkob07dv7b.apps.googleusercontent.com",
       "GOOGLE_LOGIN_WEB": "239225060602-onmhk6p6a374mhh2n6p8gmbcmp79vbao.apps.googleusercontent.com",
+      "ORIGIN_1" : "http://localhost:5173",
+      "ORIGIN_2" : "https://agrikani.onrender.com:8900",
+      "ORIGIN_3" : "http://localhost:4000",
+      "MAIN_ORIGIN" : "https://agrikani.onrender.com",
+      "RENDER_ADDRESS": "https://agrikani.onrender.com/api/v2/",
       "eas": {
         "projectId": "e0944635-b149-45a0-880d-ea9513954fec"
       }

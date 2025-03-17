@@ -1,24 +1,20 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io from "socket.io-client";
-import  config  from "@config";
-// const SOCKET_SERVER_URL = `${config.SOCKET_ADDRESS}`;
-// console.log(SOCKET_SERVER_URL, "SOCKET_SERVER_URL");
+import Constants from 'expo-constants';
 const SocketContext = createContext(null); 
 
 export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
-    // https://agrikani.onrender.com
-    // http://192.168.50.236:4000
-    // http://192.168.50.222:4000
+
     useEffect(() => {
 
-      const socketConnection = io("https://agrikani.onrender.com", {
+      const socketConnection = io( `${Constants?.expoConfig?.extra?.MAIN_ORIGIN}`, {
         transports: ["websocket"],
         cors: {
           origin: [
-            "http://localhost:5173",
-            "https://agrikani.onrender.com:8900",
-            "http://localhost:4000",
+            `${Constants?.expoConfig?.extra?.ORIGIN_1}`,
+            `${Constants?.expoConfig?.extra?.ORIGIN_2}`,
+            `${Constants?.expoConfig?.extra?.ORIGIN_3}`,
           ],
         },
       });
