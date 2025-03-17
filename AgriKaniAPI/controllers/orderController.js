@@ -31,7 +31,7 @@ exports.createOrder = asyncHandler(async (req, res, next) => {
     // }
     return SuccessHandler(res, "Order created and receipt sent successfully", createdOrder);
   } catch (error) {
-    return next(new ErrorHandler(error.message, STATUSCODE.INTERNAL_SERVER_ERROR));
+    return next(new ErrorHandler(error.message, STATUSCODE.SERVER_ERROR));
   }
 });
 
