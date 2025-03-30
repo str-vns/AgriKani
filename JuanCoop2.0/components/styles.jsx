@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginHorizontal: 16,
   },
+  
   searchBar: {
     flex: 1,
     fontSize: 16,
@@ -84,31 +85,35 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     paddingHorizontal: 20 ,
+  
   },
   productBox: {
     width: 150,
+    height:200,
     backgroundColor: "#fefdf9",
     padding: 10,
     borderRadius: 8,
     marginBottom: 20,
     alignItems: "center",
     position: "relative",  // Keep relative positioning to allow absolute positioning of the icon
+  
   },
   
   productImage: {
-    width: 110,
-    height: 120,
+    width: 120,
+    height: 110,
     marginBottom: 10,
     borderRadius: 8,  // Keep the border radius to round the corners
     overflow: "hidden",  // Ensure the wishlist icon stays inside the rounded image corners
   },
   productName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     marginBottom: 5,
+    textAlign: "center",
   },
   productPrice: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "bold",
     color: "#888888",
   },

@@ -1,10 +1,24 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Image, TouchableOpacity, Modal,  Pressable, RefreshControl, } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  RefreshControl,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useSelector, useDispatch } from "react-redux";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchUserOrders, updateOrderStatus } from "@src/redux/Actions/orderActions";
+import {
+  fetchUserOrders,
+  updateOrderStatus,
+} from "@src/redux/Actions/orderActions";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const UserOrderList = () => {
@@ -20,7 +34,7 @@ const UserOrderList = () => {
   const [refresh, setRefresh] = React.useState(false);
   const [refreshing, setRefreshing] = useState(false);
   // const filteredOrders = orders?.map((order) => ({...order,orderItems: order.orderItems.filter((item) => item.orderStatus !== "Cancelled"), })).filter((order) => order.orderItems.length > 0);
-  
+
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -33,46 +47,55 @@ const UserOrderList = () => {
     fetchJwt();
   }, []);
 
-  useFocusEffect( 
+  useFocusEffect(
     useCallback(() => {
       if (userId && token) {
         dispatch(fetchUserOrders(userId, token));
       }
     }, [userId, token, dispatch])
-  )
+  );
 
   const onRefresh = useCallback(async () => {
     setRefresh(true);
-  
-      setTimeout(() => {
-        dispatch(fetchUserOrders(userId, token));
-        setRefresh(false);
-      }, 500);
-  
+
+    setTimeout(() => {
+      dispatch(fetchUserOrders(userId, token));
+      setRefresh(false);
+    }, 500);
   }, [userId, token, dispatch]);
 
-  const handleCancelOrder = (orderId, inventortId, orderItemId, coopUser, paymentMethod) => {
+  const handleCancelOrder = (
+    orderId,
+    inventortId,
+    orderItemId,
+    coopUser,
+    paymentMethod
+  ) => {
+    navigation.navigate("Client_Cancelled", {
+      orderId,
+      inventortId,
+      orderItemId,
+      coopUser,
+      paymentMethod,
+    });
+    //   setRefresh(true);
+    //   try {
 
-  navigation.navigate("Client_Cancelled", { orderId, inventortId, orderItemId, coopUser, paymentMethod });
-  //   setRefresh(true);
-  //   try {
+    //     const status =
+    //     {
+    //       orderStatus: "Cancelled",
+    //       inventoryProduct: inventortId,
+    //     }
 
-  //     const status = 
-  //     {
-  //       orderStatus: "Cancelled",
-  //       inventoryProduct: inventortId,
-  //     }
+    //     dispatch(updateOrderStatus(orderId, status,  token));
 
-  //     dispatch(updateOrderStatus(orderId, status,  token));
+    //     onRefresh()
+    //  } catch (error) {
+    //    console.error("Error deleting or refreshing orders:", error);
+    //  } finally {
 
-  //     onRefresh()
-  //  } catch (error) {
-  //    console.error("Error deleting or refreshing orders:", error);
-  //  } finally {
-
-  //    setRefresh(false);
-  //  }
-   
+    //    setRefresh(false);
+    //  }
   };
 
   const handleOpenReviewModal = (order) => {
@@ -81,8 +104,10 @@ const UserOrderList = () => {
   };
 
   const handleReviewSubmit = (orderId, productId) => {
-   
-    navigation.navigate("Reviews", { screen: "AddReviews", params: { orderId, productId } });
+    navigation.navigate("Reviews", {
+      screen: "AddReviews",
+      params: { orderId, productId },
+    });
   };
 
   const toggleExpandedOrder = (orderId) => {
@@ -92,135 +117,86 @@ const UserOrderList = () => {
     }));
   };
 
-
   const renderItem = ({ item }) => {
     const isExpanded = expandedOrders[item._id];
-    console.log(item.orderItems[0]._id)
+    console.log(item.orderItems[0]._id);
     return (
       <View style={styles.orderCard}>
-      <View style={styles.orderHeader}>
-        <Text style={styles.orderId}>Order ID: {item._id}</Text>
-        <Text style={styles.orderTotal}>
-          Total: ₱{item.totalPrice.toFixed(2)}
-        </Text>
-      </View>
-    
-      {/* Show the first item in the order */}
-      {item.orderItems.slice(0, 1).map((orderItem) => (
-        <View key={orderItem._id} style={styles.productCard}>
-         <Image
-  source={
-    orderItem.product.image[0]?.url
-      ? { uri: orderItem.product.image[0]?.url }
-      : require('@assets/img/eggplant.png')
-  }
-  style={styles.productImage}
-/>
-
-          <View style={styles.productDetails}>
-            <Text style={styles.productName}>{orderItem.product.productName}</Text>
-            <Text style={styles.sizeQuantity}>
-             Size: {orderItem?.inventoryProduct?.unitName} {orderItem?.inventoryProduct?.metricUnit}
-            </Text>
-            <Text style={styles.productQuantity}>
-              Qty: {orderItem.quantity}
-            </Text>
-            <Text style={styles.productPrice}>
-              ₱{orderItem?.inventoryProduct?.price}
-            </Text>
-          </View>
-
-          <View style={styles.actionButtons}>
-          <Text style={styles.orderStatus(orderItem.orderStatus)}>
-          {orderItem.orderStatus}
-        </Text>
-            {orderItem.orderStatus === "Delivered" && (
-              <TouchableOpacity
-                style={[styles.button, styles.reviewButton]}
-                onPress={() => handleReviewSubmit(item._id, orderItem)}
-              >
-                <Icon name="rate-review" size={20} color="#fff" />
-                <Text style={styles.buttonText}>Review</Text>
-              </TouchableOpacity>
-            )}
-
-         {orderItem.orderStatus === "Shipping" && (
-              <TouchableOpacity
-                style={[styles.button, styles.reviewButton]}
-                onPress={() => navigation.navigate("UserTracking", { trackId: orderItem.deliveryId })}
-              >
-                <Icon name="rate-review" size={20} color="#fff" />
-                <Text style={styles.buttonText}>Track</Text>
-              </TouchableOpacity>
-            )}
-        
-            {orderItem.orderStatus === "Pending" && (
-              <TouchableOpacity
-                style={[styles.button, styles.cancelButton]}
-                onPress={() => handleCancelOrder(item?._id, orderItem.inventoryProduct?._id, orderItem?._id, orderItem?.coopUser, item?.paymentMethod)}
-              >
-                <Icon name="cancel" size={20} color="#fff" />
-                <Text style={styles.buttonText}>Cancel</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+        <View style={styles.orderHeader}>
+          <Text style={styles.orderId}>Order ID: {item._id}</Text>
+          <Text style={styles.orderTotal}>
+            Total: ₱{item.totalPrice.toFixed(2)}
+          </Text>
         </View>
-      ))}
-    
-      {/* Show additional items when expanded */}
-      {isExpanded &&
-        item.orderItems.slice(1).map((orderItem) => (
+
+        {/* Show the first item in the order */}
+        {item.orderItems.slice(0, 1).map((orderItem) => (
           <View key={orderItem._id} style={styles.productCard}>
-                   <Image
-  source={
-    orderItem.product.image[0]?.url
-      ? { uri: orderItem.product.image[0]?.url }
-      : require('@assets/img/eggplant.png')
-  }
-  style={styles.productImage}
-/>
+            <Image
+              source={
+                orderItem.product.image[0]?.url
+                  ? { uri: orderItem.product.image[0]?.url }
+                  : require("@assets/img/eggplant.png")
+              }
+              style={styles.productImage}
+            />
+
             <View style={styles.productDetails}>
-              <Text style={styles.productName}>{orderItem.product.productName}</Text>
+              <Text style={styles.productName}>
+                {orderItem.product.productName}
+              </Text>
               <Text style={styles.sizeQuantity}>
-              Size: {orderItem.inventoryProduct.unitName} {orderItem.inventoryProduct.metricUnit}
-            </Text>
+                Size: {orderItem?.inventoryProduct?.unitName}{" "}
+                {orderItem?.inventoryProduct?.metricUnit}
+              </Text>
               <Text style={styles.productQuantity}>
                 Qty: {orderItem.quantity}
               </Text>
               <Text style={styles.productPrice}>
-                ₱{orderItem.inventoryProduct.price}
+                ₱{orderItem?.inventoryProduct?.price}
               </Text>
             </View>
-    
-            <View style={styles.actionButtons}>
-            <Text style={styles.orderStatus(orderItem.orderStatus)}>
-          {orderItem.orderStatus}
-        </Text>
-        {orderItem.orderStatus === "Delivered" && (
-              <TouchableOpacity
-                style={[styles.button, styles.reviewButton]}
-                onPress={() => handleReviewSubmit(item._id, orderItem)}
-              >
-                <Icon name="rate-review" size={20} color="#fff" />
-                <Text style={styles.buttonText}>Review</Text>
-              </TouchableOpacity>
-            )}
-    
-    {orderItem.orderStatus === "Shipping" && (
-              <TouchableOpacity
-                style={[styles.button, styles.reviewButton]}
-                onPress={() => navigation.navigate("UserTracking", { trackId: orderItem.deliveryId })}
-              >
-                <Icon name="rate-review" size={20} color="#fff" />
-                <Text style={styles.buttonText}>Track</Text>
-              </TouchableOpacity>
-            )}
 
+            <View style={styles.actionButtons}>
+              <Text style={styles.orderStatus(orderItem.orderStatus)}>
+                {orderItem.orderStatus}
+              </Text>
+              {orderItem.orderStatus === "Delivered" && (
+                <TouchableOpacity
+                  style={[styles.button, styles.reviewButton]}
+                  onPress={() => handleReviewSubmit(item._id, orderItem)}
+                >
+                  <Icon name="rate-review" size={20} color="#fff" />
+                  <Text style={styles.buttonText}>Review</Text>
+                </TouchableOpacity>
+              )}
+
+              {orderItem.orderStatus === "Shipping" && (
+                <TouchableOpacity
+                  style={[styles.button, styles.reviewButton]}
+                  onPress={() =>
+                    navigation.navigate("UserTracking", {
+                      trackId: orderItem.deliveryId,
+                    })
+                  }
+                >
+                  <Icon name="rate-review" size={20} color="#fff" />
+                  <Text style={styles.buttonText}>Track</Text>
+                </TouchableOpacity>
+              )}
 
               {orderItem.orderStatus === "Pending" && (
                 <TouchableOpacity
                   style={[styles.button, styles.cancelButton]}
-                  onPress={() => handleCancelOrder(item?._id, orderItem.inventoryProduct?._id, orderItem?._id, orderItem?.coopUser, item?.paymentMethod)}
+                  onPress={() =>
+                    handleCancelOrder(
+                      item?._id,
+                      orderItem.inventoryProduct?._id,
+                      orderItem?._id,
+                      orderItem?.coopUser,
+                      item?.paymentMethod
+                    )
+                  }
                 >
                   <Icon name="cancel" size={20} color="#fff" />
                   <Text style={styles.buttonText}>Cancel</Text>
@@ -229,49 +205,121 @@ const UserOrderList = () => {
             </View>
           </View>
         ))}
-    
-      {/* Toggle button to show/hide additional products */}
-      {item.orderItems.length > 1 && (
-        <TouchableOpacity
-          style={[styles.showAllButton, { backgroundColor: 'transparent' }]}
-          onPress={() => toggleExpandedOrder(item._id)}
-        >
-          <Text style={[styles.showAllButtonText, {color: "#808080"}]}>
-            {isExpanded ? "Show Less" : "Show All"}
-          </Text>
-          <Icon
-            name={isExpanded ? "keyboard-arrow-up" : "keyboard-arrow-down"}
-            size={20}
-            style={styles.arrowIcon}
-          />
-        </TouchableOpacity>
-      )}
-    </View>
+
+        {/* Show additional items when expanded */}
+        {isExpanded &&
+          item.orderItems.slice(1).map((orderItem) => (
+            <View key={orderItem._id} style={styles.productCard}>
+              <Image
+                source={
+                  orderItem.product.image[0]?.url
+                    ? { uri: orderItem.product.image[0]?.url }
+                    : require("@assets/img/eggplant.png")
+                }
+                style={styles.productImage}
+              />
+              <View style={styles.productDetails}>
+                <Text style={styles.productName}>
+                  {orderItem.product.productName}
+                </Text>
+                <Text style={styles.sizeQuantity}>
+                  Size: {orderItem.inventoryProduct.unitName}{" "}
+                  {orderItem.inventoryProduct.metricUnit}
+                </Text>
+                <Text style={styles.productQuantity}>
+                  Qty: {orderItem.quantity}
+                </Text>
+                <Text style={styles.productPrice}>
+                  ₱{orderItem.inventoryProduct.price}
+                </Text>
+              </View>
+
+              <View style={styles.actionButtons}>
+                <Text style={styles.orderStatus(orderItem.orderStatus)}>
+                  {orderItem.orderStatus}
+                </Text>
+                {orderItem.orderStatus === "Delivered" && (
+                  <TouchableOpacity
+                    style={[styles.button, styles.reviewButton]}
+                    onPress={() => handleReviewSubmit(item._id, orderItem)}
+                  >
+                    <Icon name="rate-review" size={20} color="#fff" />
+                    <Text style={styles.buttonText}>Review</Text>
+                  </TouchableOpacity>
+                )}
+
+                {orderItem.orderStatus === "Shipping" && (
+                  <TouchableOpacity
+                    style={[styles.button, styles.reviewButton]}
+                    onPress={() =>
+                      navigation.navigate("UserTracking", {
+                        trackId: orderItem.deliveryId,
+                      })
+                    }
+                  >
+                    <Icon name="rate-review" size={20} color="#fff" />
+                    <Text style={styles.buttonText}>Track</Text>
+                  </TouchableOpacity>
+                )}
+
+                {orderItem.orderStatus === "Pending" && (
+                  <TouchableOpacity
+                    style={[styles.button, styles.cancelButton]}
+                    onPress={() =>
+                      handleCancelOrder(
+                        item?._id,
+                        orderItem.inventoryProduct?._id,
+                        orderItem?._id,
+                        orderItem?.coopUser,
+                        item?.paymentMethod
+                      )
+                    }
+                  >
+                    <Icon name="cancel" size={20} color="#fff" />
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          ))}
+
+        {/* Toggle button to show/hide additional products */}
+        {item.orderItems.length > 1 && (
+          <TouchableOpacity
+            style={[styles.showAllButton, { backgroundColor: "transparent" }]}
+            onPress={() => toggleExpandedOrder(item._id)}
+          >
+            <Text style={[styles.showAllButtonText, { color: "#808080" }]}>
+              {isExpanded ? "Show Less" : "Show All"}
+            </Text>
+            <Icon
+              name={isExpanded ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+              size={20}
+              style={styles.arrowIcon}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
     );
   };
 
   return (
     <View style={styles.container}>
       {loading ? (
-        
-  <ActivityIndicator />
-) : (
-  orders && orders.length > 0 ? (
-    <FlatList
-      data={orders}
-      refreshControl={
-                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                   }
-      keyExtractor={(item) => item._id}
-      renderItem={renderItem}
-      ItemSeparatorComponent={() => <View style={styles.separator} />}
-    />
-  ) : (
-    <Text style={styles.noOrdersText}>No orders found.</Text>
-  )
-)}
-
-
+        <ActivityIndicator />
+      ) : orders && orders.length > 0 ? (
+        <FlatList
+          data={orders}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      ) : (
+        <Text style={styles.noOrdersText}>No orders found.</Text>
+      )}
     </View>
   );
 };
@@ -295,31 +343,35 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   orderHeader: {
-    flexDirection: 'column', // Stack children vertically
-    alignItems: 'flex-start', // Align to the left
+    flexDirection: "column", // Stack children vertically
+    alignItems: "flex-start", // Align to the left
     marginBottom: 10, // Add spacing below the header if needed
   },
   orderId: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 4, // Add spacing between Order ID and Total
   },
   orderTotal: {
     fontSize: 14,
-    color: '#555',
+    color: "#555",
   },
   orderStatus: (status) => ({
     fontSize: 14,
     fontWeight: "bold",
     marginBottom: 5,
     textAlign: "center",
-    color: 
-    status === "Delivered" ? "#28a745" :
-    status === "Processing" ? "#0000FF" :
-    status === "Shipping" ? "#FFA500" :
-    status === "Cancelled" ? "red" :
-    "#ffc107"
+    color:
+      status === "Delivered"
+        ? "#28a745"
+        : status === "Processing"
+        ? "#0000FF"
+        : status === "Shipping"
+        ? "#FFA500"
+        : status === "Cancelled"
+        ? "red"
+        : "#ffc107",
   }),
   orderTotal: {
     fontSize: 14,
@@ -363,14 +415,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 5,
     marginTop: 10,
-    backgroundColor: "transparent",  
-  
+    backgroundColor: "transparent",
   },
   showAllButtonText: {
     color: "#007bff",
     fontSize: 14,
     fontWeight: "bold",
-    marginRight: 8, 
+    marginRight: 8,
     marginLeft: 120,
     //textAlign: "center",
   },
@@ -496,10 +547,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
-  sizeQuantity:{
+  sizeQuantity: {
     fontSize: 12,
     color: "#666",
-  }
+  },
 });
 
 export default UserOrderList;

@@ -28,13 +28,13 @@ import UserFooter from "../Others/UserFooter";
 import messaging from "@react-native-firebase/messaging";
 const ProductContainer = () => {
   const { products, error } = useSelector((state) => state.allProducts);
-  const { coops } = useSelector((state) => state.allofCoops); 
+  const { coops } = useSelector((state) => state.allofCoops);
   const { categories } = useSelector((state) => state.categories);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
-  
+
   const [focus, setFocus] = useState(false);
   const [token, setToken] = useState();
   const [active, setActive] = useState([]);
@@ -62,8 +62,8 @@ const ProductContainer = () => {
         coops.filter((item) =>
           item.farmName.toLowerCase().includes(text.toLowerCase())
         )
-      )
-  
+      );
+
       setFocus(true);
       setSearchText(text);
     }
@@ -84,9 +84,11 @@ const ProductContainer = () => {
         const res = await AsyncStorage.getItem("jwt");
         if (res) {
           setToken(res);
-          messaging().getToken().then((token) => {
-            setFcmToken(token);
-          });
+          messaging()
+            .getToken()
+            .then((token) => {
+              setFcmToken(token);
+            });
           dispatch(Profileuser(userId, res));
         } else {
           setErrors("No JWT token found.");
@@ -113,11 +115,13 @@ const ProductContainer = () => {
   );
 
   const searchHandler = () => {
-    navigation.navigate("SearchProduct", { productFilter: productFilter, coopFilter: coopFilter });
+    navigation.navigate("SearchProduct", {
+      productFilter: productFilter,
+      coopFilter: coopFilter,
+    });
     setSearchText("");
   };
   return (
- 
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
@@ -161,23 +165,27 @@ const ProductContainer = () => {
 
       <Text style={styles.sectionTitle}>All Categories</Text>
       <ScrollView horizontal>
-  {categories && categories.length > 0 ? (
-    categories.map((item) => {
-      return <CategoryFilter key={item?._id?.$oid || item?._id} item={item} />;
-    })
-  ) : (
-    <View>
-      <Text>No Categories Found</Text>
-    </View>
-  )}
-</ScrollView>
+        {categories && categories.length > 0 ? (
+          categories.map((item) => {
+            return (
+              <CategoryFilter key={item?._id?.$oid || item?._id} item={item} />
+            );
+          })
+        ) : (
+          <View>
+            <Text>No Categories Found</Text>
+          </View>
+        )}
+      </ScrollView>
 
       <Text style={styles.sectionTitle}>All Products</Text>
       <ScrollView>
         {products && products.length > 0 ? (
           <View style={styles.productContainer}>
             {products.map((item) => {
-              return <ProductList key={item?._id?.$oid || item?._id} item={item} />
+              return (
+                <ProductList key={item?._id?.$oid || item?._id} item={item} />
+              );
             })}
           </View>
         ) : (
@@ -187,7 +195,6 @@ const ProductContainer = () => {
         )}
       </ScrollView>
     </ScrollView>
-    
   );
 };
 

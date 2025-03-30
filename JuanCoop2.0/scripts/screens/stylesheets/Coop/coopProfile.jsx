@@ -18,17 +18,42 @@ export default StyleSheet.create({
         fontSize: 22, // Slightly smaller for a formal look
         fontWeight: "bold",
     },
-
     profileContainer: {
-        flexDirection: 'row', // Align items in a row
-        alignItems: 'center', // Center items vertically
-        paddingVertical: 12, // Balanced padding
-        paddingHorizontal: 16, // Horizontal padding for a neat look
-        backgroundColor: '#ffffff', // Clean and formal background
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc', // Subtle border for division
-    },
-    
+        alignItems: "center", // Centers items horizontally
+        justifyContent: "center",
+        padding: 10,
+      },
+      profileImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        marginBottom: 10,
+      },
+      nameAndIconContainer: {
+        alignItems: "center", // Ensures both text and icon are centered
+      },
+      profileName: {
+        fontSize: 18,
+        fontWeight: "bold",
+        textAlign: "center",
+      },
+      emailIcon: {
+        alignItems: "center", // Centers the icon and text
+        marginTop: 5, // Spacing between the coop name and icon
+      },
+      chatButton: {
+        flexDirection: "row", // Arrange items in a row
+        alignItems: "center", // Align icon and text vertically
+        padding: 8,
+        backgroundColor: "#f0f0f0", // Light gray background (optional)
+        borderRadius: 5, // Rounded corners
+      },
+      chatNowText: {
+        fontSize: 14,
+        color: "black",
+        marginLeft: 5, // Space between the icon and text
+        fontWeight: "bold",
+      },
     profileImage: {
         width: 80, // Professional size
         height: 80,
@@ -54,29 +79,30 @@ export default StyleSheet.create({
     },
     
     prodList: {
-        padding: 5,
+        padding: 12,
     },
 
     prodrow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         paddingHorizontal: 8, // Reduced padding on sides
+        paddingBottom:20,
     
     },
 
     prodCard: {
         backgroundColor: 'white',
-        borderRadius: 8, // Slightly sharper corners for a formal look
+        borderRadius: 8, 
         overflow: 'hidden',
-        marginVertical: 8, // Reduced vertical margin to remove excessive spacing
-        marginHorizontal: 5, // Adjusted side margins
-        width: '48%', // Slightly adjusted width for better alignment
+        marginVertical: 8, 
+        marginHorizontal: 5, 
+        width: '48%', 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 4,
         elevation: 3,
-        padding: 5, // Reduced padding inside cards
+        padding: 5, 
        
     
     },

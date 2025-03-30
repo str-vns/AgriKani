@@ -21,7 +21,6 @@ import { conversationList } from "@redux/Actions/converstationActions";
 import { getUsers } from "@redux/Actions/userActions";
 import { useSocket } from "../../../SocketIo";
 
-
 const FarmerProfile = (props) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -31,7 +30,9 @@ const FarmerProfile = (props) => {
   const cooperative = props?.route?.params?.coop;
   const userItem = props?.route?.params?.coop?.user;
   const userId = context?.stateUser?.userProfile?._id;
-  const { loading, coopProducts, error } = useSelector((state) => state?.CoopProduct);
+  const { loading, coopProducts, error } = useSelector(
+    (state) => state?.CoopProduct
+  );
   const { users } = useSelector((state) => state.getThemUser);
   const { success } = useSelector((state) => state.createConversation);
   const { conversations } = useSelector((state) => state.converList);
@@ -47,10 +48,10 @@ const FarmerProfile = (props) => {
   const conversationExists = Boolean(existConvo);
 
   useEffect(() => {
-      if (userId && token) {
-        dispatch(conversationList(userId, token));
-      }
-    }, [userId, token, dispatch]);
+    if (userId && token) {
+      dispatch(conversationList(userId, token));
+    }
+  }, [userId, token, dispatch]);
 
   useEffect(() => {
     const fetchJwt = async () => {
@@ -72,52 +73,50 @@ const FarmerProfile = (props) => {
   );
 
   useEffect(() => {
-      if (conversations && Array.isArray(conversations) && userId && token) {
-        const friends = conversations.flatMap((conversation) =>
-          conversation?.members?.filter((member) => member !== userId)
-        );
-  
-        if (friends.length > 0) {
-          dispatch(getUsers(friends, token));
-        }
+    if (conversations && Array.isArray(conversations) && userId && token) {
+      const friends = conversations.flatMap((conversation) =>
+        conversation?.members?.filter((member) => member !== userId)
+      );
+
+      if (friends.length > 0) {
+        dispatch(getUsers(friends, token));
       }
+    }
   }, [conversations, userId, token]);
-  
-  useEffect(() => {
-      socket.emit("addUser", userId);
-  
-      socket.on("getUsers", (users) => {
-        const onlineUsers = users?.filter(
-          (user) => user?.online && user?.userId !== null
-        );
-        setOnlineUsers(onlineUsers);
-      });
-  
-      return () => {
-        socket.off("getUsers");
-      };
-  }, [socket, userId]);
-  
 
   useEffect(() => {
-  
-      if (users && onlineUsers?.length > 0) {
-        const userIsOnline = users.some((user) =>
-          onlineUsers.some(
-            (onlineUser) =>
-              onlineUser?.userId === user?.details?._id &&
-              onlineUser?.online &&
-              onlineUser?.userId !== null
-          )
-        );
-  
-        setIsOnline(userIsOnline);
-      } else {
-        setIsOnline(false);
-      }
+    socket.emit("addUser", userId);
+
+    socket.on("getUsers", (users) => {
+      const onlineUsers = users?.filter(
+        (user) => user?.online && user?.userId !== null
+      );
+      setOnlineUsers(onlineUsers);
+    });
+
+    return () => {
+      socket.off("getUsers");
+    };
+  }, [socket, userId]);
+
+  useEffect(() => {
+    if (users && onlineUsers?.length > 0) {
+      const userIsOnline = users.some((user) =>
+        onlineUsers.some(
+          (onlineUser) =>
+            onlineUser?.userId === user?.details?._id &&
+            onlineUser?.online &&
+            onlineUser?.userId !== null
+        )
+      );
+
+      setIsOnline(userIsOnline);
+    } else {
+      setIsOnline(false);
+    }
   }, [users, onlineUsers]);
 
-console.log(conversations, "conversations");
+  console.log(conversations, "conversations");
   const chatNow = async () => {
     const cooperativeUserId = cooperative?.user?._id;
     const currentUserId = userId;
@@ -136,14 +135,14 @@ console.log(conversations, "conversations");
             receiverId: cooperativeUserId,
           };
 
-           const response = await dispatch(createConversation(newConvo, token));
-           const response2 = await dispatch(conversationList(userId, token));
-           if (response && response2) {
+          const response = await dispatch(createConversation(newConvo, token));
+          const response2 = await dispatch(conversationList(userId, token));
+          if (response && response2) {
             setTimeout(() => {
               navigation.navigate("ChatMessages", {
-                  item: userItem,
-                  conversations: response2,
-                  isOnline: onlineUsers,
+                item: userItem,
+                conversations: response2,
+                isOnline: onlineUsers,
               });
             }, 5000);
           } else {
@@ -193,10 +192,15 @@ console.log(conversations, "conversations");
           style={styles.profileImage}
         />
       )}
-      <Text style={styles.profileName}>{cooperative?.farmName}</Text>
-      <TouchableOpacity style={styles.emailIcon} onPress={() => chatNow()}>
-  <Ionicons name="mail-outline" size={20} color="black" />
-</TouchableOpacity>
+
+      {/* Coop Name and Email Icon Wrapper */}
+      <View style={styles.nameAndIconContainer}>
+        <Text style={styles.profileName}>{cooperative?.farmName}</Text>
+        <TouchableOpacity style={styles.chatButton} onPress={() => chatNow()}>
+          <Ionicons name="mail-outline" size={20} color="black" />
+          <Text style={styles.chatNowText}>Chat Now</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 

@@ -141,13 +141,13 @@ const ProductCard = (props) => {
 
   return (
     <View style={styles.productBox}>
-      <TouchableOpacity style={styles.wishlistIcon} onPress={wishlistHaart}>
+      {/* <TouchableOpacity style={styles.wishlistIcon} onPress={wishlistHaart}>
         <Icon
           name="favorite"
           size={20}
           color={wishlist.length > 0 ? "#ff6961" : "#ccc"}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       {image && image.length > 0 ? (
         <Image

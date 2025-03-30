@@ -98,44 +98,49 @@ const UserWishlist = () => {
     }
   };
 
-  const renderItem = ({ item }) => (
-
-    <TouchableOpacity 
-      style={styles.productCard} 
-      onPress={() => navigation.navigate("SingleProduct", { item: item })}
-      // onPress={() => console.log("SingleProduct", { item: item })}
-    >    
-
-      {/* Not working */}
-      {/* Product Image */}
-      {item?.image?.[0]?.url ? (
-        <Image source={{ uri: item?.image[0]?.url }} style={styles.productImage} />
-      ) : (
-        <Image source={{ uri: defaultImageUrl }} style={styles.productImage} />
-      )}
+  const renderItem = ({ item }) => {
+    if (!item) {
+      // If item is null or undefined, return an empty view
+      return <View />;
+    }
   
-      {/* Product Info */}
-      <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item?.productName}</Text>
-        <Text
-          style={styles.productDescription}
-          numberOfLines={2}
-          ellipsizeMode="tail"
-        >
-          {item?.description?.length > 50
-            ? `${item.description.substring(0, 50)}...`
-            : item.description}
-        </Text>
-      </View>
+    return (
+      <TouchableOpacity
+        style={styles.productCard}
+        onPress={() => navigation.navigate("SingleProduct", { item: item })}
+      >
+        {/* Product Image */}
+        {item?.image?.[0]?.url ? (
+          <Image source={{ uri: item?.image[0]?.url }} style={styles.productImage} />
+        ) : (
+          <Image source={{ uri: defaultImageUrl }} style={styles.productImage} />
+        )}
   
-      {/* Action Buttons */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity onPress={() => wishlistHaart(item?._id)}>
-          <Ionicons name="heart" size={28} color="#ff6961" />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
+        {/* Product Info */}
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{item?.productName || "No Name"}</Text>
+          <Text
+            style={styles.productDescription}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {item?.description
+              ? item.description.length > 50
+                ? `${item.description.substring(0, 50)}...`
+                : item.description
+              : "No description available"}
+          </Text>
+        </View>
+  
+        {/* Action Buttons */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity onPress={() => wishlistHaart(item?._id)}>
+            <Ionicons name="heart" size={28} color="#ff6961" />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    );
+  };
   
   return (
     <View style={styles.container}>
