@@ -3,6 +3,10 @@ const validator = require("validator");
 const { RESOURCE } = require("../constants/index");
 
 const postSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: [true, "Emter title!"],
+  },
   content: {
     type: String,
     required: [true, "Please enter the content!"],
