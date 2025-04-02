@@ -193,7 +193,7 @@ exports.CoopOnlyProduct = async (id) => {
     throw new ErrorHandler(`Invalid User ID: ${id}`);
   
   const coopId = await Farm.findOne({ user: id }).lean().exec();
-  const coopOnlyProduct = await Product.find({ coop: coopId._id, deletedAt: null, activeAt: 'active' })
+  const coopOnlyProduct = await Product.find({ coop: coopId._id, deletedAt: null })
   .populate({path: "reviews.user", select: "firstName lastName image.url"})
   .populate({path: "stock", select: "quantity metricUnit unitName price status"})
   .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
