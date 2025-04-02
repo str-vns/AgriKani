@@ -1448,7 +1448,7 @@ exports.onlinePaymentProcess = async (req, res) => {
 
     const paymentIntentId = paymentIntentResponse.data.id;
 
-    const returnUrl = isMobile ? process.env.MOBILE_URL_NAVIGATE : process.env.TEST_URL_NAVIGATE;
+    const returnUrl = isMobile ? process.env.MOBILE_URL_NAVIGATE : process.env.WEB_URL_NAVIGATE;
     
     // ✅ Attach Payment Method to Payment Intent
     const attachResponse = await paymongoInstance.paymentIntents.attach(paymentIntentId, {
