@@ -11,7 +11,7 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import styles from "../stylesheets/Coop/coopProfile";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { getCoopProducts } from "@redux/Actions/productActions";
+import { getCoopProducts2 } from "@redux/Actions/productActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -68,7 +68,7 @@ const FarmerProfile = (props) => {
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(getCoopProducts(cooperative?.user?._id));
+      dispatch(getCoopProducts2(cooperative?.user?._id));
     }, [])
   );
 

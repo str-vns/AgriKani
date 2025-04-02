@@ -35,6 +35,9 @@ import {
     PRODUCT_ACTIVE_FAIL,
     PRODUCT_ACTIVE_REQUEST,
     PRODUCT_ACTIVE_SUCCESS,
+    ALL_PRODUCT_COOP_FAIL2,
+    ALL_PRODUCT_COOP_REQUEST2,
+    ALL_PRODUCT_COOP_SUCCESS2,
     CLEAR_ERRORS,
   } from "@redux/Constants/productConstants";
   import baseURL from "@assets/commons/baseurl";
@@ -377,3 +380,27 @@ import {
     }
   };
   
+  export const getCoopProducts2 = (coopId) => async (dispatch) => {
+  
+    try {
+      dispatch({ type: ALL_PRODUCT_COOP_REQUEST2 });
+  
+      const { data } = await axios.get(`${baseURL}products/coop2/${coopId}`);
+      dispatch({
+        type: ALL_PRODUCT_COOP_SUCCESS2,
+        payload: data.details,
+      });
+    } catch (error) {
+      const errorMessage =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message;
+  
+      dispatch({
+        type: ALL_PRODUCT_COOP_FAIL2,
+        payload: errorMessage,
+      });
+  
+      console.log("Error from getCoopProducts", errorMessage);
+    }
+  };

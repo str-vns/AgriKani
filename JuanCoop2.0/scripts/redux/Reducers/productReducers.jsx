@@ -14,10 +14,10 @@ import {
   UPDATE_PRODUCT_FAIL,
   UPDATE_PRODUCT_SUCCESS,
   UPDATE_PRODUCT_REQUEST,
-  DELETE_PRODUCT_IMAGE_FAIL, 
+  DELETE_PRODUCT_IMAGE_FAIL,
   DELETE_PRODUCT_IMAGE_REQUEST,
   DELETE_PRODUCT_IMAGE_SUCCESS,
-  SOFTDELETE_PRODUCT_FAIL, 
+  SOFTDELETE_PRODUCT_FAIL,
   SOFTDELETE_PRODUCT_REQUEST,
   SOFTDELETE_PRODUCT_SUCCESS,
   RESTORE_PRODUCT_FAIL,
@@ -26,7 +26,7 @@ import {
   DELETE_PRODUCT_FAIL,
   DELETE_PRODUCT_REQUEST,
   DELETE_PRODUCT_SUCCESS,
-  ARCHIVE_PRODUCT_FAIL, 
+  ARCHIVE_PRODUCT_FAIL,
   ARCHIVE_PRODUCT_REQUEST,
   ARCHIVE_PRODUCT_SUCCESS,
   GET_SINGLE_PRODUCT_FAIL,
@@ -35,19 +35,22 @@ import {
   PRODUCT_ACTIVE_FAIL,
   PRODUCT_ACTIVE_REQUEST,
   PRODUCT_ACTIVE_SUCCESS,
+  ALL_PRODUCT_COOP_FAIL2,
+  ALL_PRODUCT_COOP_REQUEST2,
+  ALL_PRODUCT_COOP_SUCCESS2,
   CLEAR_ERRORS,
 } from "@redux/Constants/productConstants";
 
 export const reducerProduct = (state = { products: [] }, action) => {
   switch (action.type) {
     case ALL_PRODUCT_REQUEST:
-      case GET_SINGLE_PRODUCT_REQUEST:
+    case GET_SINGLE_PRODUCT_REQUEST:
       return { ...state, loading: true, products: [] };
     case ALL_PRODUCT_SUCCESS:
-      case GET_SINGLE_PRODUCT_SUCCESS:
+    case GET_SINGLE_PRODUCT_SUCCESS:
       return { ...state, loading: false, products: action.payload };
     case ALL_PRODUCT_FAIL:
-      case GET_SINGLE_PRODUCT_FAIL:
+    case GET_SINGLE_PRODUCT_FAIL:
       return { ...state, loading: false, error: action.payload };
     case CLEAR_ERRORS:
       return {
@@ -80,13 +83,16 @@ export const reducerCoop = (state = { coop: {} }, action) => {
 export const reducerCoopProduct = (state = { coopProducts: [] }, action) => {
   switch (action.type) {
     case ALL_PRODUCT_COOP_REQUEST:
-      case ARCHIVE_PRODUCT_REQUEST:
+    case ALL_PRODUCT_COOP_REQUEST2:
+    case ARCHIVE_PRODUCT_REQUEST:
       return { ...state, loading: true, coopProducts: [] };
     case ALL_PRODUCT_COOP_SUCCESS:
-      case ARCHIVE_PRODUCT_SUCCESS:
+    case ALL_PRODUCT_COOP_SUCCESS2:
+    case ARCHIVE_PRODUCT_SUCCESS:
       return { ...state, loading: false, coopProducts: action.payload };
     case ALL_PRODUCT_COOP_FAIL:
-      case ARCHIVE_PRODUCT_FAIL:
+    case ALL_PRODUCT_COOP_FAIL2:
+    case ARCHIVE_PRODUCT_FAIL:
       return { ...state, loading: false, error: action.payload };
     case CLEAR_ERRORS:
       return {
@@ -96,18 +102,18 @@ export const reducerCoopProduct = (state = { coopProducts: [] }, action) => {
     default:
       return state;
   }
-}
+};
 
 export const reducerCreateProduct = (state = { product: {} }, action) => {
   switch (action.type) {
     case CREATE_PRODUCT_REQUEST:
-      case PRODUCT_ACTIVE_REQUEST:
+    case PRODUCT_ACTIVE_REQUEST:
       return { ...state, loading: true, product: {} };
     case CREATE_PRODUCT_SUCCESS:
-      case PRODUCT_ACTIVE_SUCCESS:
+    case PRODUCT_ACTIVE_SUCCESS:
       return { ...state, loading: false, success: action.payload };
     case CREATE_PRODUCT_FAIL:
-      case PRODUCT_ACTIVE_FAIL:
+    case PRODUCT_ACTIVE_FAIL:
       return { ...state, loading: false, error: action.payload };
     case CLEAR_ERRORS:
       return {
@@ -117,18 +123,18 @@ export const reducerCreateProduct = (state = { product: {} }, action) => {
     default:
       return state;
   }
-}
+};
 
 export const reducerEditProduct = (state = { product: {} }, action) => {
   switch (action.type) {
     case UPDATE_PRODUCT_REQUEST:
-      case DELETE_PRODUCT_IMAGE_REQUEST:
+    case DELETE_PRODUCT_IMAGE_REQUEST:
       return { ...state, loading: true, product: {} };
     case UPDATE_PRODUCT_SUCCESS:
-      case DELETE_PRODUCT_IMAGE_SUCCESS:
+    case DELETE_PRODUCT_IMAGE_SUCCESS:
       return { ...state, loading: false, success: action.payload };
     case UPDATE_PRODUCT_FAIL:
-      case DELETE_PRODUCT_IMAGE_FAIL:
+    case DELETE_PRODUCT_IMAGE_FAIL:
       return { ...state, loading: false, error: action.payload };
     case CLEAR_ERRORS:
       return {
@@ -138,28 +144,28 @@ export const reducerEditProduct = (state = { product: {} }, action) => {
     default:
       return state;
   }
-}
+};
 
 export const reducerDelResProduct = (state = { product: {} }, action) => {
-        switch (action.type) {
-            case SOFTDELETE_PRODUCT_REQUEST:
-            case RESTORE_PRODUCT_REQUEST:
-            case DELETE_PRODUCT_REQUEST:
-                return { ...state, loading: true, product: {} };
-            case SOFTDELETE_PRODUCT_SUCCESS:
-            case RESTORE_PRODUCT_SUCCESS:
-            case DELETE_PRODUCT_SUCCESS:
-                return { ...state, loading: false, success: action.payload };
-            case SOFTDELETE_PRODUCT_FAIL:
-            case RESTORE_PRODUCT_FAIL:
-            case DELETE_PRODUCT_FAIL:
-                return { ...state, loading: false, error: action.payload };
-            case CLEAR_ERRORS:
-                return {
-                    ...state,
-                    error: null,
-                };
-            default:
-                return state;
-        }
-}
+  switch (action.type) {
+    case SOFTDELETE_PRODUCT_REQUEST:
+    case RESTORE_PRODUCT_REQUEST:
+    case DELETE_PRODUCT_REQUEST:
+      return { ...state, loading: true, product: {} };
+    case SOFTDELETE_PRODUCT_SUCCESS:
+    case RESTORE_PRODUCT_SUCCESS:
+    case DELETE_PRODUCT_SUCCESS:
+      return { ...state, loading: false, success: action.payload };
+    case SOFTDELETE_PRODUCT_FAIL:
+    case RESTORE_PRODUCT_FAIL:
+    case DELETE_PRODUCT_FAIL:
+      return { ...state, loading: false, error: action.payload };
+    case CLEAR_ERRORS:
+      return {
+        ...state,
+        error: null,
+      };
+    default:
+      return state;
+  }
+};

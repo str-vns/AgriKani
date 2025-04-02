@@ -343,10 +343,10 @@ const OrderList = ({ navigation }) => {
             </Text>
             <Text
               style={[
-                styles?.paymentStatus ? styles?.paidStatus : styles?.unpaidStatus,
+                item?.payStatus === "Paid" ? styles?.paidStatus : styles?.unpaidStatus,
               ]}
             >
-              Payment: NOT PAID
+              Payment: {item?.payStatus === "Paid" ? "Paid" : "Unpaid"}
             </Text>
 
             <View>
