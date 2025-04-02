@@ -32,6 +32,7 @@ module.exports = {
   IMAGE_PRODUCT_DELETE: "/products/image/:id/:imageId",
   PRODUCT_ARCHIVE_ID: "/products/archive/:id",
   PRODUCT_ACTIVE_ID: "/products/active/:id",
+  COOP_ONLY_PRODUCTS_ID2: "/products/coop2/:id",
 
   //Conversation
   CONVERSATION: "/t",

@@ -312,3 +312,19 @@ exports.getRankedProducts = async (req, res, next) => {
   }
 };
 
+exports.CoopOnlyProduct2 = async (id) => {
+  console.log("User ID:", id);
+  if (!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid User ID: ${id}`);
+  
+  const coopId = await Farm.findOne({ user: id }).lean().exec();
+  const coopOnlyProduct = await Product.find({ coop: coopId._id, deletedAt: null, activeAt: 'active' })
+  .populate({path: "reviews.user", select: "firstName lastName image.url"})
+  .populate({path: "stock", select: "quantity metricUnit unitName price status"})
+  .sort({ createdAt: STATUSCODE.NEGATIVE_ONE })
+  .lean().exec();
+
+  if (!coopOnlyProduct) throw new ErrorHandler(`Product not exist with ID: ${id}`);
+
+  return coopOnlyProduct;
+};

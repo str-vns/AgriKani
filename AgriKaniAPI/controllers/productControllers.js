@@ -146,3 +146,15 @@ exports.getRankedProducts = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler(error.message, STATUSCODE.SERVER_ERROR));
   }
 });
+
+exports.CoopOnlyProducts2 = asyncHandler(async (req, res, next) => {
+  const coopProducts = await productProcess.CoopOnlyProduct2(req.params.id);
+
+  return coopProducts?.length === STATUSCODE.ZERO
+    ? next(new ErrorHandler("No Product Found"))
+    : SuccessHandler(
+        res,
+        `All Product has been fetched Successfully`,
+        coopProducts
+      );
+});

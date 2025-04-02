@@ -72,7 +72,13 @@ const productRoutes = [
     path: PATH.PRODUCT_ACTIVE_ID,
     roles: [],
     handler: productController.ActiveProduct,
-  }
+  },
+  {
+    method: METHOD.GET,
+    path: PATH.COOP_ONLY_PRODUCTS_ID2,
+    roles: [],
+    handler: productController.CoopOnlyProducts2
+  },
 ];
 
 productRoutes.forEach((route) => {
