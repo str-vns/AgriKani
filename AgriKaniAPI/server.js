@@ -8,6 +8,7 @@ const { logger, logEvents } = require("./middleware/logger");
 const { server } = require("./sokIo");
 const WeatherService = require("./services/weatherService");
 const DeliveryFailed = require("./services/deliveriesFailedService");
+const deliveryAuto = require("./process/deliveryProcess");
 
 connectDB();
 app.use(logger);
@@ -15,14 +16,14 @@ app.use(logger);
 mongoose.connection.once("open", () => {
   console.log("Connected to MongoDB");
 
-  // nodeCron.schedule("0 7 * * *", async () => {
-  //   try {
-  //     console.log("Checking weather notifications...");
-  //     await WeatherService.checkWeatherNotification();
-  //   } catch (error) {
-  //     console.error("Error in WeatherService:", error);
-  //   }
-  // });
+  nodeCron.schedule("0 7 * * *", async () => {
+    try {
+      console.log("Checking weather notifications...");
+      await WeatherService.checkWeatherNotification();
+    } catch (error) {
+      console.error("Error in WeatherService:", error);
+    }
+  });
 
   // nodeCron.schedule("*/10 * * * *", async () => {
   //   try {
@@ -32,6 +33,25 @@ mongoose.connection.once("open", () => {
   //     console.error("Error in WeatherService:", error);
   //   }
   // });
+
+  const Timedata = [
+    "0 6 * * *",   
+    "0 9 * * *",   
+    "0 12 * * *", 
+    "0 15 * * *",  
+  ];
+  
+  Timedata.forEach((cronTime) => {
+    nodeCron.schedule(cronTime, async () => {
+      try {
+        console.log("Automatically Assign Deliveries to Drivers...");
+        await deliveryAuto.createDeliveryProcess();
+        console.log("Assign delivery complete");
+      } catch (error) {
+        console.error("Error in Delivery Assignment:", error);
+      }
+    });
+  });
 
   nodeCron.schedule("30 20 * * *", async () => {
     try {

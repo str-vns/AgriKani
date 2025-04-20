@@ -98,6 +98,7 @@ const driverSchema = new mongoose.Schema({
    }] ,
     maxCapacity: {
         type: Number,
+        default: 10,
     },
     isAvailable: {
         type: Boolean,
