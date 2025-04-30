@@ -35,8 +35,8 @@ mongoose.connection.once("open", () => {
   // });
 
   const Timedata = [
-    "0 6 * * *",   
-    "0 9 * * *",   
+    "0 8 * * *",   
+    "0 10 * * *",   
     "0 12 * * *", 
     "0 15 * * *",  
   ];

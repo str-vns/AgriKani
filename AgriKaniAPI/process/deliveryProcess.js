@@ -3,10 +3,12 @@ const Member = require("../models/members");
 const Delivery = require("../models/delivery");
 const Order = require("../models/order");
 const Driver = require("../models/driver");
+const User = require("../models/user");
+const Notification = require("../models/notification");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE, GENDER } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
-const delivery = require("../models/delivery");
+const { sendFcmNotification } = require("../utils/generalHelpers")
 
 const startOfDay = new Date();
 startOfDay.setHours(0, 0, 0, 0);
@@ -249,6 +251,7 @@ exports.createDeliveryProcess = async () => {
         )
       ) 
 
+
         if (!courier) continue
   
         const deliveryExists = await Delivery.exists({
@@ -278,6 +281,7 @@ exports.createDeliveryProcess = async () => {
             assignedTo: courier._id,
            })
 
+           
            for (const item of items) {
             await Order.findByIdAndUpdate(order._id, {
               $set: {
@@ -292,6 +296,16 @@ exports.createDeliveryProcess = async () => {
             }).lean().exec();
           }
 
+            const userCourier =  await User.findById(courier.userId).lean().exec(); 
+
+           sendFcmNotification(userCourier, "New Delivery Assigned", `You have a new delivery assigned to you. Order ID: ${order._id}`)
+          
+           await Notification.create({
+            user: userCourier._id,
+            title: "New Delivery Assigned",
+            content: `You have a new delivery assigned to you. Order ID: ${order._id}`,
+            type: "delivery",
+           })
         }
 
 
