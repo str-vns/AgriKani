@@ -11,7 +11,7 @@ const { cloudinary } = require("../utils/cloudinary");
 const { sendEmail } = require("../utils/sendMail");
 const { id } = require("date-fns/locale");
 const { bufferedPageRange } = require("pdfkit");
-const admin = require("firebase-admin");
+import admin from "firebase-admin";
 
 exports.registerDriverProcess = async (req) => {
   try {

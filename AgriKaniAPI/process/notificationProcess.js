@@ -3,7 +3,7 @@ const User = require("../models/user");
 const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
-const admin = require('firebase-admin');
+import admin from 'firebase-admin';
 const serviceAccount = require('../notifacation-ko-firebase-adminsdk-sahjo-8e50ce651d.json');
 
 // NOTE Three DOTS MEANS OK IN COMMENT

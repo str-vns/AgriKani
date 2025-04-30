@@ -14,7 +14,7 @@ const generateReceiptPDF = require("../utils/pdfreceipts");
 const path = require("path");
 const fs = require("fs");
 const { sendEmail } = require("../utils/sendMail");
-const admin = require('firebase-admin');
+import admin from 'firebase-admin';
 const Paymongo = require('paymongo');
 const paymongoInstance = new Paymongo(process.env.PAYMONGO_SECRET_KEY);
 const axios = require("axios");

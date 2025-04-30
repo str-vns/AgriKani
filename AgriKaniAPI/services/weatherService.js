@@ -1,6 +1,6 @@
 const axios = require("axios");
 const User = require("../models/user");
-const admin = require("firebase-admin");
+import admin from "firebase-admin";
 const { STATUSCODE } = require("../constants/index");
 
 exports.checkWeatherNotification = async () => {
