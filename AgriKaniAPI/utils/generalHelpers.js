@@ -1,7 +1,7 @@
 
-import admin from 'firebase-admin';
+const admin = require('firebase-admin');
  
- export const sendFcmNotification = async (user, title, content) => {
+ const sendFcmNotification = async (user, title, content) => {
     if (!user.deviceToken || user.deviceToken.length === 0 || !user ) return;
 
   const message = {

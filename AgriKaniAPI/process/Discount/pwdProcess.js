@@ -5,7 +5,7 @@ const { default: mongoose } = require("mongoose");
 const { uploadImageSingle } = require("../../utils/imageCloud");
 const { cloudinary } = require("../../utils/cloudinary");
 const { sendEmail } = require("../../utils/sendMail");
-import admin from 'firebase-admin';
+const admin = require('firebase-admin');
 
 exports.CreatePwdProcess = async (req) => {
     const { frontImage, backImage } = req.files;
