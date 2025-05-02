@@ -121,14 +121,14 @@ const AssignList = () => {
           </Text>
         </View>
 
-        {!isDelivered && (  // If no matching delivery found, show the "Assign now" button
+        {/* {!isDelivered && (  // If no matching delivery found, show the "Assign now" button */}
           <TouchableOpacity
             style={styles.deliverButton}
             onPress={() => navigation.navigate("AssingDetails", { order: item })}
           >
-            <Text style={styles.buttonText}>Assign now</Text>
+            <Text style={styles.buttonText}>View</Text>
           </TouchableOpacity>
-        )}
+        {/* )} */}
       </View>
     );
   };

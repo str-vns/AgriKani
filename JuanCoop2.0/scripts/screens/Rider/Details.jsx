@@ -139,7 +139,7 @@ const Details = (props) => {
           <Text style={styles.text}>
             <Text style={styles.label}>To Pay:</Text> ₱{" "}
             {deliveryDetails?.totalAmount
-            ? String(deliveryDetails?.totalAmount)
+            ? String(deliveryDetails?.totalAmount.toFixed(2))
             : "N/A"}
           </Text>
         </View>
