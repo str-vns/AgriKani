@@ -35,9 +35,11 @@ const UserChat = (props) => {
   const [images, setImages] = useState([]);
   const [fcmToken, setFcmToken] = useState("");
   const validConversations = Array.isArray(conversations) ? conversations : [];
+  console.log("validConversations", conversations);
   const myConvo = validConversations.find((convo) =>
     convo.members.includes(item?._id)
   );
+
   const isOnlinerUser = isOnline.find((user) => user.userId === item?._id);
 
   console.log("isOnlinerUser", isOnlinerUser);
@@ -111,6 +113,11 @@ const UserChat = (props) => {
   };
 
   const sendMessage = () => {
+    if (!myConvo) {
+      console.error("Conversation not found or item is undefined.");
+      return;
+    }
+  
     if (newMessage.trim() || images.length) {
       const message = {
         sender: UserId,
@@ -118,32 +125,30 @@ const UserChat = (props) => {
         conversationId: myConvo._id,
         image: images,
       };
-
+  
       socket.emit("sendMessage", {
         senderId: UserId,
         receiverId: myConvo.members.find((member) => member !== UserId),
         text: newMessage,
-        image: images, 
+        image: images,
       });
-
-if (!isOnlinerUser ) {
-      const notification = {
-        title: `New message`, 
-        content: `You have a new message from ${context?.stateUser?.userProfile?.firstName} ${context?.stateUser?.userProfile?.lastName}`,
-        user: item._id,
-        url: item.image.url,
-        fcmToken: fcmToken,
-        type: "message",
+  
+      if (!isOnlinerUser) {
+        const notification = {
+          title: `New message`,
+          content: `You have a new message from ${context?.stateUser?.userProfile?.firstName} ${context?.stateUser?.userProfile?.lastName}`,
+          user: item?._id,
+          url: item?.image?.url || "",
+          fcmToken: fcmToken,
+          type: "message",
+        };
+        dispatch(sendNotifications(notification, token));
       }
-      dispatch(sendNotifications(notification , token))
-}
-
+  
       dispatch(sendingMessage(message, token));
       setNewMessage("");
       setImages([]);
       setArrivedMessages((prev) => [...prev, message]);
-
-      // console.log("Message sent:", message); // Check if the message is added to arrivedMessages
     }
   };
 

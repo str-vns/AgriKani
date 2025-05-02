@@ -268,22 +268,28 @@ const OrderList = ({ navigation }) => {
           };
 
           const response = await dispatch(createConversation(newConvo, token));
-          if (response) {
-            setTimeout(() => {
-              navigation.navigate("Messaging", {
-                screen: "ChatMessaging",
-                params: {
-                  item: item.user,
-                  conversations: conversations,
-                  isOnline: onlineUsers,
-                },
-              });
-            }, 5000)
-            setRefresh(false);
-          } else {
-            console.error("Error creating conversation");
-            setRefresh(false);
-          }
+          console.log("response", response?.conversation?.conversation?._id);
+          
+        if (response) {
+          // Refresh the conversation list
+          const response = await dispatch(conversationList(userId, token));
+          
+          // Debugging log
+          console.log("Updated conversations:", response);
+
+          setTimeout(() => {
+            navigation.navigate("Messaging", {
+              screen: "ChatMessaging",
+              params: {
+                item: item.user,
+                conversations: response,
+                isOnline: onlineUsers,
+              },
+            });
+          }, 500); // Adjust delay as needed
+        } else {
+          console.error("Error creating conversation");
+        }
         }
       } catch (error) {
         console.error(

@@ -25,6 +25,8 @@ const UserChatlist = () => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [isOnline, setIsOnline] = useState(false);
   const [arrivedMessages, setArrivedMessages] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
   const validConversations = Array.isArray(conversations) ? conversations : [];
 const userIds = users.map((user) => user.details._id);
 const myConvos = validConversations.filter((convo) =>
@@ -121,6 +123,22 @@ useEffect(() => {
     return onlineUsers.some(onlineUser => onlineUser.userId === userId && onlineUser.online);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (UserId && token) {
+      await dispatch(conversationList(UserId, token));
+      if (conversations && Array.isArray(conversations)) {
+        const friends = conversations.flatMap(conversation =>
+          conversation.members.filter(member => member !== UserId)
+        );
+        if (friends.length > 0) {
+          await dispatch(getUsers(friends, token));
+        }
+      }
+    }
+    setRefreshing(false);
+  };
+
   const renderItem = ({ item }) => (
   
     <TouchableOpacity
@@ -195,6 +213,8 @@ useEffect(() => {
         data={users} 
         keyExtractor={(item) => item.details._id}
         renderItem={renderItem}
+        refreshing={refreshing} 
+        onRefresh={onRefresh}
       />
     </View>
   );
