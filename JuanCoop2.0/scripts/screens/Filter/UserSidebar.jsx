@@ -125,6 +125,8 @@ const UserSidebar = () => {
       navigation.navigate("Home", { screen: "ProductContainer" });
     } else if (key === "CoopDistance") {
       navigation.navigate("Home", { screen: "CoopDistance" });
+    }else if (key === "tutorial") {
+      navigation.navigate("Tutorial");
     }
   };
 

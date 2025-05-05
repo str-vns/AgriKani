@@ -17,6 +17,7 @@ import WithdrawList from "@screens/Farmer/Withdraw/WithdrawList";
 import WithdrawsList from "@screens/admin/Withdraws/WithdrawsList";
 import RefundProcess from "@screens/admin/Refund/RefundProcess";
 import AboutUs from "@screens/User/AboutUs";
+import Tutorial from "@screens/User/Tutorial";
 import Main from "../../../Main";
 import Sidebar from "@src/screens/Filter/UserSidebar";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -258,7 +259,15 @@ const context = useContext(AuthGlobal);
           headerShown: false,
           tabBarShowLabel: false,
         }}
-      />  
+      />
+      <Drawer.Screen
+        name="Tutorial"
+        component={Tutorial}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />   
 
       </Drawer.Navigator>
     </Box>

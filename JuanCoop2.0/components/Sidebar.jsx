@@ -33,6 +33,8 @@ const Sidebar = () => {
       navigation.navigate("Chat List");
     }  else if (key === "track-order") {
       navigation.navigate("Order List");
+    } else if (key === "tutorial") {
+      navigation.navigate("Tutorial");
     }
     
 
