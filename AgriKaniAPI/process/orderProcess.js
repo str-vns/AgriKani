@@ -1286,8 +1286,34 @@ exports.getCoopDashboardData = async (userId) => {
       }
     ]);
     
-    console.log("🏆 Filtered Top 5 Best-Selling Products:", topSellingProducts);    
-
+    console.log("🏆 Filtered Top 5 Best-Selling Products:", topSellingProducts);
+    
+        // ALL Selling Products with Total Sold Quantity (Delivered only)
+        const allProductSales = await Order.aggregate([
+          {
+            $unwind: "$orderItems"
+          },
+          {
+            $match: {
+              "orderItems.coopUser": coopInfo._id,
+              "orderItems.orderStatus": "Delivered"
+            }
+          },
+          {
+            $group: {
+              _id: "$orderItems.product",
+              totalSold: { $sum: "$orderItems.quantity" }
+            }
+          }
+        ]);
+    
+        // Create a map of productId -> totalSold
+        const productSalesMap = {};
+        allProductSales.forEach(item => {
+          productSalesMap[item._id.toString()] = item.totalSold;
+        });
+    
+        console.log("📦 All Product Sales Map:", productSalesMap);    
 
     return {
       totalRevenue,
@@ -1300,7 +1326,8 @@ exports.getCoopDashboardData = async (userId) => {
       salesPerWeek,
       salesPerMonth,
       salesPerYear,
-      topSellingProducts
+      topSellingProducts,
+      productSalesMap
     };
     
   } catch (error) {
