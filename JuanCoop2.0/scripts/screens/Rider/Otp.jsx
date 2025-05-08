@@ -153,7 +153,7 @@ const Otp = (props) => {
     <View style={styles.container}>
 
 
-      <Text style={styles.title}>Phone verification</Text>
+      <Text style={styles.title}>Email verification</Text>
       <Text style={styles.subtitle}>Enter your OTP code</Text>
 
       <View style={styles.otpContainer}>

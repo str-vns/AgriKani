@@ -40,7 +40,7 @@ const UserSidebar = () => {
     { label: "Directions", icon: "navigate-outline", key: "CoopDistance" },
     context.stateUser?.userProfile?.roles?.includes("Customer") && 
     context.stateUser?.userProfile?.roles?.includes("Member") ? 
-    { label: "Community Forum", icon: "create-outline", key: "Forum" } : null,
+    { label: "Discussion", icon: "create-outline", key: "Forum" } : null,
     { label: "Track Order", icon: "location-outline", key: "track-order" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     { label: "About Us", icon: "information-circle-outline", key: "AboutUs" },
@@ -60,7 +60,7 @@ const UserSidebar = () => {
     { label: "Members", icon: "people-outline", key: "members" },
     { label: "Reviews", icon: "star-outline", key: "reviews" },
     { label: "News", icon: "newspaper-outline", key: "news" },
-    { label: "Community Forum", icon: "create-outline", key: "Forum" },
+    { label: "Discussion", icon: "create-outline", key: "Forum" },
     
    
   ]
@@ -71,7 +71,7 @@ const UserSidebar = () => {
     { label: "Cooperative", icon: "storefront-outline", key: "coop" },
     { label: "Driver", icon: "car-outline", key: "driver" },
     { label: "News", icon: "newspaper-outline", key: "news" }, 
-    { label: "Community", icon: "people-outline", key: "community" },
+    { label: "Discussion", icon: "people-outline", key: "community" },
     { label: "Categories", icon: "list-outline", key: "category" },
     { label: "Types", icon: "layers-outline", key: "types" },
     { label: "Withdraws", icon: "wallet-outline", key: "withdraws" },
@@ -145,7 +145,7 @@ const UserSidebar = () => {
     } else if (key === "product") {
       navigation.navigate("ProductsList");
     } else if (key === "news") {
-      navigation.navigate("BlogList");
+      navigation.navigate("BlogListCoop");
     } else if (key === "Forum") {
       navigation.navigate("CommunityForum");
     } else if (key === "orders") {

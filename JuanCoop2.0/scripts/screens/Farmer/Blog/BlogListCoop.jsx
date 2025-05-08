@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getBlog } from "@redux/Actions/blogActions";
 import { useFocusEffect } from "@react-navigation/native";
 
-const BlogList = ({ navigation }) => {
+const BlogListCoop = ({ navigation }) => {
   const dispatch = useDispatch();
   const { loading, blogs = [], error } = useSelector((state) => state.allBlogs);
   const [refreshing, setRefreshing] = useState(false);
@@ -170,4 +170,4 @@ const styles = StyleSheet.create({
   });
   
   
-export default BlogList;
+export default BlogListCoop;

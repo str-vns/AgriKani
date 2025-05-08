@@ -30,6 +30,8 @@ import PaymentMethod from "@screens/Farmer/Withdraw/PaymentWithdraw";
 import PaymayaWithdraw from "@screens/Farmer/Withdraw/PaymayaWithdrawForm";
 import GcashWithdraw from "@screens/Farmer/Withdraw/GcashWithdrawForm";
 import CreateWithdraw from "@screens/Farmer/Withdraw/CreateWithdraw";
+import BlogListCoop from "@screens/Farmer/Blog/BlogListCoop";
+import BlogCards from "@screens/Farmer/Blog/BlogCards";
 
 const Stack = createNativeStackNavigator();
 
@@ -258,6 +260,16 @@ const Index = () => {
           headerShown: true,
           tabBarShowLabel: false,
         }}
+      />
+      <Stack.Screen
+        name="BlogListCoop"
+        component={BlogListCoop}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BlogCards"
+        component={BlogCards}
+        options={{ headerShown: false }}
       />
       
     </Stack.Navigator>

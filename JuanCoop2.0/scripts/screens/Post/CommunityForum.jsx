@@ -24,6 +24,11 @@ const CommunityForum = ({ navigation, HandleLike }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const [showFull, setShowFull] = useState(false);
+  const toggleShowFull = () => setShowFull(!showFull);
+  const [expandedPostId, setExpandedPostId] = useState(null);
+
+
   useEffect(() => {
     dispatch(fetchApprovedPosts());
   }, [dispatch]);
@@ -53,6 +58,34 @@ const CommunityForum = ({ navigation, HandleLike }) => {
       setIsLiked(likedPosts);
     }
   }, [posts, userId]);
+  
+  const badWords = [
+    // English Profanity
+    "fuck", "shit", "bitch", "asshole", "bastard", "cunt", "dumbass", "jackass", "motherfucker",
+    "dipshit", "piss", "cock", "dick", "prick", "slut", "whore", "nigger", "faggot", "twat",
+    "pussy", "bollocks", "wanker", "son of a bitch", "douchebag", "arsehole", "bloody hell",
+    "goddamn", "hell no", "screw you", "retard", "idiot", "moron",
+  
+    // Tagalog Profanity
+    "tangina", "gago", "putangina", "ulol", "bobo", "tanga", "inutil", "bwisit", "pakyu", 
+    "siraulo", "peste", "punyeta", "lecheng", "lintik", "hayop ka", "tarantado", "gunggong",
+    "ampota", "bwesit", "kantot", "hindot", "burat", "jakol", "salsal", "iyot", "chupa",
+    "pakyu ka", "hindutan", "bilat", "pokpok", "bayag", "pwet", "supalpal", "lapastangan"
+  ];
+
+  const censorComment = (comment) => {
+    if (!comment) return comment;
+  
+    return badWords.reduce((acc, word) => {
+      const regex = new RegExp(word, "gi");
+      return acc.replace(regex, (match) => {
+        // Keep the first letter, replace the rest with "*"
+        const firstLetter = match.charAt(0);
+        const stars = "*".repeat(match.length - 1);
+        return firstLetter + stars;
+      });
+    }, comment);
+  };
   
 
   const toggleLike = (postId) => {
@@ -126,13 +159,6 @@ const CommunityForum = ({ navigation, HandleLike }) => {
 
   return (
     <View > 
-       {/* <View style={styles.header2}>
-          <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
-            <Ionicons name="menu" size={34} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle2}>Discussion</Text>
-        </View> */}
-        
         <ScrollView 
           contentContainerStyle={styles.container}
           refreshControl={
@@ -146,7 +172,7 @@ const CommunityForum = ({ navigation, HandleLike }) => {
               style={styles.userPostsButton} 
               onPress={() => navigation.navigate("UserPostList")}
             >
-              <Text style={styles.userPostsButtonText}>View My Posts</Text>
+              <Text style={styles.userPostsButtonText}>View My Post</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -154,7 +180,24 @@ const CommunityForum = ({ navigation, HandleLike }) => {
             posts.map((post) => (
               <View key={post._id} style={styles.postCard}>
                 <View style={styles.postHeader}>
-                  <Text style={styles.postContent}>{post.content}</Text>
+                <Text style={styles.postContent}>
+                  {expandedPostId === post._id
+                    ? post.content
+                    : post.content.length > 100
+                      ? post.content.slice(0, 100) + '... '
+                      : post.content}
+                  {post.content.length > 100 && (
+                    <Text
+                      onPress={() =>
+                        setExpandedPostId(expandedPostId === post._id ? null : post._id)
+                      }
+                      style={{ color: '#f7b900' }}
+                    >
+                      {expandedPostId === post._id ? 'Show Less' : 'Show More'}
+                    </Text>
+                  )}
+                </Text>
+
                   {post.image &&
                     post.image
                     .map((img, idx) => (
@@ -179,24 +222,48 @@ const CommunityForum = ({ navigation, HandleLike }) => {
                 </View>
 
                 <View style={styles.postActions}>
-                  <TouchableOpacity onPress={() => handleLike(post._id)} style={styles.actionButton}>
+                <View style={styles.leftActions}>
+                <TouchableOpacity onPress={() => handleLike(post._id)} style={styles.iconButton}>
+                  <View style={styles.iconWithCount}>
                     <FontAwesome5 
-                      name="heart" 
-                      size={20} 
-                      color={isLiked[post._id] ? "red" : "#E63946"} 
+                      name="heart"
+                      solid={isLiked[post._id]}
+                      size={20}
+                      color={isLiked[post._id] ? "red" : "red"}
                     />
-                    <Text style={styles.actionText}>
-                      Like ({post.likeCount})
-                    </Text>
+                    <Text style={styles.countText}>{post.likeCount}</Text>
+                  </View>
                 </TouchableOpacity>
-                  <TouchableOpacity onPress={() => toggleComments(post._id)} style={styles.actionButton}>
-                    <FontAwesome5 
-                      name="comment" 
-                      size={20} 
-                      color="orange" />
-                    <Text style={styles.actionText}>Comment ({post.comments?.length})</Text>
-                  </TouchableOpacity>
+
+
+                <TouchableOpacity onPress={() => toggleComments(post._id)} style={styles.iconButton}>
+                <View style={styles.iconWithCount}>
+                  <FontAwesome5 
+                    name="comment"
+                    size={20}
+                    color="#f7b900"
+                  />
+                  <Text style={styles.countText}>{post.comments?.length || 0}</Text>
                 </View>
+              </TouchableOpacity>
+                </View>
+
+              <View style={styles.sentimentContainer}>
+                <Text
+                  style={[
+                    styles.sentimentText,
+                    post.overallSentimentLabel === "positive"
+                      ? { color: "green" }
+                      : post.overallSentimentLabel === "neutral"
+                      ? { color: "gray" }
+                      : { color: "red" },
+                  ]}
+                >
+                  {post.overallSentimentLabel.charAt(0).toUpperCase() + post.overallSentimentLabel.slice(1)}
+                </Text>
+              </View>
+</View>
+
 
                 {showComments[post._id] && (
                   <View style={styles.forumlistCoopComments}>
@@ -212,7 +279,7 @@ const CommunityForum = ({ navigation, HandleLike }) => {
                                 <Text style={styles.commentUser}>
                                   {comment.user?.firstName} {comment.user?.lastName}:
                                 </Text>{" "}
-                                {comment.comment}
+                                {censorComment(comment.comment)}
                               </Text>
 
                               {/* Sentiment Label */}
@@ -268,6 +335,21 @@ const CommunityForum = ({ navigation, HandleLike }) => {
 };
 
 const styles = StyleSheet.create({
+  iconButton: {
+    marginRight: 15,
+  },
+  
+  iconWithCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  
+  countText: {
+    marginLeft: 5,
+    fontSize: 14,
+    color: '#333',
+  },
+  
   container: {
     padding: 10,
     backgroundColor: '#f0f2f5',
@@ -296,6 +378,7 @@ const styles = StyleSheet.create({
   },
   userPostsButton: {
     backgroundColor: '#f7b900',
+    marginLeft: 240,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 5,
@@ -325,11 +408,16 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: '100%',
-    height: 150,
+    height: 120,             // Reduced height for a smaller look
     resizeMode: 'cover',
-    borderRadius: 10,
-    marginVertical: 10,
-  },
+    borderRadius: 12,        // Slightly rounder corners
+    marginVertical: 8,       // Slightly tighter spacing
+    shadowColor: '#000',     // Optional: subtle shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,            // For Android shadow
+  },  
   postAuthor: {
     marginBottom: 10,
   },
@@ -473,6 +561,31 @@ commentDate: {
   fontSize: 12,
   color: "#666",
   marginTop: 3,
+},
+postActions: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 10,
+  paddingHorizontal: 10,
+},
+
+leftActions: {
+  flexDirection: 'row',
+  alignItems: 'center',
+},
+
+iconButton: {
+  marginRight: 15,
+},
+
+sentimentContainer: {
+  alignItems: 'flex-end',
+},
+
+sentimentText: {
+  fontWeight: '600',
+  fontSize: 14,
 },
 });
 
