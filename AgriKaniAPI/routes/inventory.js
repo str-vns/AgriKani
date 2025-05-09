@@ -59,7 +59,13 @@ const inventoryRoutes = [
     path: PATH.INVENTORY_STOCK_CHECK,
     roles: [],
     handler: inventoryController.inventoryCheck,
-  }
+  },
+  {
+    method: METHOD.POST,
+    path: PATH.INVENTORY_DASHBOARD,
+    roles: [],
+    handler: inventoryController.inventoryDashboard,
+  },
 ];
 
 inventoryRoutes.forEach((route) => {

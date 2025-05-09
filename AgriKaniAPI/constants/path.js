@@ -143,6 +143,8 @@ module.exports = {
   INVENTORY_PRODUCT_ID: "/inventory/product/:id",
   INVENTORY_UPDATE_ID: "/inventory/update/:id",
   INVENTORY_STOCK_CHECK: "/inventory/stock",
+  INVENTORY_DASHBOARD: "/inventory/coop/dashboard",
+
   //member
   MEMBER: "/member",
   MEMBER_ID: "/member/:id",
