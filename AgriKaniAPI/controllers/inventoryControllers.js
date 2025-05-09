@@ -101,3 +101,12 @@ exports.inventoryCheck = asyncHandler(async (req, res) => {
     inventory
     );
 })
+
+exports.inventoryDashboard = asyncHandler(async (req, res) => {
+    const inventory = await inventoryProcess.InventoryDashboard(req)
+    return SuccessHandler(
+    res,
+    `The Inventory has been checked successfully`,
+    inventory
+    );
+})

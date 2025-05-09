@@ -5,6 +5,8 @@ const Inventory = require("../models/inventoryM");
 const Product = require("../models/product");
 const Farm = require("../models/farm");
 const Order = require("../models/order"); 
+const { BadRequestErrorErrorCodeEnum } = require("xendit-node/invoice/models");
+
 //create ...
 exports.CreateInventoryProcess = async (req) => {
     if (!mongoose.Types.ObjectId.isValid(req.body.productId))
@@ -298,4 +300,163 @@ exports.InventoryCheckStock = async (req) => {
     } catch (error) {
         return next(new ErrorHandler(error.message, STATUSCODE.SERVER_ERROR));
     }
+};
+
+exports.InventoryDashboard = async (req) => {
+    let startOfDay, endOfDay;
+    const now = new Date(); 
+    let currentDayString = '';
+
+    if (req.body.type === "daily") {
+        startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+    const options = { month: 'short', day: 'numeric' };
+    const formattedDate = startOfDay.toLocaleDateString('en-US', options);
+    currentDayString = `${formattedDate}, ${startOfDay.getFullYear()}`; 
+
+    } else if (req.body.type === "weekly") {
+
+    const dayOfWeek = now.getDay(); 
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; 
+    const diffToSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek; 
+
+    startOfDay = new Date(now);
+    startOfDay.setDate(now.getDate() + diffToMonday);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    endOfDay = new Date(now);
+    endOfDay.setDate(now.getDate() + diffToSunday);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const start = new Date(startOfDay);
+    const end = new Date(endOfDay);
+
+    const options = { month: 'short', day: 'numeric' };
+    const formattedStart = start.toLocaleDateString('en-US', options); 
+    const formattedEnd = end.toLocaleDateString('en-US', options);    
+
+    currentDayString = `${formattedStart} - ${formattedEnd}, ${start.getFullYear()}`;
+    }
+    else if (req.body.type === "monthly") {
+        startOfDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        endOfDay = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+        const options = { month: 'short' };
+        const formattedDate = startOfDay.toLocaleDateString('en-US', options);
+        currentDayString = `${formattedDate} - ${startOfDay.getFullYear()}`; 
+    } else if (req.body.type === "yearly") {
+        startOfDay = new Date(now.getFullYear(), 0, 1);
+        endOfDay = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+
+        const options = { year: 'numeric' };
+        const formattedDate = startOfDay.toLocaleDateString('en-US', options);
+        currentDayString = `${formattedDate}`;
+    }
+
+    const coopId = await Farm.findOne({ user: req.body.user }).lean().exec();
+    if (!coopId) throw new ErrorHandler(`Coop not exist with ID: ${req.body.user}`);
+
+  
+    const inventoryDaily = await Inventory.aggregate([
+        {
+          $lookup: {
+            from: "products",
+            localField: "productId",
+            foreignField: "_id",
+            as: "product"
+          }
+        },
+        { $unwind: "$product" },
+        {
+          $match: {
+            "product.coop": coopId._id,
+            "product.activeAt": "active"
+          }
+        },
+        {
+          $lookup: {
+            from: "deliveries",
+            let: { inventoryId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  status: "delivered",
+                  createdAt: { $gte: startOfDay, $lt: endOfDay }
+                }
+              },
+              { $unwind: "$orderItems" },
+              {
+                $match: {
+                  $expr: {
+                    $eq: ["$orderItems.inventoryProduct", "$$inventoryId"]
+                  }
+                }
+              },
+              {
+                $group: {
+                  _id: null,
+                  totalDelivered: { $sum: "$orderItems.quantity" }
+                }
+              }
+            ],
+            as: "deliveryData"
+          }
+        },
+        {
+          $addFields: {
+            quantityDelivered: {
+              $ifNull: [{ $arrayElemAt: ["$deliveryData.totalDelivered", 0] }, 0]
+            },
+            currentDay: currentDayString
+          }
+        },
+        {
+          $group: {
+            _id: {
+              productName: "$product.productName",
+            },
+            variations: {
+              $push: {
+                unitName: "$unitName",
+                metricUnit: "$metricUnit",
+                currentStock: "$quantity",
+                quantityDelivered: "$quantityDelivered"
+              }
+            },
+            currentDay: { $first: "$currentDay" }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            productName: "$_id.productName",
+            variations: 1,
+            currentDay: 1
+          }
+        },
+        {
+          $group: {
+            _id: "$currentDay",
+            products: {
+              $push: {
+                productName: "$productName",
+                variations: "$variations"
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            currentDay: "$_id",
+            products: 1
+          }
+        }
+      ]);
+
+    return inventoryDaily;
 };
