@@ -3,12 +3,13 @@ const Order = require("../models/order");
 const Wallet = require("../models/wallets");
 const Notification = require("../models/notification");
 const Member = require("../models/members");
+const Inventory = require("../models/inventoryM");
+const Delivery = require("../models/delivery");
 const User = require("../models/user");
 const Product = require("../models/product")
 const Transaction = require("../models/transaction");
 const ErrorHandler = require("../utils/errorHandler");
 const mongoose = require("mongoose");
-const Inventory = require("../models/inventoryM");
 const Farm = require("../models/farm");
 const generateReceiptPDF = require("../utils/pdfreceipts");
 const path = require("path");
@@ -18,6 +19,7 @@ const admin = require('firebase-admin');
 const Paymongo = require('paymongo');
 const paymongoInstance = new Paymongo(process.env.PAYMONGO_SECRET_KEY);
 const axios = require("axios");
+
 
 // Create a new order
 exports.createOrderProcess = async ({ orderItems, shippingAddress, paymentMethod, totalPrice,shippingPrice, user, payStatus  }) => {
@@ -1100,220 +1102,242 @@ exports.getCoopDashboardData = async (userId) => {
   console.log("✅ Cooperative ID:", coopInfo._id);
 
   try {
-    const orders = await Order.find({ "orderItems.coopUser": coopInfo._id })
+    const deliveries = await Delivery.find({ coopId: coopInfo._id })
       .populate("orderItems.product")
       .lean();
 
-    // Filter only delivered orders
-    const deliveredOrders = orders.filter(order =>
-      order.orderItems.every(item => item.orderStatus === "Delivered")
-    );        
+    // Filter only delivered deliveries
+    const deliveredDeliveries = deliveries.filter(
+      (d) => d.status === "delivered"
+    );
 
-    // Total Revenue (only from Delivered orders)
-    const totalRevenue = deliveredOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+    // Total Revenue
+    const totalRevenue = deliveredDeliveries.reduce(
+      (sum, d) => sum + d.totalAmount,
+      0
+    );
     console.log("💰 Total Revenue:", totalRevenue);
 
-    // Total Orders
-    const totalOrders = orders.length;
-    console.log("📊 Total Orders:", totalOrders);
+    // Total Deliveries
+    const totalOrders = deliveries.length;
+    console.log("📊 Total Deliveries:", totalOrders);
 
     // Total Customers
-    const totalCustomers = new Set(orders.map(order => order.user.toString())).size;
+    const totalCustomers = new Set(deliveries.map((d) => d.userId.toString())).size;
     console.log("👥 Total Customers:", totalCustomers);
 
-    // Get total count of each order status
-    const orderStatusCounts = orders.reduce((counts, order) => {
-      order.orderItems.forEach(item => {
-        counts[item.orderStatus] = (counts[item.orderStatus] || 0) + 1;
-      });
+    // Order Status Counts
+    const orderStatusCounts = deliveries.reduce((counts, d) => {
+      counts[d.status] = (counts[d.status] || 0) + 1;
       return counts;
     }, {});
+    console.log("📌 Delivery Status Counts:", orderStatusCounts);
 
-    console.log("📌 Order Status Counts:", orderStatusCounts);
-
-
-    // Date calculations
+    // Date Calculations
     const today = new Date();
 
-    // Start of current week (Sunday)
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
 
-    // Start of last week (Sunday of last week)
     const startOfLastWeek = new Date(startOfWeek);
     startOfLastWeek.setDate(startOfWeek.getDate() - 7);
 
-    // Start and end of the current month
     const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const endOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    endOfCurrentMonth.setHours(23, 59, 59, 999); // Ensure it includes the whole last day
+    endOfCurrentMonth.setHours(23, 59, 59, 999);
 
-    // Revenue this week (only Delivered orders)
-    const revenueThisWeek = deliveredOrders
-      .filter(order => new Date(order.createdAt) >= startOfWeek)
-      .reduce((sum, order) => sum + order.totalPrice, 0);
+    const revenueThisWeek = deliveredDeliveries
+      .filter((d) => new Date(d.createdAt) >= startOfWeek)
+      .reduce((sum, d) => sum + d.totalAmount, 0);
+
+    const revenueLastWeek = deliveredDeliveries
+      .filter(
+        (d) =>
+          new Date(d.createdAt) >= startOfLastWeek &&
+          new Date(d.createdAt) < startOfWeek
+      )
+      .reduce((sum, d) => sum + d.totalAmount, 0);
 
     console.log("📅 Revenue This Week:", revenueThisWeek);
-
-    // Revenue last week (only Delivered orders)
-    const revenueLastWeek = deliveredOrders
-      .filter(order => new Date(order.createdAt) >= startOfLastWeek && new Date(order.createdAt) < startOfWeek)
-      .reduce((sum, order) => sum + order.totalPrice, 0);
-
     console.log("📅 Revenue Last Week:", revenueLastWeek);
 
-    const salesPerDay = await Order.aggregate([
+    // Aggregated Sales (Day, Week, Month, Year)
+    // Aggregation to fetch sales per day (Monday-Sunday)
+    // Aggregation to fetch sales per day (May 1-31)
+    const salesPerDay = await Delivery.aggregate([
       {
         $match: {
-          "orderItems.coopUser": coopInfo._id,
-          "orderItems.orderStatus": "Delivered",
-          createdAt: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth }
-        }
+          coopId: coopInfo._id,
+          status: "delivered",
+          createdAt: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth },
+        },
+      },
+      {
+        $project: {
+          dayOfMonth: { $dayOfMonth: "$createdAt" },
+          totalAmount: 1,
+          createdAt: 1,
+        },
       },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-          totalSales: { $sum: "$totalPrice" }
-        }
+          _id: {
+            dayOfMonth: "$dayOfMonth",
+            month: { $month: "$createdAt" },
+            year: { $year: "$createdAt" }
+          },
+          totalSales: { $sum: "$totalAmount" },
+        },
       },
-      { $sort: { _id: 1 } }
+      {
+        $sort: { "_id.dayOfMonth": 1 },
+      },
     ]);
-    console.log("📆 Sales Per Day (Current Month):", salesPerDay);
 
-    // Sales per week (Only in the current month)
-    const salesPerWeek = await Order.aggregate([
+// Aggregation to fetch sales per month (May 2025)
+const salesPerMonth = await Delivery.aggregate([
+  {
+    $match: {
+      coopId: coopInfo._id,
+      status: "delivered",
+    },
+  },
+  {
+    $group: {
+      _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
+      totalSales: { $sum: "$totalAmount" },
+    },
+  },
+  {
+    $sort: { "_id.year": 1, "_id.month": 1 },
+  },
+]);
+
+// Aggregation to fetch sales per year (2025)
+const salesPerYear = await Delivery.aggregate([
+  {
+    $match: {
+      coopId: coopInfo._id,
+      status: "delivered",
+    },
+  },
+  {
+    $group: {
+      _id: { year: { $year: "$createdAt" } },
+      totalSales: { $sum: "$totalAmount" },
+    },
+  },
+  {
+    $sort: { "_id.year": 1 },
+  },
+]);
+
+// Format Sales Per Day (May 1-31)
+// Assuming salesPerDay contains _id with dayOfMonth, month, and year
+const formattedSalesPerDay = [];
+
+if (salesPerDay.length > 0) {
+  const { month, year } = salesPerDay[0]._id; // Get the current month/year from the first item
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  // Get the number of days in the given month/year
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    const sale = salesPerDay.find((sale) => sale._id.dayOfMonth === i);
+    formattedSalesPerDay.push({
+      day: `${monthNames[month - 1]} ${i}`,
+      totalSales: sale ? sale.totalSales : 0,
+    });
+  }
+}
+
+console.log("📅 Sales Per Day (May 1-31):", formattedSalesPerDay);
+
+// Format Sales Per Month (May 2025)
+const formattedSalesPerMonth = salesPerMonth.map((sale) => {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June", "July", "August",
+    "September", "October", "November", "December"
+  ];
+  return {
+    month: `${monthNames[sale._id.month - 1]} ${sale._id.year}`,
+    totalSales: sale.totalSales,
+  };
+});
+console.log("📅 Sales Per Month:", formattedSalesPerMonth);
+
+// Format Sales Per Year (2025)
+const formattedSalesPerYear = salesPerYear.map((sale) => {
+  return {
+    year: sale._id.year,
+    totalSales: sale.totalSales,
+  };
+});
+console.log("📅 Sales Per Year:", formattedSalesPerYear);
+
+
+    // Top 5 Selling Products
+    const topSellingProducts = await Delivery.aggregate([
+      { $unwind: "$orderItems" },
       {
         $match: {
-          "orderItems.coopUser": coopInfo._id,
-          "orderItems.orderStatus": "Delivered",
-          createdAt: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth }
-        }
+          coopId: coopInfo._id,
+          status: "delivered",
+        },
       },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%U", date: "$createdAt" } }, // Group by week
-          totalSales: { $sum: "$totalPrice" }
-        }
+          _id: "$orderItems.product",
+          totalSold: { $sum: "$orderItems.quantity" },
+        },
       },
-      { $sort: { _id: 1 } }
-    ]);
-    console.log("📆 Sales Per Week (Current Month):", salesPerWeek);
-
-    // Sales per month
-    const salesPerMonth = await Order.aggregate([
-      {
-        $match: {
-          "orderItems.coopUser": coopInfo._id,
-          "orderItems.orderStatus": "Delivered"
-        }
-      },
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-          totalSales: { $sum: "$totalPrice" }
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]);
-    console.log("📆 Sales Per Month:", salesPerMonth);
-
-    // Sales per year
-    const salesPerYear = await Order.aggregate([
-      {
-        $match: {
-          "orderItems.coopUser": coopInfo._id,
-          "orderItems.orderStatus": "Delivered"
-        }
-      },
-      {
-        $group: {
-          _id: { $dateToString: { format: "%Y", date: "$createdAt" } },
-          totalSales: { $sum: "$totalPrice" } // Use totalPrice instead of multiplying manually
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]);    
-
-    console.log("📆 Sales Per Year:", salesPerYear);
-
-    // Top 5 Selling Products (Only Delivered Orders)
-    const topSellingProducts = await Order.aggregate([
-      {
-        $unwind: "$orderItems" // Break down order items array
-      },
-      {
-        $match: {
-          "orderItems.coopUser": coopInfo._id, // Ensure only products from the logged-in user's cooperative
-          "orderItems.orderStatus": "Delivered"
-        }
-      },
-      {
-        $group: {
-          _id: "$orderItems.product", // Group by product
-          totalSold: { $sum: "$orderItems.quantity" } // Sum up quantities sold
-        }
-      },
-      {
-        $sort: { totalSold: -1 } // Sort by most sold
-      },
-      {
-        $limit: 5 // Get only the top 5
-      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 5 },
       {
         $lookup: {
           from: "products",
           localField: "_id",
           foreignField: "_id",
-          as: "productDetails"
-        }
+          as: "productDetails",
+        },
       },
-      {
-        $unwind: "$productDetails" // Flatten productDetails array
-      },
-      {
-        $match: {
-          "productDetails.coop": coopInfo._id // Extra filtering for safety
-        }
-      },
+      { $unwind: "$productDetails" },
       {
         $project: {
           _id: 1,
           productName: "$productDetails.productName",
           totalSold: 1,
-          image: "$productDetails.image"
-        }
-      }
+          image: "$productDetails.image",
+        },
+      },
     ]);
-    
-    console.log("🏆 Filtered Top 5 Best-Selling Products:", topSellingProducts);
-    
-        // ALL Selling Products with Total Sold Quantity (Delivered only)
-        const allProductSales = await Order.aggregate([
-          {
-            $unwind: "$orderItems"
-          },
-          {
-            $match: {
-              "orderItems.coopUser": coopInfo._id,
-              "orderItems.orderStatus": "Delivered"
-            }
-          },
-          {
-            $group: {
-              _id: "$orderItems.product",
-              totalSold: { $sum: "$orderItems.quantity" }
-            }
-          }
-        ]);
-    
-        // Create a map of productId -> totalSold
-        const productSalesMap = {};
-        allProductSales.forEach(item => {
-          productSalesMap[item._id.toString()] = item.totalSold;
-        });
-    
-        console.log("📦 All Product Sales Map:", productSalesMap);    
+
+    // All Product Sales Map
+    const allProductSales = await Delivery.aggregate([
+      { $unwind: "$orderItems" },
+      {
+        $match: {
+          coopId: coopInfo._id,
+          status: "delivered",
+        },
+      },
+      {
+        $group: {
+          _id: "$orderItems.product",
+          totalSold: { $sum: "$orderItems.quantity" },
+        },
+      },
+    ]);
+
+    const productSalesMap = {};
+    allProductSales.forEach((item) => {
+      productSalesMap[item._id.toString()] = item.totalSold;
+    });
 
     return {
       totalRevenue,
@@ -1323,11 +1347,13 @@ exports.getCoopDashboardData = async (userId) => {
       revenueThisWeek,
       revenueLastWeek,
       salesPerDay,
-      salesPerWeek,
       salesPerMonth,
       salesPerYear,
+      formattedSalesPerDay,
+      formattedSalesPerMonth,
+      formattedSalesPerYear,
       topSellingProducts,
-      productSalesMap
+      productSalesMap,
     };
     
   } catch (error) {
