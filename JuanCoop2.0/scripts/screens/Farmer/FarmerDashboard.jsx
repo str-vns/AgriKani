@@ -200,14 +200,37 @@ const FarmerDashboard = () => {
     }
   }, [dispatch, userId]);
 
-  const [selectedRange, setSelectedRange] = useState("day");
+  const [selectedRange, setSelectedRange] = useState("daily");
 
   const salesData = {
-    day: dashboard?.salesPerDay || [],
-    week: dashboard?.salesPerWeek || [],
-    month: dashboard?.salesPerMonth || [],
-    year: dashboard?.salesPerYear || [],
+    daily: dashboard?.salesPerDay || [],
+    monthly: dashboard?.salesPerMonth || [],
+    yearly: dashboard?.salesPerYear || [],
   };
+
+  console.log("Sales Data:", salesData); 
+  
+  const formatLabel = (id) => {
+    if (!id || typeof id !== "object") return String(id);
+
+    const monthNames = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ];
+
+    switch (selectedRange) {
+      case "daily":
+        // Use dayOfMonth instead of day
+        return `${monthNames[id.month - 1]} ${id.dayOfMonth}`; // e.g., May 10
+      case "monthly":
+        return monthNames[id.month - 1]; // e.g., May
+      case "yearly":
+        return `${id.year}`; // e.g., 2024
+      default:
+        return JSON.stringify(id);
+    }
+  };
+
 
   const currentSales = salesData[selectedRange];
 
@@ -227,6 +250,8 @@ const FarmerDashboard = () => {
       </View>
     );
   }
+
+  
 
   return (
     <ScrollView style={styles.container}>
@@ -399,46 +424,53 @@ const FarmerDashboard = () => {
 
         {/* Sales Overview */}
         <View style={styles.coopdashboardSalesContainer}>
-          <View style={styles.coopdashboardHeader}>
-            <Text style={styles.coopdashboardSalesTitle}>
-              📊 Sales Overview
-            </Text>
-            <Picker
-              selectedValue={selectedRange}
-              style={styles.coopdashboardPicker}
-              onValueChange={(itemValue) => setSelectedRange(itemValue)}
-            >
-              <Picker.Item label="Daily" value="day" />
-              <Picker.Item label="Weekly" value="week" />
-              <Picker.Item label="Monthly" value="month" />
-              <Picker.Item label="Yearly" value="year" />
-            </Picker>
-          </View>
+          <View style={styles.coopdashboardSalesContainer}>
+      <View style={styles.coopdashboardHeader}>
+        <Text style={styles.coopdashboardSalesTitle}>📊 Sales Overview</Text>
+        <Picker
+          selectedValue={selectedRange}
+          style={styles.coopdashboardPicker}
+          onValueChange={(itemValue) => setSelectedRange(itemValue)}
+        >
+          <Picker.Item label="Daily" value="daily" />
+          <Picker.Item label="Monthly" value="monthly" />
+          <Picker.Item label="Yearly" value="yearly" />
+        </Picker>
+      </View>
 
-          {currentSales.length > 0 ? (
-            <BarChart
-              data={{
-                labels: currentSales.map((entry) => entry._id),
-                datasets: [
-                  { data: currentSales.map((entry) => entry.totalSales) },
-                ],
-              }}
-              width={screenWidth - 50}
-              height={220}
-              yAxisLabel="₱"
-              chartConfig={{
-                backgroundGradientFrom: "white",
-                backgroundGradientTo: "white",
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(255, 165, 0, ${opacity})`, // Orange Tint
-              }}
-              style={styles.coopdashboardChart}
-            />
-          ) : (
-            <Text style={styles.coopdashboardNoDataText}>
-              No sales data available for this period.
-            </Text>
-          )}
+      {currentSales.length > 0 ? (
+        <BarChart
+          data={{
+            labels: currentSales.map((entry) => formatLabel(entry._id)),
+            datasets: [
+              {
+                data: currentSales.map((entry) => entry.totalSales),
+              },
+            ],
+          }}
+          
+          width={screenWidth - 50}
+          height={220}
+          yAxisLabel="₱"
+          chartConfig={{
+            backgroundGradientFrom: "white",
+            backgroundGradientTo: "white",
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(255, 165, 0, ${opacity})`, // orange
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            propsForBackgroundLines: {
+              stroke: "#E5E7EB", // gray-200
+            },
+          }}
+          style={styles.coopdashboardChart}
+        />
+        
+      ) : (
+        <Text style={styles.coopdashboardNoDataText}>
+          No sales data available for this period.
+        </Text>
+      )}
+        </View>
         </View>
 
         {/* Top Selling Products */}
