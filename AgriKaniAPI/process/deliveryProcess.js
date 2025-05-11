@@ -430,12 +430,23 @@ exports.getDeliveryCompletedProcess = async (id) => {
 };
 
 exports.getDeliveryHistoryProcess = async (id) => {
-  const drivers = await Driver.findOne({ userId: id }).lean().exec();
-  if (!drivers) throw new ErrorHandler(`Driver not found with ID: ${id}`);
+   if(!mongoose.Types.ObjectId.isValid(id))
+    throw new ErrorHandler(`Invalid user ID: ${id}`);
+  
+  const courierId = await Driver.findOne({ userId: id }).lean().exec();
+  if (!courierId) throw new ErrorHandler(`Driver not found with ID: ${id}`);
 
   const deliveries = await Delivery.find({
-    assignedTo: drivers._id,
+    assignedTo: courierId._id,
   })
+    .populate("orderId", "totalPrice paymentMethod")
+    .populate("coopId")
+    .populate("userId", "firstName lastName email image.url phoneNum")
+    .populate("orderItems.product", "productName pricing price image.url ")
+    .populate("orderItems.inventoryProduct", "metricUnit unitName")
+    .populate("shippingAddress", "address city barangay")
+    .populate("assignedTo", "firstName lastName email image.url userId")
+    .sort({ createdAt: -1 })
     .lean()
     .exec();
 
