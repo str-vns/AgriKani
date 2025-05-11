@@ -203,9 +203,9 @@ exports.createDeliveryProcess = async () => {
     }
 
     for (const [coopId, items] of Object.entries(coopGroups)) {
-      const city = order.shippingAddress.city.replace(/ City$/i, "");
-      const barangay = order.shippingAddress.barangay;
-     
+      const city = order?.shippingAddress?.city?.replace(/ City$/i, "");
+      const barangay = order?.shippingAddress?.barangay;
+
       //total amount calculation
       const isMember = !!(await Member.findOne({
         userId: order.user,
@@ -244,12 +244,14 @@ exports.createDeliveryProcess = async () => {
                   });
   
       const courier = sortedCouriers.find(courier => 
-        courier.coopId.toString() === coopId && 
-        courier.assignedLocation.some(location =>
-          location.barangay === barangay &&
-          location.city.replace(/ City$/i, '') === city
-        )
-      ) 
+  courier?.coopId?.toString() === coopId && 
+  courier?.assignedLocation.some(location => {
+    return (
+      location?.barangay === barangay &&
+      location?.city?.replace(/ City$/i, '') === city
+    );
+  })
+);
 
 
         if (!courier) continue
