@@ -1,13 +1,11 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getHistoryDelivery } from "@redux/Actions/deliveryActions";
 import AuthGlobal from '@redux/Store/AuthGlobal';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux';
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const scale = SCREEN_WIDTH / 375;
 
 const statusColors = {
   delivered: '#28a745', 
@@ -20,14 +18,8 @@ const statusColors = {
 
 const OrderItem = ({ order }) => (
   <View style={styles.orderItem}>
-    <Text
-      style={styles.orderId}
-      numberOfLines={1}
-      ellipsizeMode="tail"
-    >
-      order#{order._id}
-    </Text>
-    <View style={[styles.statusBadge, { backgroundColor: statusColors[order.status], flexShrink: 0 }]}>
+    <Text style={styles.orderId}>order#{order._id}</Text>
+    <View style={[styles.statusBadge, { backgroundColor: statusColors[order.status] }]}>
       <Text style={styles.statusText}>{order.status}</Text>
     </View>
   </View>
@@ -60,15 +52,10 @@ const Section = ({ title, data }) => {
             </Text>
           </TouchableOpacity>
           <FlatList
-  data={displayedData}
-  keyExtractor={(item, index) => `${title}-${index}`}
-  renderItem={({ item }) => 
-    <TouchableOpacity>
-      <OrderItem order={item} />
-    </TouchableOpacity>
-  }
-  style={{ width: '100%' }}
-/>
+            data={displayedData}
+            keyExtractor={(item, index) => `${title}-${index}`}
+            renderItem={({ item }) => <OrderItem order={item} />}
+          />
         </View>
       )}
     </View>
@@ -143,9 +130,7 @@ const AssignFile = () => {
             <Text>Loading...</Text>
           ) : history?.length > 0 ? (
             Object.keys(groupedDeliveries).map((month) => (
-            
               <Section key={month} title={month} data={groupedDeliveries[month]} />
-              
             ))
           ) : (
             <View style={styles.noHistoryContainer}>
@@ -163,10 +148,11 @@ const AssignFile = () => {
 };
 
 const styles = StyleSheet.create({
-   container: {
+  container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 12 * scale,
+    padding: 16,
+    
   },
   containerNo: {
     flexGrow: 1,
@@ -175,77 +161,69 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20 * scale,
-    paddingTop: 15 * scale,
-    paddingBottom: 15 * scale,
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     elevation: 3,
-  },
-  headerTitle: {
-    fontSize: 22 * scale,
+},
+headerTitle: {
+    fontSize: 22,
     fontWeight: '700',
     flex: 1,
     textAlign: 'center',
     color: '#333',
-  },
+},
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8 * scale,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
   sectionTitle: {
-    fontSize: 16 * scale,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   toggleSymbol: {
-    fontSize: 16 * scale,
+    fontSize: 16,
   },
   filterButton: {
-    marginVertical: 8 * scale,
-    padding: 8 * scale,
+    marginVertical: 8,
+    padding: 8,
     backgroundColor: '#007bff',
-    borderRadius: 8 * scale,
+    borderRadius: 8,
     alignItems: 'center',
   },
   filterButtonText: {
     color: '#fff',
-    fontSize: 14 * scale,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   orderItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 5 * scale,
-    paddingHorizontal: 10 * scale,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    marginBottom: 8 * scale,
-    minHeight: 48 * scale,
   },
   orderId: {
-    fontSize: 14 * scale,
+    fontSize: 14,
     fontWeight: 'bold',
-    flex: 1,
-    marginRight: 10 * scale,
   },
   statusBadge: {
-    borderRadius: 12 * scale,
-    paddingHorizontal: 12 * scale,
-    paddingVertical: 4 * scale,
-    minWidth: 70 * scale,
-    alignItems: 'center',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
   },
   statusText: {
     color: '#fff',
-    fontSize: 12 * scale,
+    fontSize: 12,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
 });
 
