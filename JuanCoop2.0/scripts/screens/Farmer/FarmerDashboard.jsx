@@ -3,30 +3,29 @@ import {
   View,
   Text,
   TouchableOpacity,
+  StyleSheet,
   ScrollView,
   Dimensions,
   FlatList,
   Image,
   ActivityIndicator,
-  PermissionsAndroid,
-  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { BarChart, PieChart } from "react-native-chart-kit";
-import { useFocusEffect, useNavigation } from "@react-navigation/native"; 
+import { useFocusEffect, useNavigation } from "@react-navigation/native"; // Assuming navigation is set up
 import styles from "./css/styles";
 import { Profileuser } from "@redux/Actions/userActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
-import { singleInventory, inventoryDashboard } from "@redux/Actions/inventoryActions";
+import { getCoopProducts } from "@redux/Actions/productActions";
+import { singleInventory } from "@redux/Actions/inventoryActions";
 import { fetchCoopDashboardData } from "@redux/Actions/orderActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { useWeather } from "../../../CurrentWeather";
 import { useSocket } from "../../../SocketIo";
+import messaging from "@react-native-firebase/messaging";
 import Constants from "expo-constants";
 import { Picker } from "@react-native-picker/picker";
-import * as Print from "expo-print";
-import RNFS from 'react-native-fs';
 
 const FarmerDashboard = () => {
   const weather = useWeather();
@@ -35,13 +34,11 @@ const FarmerDashboard = () => {
   const socket = useSocket();
   const { coopProducts } = useSelector((state) => state.CoopProduct);
   const { Invsuccess } = useSelector((state) => state.sinvent);
-  const { InvDloading, InvDash, InvDError  } = useSelector((state) => state.inventoryDashboard);
   const {
     coopdashboards: dashboard,
     coopdashboardloading: loading,
     coopdashboarderror: error,
   } = useSelector((state) => state.coopdashboards || {});
-
 
   const screenWidth = Dimensions.get("window").width;
   const context = useContext(AuthGlobal);
@@ -49,14 +46,12 @@ const FarmerDashboard = () => {
   const [loadingData, setLoading] = useState(false);
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState(null);
-  const [type, setType] = useState("daily");
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [dailyWeather, setDailyWeather] = useState(null);
   const InventoryInfo = Invsuccess?.details;
   const [fcmToken, setFcmToken] = useState("");
 
-  // console.log("type", type);
   const weatherIcons = {
     a01d: require("../../../assets/weather/a01d.png"),
     a01n: require("../../../assets/weather/a01n.png"),
@@ -156,8 +151,6 @@ const FarmerDashboard = () => {
       return () => {
         socket.off("getUsers");
       };
-
-
     }, [socket, userId])
   );
 
@@ -169,13 +162,8 @@ const FarmerDashboard = () => {
         if (res) {
           setToken(res);
           if (userId) {
-            const invItem = {
-              type: type,
-              user: userId,
-            }
             dispatch(Profileuser(userId, res));
             dispatch(singleInventory(userId, res));
-            dispatch(inventoryDashboard(invItem, res))
           } else {
             setErrors("User ID is missing.");
           }
@@ -191,7 +179,7 @@ const FarmerDashboard = () => {
     };
 
     fetchUserData();
-  }, [userId, dispatch, type]);
+  }, [userId, dispatch]);
 
   useEffect(() => {
     let interval;
@@ -212,13 +200,6 @@ const FarmerDashboard = () => {
     }
   }, [dispatch, userId]);
 
-  const handleDashboardRefresh = (itemValue) => {
-    const invItem = {
-      type: itemValue,
-      user: userId,
-    }
-    dispatch(inventoryDashboard(invItem, token))
-  }
   const [selectedRange, setSelectedRange] = useState("day");
 
   const salesData = {
@@ -246,187 +227,6 @@ const FarmerDashboard = () => {
       </View>
     );
   }
-
-  console.log(PermissionsAndroid.RESULTS.GRANTED, "Platform");
-
-async function requestStoragePermission() {
-  if (Platform.OS === "android") {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: "Storage Permission",
-          message: "This app needs access to your storage to download files.",
-          buttonNeutral: "Ask Me Later",
-          buttonNegative: "Cancel",
-          buttonPositive: "OK",
-        }
-      );
-      return true;
-    } catch (err) {
-      console.warn(err);
-      return false;
-    }
-  }
-  return true;
-}
-
-  
-
-
-  const handleDownload = async () => {
-  if (!InvDash?.[0]?.products || InvDash?.[0]?.products?.length === 0) {
-    alert("No data available to download.");
-    return;
-  }
-
-  let baseFileName = `inventory_${InvDash?.[0]?.currentDay}`;
-  let fileName = `${baseFileName}.pdf`;
-  const downloadsDir = RNFS.DownloadDirectoryPath;
-  let filePath = `${downloadsDir}/${fileName}`;
-  let counter = 1;
-
-  while (await RNFS.exists(filePath)) {
-    fileName = `${baseFileName}(${counter}).pdf`;
-    filePath = `${downloadsDir}/${fileName}`;
-    counter++;
-  }
-
-  const hasPermission = await requestStoragePermission();
-  console.log("hasPermission", hasPermission);
-  if (!hasPermission) {
-    alert("Storage permission is required to download the file.");
-    return;
-  }
-
-  try {
-    const InventoryContent = `
-     <html>
-  <head>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-      h1 {
-        text-align: center;
-        color: #EDC001;
-        -webkit-text-stroke: 1px black;
-      }
-      h2 {
-        color: #EDC001;
-        -webkit-text-stroke: 1px black;
-        margin-bottom: 0;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 40px;
-      }
-      th,
-      td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      th {
-        background-color: #EDC001;
-        color: black;
-      }
-      tr:nth-child(even) {
-        background-color: #f2f2f2;
-      }
-      .center-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        color: #FFDA03;
-        -webkit-text-stroke: 1px black;
-      }
-      .inline-image {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .inline-image img {
-        width: 50px;
-        height: 50px;
-        vertical-align: middle;
-      }
-      .text-container {
-        text-align: center;
-      }
-      .text-container h1 {
-        font-size: 36px;
-        margin: 0;
-      }
-      .text-container .date {
-        font-size: 14px;
-        margin-top: 5px;
-        color: #555;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="center-container">
-      <div class="inline-image">
-        <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1746856018/files/mkenwabkxpdtpa6vmwul.png" alt="Inventory Icon">
-        <h2>JuanCoop</h2>
-      </div>
-    </div>
-    <div class="text-container">
-      <h1>Inventory</h1>
-      <p class="date">Date: ${InvDash?.[0]?.currentDay}</p>
-    </div>
-
-    ${InvDash[0].products
-      .map(
-        (product) => `
-          <h2>${product.productName}</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Unit Metric</th>
-                <th>Delivered</th>
-                <th>Current Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${product.variations
-                .map(
-                  (v) => `
-                    <tr>
-                      <td>${v.unitName} (${v.metricUnit})</td>
-                      <td>${v.quantityDelivered}</td>
-                      <td>${v.currentStock}</td>
-                    </tr>`
-                )
-                .join('')}
-            </tbody>
-          </table>
-        `
-      )
-      .join('')}
-  </body>
-</html>
-    `;
-
-    // Generate PDF in cache
-    const { uri } = await Print.printToFileAsync({
-      html: InventoryContent,
-      base64: false,
-    });
-
-    await RNFS.moveFile(uri, filePath);
-
-    alert(`PDF saved to Downloads`);
-    console.log('PDF saved to:', filePath);
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    alert('Failed to download inventory data.');
-  }
-};
 
   return (
     <ScrollView style={styles.container}>
@@ -639,65 +439,6 @@ async function requestStoragePermission() {
               No sales data available for this period.
             </Text>
           )}
-        </View>
-
-      {/* Inventory Overview */}
-        <View style={styles.invContainer}>
-          <View style={styles.coopdashboardHeader}>
-            <Text style={styles.coopdashboardSalesTitle}>
-              📊 Inventory Overview
-            </Text>
-            <Text style={styles.coopdashboardSalesTitle}>
-            {InvDash?.[0]?.currentDay}
-            </Text>
-            <Picker
-              selectedValue={selectedRange}
-              style={styles.coopdashboardPicker}
-              onValueChange={(itemValue) => {
-                setType(itemValue);
-                handleDashboardRefresh(itemValue);
-              }}
-            >
-              <Picker.Item label="Daily" value="daily" />
-              <Picker.Item label="Weekly" value="weekly" />
-              <Picker.Item label="Monthly" value="monthly" />
-              <Picker.Item label="Yearly" value="yearly" />
-            </Picker>
-
-            <TouchableOpacity style={styles.downloadButton} onPress={() => handleDownload()}>
-      <Text style={styles.downloadButtonText}>Download Data</Text>
-    </TouchableOpacity>
-          </View>
-          {InvDash?.[0]?.products?.length > 0 ? (
-  <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-    {InvDash?.[0]?.products.map((product, index) => (
-      <View key={index} style={styles.card}>
-        <Text style={styles.productName}>{product.productName}</Text>
-
-        <View style={styles.tableHeader}>
-          <Text style={[styles.cell, styles.cellHeader]}>Unit</Text>
-          <Text style={[styles.cell, styles.cellHeader]}>Metric</Text>
-          <Text style={[styles.cell, styles.cellHeader]}>Delivered</Text>
-          <Text style={[styles.cell, styles.cellHeader]}>Current</Text>
-        </View>
-
-        {/* Render variations of the product */}
-        {product.variations.map((variation, idx) => (
-          <View key={idx} style={styles.tableRow}>
-            <Text style={styles.cell}>{variation.unitName}</Text>
-            <Text style={styles.cell}>{variation.metricUnit}</Text>
-            <Text style={styles.cell}>{variation.quantityDelivered}</Text>
-            <Text style={styles.cell}>{variation.currentStock}</Text>
-          </View>
-        ))}
-      </View>
-    ))}
-  </ScrollView>
-) : (
-  <Text style={styles.coopdashboardNoDataText}>
-    No inventory data available for this period.
-  </Text>
-)}
         </View>
 
         {/* Top Selling Products */}
