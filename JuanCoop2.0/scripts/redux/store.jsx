@@ -20,7 +20,7 @@ import {
   import { commentcreateReducers } from "./Reducers/commentReducers";
   import { reducerBlog, reducerSingleBlog, reducerCreateBlog, reducerEditBlog, reducerDelBlog } from "@redux/Reducers/blogReducer";
   import { sendNotificationReducers, getNotificationReducers, readNotificationReducers } from "@redux/Reducers/notificationReducers";
-  import { inventoryCreateReducer, singleInventoryReducer } from "@redux/Reducers/inventoryReducer";
+  import { inventoryCreateReducer, singleInventoryReducer, inventoryDashboardReducer } from "@redux/Reducers/inventoryReducer";
   import { memberListReducer, memberApiReducer } from "@redux/Reducers/memberReducer";
   import { driverApiReducer, driverListReducer, onlyApprovedDriverReducer, driverProfileReducer } from "@redux/Reducers/driverReducer";
   import { deliveryListReducer, deliveryApiReducer, deliveryCompleteReducer, deliveryHistoryReducer } from "@redux/Reducers/deliveryReducers";
@@ -30,6 +30,7 @@ import {
   import { postReducer, addCommentReducer, getCommentsReducer, postLikeReducer } from "@redux/Reducers/postReducer";
   import salesReducer from "./Reducers/salesReducer"; 
   import rankedReducer from "./Reducers/rankReducers";
+import { inventoryDashboard } from "./Actions/inventoryActions";
 
 
   const reducers = combineReducers({
@@ -110,7 +111,8 @@ import {
     getWallet: walletReducer,
     transaction: transactionReducer,
     transactionAPI: transactionAPIReducer,
-    refund: refundReducer
+    refund: refundReducer,
+    inventoryDashboard: inventoryDashboardReducer,
   });
   
   const store = createStore(reducers, applyMiddleware(thunk));

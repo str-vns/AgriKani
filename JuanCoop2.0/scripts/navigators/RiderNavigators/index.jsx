@@ -8,6 +8,7 @@ import Dropoff from "@src/screens/Rider/Dropoff";
 import Completed from "@src/screens/Rider/HistoryCompleted";
 import QrScan from "@src/screens/Rider/QrScan";
 import RiderCancelled from "@src/screens/Cancelled/Rider_Cancelled"
+import History from "@src/screens/Rider/History";
 import CoopDashboard from "@screens/Farmer/FarmerDashboard";
 // Coop part for rider
 
@@ -50,6 +51,11 @@ const RiderNavigators = () => {
       <Stack.Screen
         name="Rider_Cancelled"
         component={RiderCancelled}
+        options={{ headerShown: false }}
+      />
+         <Stack.Screen
+        name="History"
+        component={History}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

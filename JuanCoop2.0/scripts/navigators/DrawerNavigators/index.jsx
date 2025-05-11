@@ -16,6 +16,7 @@ import RiderNavigators from "@navigators/RiderNavigators"
 import WithdrawList from "@screens/Farmer/Withdraw/WithdrawList";
 import WithdrawsList from "@screens/admin/Withdraws/WithdrawsList";
 import RefundProcess from "@screens/admin/Refund/RefundProcess";
+
 import AboutUs from "@screens/User/AboutUs";
 import Tutorial from "@screens/User/Tutorial";
 import Main from "../../../Main";
@@ -224,6 +225,20 @@ const context = useContext(AuthGlobal);
             initialParams={{ screen: "ReviewList" }}
             options={{ headerShown: false, tabBarShowLabel: false }}
             component={CoopNavigators}
+        />
+        
+          <Drawer.Screen
+            name="CategoryList"
+            initialParams={{ screen: "CategoryList " }}
+            options={{ headerShown: false, tabBarShowLabel: false }}
+            component={AdminNavigators}
+        />
+
+     <Drawer.Screen
+            name="TypeList"
+            initialParams={{ screen: "TypeList " }}
+            options={{ headerShown: false, tabBarShowLabel: false }}
+            component={AdminNavigators}
         />
         
         <Drawer.Screen
