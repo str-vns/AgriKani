@@ -63,7 +63,7 @@ const Section = ({ title, data }) => {
   data={displayedData}
   keyExtractor={(item, index) => `${title}-${index}`}
   renderItem={({ item }) => 
-    <TouchableOpacity onPress={() => navigation.navigate("HistoryDetails", { History: item })}>
+    <TouchableOpacity>
       <OrderItem order={item} />
     </TouchableOpacity>
   }
