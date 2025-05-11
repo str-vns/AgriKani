@@ -34,7 +34,7 @@ const OrderItem = ({ order }) => (
 );
 
 const Section = ({ title, data }) => {
-  const navigation = useNavigation();
+
   const [expanded, setExpanded] = useState(false);
   const [showAssignedOnly, setShowAssignedOnly] = useState(false);
 
@@ -63,7 +63,7 @@ const Section = ({ title, data }) => {
   data={displayedData}
   keyExtractor={(item, index) => `${title}-${index}`}
   renderItem={({ item }) => 
-    <TouchableOpacity onPress={() => navigation.navigate("HistoryDetails", { History: item })}>
+    <TouchableOpacity>
       <OrderItem order={item} />
     </TouchableOpacity>
   }
