@@ -70,7 +70,7 @@ const HistoryDetails = (props) => {
         >
           <Ionicons name="menu" size={34} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle2}>Delivery List</Text>
+        <Text style={styles.headerTitle2}>Details</Text>
       </View>
 
       <ScrollView style={styles.container}>
