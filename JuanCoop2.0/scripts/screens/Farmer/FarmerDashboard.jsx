@@ -403,10 +403,10 @@ async function requestStoragePermission() {
       <p class="date">Date: ${InvDash?.[0]?.currentDay}</p>
     </div>
 
-    ${InvDash[0].products
+    ${InvDash[0]?.products
       .map(
         (product) => `
-          <h2>${product.productName}</h2>
+          <h2>${product?.productName}</h2>
           <table>
             <thead>
               <tr>
@@ -420,9 +420,9 @@ async function requestStoragePermission() {
                 .map(
                   (v) => `
                     <tr>
-                      <td>${v.unitName} (${v.metricUnit})</td>
-                      <td>${v.quantityDelivered}</td>
-                      <td>${v.currentStock}</td>
+                      <td>${v?.unitName} (${v?.metricUnit})</td>
+                      <td>${v?.quantityDelivered}</td>
+                      <td>${v?.currentStock}</td>
                     </tr>`
                 )
                 .join('')}
@@ -430,7 +430,7 @@ async function requestStoragePermission() {
           </table>
         `
       )
-      .join('')}
+      ?.join('')}
   </body>
 </html>
     `;
@@ -636,13 +636,13 @@ async function requestStoragePermission() {
         </Picker>
       </View>
 
-      {currentSales.length > 0 ? (
+      {currentSales?.length > 0 ? (
         <BarChart
           data={{
-            labels: currentSales.map((entry) => formatLabel(entry._id)),
+            labels: currentSales?.map((entry) => formatLabel(entry._id)),
             datasets: [
               {
-                data: currentSales.map((entry) => entry.totalSales),
+                data: currentSales?.map((entry) => entry.totalSales),
               },
             ],
           }}
@@ -712,7 +712,7 @@ async function requestStoragePermission() {
         </View>
 
         {/* Render variations of the product */}
-        {product.variations.map((variation, idx) => (
+        {product?.variations?.map((variation, idx) => (
           <View key={idx} style={styles.tableRow}>
             <Text style={styles.cell}>{variation.unitName}</Text>
             <Text style={styles.cell}>{variation.metricUnit}</Text>
