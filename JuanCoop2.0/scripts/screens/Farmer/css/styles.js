@@ -1104,6 +1104,57 @@ initiativesContainer: {
   UnavailableText: {
     fontWeight: "bold",
     fontSize: 16,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  productName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+    paddingBottom: 4,
+    marginBottom: 6,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  cell: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#555',
+  },
+  cellHeader: {
+    fontWeight: '600',
+    fontSize: 14,
+    color: '#777',
+  },
+  invContainer: {
+    backgroundColor: "#fff",
+    padding: 15,
+    flex: 1,
+    borderRadius: 12,
+    marginVertical: 10,
+    elevation: 3,
+  },
+  scrollViewContainer: {
+    paddingBottom: 20, // To add some space at the bottom for smooth scrolling
   }
 });
 
