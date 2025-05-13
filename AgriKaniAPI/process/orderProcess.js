@@ -680,415 +680,6 @@ exports.getMonthlySalesReport = async () => {
   ]);
 };
 
-// exports.getCoopDashboardData = async (id) => {
-//   if (!mongoose.Types.ObjectId.isValid(id)) {
-//     throw new ErrorHandler(`Invalid Cooperative ID: ${id}`, 400);
-//   }
-
-//   const coopInfo = await Farm.findOne({ user: id });
-//   if (!coopInfo) {
-//     throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
-//   }
-
-//   console.log("Cooperative ID:", coopInfo._id);
-
-//   try {
-//     // Fetch Orders
-//     const orders = await Order.find({ "orderItems.coopUser": coopInfo._id })
-//       .populate("orderItems.product")
-//       .lean();
-
-//     console.log("Fetched Orders:", orders.length);
-
-//     // 📊 **Total Sales Revenue**
-//     const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
-
-//     // 📦 **Total Orders**
-//     const totalOrders = orders.length;
-
-//     // 💲 **Average Order Value (AOV)**
-//     const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
-
-//     // **Sales Trends Calculation**
-//     const currentDate = new Date();
-//     const startOfDay = new Date().setHours(0, 0, 0, 0);
-//     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-//     const sevenDaysAgo = new Date().setDate(currentDate.getDate() - 7);
-
-//     // Helper Function to Get Sales Revenue for a Time Period
-//     const getSalesRevenue = async (startDate) => {
-//       const sales = await Order.aggregate([
-//         { 
-//           $match: { 
-//             "orderItems.orderStatus": "Delivered",
-//             createdAt: { $gte: new Date(startDate) }
-//           } 
-//         },
-//         { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
-//       ]);
-//       return sales[0]?.revenue || 0;
-//     };
-
-//     // 📅 **Sales Over Time**
-//     const dailySales = await getSalesRevenue(startOfDay);
-//     const weeklySales = await getSalesRevenue(sevenDaysAgo);
-//     const monthlySales = await getSalesRevenue(startOfMonth);
-
-//     // 📈 **Sales Comparison (Current vs. Previous Periods)**
-//     const prevMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-//     const prevMonthSales = await getSalesRevenue(prevMonthStart);
-
-//     const salesComparison = {
-//       currentMonth: monthlySales,
-//       previousMonth: prevMonthSales,
-//       percentageChange: prevMonthSales > 0 
-//         ? (((monthlySales - prevMonthSales) / prevMonthSales) * 100).toFixed(2) 
-//         : 100,
-//     };
-
-//     // 🔥 **Top-Selling & Low-Performing Products**
-//     const productSales = await Order.aggregate([
-//       { $unwind: "$orderItems" },
-//       { 
-//         $match: { 
-//           "orderItems.coopUser": coopInfo._id,
-//           "orderItems.orderStatus": "Delivered" 
-//         } 
-//       },
-//       {
-//         $group: {
-//           _id: "$orderItems.product",
-//           totalQuantitySold: { $sum: "$orderItems.quantity" },
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "products",
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "productDetails",
-//         },
-//       },
-//       { $unwind: "$productDetails" },
-//       {
-//         $project: {
-//           _id: 0,
-//           productId: "$_id",
-//           productName: "$productDetails.productName",
-//           totalQuantitySold: 1,
-//         },
-//       },
-//       { $sort: { totalQuantitySold: -1 } },
-//     ]);
-
-//     const topSellingProducts = productSales.slice(0, 5);
-//     const lowPerformingProducts = productSales.slice(-5);
-
-//     console.log("Top-Selling Products:", topSellingProducts);
-//     console.log("Low-Performing Products:", lowPerformingProducts);
-
-//     return {
-//       totalRevenue,
-//       totalOrders,
-//       averageOrderValue,
-//       salesTrends: {
-//         daily: dailySales,
-//         weekly: weeklySales,
-//         monthly: monthlySales,
-//       },
-//       salesComparison,
-//       topSellingProducts,
-//       lowPerformingProducts,
-//     };
-//   } catch (error) {
-//     console.error("Error fetching dashboard data:", error);
-//     throw new ErrorHandler("Error processing dashboard data", 500);
-//   }
-// };
-
-
-//correct
-// exports.getCoopDashboardData = async (id) => {
-//   if (!mongoose.Types.ObjectId.isValid(id)) {
-//     throw new ErrorHandler(`Invalid Cooperative ID: ${id}`, 400);
-//   }
-
-//   const coopInfo = await Farm.findOne({ user: id });
-//   if (!coopInfo) {
-//     throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
-//   }
-
-//   console.log("Cooperative ID:", coopInfo._id);
-
-//   try {
-//     const orders = await Order.find({ 
-//       "orderItems.coopUser": coopInfo._id, 
-//       "orderItems.orderStatus": "Shipping" 
-//     })
-//       .populate("orderItems.product")
-//       .lean();
-
-//     const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
-//     const totalOrders = orders.length;
-
-//     // Top-selling products
-//     const rankedProducts = await Order.aggregate([
-//       { $unwind: "$orderItems" },
-//       { 
-//         $match: { 
-//           "orderItems.coopUser": coopInfo._id,
-//           "orderItems.orderStatus": "Shipping" 
-//         } 
-//       },
-//       {
-//         $group: {
-//           _id: "$orderItems.product",
-//           totalQuantitySold: { $sum: "$orderItems.quantity" },
-//         },
-//       },
-//       {
-//         $sort: { totalQuantitySold: -1 },
-//       },
-//       {
-//         $lookup: {
-//           from: "products",
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "productDetails",
-//         },
-//       },
-//       { $unwind: "$productDetails" },
-//       {
-//         $project: {
-//           _id: 0,
-//           productId: "$_id",
-//           productName: "$productDetails.productName",
-//           totalQuantitySold: 1,
-//         },
-//       },
-//     ]);
-
-//     // Group sales by day, week, and month
-//     const dailySales = await Order.aggregate([
-//       {
-//         $match: {
-//           "orderItems.orderStatus": "Shipping",
-//           "orderItems.coopUser": coopInfo._id,
-//           createdAt: {
-//             $gte: new Date(new Date().setDate(new Date().getDate() - 7)), // Only last 7 days
-//           },
-//         },
-//       },
-//       {
-//         $group: {
-//           _id: { $dayOfWeek: "$createdAt" }, // Group by day of the week (1 = Sunday, 7 = Saturday)
-//           revenue: { $sum: "$totalPrice" },
-//         },
-//       },
-//       {
-//         $sort: { "_id": 1 }, // Sort by day of the week
-//       },
-//       {
-//         $project: {
-//           day: {
-//             $switch: {
-//               branches: [
-//                 { case: { $eq: ["$_id", 1] }, then: "Sunday" },
-//                 { case: { $eq: ["$_id", 2] }, then: "Monday" },
-//                 { case: { $eq: ["$_id", 3] }, then: "Tuesday" },
-//                 { case: { $eq: ["$_id", 4] }, then: "Wednesday" },
-//                 { case: { $eq: ["$_id", 5] }, then: "Thursday" },
-//                 { case: { $eq: ["$_id", 6] }, then: "Friday" },
-//                 { case: { $eq: ["$_id", 7] }, then: "Saturday" },
-//               ],
-//               default: "Unknown",
-//             },
-//           },
-//           revenue: 1,
-//         },
-//       },
-//     ]);
-    
-
-//     const weeklySales = await Order.aggregate([
-//       { 
-//         $match: { 
-//           "orderItems.orderStatus": "Shipping",
-//           "orderItems.coopUser": coopInfo._id,
-//         }
-//       },
-//       {
-//         $group: {
-//           _id: { $isoWeek: "$createdAt" },
-//           revenue: { $sum: "$totalPrice" },
-//         }
-//       },
-//       { $sort: { "_id": 1 } }
-//     ]);
-
-//     const monthlySales = await Order.aggregate([
-//       { 
-//         $match: { 
-//           "orderItems.orderStatus": "Shipping",
-//           "orderItems.coopUser": coopInfo._id,
-//         }
-//       },
-//       {
-//         $group: {
-//           _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
-//           revenue: { $sum: "$totalPrice" },
-//         }
-//       },
-//       { $sort: { "_id": 1 } }
-//     ]);
-
-//     return {
-//       totalRevenue,
-//       totalOrders,
-//       rankedProducts,
-//       salesTrends: {
-//         daily: dailySales,
-//         weekly: weeklySales,
-//         monthly: monthlySales,
-//       },
-//     };
-//   } catch (error) {
-//     console.error("Error fetching dashboard data:", error);
-//     throw new ErrorHandler("Error processing dashboard data", 500);
-//   }
-// };
-
-// exports.getCoopDashboardData = async (id) => {
-//   if (!mongoose.Types.ObjectId.isValid(id)) {
-//     throw new ErrorHandler(`Invalid Cooperative ID: ${id}`, 400);
-//   }
-
-//   const coopInfo = await Farm.findOne({ user: id });
-//   if (!coopInfo) {
-//     throw new ErrorHandler(`Cooperative not found with ID: ${id}`, 404);
-//   }
-
-//   console.log("✅ Cooperative ID:", coopInfo._id);
-
-//   try {
-//     // Fetch Orders
-//     const orders = await Order.find({ "orderItems.coopUser": coopInfo._id })
-//       .populate("orderItems.product")
-//       .lean();
-
-//     console.log("📦 Fetched Orders:", orders.length);
-
-//     // Total Sales Revenue
-//     const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
-//     console.log("💰 Total Revenue:", totalRevenue);
-
-//     // Total Orders
-//     const totalOrders = orders.length;
-//     console.log("📊 Total Orders:", totalOrders);
-
-//     // Average Order Value (AOV)
-//     const averageOrderValue = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
-//     console.log("📉 Average Order Value:", averageOrderValue);
-
-//     // Total Customers
-//     const totalCustomers = new Set(orders.map(order => order.user.toString())).size;
-//     console.log("👥 Total Customers:", totalCustomers);
-
-//     // Order Status Breakdown
-//     const orderStatusCounts = orders.reduce((acc, order) => {
-//       acc[order.orderStatus] = (acc[order.orderStatus] || 0) + 1;
-//       return acc;
-//     }, {});
-
-//     const orderStatus = {
-//       completed: orderStatusCounts["Delivered"] || 0,
-//       cancelled: orderStatusCounts["Cancelled"] || 0,
-//       refunded: orderStatusCounts["Refunded"] || 0,
-//       failed: orderStatusCounts["Failed"] || 0,
-//     };
-
-//     console.log("📌 Order Status Breakdown:", orderStatus);
-
-//     // Sales Over Time (Daily for the past month)
-//     const salesOverTime = await Order.aggregate([
-//       {
-//         $match: {
-//           "orderItems.coopUser": coopInfo._id,
-//           "orderItems.orderStatus": "Delivered",
-//           createdAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 30)) }
-//         }
-//       },
-//       {
-//         $group: {
-//           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
-//           totalSales: { $sum: "$totalPrice" },
-//           totalOrders: { $sum: 1 }
-//         }
-//       },
-//       { $sort: { _id: 1 } }
-//     ]);
-
-//     console.log("📆 Sales Over Time (Daily):", salesOverTime);
-
-//     // Cumulative Sales Over Time
-//     let cumulativeSales = 0;
-//     let cumulativeOrders = 0;
-//     const cumulativeSalesOverTime = salesOverTime.map((day) => {
-//       cumulativeSales += day.totalSales;
-//       cumulativeOrders += day.totalOrders;
-//       return { date: day._id, totalSales: cumulativeSales, totalOrders: cumulativeOrders };
-//     });
-
-//     console.log("📈 Cumulative Sales Over Time:", cumulativeSalesOverTime);
-
-//     // Top 5 Selling Products
-//     const productSales = await Order.aggregate([
-//       { $unwind: "$orderItems" },
-//       { $match: { "orderItems.coopUser": coopInfo._id, "orderItems.orderStatus": "Delivered" } },
-//       {
-//         $group: {
-//           _id: "$orderItems.product",
-//           totalQuantitySold: { $sum: "$orderItems.quantity" },
-//         },
-//       },
-//       {
-//         $lookup: {
-//           from: "products",
-//           localField: "_id",
-//           foreignField: "_id",
-//           as: "productDetails",
-//         },
-//       },
-//       { $unwind: "$productDetails" },
-//       {
-//         $project: {
-//           productId: "$_id",
-//           productName: "$productDetails.productName",
-//           totalQuantitySold: 1,
-//         },
-//       },
-//       { $sort: { totalQuantitySold: -1 } },
-//       { $limit: 5 }
-//     ]);
-
-//     console.log("🔥 Top 5 Selling Products:", productSales);
-
-//     return {
-//       totalRevenue,
-//       totalOrders,
-//       averageOrderValue,
-//       totalCustomers,
-//       orderStatus,
-//       salesOverTime,
-//       cumulativeSalesOverTime,
-//       topSellingProducts: productSales,
-//     };
-//   } catch (error) {
-//     console.error("❌ Error fetching dashboard data:", error);
-//     throw new ErrorHandler("Error processing dashboard data", 500);
-//   }
-// };
-
 exports.getCoopDashboardData = async (userId) => {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new ErrorHandler(`Invalid User ID: ${userId}`, 400);
@@ -1119,11 +710,11 @@ exports.getCoopDashboardData = async (userId) => {
     console.log("💰 Total Revenue:", totalRevenue);
 
     // Total Deliveries
-    const totalOrders = deliveries.length;
+    const totalOrders = deliveredDeliveries.length;
     console.log("📊 Total Deliveries:", totalOrders);
 
     // Total Customers
-    const totalCustomers = new Set(deliveries.map((d) => d.userId.toString())).size;
+    const totalCustomers = new Set(deliveredDeliveries.map((d) => d.userId.toString())).size;
     console.log("👥 Total Customers:", totalCustomers);
 
     // Order Status Counts
@@ -1364,82 +955,111 @@ console.log("📅 Sales Per Year:", formattedSalesPerYear);
 
 exports.getOverallDashboardData = async () => {
   try {
-    // Fetch only delivered orders
-    const orders = await Order.find({ "orderItems.orderStatus": "Delivered" })
-      .populate("orderItems.product")
-      .lean();
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
 
-    const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
-    const totalOrders = orders.length;
-
-    // Top 5 best-selling products based on delivered orders
-    const rankedProducts = await Order.aggregate([
-      { $unwind: "$orderItems" },
-      { $match: { "orderItems.orderStatus": "Delivered" } },
-      {
-        $group: {
-          _id: "$orderItems.product",
-          totalQuantitySold: { $sum: "$orderItems.quantity" },
+    // Fetch only delivered deliveries
+    const deliveries = await Delivery.find({ status: "delivered" })
+      .populate({
+        path: "orderId",
+        populate: {
+          path: "orderItems.product",
+          model: "product",
         },
-      },
-      { $sort: { totalQuantitySold: -1 } },
-      { $limit: 5 },
-      {
-        $lookup: {
-          from: "products",
-          localField: "_id",
-          foreignField: "_id",
-          as: "productDetails",
-        },
-      },
-      { $unwind: "$productDetails" },
-      {
-        $project: {
-          _id: 0,
-          productId: "$_id",
-          productName: "$productDetails.productName",
-          totalQuantitySold: 1,
-        },
-      },
-    ]);
+      })
+      .populate("coopId");
 
-    const currentDate = new Date();
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
+    console.log("Total Delivered Deliveries:", deliveries.length);
 
-    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(currentDate.getDate() - 7);
-    sevenDaysAgo.setHours(0, 0, 0, 0);
+    const filterByDate = (date) => deliveries.filter(d => new Date(d.createdAt) >= date);
 
-    // Sales trends (only delivered orders)
-    const dailySales = await Order.aggregate([
-      { $match: { "orderItems.orderStatus": "Delivered", createdAt: { $gte: startOfDay } } },
-      { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
-    ]);
+    const calcRevenue = (items) => items.reduce((sum, item) => sum + item.totalAmount, 0);
 
-    const weeklySales = await Order.aggregate([
-      { $match: { "orderItems.orderStatus": "Delivered", createdAt: { $gte: sevenDaysAgo } } },
-      { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
-    ]);
+    const dailyDeliveries = filterByDate(startOfDay);
+    const weeklyDeliveries = filterByDate(startOfWeek);
+    const monthlyDeliveries = filterByDate(startOfMonth);
+    const yearlyDeliveries = filterByDate(startOfYear);
 
-    const monthlySales = await Order.aggregate([
-      { $match: { "orderItems.orderStatus": "Delivered", createdAt: { $gte: startOfMonth } } },
-      { $group: { _id: null, revenue: { $sum: "$totalPrice" } } },
-    ]);
+    const dailySales = calcRevenue(dailyDeliveries);
+    const weeklySales = calcRevenue(weeklyDeliveries);
+    const monthlySales = calcRevenue(monthlyDeliveries);
+    const yearlySales = calcRevenue(yearlyDeliveries);
+
+    console.log("Daily Sales:", dailySales);
+    console.log("Weekly Sales:", weeklySales);
+    console.log("Monthly Sales:", monthlySales);
+    console.log("Yearly Sales:", yearlySales);
+
+    const totalRevenue = calcRevenue(deliveries);
+    const totalOrders = deliveries.length;
+
+    console.log("Total Revenue:", totalRevenue);
+    console.log("Total Orders:", totalOrders);
+
+    // Flatten all orderItems
+    const allOrderItems = deliveries.flatMap(delivery => delivery.orderId?.orderItems || []);
+    const productSalesMap = new Map();
+
+    allOrderItems.forEach(item => {
+      if (item.product) {
+        const key = item.product._id.toString();
+        if (!productSalesMap.has(key)) {
+          productSalesMap.set(key, {
+            productId: key,
+            productName: item.product.productName,
+            totalQuantitySold: 0,
+          });
+        }
+        productSalesMap.get(key).totalQuantitySold += item.quantity;
+      }
+    });
+
+    const rankedProducts = Array.from(productSalesMap.values())
+      .sort((a, b) => b.totalQuantitySold - a.totalQuantitySold)
+      .slice(0, 5);
+
+    console.log("Top Selling Products:", rankedProducts);
+
+    // Top Coops based on revenue
+    const coopRevenueMap = new Map();
+
+    deliveries.forEach(delivery => {
+      const coopId = delivery.coopId?._id?.toString();
+      if (!coopId) return;
+      if (!coopRevenueMap.has(coopId)) {
+        coopRevenueMap.set(coopId, {
+          coopId: coopId,
+          coopName: delivery.coopId.farmName,
+          totalRevenue: 0,
+        });
+      }
+      coopRevenueMap.get(coopId).totalRevenue += delivery.totalAmount;
+    });
+
+    const topCoops = Array.from(coopRevenueMap.values())
+      .sort((a, b) => b.totalRevenue - a.totalRevenue)
+      .slice(0, 5);
+
+    console.log("Top Coops:", topCoops);
 
     return {
+      salesTrends: {
+        daily: dailySales,
+        weekly: weeklySales,
+        monthly: monthlySales,
+        yearly: yearlySales,
+      },
       totalRevenue,
       totalOrders,
       rankedProducts,
-      salesTrends: {
-        daily: dailySales[0]?.revenue || 0,
-        weekly: weeklySales[0]?.revenue || 0,
-        monthly: monthlySales[0]?.revenue || 0,
-      },
+      topCoops,
     };
   } catch (error) {
-    console.error("Error fetching overall dashboard data:", error);
+    console.error("Error fetching dashboard data:", error);
     throw new Error("Error processing dashboard data");
   }
 };
@@ -1537,7 +1157,6 @@ exports.onlinePaymentProcess = async (req, res) => {
   }
 };
 
- 
 exports.getPaymentIntentProcess = async (id) => {
     try {
       const { data } = await axios.get(`https://api.paymongo.com/v1/payment_intents/${id}`, {

@@ -61,6 +61,7 @@ const UserSidebar = () => {
     { label: "Reviews", icon: "star-outline", key: "reviews" },
     { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Discussion", icon: "create-outline", key: "Forum" },
+    { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     
    
   ]
@@ -75,7 +76,8 @@ const UserSidebar = () => {
     { label: "Categories", icon: "list-outline", key: "category" },
     { label: "Types", icon: "layers-outline", key: "types" },
     { label: "Withdraws", icon: "wallet-outline", key: "withdraws" },
-    { label: "Refund", icon: "refresh-outline", key: "refund" }
+    { label: "Refund", icon: "refresh-outline", key: "refund" },
+    { label: "Tutorial", icon: "book-outline", key: "tutorial" },
    
   ];
 
@@ -90,6 +92,7 @@ const UserSidebar = () => {
     { label: "Deliveries", icon: "cube-outline", key: "deliveries" },
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "History", icon: "time-outline", key: "history" },
+    { label: "Tutorial", icon: "book-outline", key: "tutorial" },
   ]
 
   const handlePress = (key) => {
@@ -161,9 +164,10 @@ const UserSidebar = () => {
     } else if (key === "inventory"){
       navigation.navigate("InventoryList");
     } else if (key === "wallet"){
-      navigation.navigate("WithdrawList")
+      navigation.navigate("WithdrawList");
+    } else if (key === "tutorial") {
+      navigation.navigate("Tutorial");
     }
-    
 
     // Add other navigation conditions for different items
   };
@@ -193,6 +197,8 @@ const UserSidebar = () => {
       navigation.navigate("WithdrawsList")
     } else if (key === "refund"){
       navigation.navigate("RefundProcess")
+    } else if (key === "tutorial") {
+      navigation.navigate("Tutorial");
     }
   };
 
@@ -205,6 +211,8 @@ const UserSidebar = () => {
       navigation.navigate("Profile");
     } else if (key === "history") {
       navigation.navigate("History");
+    }else if (key === "tutorial") {
+      navigation.navigate("Tutorial");
     }
   }
 
@@ -213,8 +221,6 @@ const UserSidebar = () => {
     socket.emit("removeUser", socket?.id);
     console.log("User disconnected from socket.");
   };
-
-
 
   return (
     <View style={styles.container}>
@@ -525,5 +531,6 @@ const UserSidebar = () => {
     </View>
   );
 };
+
 
 export default UserSidebar;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   Image,
 } from "react-native";
+import AuthGlobal from "@redux/Store/AuthGlobal";
 
 // Your tutorial video data
 const tutorialVideos = [
@@ -24,14 +25,70 @@ const tutorialVideos = [
     title: "User Registration",
     youtubeUrl: "https://youtube.com/shorts/0dMjcAPXu9c",
     thumbnail: require('@/assets/images/registration.png'), // Local image path
+  },{
+    id: "3",
+    title: "Buying Products",
+    youtubeUrl: "https://youtube.com/shorts/p3MGIlqlPLo",
+    thumbnail: require('@/assets/images/buy-product.jpg'), // Local image path
+  },
+  {
+    id: "4",
+    title: "Product and Seller Review",
+    youtubeUrl: "https://youtube.com/shorts/0dMjcAPXu9c",
+    thumbnail: require('@/assets/images/productseller-review.jpg'), // Local image path
+  },{
+    id: "5",
+    title: "Member Registration",
+    youtubeUrl: "https://youtube.com/shorts/p3MGIlqlPLo",
+    thumbnail: require('@/assets/images/member-registration.jpg'), // Local image path
+  },
+  {
+    id: "6",
+    title: "Cooperative Registration",
+    youtubeUrl: "https://youtube.com/shorts/0dMjcAPXu9c",
+    thumbnail: require('@/assets/images/registercooperative.jpg'), // Local image path
+  },{
+    id: "7",
+    title: "Driver",
+    youtubeUrl: "https://youtube.com/shorts/p3MGIlqlPLo",
+    thumbnail: require('@/assets/images/driver.jpg'), // Local image path
+  },
+  {
+    id: "8",
+    title: "Cooperative",
+    youtubeUrl: "https://youtube.com/shorts/0dMjcAPXu9c",
+    thumbnail: require('@/assets/images/cooperative.jpg'), // Local image path
   },
 ];
 
 // Main component
 const Tutorial = () => {
   const [searchText, setSearchText] = useState("");
+  const context = useContext(AuthGlobal);
+  const userRole = context?.stateUser?.userProfile || null;
 
-  const filteredVideos = tutorialVideos.filter((video) =>
+  // Filter videos based on role
+  const accessibleVideos = tutorialVideos.filter((video) => {
+    if (
+      context?.stateUser?.isAuthenticated &&
+      userRole?.roles.includes("Customer") &&
+      userRole?.roles.includes("Cooperative")
+    ) {
+      return true; // Coop can view all videos
+    } else if (context?.stateUser?.isAuthenticated &&
+      userRole?.roles.includes("Admin")) {
+      return true; 
+    } else if (context?.stateUser?.isAuthenticated &&
+      userRole?.roles.includes("Rider")) {
+      return parseInt(video.id) <= 7; 
+    } else if (context?.stateUser?.isAuthenticated &&
+      userRole?.roles.includes("Customer")) {
+      return parseInt(video.id) <= 6; 
+    }
+  });
+
+  // Apply search filter on accessible videos
+  const filteredVideos = accessibleVideos.filter((video) =>
     video.title.toLowerCase().includes(searchText.toLowerCase())
   );
 
@@ -41,25 +98,23 @@ const Tutorial = () => {
     );
   };
 
-  const renderItem = ({ item }) => {
-    return (
-      <TouchableOpacity
-        style={styles.videoItem}
-        onPress={() => handleOpenLink(item.youtubeUrl)}
-      >
-        <Image
-          source={item.thumbnail}  // Using local image here
-          style={styles.thumbnail}
-          resizeMode="cover"
-        />
-      </TouchableOpacity>
-    );
-  };
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.videoItem}
+      onPress={() => handleOpenLink(item.youtubeUrl)}
+    >
+      <Image
+        source={item.thumbnail}
+        style={styles.thumbnail}
+        resizeMode="cover"
+      />
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.header}>📺 Tutorial Videos</Text>
+        <Text style={styles.header}> Tutorial Videos </Text>
 
         <TextInput
           style={styles.searchInput}
@@ -74,13 +129,14 @@ const Tutorial = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={renderItem}
-          numColumns={2} // Display two videos per row
-          columnWrapperStyle={styles.row} // Styling for each row
+          numColumns={2}
+          columnWrapperStyle={styles.row}
         />
       </View>
     </SafeAreaView>
   );
 };
+
 
 // Styles
 const styles = StyleSheet.create({
