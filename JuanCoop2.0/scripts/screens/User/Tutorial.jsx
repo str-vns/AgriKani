@@ -79,12 +79,14 @@ const Tutorial = () => {
       userRole?.roles.includes("Admin")) {
       return true; 
     } else if (context?.stateUser?.isAuthenticated &&
-      userRole?.roles.includes("Rider")) {
+      userRole?.roles.includes("Driver")) {
       return parseInt(video.id) <= 7; 
     } else if (context?.stateUser?.isAuthenticated &&
       userRole?.roles.includes("Customer")) {
       return parseInt(video.id) <= 6; 
-    }
+    }else {
+    return parseInt(video.id) <= 6;
+  }
   });
 
   // Apply search filter on accessible videos

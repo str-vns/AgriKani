@@ -219,36 +219,47 @@ const FarmerDashboard = () => {
     }
     dispatch(inventoryDashboard(invItem, token))
   }
-  const [selectedRange, setSelectedRange] = useState("day");
+  const [selectedRange, setSelectedRange] = useState("daily");
 
-  const salesData = {
-    daily: dashboard?.salesPerDay || [],
-    monthly: dashboard?.salesPerMonth || [],
-    yearly: dashboard?.salesPerYear || [],
+  const salesData = () => {
+    switch (selectedRange) {
+    case "daily":
+    return dashboard?.formattedSalesPerDay || [];
+    case "monthly":
+      return dashboard?.formattedSalesPerMonth || [];
+    case "yearly":
+      return dashboard?.formattedSalesPerYear || [];
+    default:
+      return dashboard?.formattedSalesPerDay || [];
+    }
   };
 
   console.log("Sales Data:", salesData); 
   
   const formatLabel = (id) => {
-    if (!id || typeof id !== "object") return String(id);
-
-    const monthNames = [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-    ];
-
     switch (selectedRange) {
-      case "daily":
-        // Use dayOfMonth instead of day
-        return `${monthNames[id.month - 1]} ${id.dayOfMonth}`; // e.g., May 10
-      case "monthly":
-        return monthNames[id.month - 1]; // e.g., May
-      case "yearly":
-        return `${id.year}`; // e.g., 2024
-      default:
-        return JSON.stringify(id);
+    case "daily":
+      return "day"; // "May 1", "May 2", etc.
+    case "monthly":
+      return "month"; // "April 2025", "May 2025", etc.
+    case "yearly":
+      return "year"; // "2025"
+    default:
+      return "day";
     }
   };
+
+  const COLORS = ["#FFD700", "#FFA500", "#FF8C00"]; // Gold, Orange, Dark Orange
+
+  const orderStatusData = Object.entries(dashboard?.orderStatusCounts || {}).map(
+    ([status, count], index) => ({
+      name: `${status} (${count})`, // 👈 Include count in label
+      population: count,
+      color: COLORS[index % COLORS.length],
+      legendFontColor: "#333",
+      legendFontSize: 12,
+    })
+  );
 
 
   const currentSales = salesData[selectedRange];
@@ -294,7 +305,23 @@ async function requestStoragePermission() {
   return true;
 }
 
-  
+const chartData = {
+  labels: salesData().map((item) => item[formatLabel(selectedRange)]),
+  datasets: [
+    {
+      data: salesData().map((item) => item.totalSales),
+    },
+  ],
+};
+
+const filteredChartData = {
+  labels: chartData.labels.filter((_, index) => chartData.datasets[0].data[index] > 0),
+  datasets: [
+    {
+      data: chartData.datasets[0].data.filter((value) => value > 0),
+    },
+  ],
+};
 
 
   const handleDownload = async () => {
@@ -492,10 +519,11 @@ async function requestStoragePermission() {
         {/* Dashboard Header */}
         <View style={styles.coopdashboardHeader}>
           <Text style={styles.coopdashboardTitle}>
-            🚀 Cooperative Dashboard
+            Cooperative Dashboard
           </Text>
         </View>
 
+        {/* Weather Section */}
         <View style={styles.weatherContainer}>
           {weather !== null ? (
             <View style={styles.weatherBox}>
@@ -581,11 +609,11 @@ async function requestStoragePermission() {
         <View style={styles.coopdashboardSummaryContainer}>
           {[
             {
-              title: "💰 Sales",
-              value: `₱${dashboard?.totalRevenue?.toLocaleString()}`,
+              title: "Total Revenue",
+              value: `₱ ${Number(dashboard?.totalRevenue || 0).toFixed(2)}`,
             },
-            { title: "📊 Orders", value: dashboard?.totalOrders },
-            { title: "👥 Customers", value: dashboard?.totalCustomers },
+            { title: "Orders", value: dashboard?.totalOrders },
+            { title: "Customers", value: dashboard?.totalCustomers },
           ].map((item, index) => (
             <View key={index} style={styles.coopdashboardSummaryCard}>
               <Text style={styles.coopdashboardSummaryTitle}>{item.title}</Text>
@@ -595,87 +623,83 @@ async function requestStoragePermission() {
         </View>
 
         {/* Order Status Breakdown */}
-        {dashboard?.orderStatusCounts && (
-          <PieChart
-            data={Object.entries(dashboard.orderStatusCounts).map(
-              ([status, count], index) => ({
-                name: status,
-                population: count,
-                color: ["#FFD700", "#FFB703", "#FB8500", "#219EBC"][index % 4],
-                legendFontColor: "#333",
-                legendFontSize: 12,
-              })
-            )}
-            width={screenWidth - 20}
-            height={220}
-            chartConfig={{
-              backgroundGradientFrom: "#fff",
-              backgroundGradientTo: "#fff",
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(255, 99, 71, ${opacity})`,
-            }}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="15"
-          />
-        )}
+        <PieChart
+          data={orderStatusData}
+          width={screenWidth - 20}
+          height={220}
+          chartConfig={{
+            backgroundGradientFrom: "#fff",
+            backgroundGradientTo: "#fff",
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(255, 99, 71, ${opacity})`,
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+          paddingLeft="15"
+        />
+
+
 
         {/* Sales Overview */}
-        <View style={styles.coopdashboardSalesContainer}>
           <View style={styles.coopdashboardSalesContainer}>
-      <View style={styles.coopdashboardHeader}>
-        <Text style={styles.coopdashboardSalesTitle}>📊 Sales Overview</Text>
-        <Picker
-          selectedValue={selectedRange}
-          style={styles.coopdashboardPicker}
-          onValueChange={(itemValue) => setSelectedRange(itemValue)}
-        >
-          <Picker.Item label="Daily" value="daily" />
-          <Picker.Item label="Monthly" value="monthly" />
-          <Picker.Item label="Yearly" value="yearly" />
-        </Picker>
-      </View>
+            <View style={styles.coopdashboardHeader}>
+              <Text style={styles.coopdashboardSalesTitle}>Sales Overview</Text>
+              <Picker
+                selectedValue={selectedRange}
+                style={styles.coopdashboardPicker}
+                onValueChange={(itemValue) => setSelectedRange(itemValue)}
+              >
+                <Picker.Item label="Daily" value="daily" />
+                <Picker.Item label="Monthly" value="monthly" />
+                <Picker.Item label="Yearly" value="yearly" />
+              </Picker>
+            </View>
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: 20,
+                  fontWeight: "600",
+                  marginBottom: 10,
+                  color: "#333",
+                }}
+              >
+                Sales ({selectedRange.charAt(0).toUpperCase() + selectedRange.slice(1)})
+              </Text>
 
-      {currentSales?.length > 0 ? (
-        <BarChart
-          data={{
-            labels: currentSales?.map((entry) => formatLabel(entry._id)),
-            datasets: [
-              {
-                data: currentSales?.map((entry) => entry.totalSales),
-              },
-            ],
-          }}
-          
-          width={screenWidth - 50}
-          height={220}
-          yAxisLabel="₱"
-          chartConfig={{
-            backgroundGradientFrom: "white",
-            backgroundGradientTo: "white",
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(255, 165, 0, ${opacity})`, // orange
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            propsForBackgroundLines: {
-              stroke: "#E5E7EB", // gray-200
-            },
-          }}
-          style={styles.coopdashboardChart}
-        />
-        
-      ) : (
-        <Text style={styles.coopdashboardNoDataText}>
-          No sales data available for this period.
-        </Text>
-      )}
-        </View>
+              <BarChart
+                data={filteredChartData}
+                width={300}
+                height={240}
+                yAxisLabel="₱"
+                chartConfig={{
+                  backgroundGradientFrom: "#ffffff",
+                  backgroundGradientTo: "#ffffff",
+                  decimalPlaces: 2,
+                  color: (opacity = 1) => `rgba(204, 153, 0, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  barPercentage: 0.6,
+                  propsForBackgroundLines: {
+                    strokeDasharray: "", // solid lines
+                    stroke: "#e3e3e3",
+                  },
+                }}
+                style={{
+                  borderRadius: 16,
+                  elevation: 3, // Android shadow
+                  shadowColor: "#000", // iOS shadow
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  backgroundColor: "#fff",
+                }}
+              />
         </View>
 
       {/* Inventory Overview */}
         <View style={styles.invContainer}>
           <View style={styles.coopdashboardHeader}>
             <Text style={styles.coopdashboardSalesTitle}>
-              📊 Inventory Overview
+              Inventory Overview
             </Text>
             <Text style={styles.coopdashboardSalesTitle}>
             {InvDash?.[0]?.currentDay}
@@ -734,7 +758,7 @@ async function requestStoragePermission() {
         {dashboard?.topSellingProducts?.length > 0 && (
           <View style={styles.coopdashboardTopProductsContainer}>
             <Text style={styles.coopdashboardTopProductsTitle}>
-              🔥 Top 5 Selling Products
+              Top 5 Selling Products
             </Text>
             {dashboard.topSellingProducts.map((product, index) => (
               <View
