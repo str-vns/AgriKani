@@ -45,7 +45,7 @@ const getPaymentStatus = async (paymentIntentId) => {
   try {
     const { data } = await axios.get(`https://api.paymongo.com/v1/payment_intents/${paymentIntentId}`, {
       headers: {
-        Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString('base64')}`, 
+        Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_TEST_KEY).toString('base64')}`, 
       },
     });
 

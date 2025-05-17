@@ -17,7 +17,7 @@ const fs = require("fs");
 const { sendEmail } = require("../utils/sendMail");
 const admin = require('firebase-admin');
 const Paymongo = require('paymongo');
-const paymongoInstance = new Paymongo(process.env.PAYMONGO_SECRET_KEY);
+const paymongoInstance = new Paymongo(process.env.PAYMONGO_TEST_KEY);
 const axios = require("axios");
 
 
@@ -1161,7 +1161,7 @@ exports.getPaymentIntentProcess = async (id) => {
     try {
       const { data } = await axios.get(`https://api.paymongo.com/v1/payment_intents/${id}`, {
         headers: {
-          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_SECRET_KEY).toString('base64')}`, 
+          Authorization: `Basic ${Buffer.from(process.env.PAYMONGO_TEST_KEY).toString('base64')}`, 
         },
       });
       console.log("Payment Intent Data:", data);
