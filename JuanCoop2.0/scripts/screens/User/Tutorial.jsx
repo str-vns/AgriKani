@@ -17,46 +17,46 @@ const tutorialVideos = [
   {
     id: "1",
     title: "App Preview",
-    youtubeUrl: "https://youtube.com/shorts/p3MGIlqlPLo",
+    youtubeUrl: "https://youtube.com/shorts/QJWAUgfOl2Y",
     thumbnail: require('@/assets/images/app-preview.png'), // Local image path
   },
   {
     id: "2",
     title: "User Registration",
-    youtubeUrl: "https://youtube.com/shorts/0dMjcAPXu9c",
+    youtubeUrl: "https://youtube.com/shorts/Ok3cyA1YXsk",
     thumbnail: require('@/assets/images/registration.png'), // Local image path
   },{
     id: "3",
     title: "Buying Products",
-    youtubeUrl: "https://youtube.com/shorts/p3MGIlqlPLo",
+    youtubeUrl: "https://youtube.com/shorts/sryLBjrtbrU",
     thumbnail: require('@/assets/images/buy-product.jpg'), // Local image path
   },
   {
     id: "4",
     title: "Product and Seller Review",
-    youtubeUrl: "https://youtube.com/shorts/0dMjcAPXu9c",
+    youtubeUrl: "https://youtube.com/shorts/Ljuil2emvCw",
     thumbnail: require('@/assets/images/productseller-review.jpg'), // Local image path
   },{
     id: "5",
     title: "Member Registration",
-    youtubeUrl: "https://youtube.com/shorts/p3MGIlqlPLo",
+    youtubeUrl: "https://youtube.com/shorts/-3VdhDW-eGI",
     thumbnail: require('@/assets/images/member-registration.jpg'), // Local image path
   },
   {
     id: "6",
     title: "Cooperative Registration",
-    youtubeUrl: "https://youtube.com/shorts/0dMjcAPXu9c",
+    youtubeUrl: "https://youtube.com/shorts/rWtvavuibQQ",
     thumbnail: require('@/assets/images/registercooperative.jpg'), // Local image path
   },{
     id: "7",
     title: "Driver",
-    youtubeUrl: "https://youtube.com/shorts/p3MGIlqlPLo",
+    youtubeUrl: "https://youtu.be/iJf3eyboBJo",
     thumbnail: require('@/assets/images/driver.jpg'), // Local image path
   },
   {
     id: "8",
     title: "Cooperative",
-    youtubeUrl: "https://youtube.com/shorts/0dMjcAPXu9c",
+    youtubeUrl: "https://youtu.be/1WZ4CEtPixc?si=UrGgPS_zPG3SXjiW",
     thumbnail: require('@/assets/images/cooperative.jpg'), // Local image path
   },
 ];
