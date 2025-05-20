@@ -51,9 +51,15 @@ const Register = () => {
   const [errors, setErrors] = useState(null);
   const [checked, setChecked] = useState(false);
   const [termsModalVisible, setTermsModalVisible] = useState(false);
+  const [privacyPolicyVisible, setPrivacyPolicyVisible] = useState(false);
   const handleTermCondition = () => {
     setTermsModalVisible(true);
   };
+
+  const handlePrivacyPolicy = () => {
+    setPrivacyPolicyVisible(true);
+  };
+
   useEffect(() => {
     (async () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
@@ -542,13 +548,257 @@ const Register = () => {
               </View>
             </View>
           </Modal>
+
+              <Modal
+                      animationType="slide"
+                      transparent={true}
+                      visible={privacyPolicyVisible}
+                      onRequestClose={() => setPrivacyPolicyVisible(false)}
+                    >
+                      <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                          <Text style={styles.modalText}>Privacy Policy</Text>
+          
+                          {/* Scrollable Content */}
+                          <ScrollView style={{ padding: 20 }}>
+                            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                              JuanKooP Rider Terms and Conditions
+                            </Text>
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 10 }}
+                            >
+                              Effective Date:
+                            </Text>
+                            <Text>Effective Date: May 13, 2025</Text>
+          
+                            <Text style={{ marginTop: 15 }}>
+                              Platform Name: JuanKooP{"\n"}
+                              Website: https://juancoopweb.onrender.com{"\n"}
+                              Entity Type: Business{"\n"}
+                              Jurisdiction: Philippines
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              1. Introduction
+                            </Text>
+                            <Text>
+                              JuanKooP (“we,” “our,” “us”) values your privacy and is
+                              committed to protecting the personal information you provide
+                              to us. This Privacy Policy explains how we collect, use,
+                              disclose, and safeguard your information when you use our
+                              website or mobile application (the “Platform”).
+                            </Text>
+          
+                            <Text style={{ marginTop: 15 }}>
+                              By accessing or using JuanKooP, you agree to the terms of
+                              this Privacy Policy and consent to the collection and
+                              processing of your personal data in accordance with Republic
+                              Act No. 10173, also known as the Data Privacy Act of 2012.
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              2. Information We Collect
+                            </Text>
+          
+                            <Text style={{ marginTop: 10 }}>
+                              We collect personal and business information necessary to
+                              provide our services, verify cooperative identity,
+                              facilitate transactions, and support platform
+                              functionalities.
+                            </Text>
+          
+                            <Text style={{ marginTop: 10, fontWeight: "bold" }}>
+                              Personal Information We Collect May Include:
+                            </Text>
+          
+                            <Text>
+                              • Full Name{"\n"}• Email Address{"\n"}• Phone Number{"\n"}•
+                              Residential or Business Address{"\n"}• Age{"\n"}• Uploaded
+                              Images or Profile Photos{"\n"}• Business Documents and
+                              Permits
+                            </Text>
+          
+                            <Text style={{ marginTop: 10, fontWeight: "bold" }}>
+                              Device and Technical Data:
+                            </Text>
+          
+                            <Text>
+                              • Geolocation (to enable delivery, mapping, and cooperative
+                              visibility){"\n"}• Camera Access (to capture photos for
+                              profiles or documentation){"\n"}• Photo Gallery Access (to
+                              select images for uploads){"\n"}• Local Storage and Sessions
+                              (to manage user preferences and session data)
+                            </Text>
+          
+                            <Text style={{ marginTop: 10 }}>
+                              We do not use cookies, ad trackers, or analytics software.
+                              We also do not send marketing newsletters or promotional
+                              messages.
+                            </Text>
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              3. How We Use Your Information
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              Your personal data may be used for the following purposes:
+                            </Text>
+                            <Text>
+                              • To create and manage user or cooperative accounts{"\n"}•
+                              To verify user identity and cooperative legitimacy{"\n"}• To
+                              process product listings, orders, and online payments{"\n"}•
+                              To enable delivery tracking and geolocation-based services
+                              {"\n"}• To allow access to features such as the forum,
+                              reviews, and analytics tools{"\n"}• To ensure the safety,
+                              security, and performance of the platform
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              4. Online Payments
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              Our platform accepts online payments. All transactions are
+                              processed securely through third-party payment providers. We
+                              do not store or directly access any sensitive financial
+                              information such as credit or debit card details.
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              5. Data Sharing and Disclosure
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              We do not sell or rent your personal data to third parties.
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              We may share your information only when necessary:
+                            </Text>
+                            <Text>
+                              • With third-party service providers (e.g., payment
+                              gateways, cloud hosting){"\n"}• To comply with legal
+                              obligations or respond to lawful requests{"\n"}• With your
+                              explicit consent for cooperative visibility or public
+                              profiles
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              6. Social Login
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              JuanKooP allows users to log in using Google Login for
+                              convenience and account security. No additional social media
+                              data is collected or shared beyond authentication.
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              7. Children’s Privacy
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              Our platform is not intended for children under the age of
+                              13. We do not knowingly collect or process personal
+                              information from individuals below this age.
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              8. Your Rights Under the Data Privacy Act
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              As a data subject under the Data Privacy Act of 2012, you
+                              have the right to:
+                            </Text>
+                            <Text>
+                              • Access and request a copy of your personal data{"\n"}•
+                              Correct inaccurate or outdated information{"\n"}• Object to
+                              processing under certain conditions{"\n"}• Request deletion
+                              or blocking of data (subject to legal requirements){"\n"}•
+                              Withdraw consent at any time{"\n"}• Lodge a complaint with
+                              the National Privacy Commission (NPC)
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              To exercise any of these rights, you may contact us using
+                              the details below.
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              9. Data Security and Retention
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              We implement administrative, technical, and physical
+                              safeguards to protect your personal data against
+                              unauthorized access, loss, or misuse. Your data is retained
+                              only for as long as necessary to fulfill the purposes for
+                              which it was collected, or as required by law.
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              10. Changes to This Policy
+                            </Text>
+                            <Text style={{ marginTop: 10 }}>
+                              We may update this Privacy Policy periodically to reflect
+                              changes in our operations or legal requirements. Updated
+                              versions will be posted on this page with a new effective
+                              date. Continued use of the platform indicates your
+                              acceptance of any revisions.
+                            </Text>
+          
+                            <Text
+                              style={{ fontSize: 16, fontWeight: "bold", marginTop: 20 }}
+                            >
+                              11. Contact Us
+                            </Text>
+                            <Text style={{ marginTop: 10, marginBottom: 20 }}>
+                              If you have any questions, requests, or concerns about this
+                              Privacy Policy or our data handling practices, you may
+                              contact us at:
+                              <Text style={{ marginTop: 10 }}>
+                                {" "}
+                                📧 Email: agrikaani@gmail.com
+                              </Text>
+                            </Text>
+                          </ScrollView>
+          
+                          {/* Close Button */}
+                          <TouchableOpacity
+                            style={styles.closeButton}
+                            onPress={() => setPrivacyPolicyVisible(false)}
+                          >
+                            <Text style={styles.buttonText}>Close</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </Modal>
+
           <Text style={styles.text}>
             I accept the{" "}
             <Text
               style={[styles.linkText, { textDecorationLine: "underline" }]}
               onPress={handleTermCondition} // Open modal on click
             >
-              Terms and Conditions
+              Terms and Conditions 
+            </Text>
+            {" "}and{" "}
+            <Text
+              style={[styles.linkText, { textDecorationLine: "underline" }]}
+              onPress={handlePrivacyPolicy} 
+            >
+              Privacy Policy
             </Text>
           </Text>
         </View>

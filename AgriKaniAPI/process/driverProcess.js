@@ -130,6 +130,7 @@ exports.approveDriverProcess = async (id, req) => {
   driver.approvedAt = new Date();
 
   const user = await Farm.findById(driver.coopId).lean().exec();
+  const coopuser = await User.findById(user.user).lean().exec();
 
   const role = ROLE.DRIVER;
 
@@ -236,10 +237,11 @@ exports.approveDriverProcess = async (id, req) => {
   };
 
   await sendEmail(mailOptions);
+  
   await sendFcmNotification(
-    user,
+    coopuser,
     "Driver Approved",
-    "Your driver account has been approved",
+    `Your driver ${driver.firstName} ${driver.lastName} account has been approved`,
     req.body.fcmToken
   );
 
@@ -264,11 +266,12 @@ exports.disapproveDriverProcess = async (id, req) => {
     if (!driver) throw new ErrorHandler(`Driver not exist with ID: ${id}`);
 
     const user = await Farm.findById(driver.coopId).lean().exec();
+    const coopuser = await User.findById(user.user).lean().exec();
 
     await sendFcmNotification(
-      user,
+      coopuser,
       "Driver Disapproved",
-      "Your driver account has been disapproved due to incomplete information or not meeting the required criteria",
+      `Your driver ${driver.firstName} ${driver.lastName} account has been disapproved due to incomplete information or not meeting the required criteria`,
       req.body.fcmToken
     );
 
@@ -610,11 +613,14 @@ exports.getSingleDriverProcess = async (id) => {
 };
 
 const sendFcmNotification = async (user, title, content, fcmToken) => {
+  console.log('user', user);
   if (!user.deviceToken || user.deviceToken.length === 0) {
     console.log("No device tokens found for the user.");
     return;
   }
 
+  
+  console.log("Device tokens found for the user:", user);
   let registrationTokens = user.deviceToken;
   if (fcmToken) {
     registrationTokens = registrationTokens.filter(
