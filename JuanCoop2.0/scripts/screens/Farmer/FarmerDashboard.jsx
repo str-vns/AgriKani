@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, Fragment } from "react";
 import {
   View,
   Text,
@@ -521,9 +521,7 @@ const FarmerDashboard = () => {
         <View style={styles.weatherContainer}>
           {loadingWCurrent ? (
             <ActivityIndicator size="large" color="#4CAF50" />
-          ) : errorWCurrent ||
-            weatherCurrent === null ||
-            weatherCurrent.length === 0 ? (
+          ) : errorWCurrent || weatherCurrent === null ? (
             <Text style={styles.UnavailableText}>
               Weather is Unavailable Currently...
             </Text>
@@ -537,22 +535,22 @@ const FarmerDashboard = () => {
               <View style={styles.overlay}>
                 <Image
                   source={
-                    weatherIcons[weather?.data[0]?.weather?.icon] ||
+                    weatherIcons[weatherCurrent?.data[0]?.weather?.icon] ||
                     weatherIcons["default"]
                   }
                   style={styles.cloudImage}
                 />
                 <Text style={styles.weatherText}>
-                  City: {weather?.data[0].city_name}
+                  City: {weatherCurrent?.data[0].city_name}
                 </Text>
                 <Text style={styles.weatherText}>
-                  Temperature: {weather?.data[0].temp}°C
+                  Temperature: {weatherCurrent?.data[0].temp}°C
                 </Text>
                 <Text style={styles.weatherText}>
-                  Weather: {weather?.data[0].weather.description}
+                  Weather: {weatherCurrent?.data[0].weather.description}
                 </Text>
                 <Text style={styles.weatherText}>
-                  Wind Speed: {weather?.data[0].wind_spd} m/s
+                  Wind Speed: {weatherCurrent?.data[0].wind_spd} m/s
                 </Text>
               </View>
             </View>
@@ -561,14 +559,15 @@ const FarmerDashboard = () => {
           {loadingWDaily ? (
             <ActivityIndicator size="large" color="#4CAF50" />
           ) : errorWDaily ||
-            weatherDaily === null ||
-            weatherDaily.length === 0 ? (
+            !weatherDaily ||
+            !weatherDaily.data ||
+            weatherDaily.data.length === 0 ? (
             <Text style={styles.UnavailableText}>
               Weather is Unavailable Currently...
             </Text>
           ) : (
             <ScrollView horizontal={true}>
-              {dailyWeather.data.map((item, index) => (
+              {weatherDaily.data.map((item, index) => (
                 <View
                   key={item._id || index}
                   style={styles.dailyWeatherContainer}
@@ -606,7 +605,6 @@ const FarmerDashboard = () => {
               ))}
             </ScrollView>
           )}
-          
         </View>
 
         <View style={styles.coopdashboardSummaryContainer}>
@@ -772,17 +770,19 @@ const FarmerDashboard = () => {
               Top 5 Selling Products
             </Text>
             {dashboard.topSellingProducts.map((product, index) => (
-              <View
-                key={product.productId}
-                style={styles.coopdashboardTopProductRow}
-              >
-                <Text style={styles.coopdashboardTopProductText}>
-                  {index + 1}. {product.productName}
-                </Text>
-                <Text style={styles.coopdashboardTopProductText}>
-                  {product.totalSold} sold
-                </Text>
-              </View>
+              <Fragment key={index}>
+                <View
+                  key={product.productId}
+                  style={styles.coopdashboardTopProductRow}
+                >
+                  <Text style={styles.coopdashboardTopProductText}>
+                    {index + 1}. {product.productName}
+                  </Text>
+                  <Text style={styles.coopdashboardTopProductText}>
+                    {product.totalSold} sold
+                  </Text>
+                </View>
+              </Fragment>
             ))}
           </View>
         )}
