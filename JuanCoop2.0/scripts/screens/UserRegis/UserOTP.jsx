@@ -131,7 +131,7 @@ const UserOTP = (props) => {
         source={require('@assets/img/logo.png')}
         style={styles.logo}
       />
-      <Text style={styles.title}>AgriKaani</Text>
+      <Text style={styles.title}>JuanKooP</Text>
       <Text style={styles.subtitle}>OTP Verification</Text>
       <Text style={styles.subsubtitle}>Please enter the 6-digit code sent to your email for verification</Text>
       

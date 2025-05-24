@@ -120,19 +120,20 @@ const WithdrawsSuccess = () => {
               <View style={styles.userItem}>
   
                 <View style={styles.userDetails}>
-                  <Text style={styles.userName}>{item?._id}</Text>
+                  <Text style={styles.userName}>{item?.accountName}</Text>
+                  <Text style={styles.userEmail}>Manager: {item?.user?.firstName}{item?.user?.lastName}</Text>
                   <Text style={styles.userEmail} >Status: {" "}
                   <Text 
-    style={[
-      styles.userEmail, 
-      { color: item?.transactionStatus === "SUCCESS" ? "green" : 
-              item?.transactionStatus === "PENDING" ? "orange" : 
-              item?.transactionStatus === "FAILED" ? "red" : "black" } // Default to black
-    ]}
-  >
-    {item?.transactionStatus}
-  </Text>
-  </Text>
+                    style={[
+                      styles.userEmail, 
+                      { color: item?.transactionStatus === "SUCCESS" ? "green" : 
+                              item?.transactionStatus === "PENDING" ? "orange" : 
+                              item?.transactionStatus === "FAILED" ? "red" : "black" } // Default to black
+                    ]}
+                  >
+                    {item?.transactionStatus}
+                  </Text>
+                </Text>
                   <Text style={styles.userEmail}>Amount: ₱ {item?.amount}</Text>
                 </View>
                 <TouchableOpacity
