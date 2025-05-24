@@ -119,7 +119,7 @@ const RefundProcess = () => {
             <View style={styles.userItem}>
 
               <View style={styles.userDetails}>
-                <Text style={styles.userName}>{item?._id}</Text>
+                <Text style={styles.userName}>{item?.accountName}</Text>
                 <Text style={styles.userEmail} >Status: {" "}
                 <Text 
   style={[

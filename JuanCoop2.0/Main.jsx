@@ -20,6 +20,7 @@ import { isLogin } from "@redux/Actions/Auth.actions";
 import { Text } from "native-base";
 import messaging from '@react-native-firebase/messaging';
 import * as Notification from 'expo-notifications';
+import Landing from "@screens/User/Landing";
 
 const Stack = createStackNavigator();
 
@@ -258,7 +259,8 @@ useEffect(() => {
       );
     } else  {
       return (
-        <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Landing" component={Landing} />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="Address" component={AddressNavigators} />

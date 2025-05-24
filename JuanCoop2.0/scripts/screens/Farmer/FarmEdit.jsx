@@ -309,7 +309,7 @@ const FarmRegistration = ({ navigation }) => {
         <Text style={styles.label}>Coop Name</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter Farm Name"
+          placeholder="Enter Coop Name"
           value={farmName}
           onChangeText={setFarmName}
         />
@@ -325,7 +325,7 @@ const FarmRegistration = ({ navigation }) => {
               fontSize: 16,
             },
           ]}
-          placeholder="Enter Farm Address"
+          placeholder="Enter Coop Address"
           value={myaddress}
           onChangeText={setMyAddress}
           editable={false}

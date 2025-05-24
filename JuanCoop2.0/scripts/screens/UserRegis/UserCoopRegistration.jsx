@@ -9,7 +9,7 @@ const StartScreen = ({ navigation }) => {
         <Image source={require('@assets/img/logo.png')} style={styles.image} />
 
         {/* Title */}
-        <Text style={styles.title}>JuanCoop</Text>
+        <Text style={styles.title}>JuanKooP</Text>
 
         {/* Subtitle */}
         <Text style={styles.subtitle}>
