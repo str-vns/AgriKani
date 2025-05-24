@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback, Fragment } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -64,12 +64,7 @@ const FarmerDashboard = () => {
   const InventoryInfo = Invsuccess?.details;
   const [fcmToken, setFcmToken] = useState("");
 
-  console.log(
-  "currentDaily",
-  weatherDaily && weatherDaily.data && weatherDaily.data.length > 1
-    ? weatherDaily.data[1]
-    : "No data"
-);
+  // console.log("type", type);
   const weatherIcons = {
     a01d: require("../../../assets/weather/a01d.png"),
     a01n: require("../../../assets/weather/a01n.png"),
@@ -527,7 +522,8 @@ const FarmerDashboard = () => {
           {loadingWCurrent ? (
             <ActivityIndicator size="large" color="#4CAF50" />
           ) : errorWCurrent ||
-            weatherCurrent === null ? (
+            weatherCurrent === null ||
+            weatherCurrent.length === 0 ? (
             <Text style={styles.UnavailableText}>
               Weather is Unavailable Currently...
             </Text>
@@ -541,73 +537,75 @@ const FarmerDashboard = () => {
               <View style={styles.overlay}>
                 <Image
                   source={
-                    weatherIcons[weatherCurrent?.data[0]?.weather?.icon] ||
+                    weatherIcons[weather?.data[0]?.weather?.icon] ||
                     weatherIcons["default"]
                   }
                   style={styles.cloudImage}
                 />
                 <Text style={styles.weatherText}>
-                  City: {weatherCurrent?.data[0].city_name}
+                  City: {weather?.data[0].city_name}
                 </Text>
                 <Text style={styles.weatherText}>
-                  Temperature: {weatherCurrent?.data[0].temp}°C
+                  Temperature: {weather?.data[0].temp}°C
                 </Text>
                 <Text style={styles.weatherText}>
-                  Weather: {weatherCurrent?.data[0].weather.description}
+                  Weather: {weather?.data[0].weather.description}
                 </Text>
                 <Text style={styles.weatherText}>
-                  Wind Speed: {weatherCurrent?.data[0].wind_spd} m/s
+                  Wind Speed: {weather?.data[0].wind_spd} m/s
                 </Text>
               </View>
             </View>
           )}
 
-         {loadingWDaily ? (
-  <ActivityIndicator size="large" color="#4CAF50" />
-) : errorWDaily || !weatherDaily || !weatherDaily.data || weatherDaily.data.length === 0 ? (
-  <Text style={styles.UnavailableText}>
-    Weather is Unavailable Currently...
-  </Text>
-) : (
- <ScrollView horizontal={true}>
-  {weatherDaily.data.map((item, index) => (
-    <View
-      key={item._id || index}
-      style={styles.dailyWeatherContainer}
-    >
-      <View style={styles.dailyWeatherBox}>
-        <Image
-          blurRadius={70}
-          source={require("../../../assets/img/bg.jpg")}
-          style={styles.backgroundImageDaily}
-        />
-        <View style={styles.dailyOverlay}>
-          <Text style={styles.dailyWeatherDate}>
-            {item.valid_date}
-          </Text>
-          <Image
-            source={
-              weatherIcons[item?.weather?.icon] ||
-              weatherIcons["default"]
-            }
-            style={styles.dailyWeatherCloudImage}
-          />
-          <Text
-            style={styles.dailyWeatherText}
-            ellipsizeMode="tail"
-            numberOfLines={1}
-          >
-            {item.weather.description}
-          </Text>
-          <Text style={styles.dailyWeatherTempText}>
-            {item.temp}°C
-          </Text>
-        </View>
-      </View>
-    </View>
-  ))}
-</ScrollView>
-)}
+          {loadingWDaily ? (
+            <ActivityIndicator size="large" color="#4CAF50" />
+          ) : errorWDaily ||
+            weatherDaily === null ||
+            weatherDaily.length === 0 ? (
+            <Text style={styles.UnavailableText}>
+              Weather is Unavailable Currently...
+            </Text>
+          ) : (
+            <ScrollView horizontal={true}>
+              {dailyWeather.data.map((item, index) => (
+                <View
+                  key={item._id || index}
+                  style={styles.dailyWeatherContainer}
+                >
+                  <View style={styles.dailyWeatherBox}>
+                    <Image
+                      blurRadius={70}
+                      source={require("../../../assets/img/bg.jpg")}
+                      style={styles.backgroundImageDaily}
+                    />
+                    <View style={styles.dailyOverlay}>
+                      <Text style={styles.dailyWeatherDate}>
+                        {item.valid_date}
+                      </Text>
+                      <Image
+                        source={
+                          weatherIcons[item?.weather?.icon] ||
+                          weatherIcons["default"]
+                        }
+                        style={styles.dailyWeatherCloudImage}
+                      />
+                      <Text
+                        style={styles.dailyWeatherText}
+                        ellipsizeMode="tail"
+                        numberOfLines={1}
+                      >
+                        {item.weather.description}
+                      </Text>
+                      <Text style={styles.dailyWeatherTempText}>
+                        {item.temp}°C
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          )}
           
         </View>
 
@@ -774,7 +772,6 @@ const FarmerDashboard = () => {
               Top 5 Selling Products
             </Text>
             {dashboard.topSellingProducts.map((product, index) => (
-                 <Fragment key={index}>
               <View
                 key={product.productId}
                 style={styles.coopdashboardTopProductRow}
@@ -786,10 +783,8 @@ const FarmerDashboard = () => {
                   {product.totalSold} sold
                 </Text>
               </View>
-              </Fragment>
             ))}
           </View>
-          
         )}
       </View>
     </ScrollView>
