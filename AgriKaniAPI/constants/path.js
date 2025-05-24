@@ -227,5 +227,8 @@ module.exports = {
   REFUND_PENDING: "/refund/pending",
   REFUND_SUCCESS: "/refund/success",
   REFUND_ID: "/refund/:id",
+
+  WEATHER_DAILY: "/daily/weather",
+  WEATHER_CURRENT: "/current/weather",
 };
 

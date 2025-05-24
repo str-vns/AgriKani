@@ -32,4 +32,5 @@ module.exports = {
     WALLET: "wallet",
     REFUND: "refund",
     TRANSACTION: "transaction",
+    Weather: "weather",
 }

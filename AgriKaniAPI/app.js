@@ -32,6 +32,7 @@ const pwd = require("./routes/Discount/pwd");
 const senior = require("./routes/Discount/senior");
 const wallet = require("./routes/wallets");
 const transaction = require("./routes/transaction")
+const weather = require("./routes/weather");
 const axios = require("axios");
 const { sendEmail } = require("./utils/sendMail");
 
@@ -182,7 +183,8 @@ app.use(
   pwd,
   senior,
   wallet,
-  transaction
+  transaction, 
+  weather,
 );
 
 module.exports = app;
