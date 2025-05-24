@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { NativeBaseProvider } from "native-base";
 import { SocketProvider } from "./SocketIo";
-import { WeatherProvider } from "./CurrentWeather";
 import "react-native-gesture-handler";
 import Auth from "@redux/Store/Auth";
 import { Provider } from "react-redux";
@@ -21,7 +20,6 @@ export default function App() {
   return (
     <Auth>
       <SocketProvider>
-        <WeatherProvider>
           <Provider store={store}>
             <NativeBaseProvider>
               <NavigationContainer>
@@ -30,7 +28,6 @@ export default function App() {
               </NavigationContainer>
             </NativeBaseProvider>
           </Provider>
-        </WeatherProvider>
       </SocketProvider>
     </Auth>
   );
