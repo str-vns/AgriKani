@@ -11,38 +11,46 @@ import {
   PermissionsAndroid,
   Platform,
 } from "react-native";
+import {
+  weatherDailyActions,
+  weatherCurrentActions,
+  clearErrors,
+} from "@redux/Actions/weatherActions";
 import { Ionicons } from "@expo/vector-icons";
 import { BarChart, PieChart } from "react-native-chart-kit";
-import { useFocusEffect, useNavigation } from "@react-navigation/native"; 
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import styles from "./css/styles";
 import { Profileuser } from "@redux/Actions/userActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
-import { singleInventory, inventoryDashboard } from "@redux/Actions/inventoryActions";
+import {
+  singleInventory,
+  inventoryDashboard,
+} from "@redux/Actions/inventoryActions";
 import { fetchCoopDashboardData } from "@redux/Actions/orderActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
-import { useWeather } from "../../../CurrentWeather";
 import { useSocket } from "../../../SocketIo";
-import Constants from "expo-constants";
 import { Picker } from "@react-native-picker/picker";
 import * as Print from "expo-print";
-import RNFS from 'react-native-fs';
+import RNFS from "react-native-fs";
 
 const FarmerDashboard = () => {
-  const weather = useWeather();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const socket = useSocket();
-  const { coopProducts } = useSelector((state) => state.CoopProduct);
+  const { loadingWCurrent, weatherCurrent, errorWCurrent } = useSelector(
+    (state) => state.weatherCurrent
+  );
+  const { loadingWDaily, weatherDaily, errorWDaily } = useSelector(
+    (state) => state.weatherDaily
+  );
   const { Invsuccess } = useSelector((state) => state.sinvent);
-  const { InvDloading, InvDash, InvDError  } = useSelector((state) => state.inventoryDashboard);
+  const { InvDash } = useSelector((state) => state.inventoryDashboard);
   const {
     coopdashboards: dashboard,
     coopdashboardloading: loading,
     coopdashboarderror: error,
   } = useSelector((state) => state.coopdashboards || {});
-
-
   const screenWidth = Dimensions.get("window").width;
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
@@ -125,15 +133,9 @@ const FarmerDashboard = () => {
 
   useFocusEffect(
     useCallback(() => {
-      const fetchDailyWeather = async () => {
-        const response = await fetch(
-          `https://api.weatherbit.io/v2.0/forecast/daily?city=Bulacan&country=PH&key=${Constants?.expoConfig?.extra?.WEATHER_API_KEY}`
-        );
-        const data = await response.json();
-        setDailyWeather(data);
-      };
+      dispatch(weatherCurrentActions());
+      dispatch(weatherDailyActions());
 
-      fetchDailyWeather();
       if (!socket) {
         console.warn("Socket is not initialized.");
         return;
@@ -156,8 +158,6 @@ const FarmerDashboard = () => {
       return () => {
         socket.off("getUsers");
       };
-
-
     }, [socket, userId])
   );
 
@@ -172,10 +172,10 @@ const FarmerDashboard = () => {
             const invItem = {
               type: type,
               user: userId,
-            }
+            };
             dispatch(Profileuser(userId, res));
             dispatch(singleInventory(userId, res));
-            dispatch(inventoryDashboard(invItem, res))
+            dispatch(inventoryDashboard(invItem, res));
           } else {
             setErrors("User ID is missing.");
           }
@@ -216,53 +216,48 @@ const FarmerDashboard = () => {
     const invItem = {
       type: itemValue,
       user: userId,
-    }
-    dispatch(inventoryDashboard(invItem, token))
-  }
+    };
+    dispatch(inventoryDashboard(invItem, token));
+  };
   const [selectedRange, setSelectedRange] = useState("daily");
 
   const salesData = () => {
     switch (selectedRange) {
-    case "daily":
-    return dashboard?.formattedSalesPerDay || [];
-    case "monthly":
-      return dashboard?.formattedSalesPerMonth || [];
-    case "yearly":
-      return dashboard?.formattedSalesPerYear || [];
-    default:
-      return dashboard?.formattedSalesPerDay || [];
+      case "daily":
+        return dashboard?.formattedSalesPerDay || [];
+      case "monthly":
+        return dashboard?.formattedSalesPerMonth || [];
+      case "yearly":
+        return dashboard?.formattedSalesPerYear || [];
+      default:
+        return dashboard?.formattedSalesPerDay || [];
     }
   };
 
-  console.log("Sales Data:", salesData); 
-  
   const formatLabel = (id) => {
     switch (selectedRange) {
-    case "daily":
-      return "day"; // "May 1", "May 2", etc.
-    case "monthly":
-      return "month"; // "April 2025", "May 2025", etc.
-    case "yearly":
-      return "year"; // "2025"
-    default:
-      return "day";
+      case "daily":
+        return "day"; // "May 1", "May 2", etc.
+      case "monthly":
+        return "month"; // "April 2025", "May 2025", etc.
+      case "yearly":
+        return "year"; // "2025"
+      default:
+        return "day";
     }
   };
 
-  const COLORS = ["#FFD700", "#FFA500", "#FF8C00"]; // Gold, Orange, Dark Orange
+  const COLORS = ["#FFD700", "#FFA500", "#FF8C00"];
 
-  const orderStatusData = Object.entries(dashboard?.orderStatusCounts || {}).map(
-    ([status, count], index) => ({
-      name: `${status} (${count})`, // 👈 Include count in label
-      population: count,
-      color: COLORS[index % COLORS.length],
-      legendFontColor: "#333",
-      legendFontSize: 12,
-    })
-  );
-
-
-  const currentSales = salesData[selectedRange];
+  const orderStatusData = Object.entries(
+    dashboard?.orderStatusCounts || {}
+  ).map(([status, count], index) => ({
+    name: `${status} (${count})`, // 👈 Include count in label
+    population: count,
+    color: COLORS[index % COLORS.length],
+    legendFontColor: "#333",
+    legendFontSize: 12,
+  }));
 
   if (loading) {
     return (
@@ -283,74 +278,75 @@ const FarmerDashboard = () => {
 
   console.log(PermissionsAndroid.RESULTS.GRANTED, "Platform");
 
-async function requestStoragePermission() {
-  if (Platform.OS === "android") {
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: "Storage Permission",
-          message: "This app needs access to your storage to download files.",
-          buttonNeutral: "Ask Me Later",
-          buttonNegative: "Cancel",
-          buttonPositive: "OK",
-        }
-      );
-      return true;
-    } catch (err) {
-      console.warn(err);
-      return false;
+  async function requestStoragePermission() {
+    if (Platform.OS === "android") {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: "Storage Permission",
+            message: "This app needs access to your storage to download files.",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK",
+          }
+        );
+        return true;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
     }
+    return true;
   }
-  return true;
-}
 
-const chartData = {
-  labels: salesData().map((item) => item[formatLabel(selectedRange)]),
-  datasets: [
-    {
-      data: salesData().map((item) => item.totalSales),
-    },
-  ],
-};
+  const chartData = {
+    labels: salesData().map((item) => item[formatLabel(selectedRange)]),
+    datasets: [
+      {
+        data: salesData().map((item) => item.totalSales),
+      },
+    ],
+  };
 
-const filteredChartData = {
-  labels: chartData.labels.filter((_, index) => chartData.datasets[0].data[index] > 0),
-  datasets: [
-    {
-      data: chartData.datasets[0].data.filter((value) => value > 0),
-    },
-  ],
-};
-
+  const filteredChartData = {
+    labels: chartData.labels.filter(
+      (_, index) => chartData.datasets[0].data[index] > 0
+    ),
+    datasets: [
+      {
+        data: chartData.datasets[0].data.filter((value) => value > 0),
+      },
+    ],
+  };
 
   const handleDownload = async () => {
-  if (!InvDash?.[0]?.products || InvDash?.[0]?.products?.length === 0) {
-    alert("No data available to download.");
-    return;
-  }
+    if (!InvDash?.[0]?.products || InvDash?.[0]?.products?.length === 0) {
+      alert("No data available to download.");
+      return;
+    }
 
-  let baseFileName = `inventory_${InvDash?.[0]?.currentDay}`;
-  let fileName = `${baseFileName}.pdf`;
-  const downloadsDir = RNFS.DownloadDirectoryPath;
-  let filePath = `${downloadsDir}/${fileName}`;
-  let counter = 1;
+    let baseFileName = `inventory_${InvDash?.[0]?.currentDay}`;
+    let fileName = `${baseFileName}.pdf`;
+    const downloadsDir = RNFS.DownloadDirectoryPath;
+    let filePath = `${downloadsDir}/${fileName}`;
+    let counter = 1;
 
-  while (await RNFS.exists(filePath)) {
-    fileName = `${baseFileName}(${counter}).pdf`;
-    filePath = `${downloadsDir}/${fileName}`;
-    counter++;
-  }
+    while (await RNFS.exists(filePath)) {
+      fileName = `${baseFileName}(${counter}).pdf`;
+      filePath = `${downloadsDir}/${fileName}`;
+      counter++;
+    }
 
-  const hasPermission = await requestStoragePermission();
-  console.log("hasPermission", hasPermission);
-  if (!hasPermission) {
-    alert("Storage permission is required to download the file.");
-    return;
-  }
+    const hasPermission = await requestStoragePermission();
+    console.log("hasPermission", hasPermission);
+    if (!hasPermission) {
+      alert("Storage permission is required to download the file.");
+      return;
+    }
 
-  try {
-    const InventoryContent = `
+    try {
+      const InventoryContent = `
      <html>
   <head>
     <style>
@@ -452,31 +448,31 @@ const filteredChartData = {
                       <td>${v?.currentStock}</td>
                     </tr>`
                 )
-                .join('')}
+                .join("")}
             </tbody>
           </table>
         `
       )
-      ?.join('')}
+      ?.join("")}
   </body>
 </html>
     `;
 
-    // Generate PDF in cache
-    const { uri } = await Print.printToFileAsync({
-      html: InventoryContent,
-      base64: false,
-    });
+      // Generate PDF in cache
+      const { uri } = await Print.printToFileAsync({
+        html: InventoryContent,
+        base64: false,
+      });
 
-    await RNFS.moveFile(uri, filePath);
+      await RNFS.moveFile(uri, filePath);
 
-    alert(`PDF saved to Downloads`);
-    console.log('PDF saved to:', filePath);
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    alert('Failed to download inventory data.');
-  }
-};
+      alert(`PDF saved to Downloads`);
+      console.log("PDF saved to:", filePath);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Failed to download inventory data.");
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -518,21 +514,26 @@ const filteredChartData = {
       <View style={styles.coopdashboardContainer}>
         {/* Dashboard Header */}
         <View style={styles.coopdashboardHeader}>
-          <Text style={styles.coopdashboardTitle}>
-            Cooperative Dashboard
-          </Text>
+          <Text style={styles.coopdashboardTitle}>Cooperative Dashboard</Text>
         </View>
 
         {/* Weather Section */}
         <View style={styles.weatherContainer}>
-          {weather !== null ? (
+          {loadingWCurrent ? (
+            <ActivityIndicator size="large" color="#4CAF50" />
+          ) : errorWCurrent ||
+            weatherCurrent === null ||
+            weatherCurrent.length === 0 ? (
+            <Text style={styles.UnavailableText}>
+              Weather is Unavailable Currently...
+            </Text>
+          ) : (
             <View style={styles.weatherBox}>
               <Image
                 blurRadius={70}
                 source={require("@assets/img/bg.jpg")}
                 style={styles.backgroundImage}
               />
-
               <View style={styles.overlay}>
                 <Image
                   source={
@@ -541,7 +542,6 @@ const filteredChartData = {
                   }
                   style={styles.cloudImage}
                 />
-
                 <Text style={styles.weatherText}>
                   City: {weather?.data[0].city_name}
                 </Text>
@@ -556,15 +556,19 @@ const filteredChartData = {
                 </Text>
               </View>
             </View>
-          ) : (
+          )}
+
+          {loadingWDaily ? (
+            <ActivityIndicator size="large" color="#4CAF50" />
+          ) : errorWDaily ||
+            weatherDaily === null ||
+            weatherDaily.length === 0 ? (
             <Text style={styles.UnavailableText}>
               Weather is Unavailable Currently...
             </Text>
-          )}
-
-          {dailyWeather !== null && (
+          ) : (
             <ScrollView horizontal={true}>
-              {dailyWeather?.data?.map((item, index) => (
+              {dailyWeather.data.map((item, index) => (
                 <View
                   key={item._id || index}
                   style={styles.dailyWeatherContainer}
@@ -579,7 +583,6 @@ const filteredChartData = {
                       <Text style={styles.dailyWeatherDate}>
                         {item.valid_date}
                       </Text>
-
                       <Image
                         source={
                           weatherIcons[item?.weather?.icon] ||
@@ -587,7 +590,6 @@ const filteredChartData = {
                         }
                         style={styles.dailyWeatherCloudImage}
                       />
-
                       <Text
                         style={styles.dailyWeatherText}
                         ellipsizeMode="tail"
@@ -604,8 +606,9 @@ const filteredChartData = {
               ))}
             </ScrollView>
           )}
+          
         </View>
-        {/* Summary Cards */}
+
         <View style={styles.coopdashboardSummaryContainer}>
           {[
             {
@@ -638,71 +641,70 @@ const filteredChartData = {
           paddingLeft="15"
         />
 
-
-
         {/* Sales Overview */}
-          <View style={styles.coopdashboardSalesContainer}>
-            <View style={styles.coopdashboardHeader}>
-              <Text style={styles.coopdashboardSalesTitle}>Sales Overview</Text>
-              <Picker
-                selectedValue={selectedRange}
-                style={styles.coopdashboardPicker}
-                onValueChange={(itemValue) => setSelectedRange(itemValue)}
-              >
-                <Picker.Item label="Daily" value="daily" />
-                <Picker.Item label="Monthly" value="monthly" />
-                <Picker.Item label="Yearly" value="yearly" />
-              </Picker>
-            </View>
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: 20,
-                  fontWeight: "600",
-                  marginBottom: 10,
-                  color: "#333",
-                }}
-              >
-                Sales ({selectedRange.charAt(0).toUpperCase() + selectedRange.slice(1)})
-              </Text>
+        <View style={styles.coopdashboardSalesContainer}>
+          <View style={styles.coopdashboardHeader}>
+            <Text style={styles.coopdashboardSalesTitle}>Sales Overview</Text>
+            <Picker
+              selectedValue={selectedRange}
+              style={styles.coopdashboardPicker}
+              onValueChange={(itemValue) => setSelectedRange(itemValue)}
+            >
+              <Picker.Item label="Daily" value="daily" />
+              <Picker.Item label="Monthly" value="monthly" />
+              <Picker.Item label="Yearly" value="yearly" />
+            </Picker>
+          </View>
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: 20,
+              fontWeight: "600",
+              marginBottom: 10,
+              color: "#333",
+            }}
+          >
+            Sales (
+            {selectedRange.charAt(0).toUpperCase() + selectedRange.slice(1)})
+          </Text>
 
-              <BarChart
-                data={filteredChartData}
-                width={300}
-                height={240}
-                yAxisLabel="₱"
-                chartConfig={{
-                  backgroundGradientFrom: "#ffffff",
-                  backgroundGradientTo: "#ffffff",
-                  decimalPlaces: 2,
-                  color: (opacity = 1) => `rgba(204, 153, 0, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  barPercentage: 0.6,
-                  propsForBackgroundLines: {
-                    strokeDasharray: "", // solid lines
-                    stroke: "#e3e3e3",
-                  },
-                }}
-                style={{
-                  borderRadius: 16,
-                  elevation: 3, // Android shadow
-                  shadowColor: "#000", // iOS shadow
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 4,
-                  backgroundColor: "#fff",
-                }}
-              />
+          <BarChart
+            data={filteredChartData}
+            width={300}
+            height={240}
+            yAxisLabel="₱"
+            chartConfig={{
+              backgroundGradientFrom: "#ffffff",
+              backgroundGradientTo: "#ffffff",
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(204, 153, 0, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              barPercentage: 0.6,
+              propsForBackgroundLines: {
+                strokeDasharray: "", // solid lines
+                stroke: "#e3e3e3",
+              },
+            }}
+            style={{
+              borderRadius: 16,
+              elevation: 3, // Android shadow
+              shadowColor: "#000", // iOS shadow
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              backgroundColor: "#fff",
+            }}
+          />
         </View>
 
-      {/* Inventory Overview */}
+        {/* Inventory Overview */}
         <View style={styles.invContainer}>
           <View style={styles.coopdashboardHeader}>
             <Text style={styles.coopdashboardSalesTitle}>
               Inventory Overview
             </Text>
             <Text style={styles.coopdashboardSalesTitle}>
-            {InvDash?.[0]?.currentDay}
+              {InvDash?.[0]?.currentDay}
             </Text>
             <Picker
               selectedValue={selectedRange}
@@ -718,40 +720,49 @@ const filteredChartData = {
               <Picker.Item label="Yearly" value="yearly" />
             </Picker>
 
-            <TouchableOpacity style={styles.downloadButton} onPress={() => handleDownload()}>
-      <Text style={styles.downloadButtonText}>Download Data</Text>
-    </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.downloadButton}
+              onPress={() => handleDownload()}
+            >
+              <Text style={styles.downloadButtonText}>Download Data</Text>
+            </TouchableOpacity>
           </View>
           {InvDash?.[0]?.products?.length > 0 ? (
-  <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-    {InvDash?.[0]?.products.map((product, index) => (
-      <View key={index} style={styles.card}>
-        <Text style={styles.productName}>{product.productName}</Text>
+            <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+              {InvDash?.[0]?.products.map((product, index) => (
+                <View key={index} style={styles.card}>
+                  <Text style={styles.productName}>{product.productName}</Text>
 
-        <View style={styles.tableHeader}>
-          <Text style={[styles.cell, styles.cellHeader]}>Unit</Text>
-          <Text style={[styles.cell, styles.cellHeader]}>Metric</Text>
-          <Text style={[styles.cell, styles.cellHeader]}>Delivered</Text>
-          <Text style={[styles.cell, styles.cellHeader]}>Current</Text>
-        </View>
+                  <View style={styles.tableHeader}>
+                    <Text style={[styles.cell, styles.cellHeader]}>Unit</Text>
+                    <Text style={[styles.cell, styles.cellHeader]}>Metric</Text>
+                    <Text style={[styles.cell, styles.cellHeader]}>
+                      Delivered
+                    </Text>
+                    <Text style={[styles.cell, styles.cellHeader]}>
+                      Current
+                    </Text>
+                  </View>
 
-        {/* Render variations of the product */}
-        {product?.variations?.map((variation, idx) => (
-          <View key={idx} style={styles.tableRow}>
-            <Text style={styles.cell}>{variation.unitName}</Text>
-            <Text style={styles.cell}>{variation.metricUnit}</Text>
-            <Text style={styles.cell}>{variation.quantityDelivered}</Text>
-            <Text style={styles.cell}>{variation.currentStock}</Text>
-          </View>
-        ))}
-      </View>
-    ))}
-  </ScrollView>
-) : (
-  <Text style={styles.coopdashboardNoDataText}>
-    No inventory data available for this period.
-  </Text>
-)}
+                  {/* Render variations of the product */}
+                  {product?.variations?.map((variation, idx) => (
+                    <View key={idx} style={styles.tableRow}>
+                      <Text style={styles.cell}>{variation.unitName}</Text>
+                      <Text style={styles.cell}>{variation.metricUnit}</Text>
+                      <Text style={styles.cell}>
+                        {variation.quantityDelivered}
+                      </Text>
+                      <Text style={styles.cell}>{variation.currentStock}</Text>
+                    </View>
+                  ))}
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <Text style={styles.coopdashboardNoDataText}>
+              No inventory data available for this period.
+            </Text>
+          )}
         </View>
 
         {/* Top Selling Products */}
