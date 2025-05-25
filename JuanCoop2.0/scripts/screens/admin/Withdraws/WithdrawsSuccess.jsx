@@ -13,91 +13,128 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getSuccessTransactions } from "@redux/Actions/transactionActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SelectedTab } from "@shared/SelectedTab";
+import { allCoops } from "@redux/Actions/coopActions";
 
 const WithdrawsSuccess = () => {
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
-  const [refreshing, setRefreshing] = useState(false);
-  const { withdrawloading, withdraw, withdrawerror } = useSelector(
-    (state) => state.transaction
-  );
-  const [selectedTab, setSelectedTab] = useState("WApproved");
-  const [token, setToken] = useState(null);
-
-  useEffect(() => {
-    const fetchJwt = async () => {
-      try {
-        const res = await AsyncStorage.getItem("jwt");
-        setToken(res);
-      } catch (error) {
-        console.error("Error retrieving JWT: ", error);
-      }
-    };
-
-    fetchJwt();
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      dispatch(getSuccessTransactions(token));
-      return () => {
-        console.log("Cleaning up on screen unfocus...");
+    const dispatch = useDispatch();
+    const navigation = useNavigation();
+    const [refreshing, setRefreshing] = useState(false);
+    const {withdrawloading, withdraw, withdrawerror} = useSelector((state) => state.transaction)
+    const [selectedTab, setSelectedTab] = useState("Success");
+    const [token, setToken] = useState(null);
+    const { loading, coops, error } = useSelector((state) => state.allofCoops);
+   
+    useEffect(() => {
+      const fetchJwt = async () => {
+        try {
+          const res = await AsyncStorage.getItem("jwt");
+          setToken(res);
+        } catch (error) {
+          console.error("Error retrieving JWT: ", error);
+        }
       };
-    }, [token])
-  );
+  
+      fetchJwt();
+    }, []);
+  
+    useFocusEffect(
+      useCallback(() => {
+        dispatch(getSuccessTransactions(token));
+        dispatch(allCoops(token));
+        return () => {
+          console.log("Cleaning up on screen unfocus...");
+        };
+      }, [token])
+    );
+  
+    // Refresh users
+    const onRefresh = useCallback(async () => {
+      setRefreshing(true);
+      try {
+        dispatch(getSuccessTransactions(token));
+        dispatch(allCoops(token));
+      } catch (err) {
+        console.error("Error refreshing users:", err);
+      } finally {
+        setRefreshing(false);
+      }
+    }, [dispatch, token]);
+  
+    return (
+      <View style={styles.container}>
+  
+        {/* <View style={styles.header}>
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={() => navigation.goBack()}
+                >
+                  <Ionicons name="arrow-back" size={28} color="black" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Withdraw Request List</Text>
+            </View> */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              selectedTab === "Pending" && styles.activeTab,
+            ]}
+            onPress={() => {
+                navigation.navigate("WithdrawsList");
+              }}
 
-  // Refresh users
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      dispatch(getSuccessTransactions(token));
-    } catch (err) {
-      console.error("Error refreshing users:", err);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [dispatch, token]);
-
-  const choicesTab = [
-    { label: "Pending", value: "WPending" },
-    { label: "Success", value: "WApproved" },
-  ];
-
-  return (
-    <View style={styles.container}>
-      <SelectedTab
-        selectedTab={selectedTab}
-        tabs={choicesTab}
-        onTabChange={setSelectedTab}
-      />
-
-      {/* Content */}
-      {withdrawloading ? (
-        <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : withdraw?.length === 0 || withdrawerror ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No Request Withdraw found.</Text>
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "Pending" && styles.activeTabText,
+              ]}
+            >
+              Pending
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              selectedTab === "Success" && styles.activeTab,
+            ]}
+            onPress={() => {
+                setSelectedTab("Success");
+              }}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "Success" && styles.activeTabText,
+              ]}
+            >
+              Success 
+            </Text>
+          </TouchableOpacity>
         </View>
-      ) : (
-        <FlatList
-          data={withdraw}
-          keyExtractor={(item) => item?._id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          contentContainerStyle={styles.listContainer}
-          renderItem={({ item }) => (
-            <View style={styles.userItem}>
-              <View style={styles.userDetails}>
-                <Text style={styles.userName}>{item?.accountName}</Text>
-                <Text style={styles.userEmail}>
-                  Manager: {item?.user?.firstName}
-                  {item?.user?.lastName}
-                </Text>
-                <Text style={styles.userEmail}>
-                  Status:{" "}
-                  <Text
+  
+        {/* Content */}
+        {withdrawloading ? (
+          <ActivityIndicator size="large" color="blue" style={styles.loader} />
+        ) : withdraw?.length === 0 || withdrawerror ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No Request Withdraw found.</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={withdraw}
+            keyExtractor={(item) => item?._id}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            contentContainerStyle={styles.listContainer}
+            renderItem={({ item }) => (
+              <View style={styles.userItem}>
+  
+                <View style={styles.userDetails}>
+                  <Text style={styles.userName}>{coops?.find((coop) => coop.user?._id === item.user?._id)?.farmName || "Farm Name Not Found"}</Text>
+                  <Text style={styles.userEmail}>Request By: {item?.accountName}</Text>
+                  <Text style={styles.userEmail} >Status: {" "}
+                  <Text 
                     style={[
                       styles.userEmail,
                       {

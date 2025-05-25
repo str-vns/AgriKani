@@ -41,9 +41,10 @@ const Index = () => {
       <Stack.Screen
         name="CoopDashboard"
         component={CoopDashboard}
-        options={{
-          header: (props) => <DrawerDesign {...props} title="Dashboard" />,
-        }}
+        options={{ headerShown: false }}
+        // options={{
+        //   header: (props) => <DrawerDesign {...props} title="Dashboard" />,
+        // }}
       />
 
       <Stack.Screen

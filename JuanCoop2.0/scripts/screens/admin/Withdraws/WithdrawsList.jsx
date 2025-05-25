@@ -13,7 +13,7 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getPendingTransactions } from "@redux/Actions/transactionActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SelectedTab } from "@shared/SelectedTab";
+import { allCoops } from "@redux/Actions/coopActions";
 
 const WithdrawsList = () => {
   const dispatch = useDispatch();
@@ -24,7 +24,8 @@ const WithdrawsList = () => {
   );
   const [selectedTab, setSelectedTab] = useState("WPending");
   const [token, setToken] = useState(null);
-
+  const { loading, coops, error } = useSelector((state) => state.allofCoops);
+ 
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -41,6 +42,7 @@ const WithdrawsList = () => {
   useFocusEffect(
     useCallback(() => {
       dispatch(getPendingTransactions(token));
+      dispatch(allCoops(token));
       return () => {
         console.log("Cleaning up on screen unfocus...");
       };
@@ -52,6 +54,7 @@ const WithdrawsList = () => {
     setRefreshing(true);
     try {
       dispatch(getPendingTransactions(token));
+      dispatch(allCoops(token));
     } catch (err) {
       console.error("Error refreshing users:", err);
     } finally {
@@ -89,31 +92,20 @@ const WithdrawsList = () => {
           renderItem={({ item }) => (
             <View style={styles.userItem}>
               <View style={styles.userDetails}>
-                <Text style={styles.userName}>{item?.accountName}</Text>
-                <Text style={styles.userEmail}>
-                  Manager: {item?.user?.firstName}
-                  {item?.user?.lastName}
-                </Text>
-                <Text style={styles.userEmail}>
-                  Status:{" "}
-                  <Text
-                    style={[
-                      styles.userEmail,
-                      {
-                        color:
-                          item?.transactionStatus === "SUCCESS"
-                            ? "green"
-                            : item?.transactionStatus === "PENDING"
-                            ? "orange"
-                            : item?.transactionStatus === "FAILED"
-                            ? "red"
-                            : "black",
-                      }, // Default to black
-                    ]}
-                  >
-                    {item?.transactionStatus}
-                  </Text>
-                </Text>
+                <Text style={styles.userName}>{coops?.find((coop) => coop.user?._id === item.user?._id)?.farmName || "Farm Name Not Found"}</Text>
+                <Text style={styles.userEmail}>Request By: {item?.accountName}</Text>
+                <Text style={styles.userEmail} >Status: {" "}
+                <Text 
+  style={[
+    styles.userEmail, 
+    { color: item?.transactionStatus === "SUCCESS" ? "green" : 
+            item?.transactionStatus === "PENDING" ? "orange" : 
+            item?.transactionStatus === "FAILED" ? "red" : "black" } // Default to black
+              ]}
+            >
+              {item?.transactionStatus}
+            </Text>
+            </Text>
                 <Text style={styles.userEmail}>Amount: ₱ {item?.amount}</Text>
               </View>
               <TouchableOpacity
