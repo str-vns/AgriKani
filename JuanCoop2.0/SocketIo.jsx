@@ -8,7 +8,7 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
 
-      const socketConnection = io( `http://192.168.50.222:4000`, {
+      const socketConnection = io(Constants?.expoConfig?.extra?.MAIN_ORIGIN, {
         transports: ["websocket"],
         cors: {
           origin: [
