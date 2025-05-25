@@ -15,7 +15,7 @@ import { memberInactive } from "@redux/Actions/memberActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { SelectedTab } from "@shared/SelectedTab";
 const Memberlist = () => {
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
@@ -23,7 +23,7 @@ const Memberlist = () => {
   const userId = context?.stateUser?.userProfile?._id;
   const [refreshing, setRefreshing] = useState(false);
   const { loading, members, error } = useSelector((state) => state.memberList);
-  const [selectedTab, setSelectedTab] = useState("Not_Approved");
+  const [selectedTab, setSelectedTab] = useState("MPending");
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -56,57 +56,14 @@ const Memberlist = () => {
     }
   }, [ userId, token]);
 
+    const choicesTab = [
+    { label: "Pending", value: "MPending" },
+    { label: "Approved", value: "MApproved" },
+  ]
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Members List</Text>
-      </View> */}
-
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "Not_Approved" && styles.activeTab,
-          ]}
-          onPress={() => {
-            setSelectedTab("Not_Approved");
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Not_Approved" && styles.activeTabText,
-            ]}
-          >
-            Not Approved
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "Approved" && styles.activeTab,
-          ]}
-          onPress={() => {
-            navigation.navigate("MemberActive");
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Approved" && styles.activeTabText,
-            ]}
-          >
-            Approved
-          </Text>
-        </TouchableOpacity>
-      </View>
+<SelectedTab selectedTab={selectedTab} tabs={choicesTab} onTabChange={setSelectedTab} />
 
       {/* Content */}
       {loading ? (

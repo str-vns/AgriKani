@@ -4,45 +4,40 @@ import ProductsList from "@screens/Farmer/Product/ProductList";
 import ProductsCreate from "@screens/Farmer/Product/ProductCreate";
 import productEdit from "@screens/Farmer/Product/ProductUpdate";
 import productArchive from "@screens/Farmer/Product/ProductArchive";
+import {
+  DrawerDesign,
+  BackButton,
+  ListContainer,
+} from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="ProductsList">
        <Stack.Screen
           name="ProductsList"
           component={ProductsList}
-          options={{
-            headerShown: false,
-            tabBarShowLabel: false,
-          }}
+          options={{ header: (props) => <ListContainer {...props} title="Product List" isCreate={true} isScreen={"Product"}/> }}
         />
         <Stack.Screen
           name="ProductsCreate"
           component={ProductsCreate}
           options={{
-            headerShown: true,
-            title:"Create Product",
-            tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Create Product" />
           }}
         />
         <Stack.Screen
           name="productEdit"
           component={productEdit}
           options={{
-            headerShown: true,
-            title:"Update Product",
-            tabBarShowLabel: false,
+            header: (props) => <BackButton {...props} title="Update Product" />
           }}
         />
         <Stack.Screen
           name="productArchive"
           component={productArchive}
           options={{
-            
-            headerShown:true,
-            title:"Product Archive",
-            headerBackTitleVisible: true,
+            header: (props) => <DrawerDesign {...props} title="Product Archive" />
         
           }}
         />

@@ -14,17 +14,17 @@ const Index = () => {
        <Stack.Screen
         name="UserPostList"
         component={UserPostList}
-        options={{ headerShown: true , title:"Your Post"}}
+        options={{ header: (props) => <BackButton {...props} title="Your Post" />,}}
       />
        <Stack.Screen
         name="PostList"
         component={PostList}
-        options={{ headerShown: true }}
+        options={{ header: (props) => <BackButton {...props} title="Post List" />, }}
       />
       <Stack.Screen
         name="UserPostScreen"
         component={UserPostScreen}
-        options={{ headerShown: true,title:"Create Post" }}
+        options={{ header: (props) => <BackButton {...props} title="Create" />, }}
       />
       <Stack.Screen
         name="CommunityForum"

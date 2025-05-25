@@ -93,9 +93,7 @@ const UserNavigation = () => {
       <Stack.Screen
         name="EditFarm"
         options={{
-          headerShown: true,
-          title: "Edit Farm",
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Update Farm" />,
         }}
         component={EditFarm}
       />

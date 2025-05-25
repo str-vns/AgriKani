@@ -97,16 +97,6 @@ const InventoryCreate = (props) => {
 
     return (
         <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => backButton()}
-          >
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Add Inventory</Text>
-        </View>
-  
         <ScrollView contentContainerStyle={styles.scrollViewContainer}>
             
         <Text style={styles.label}>Unit</Text>

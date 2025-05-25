@@ -14,8 +14,6 @@ import {
 import { allCoopOrders } from "@redux/Actions/coopActions";
 import { fetchCoopOrders } from "@redux/Actions/orderActions";
 import { Ionicons } from "@expo/vector-icons";
-// import styles from "../css/styles";
-
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -29,6 +27,7 @@ import messaging from "@react-native-firebase/messaging";
 import { createConversation } from "@redux/Actions/converstationActions";
 import { conversationList } from "@redux/Actions/converstationActions";
 import { getUsers } from "@redux/Actions/userActions";
+import { SelectedTab } from "@shared/SelectedTab";
 
 const OrderList = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -46,6 +45,7 @@ const OrderList = ({ navigation }) => {
   const [fcmToken, setFcmToken] = useState(null);
   const [refresh, setRefresh] = React.useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("Pending");
   const filteredOrders = (Array.isArray(orders) ? orders : [])
     .map((order) => ({
       ...order,
@@ -56,6 +56,23 @@ const OrderList = ({ navigation }) => {
     .filter((order) => order.orderItems?.length > 0);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [isOnline, setIsOnline] = useState(false);
+
+  const filterTab = filteredOrders
+    ?.map((order) => ({
+      ...order,
+      orderItems: order.orderItems.filter(
+        (item) => item.orderStatus === selectedTab
+      ),
+    }))
+    .filter((order) => order.orderItems.length > 0);
+
+  const choicesTab = [
+    { label: "Pending", value: "Pending" },
+    { label: "Processing", value: "Processing" },
+    { label: "Shipping", value: "Shipping" },
+    { label: "Delivered", value: "Delivered" },
+    { label: "Cancelled", value: "Cancelled" },
+  ];
 
   useEffect(() => {
     if (userId && token) {
@@ -112,7 +129,6 @@ const OrderList = ({ navigation }) => {
   }, [socket, userId]);
 
   useEffect(() => {
-
     if (users && onlineUsers.length > 0) {
       const userIsOnline = users.some((user) =>
         onlineUsers.some(
@@ -269,27 +285,27 @@ const OrderList = ({ navigation }) => {
 
           const response = await dispatch(createConversation(newConvo, token));
           console.log("response", response?.conversation?.conversation?._id);
-          
-        if (response) {
-          // Refresh the conversation list
-          const response = await dispatch(conversationList(userId, token));
-          
-          // Debugging log
-          console.log("Updated conversations:", response);
 
-          setTimeout(() => {
-            navigation.navigate("Messaging", {
-              screen: "ChatMessaging",
-              params: {
-                item: item.user,
-                conversations: response,
-                isOnline: onlineUsers,
-              },
-            });
-          }, 500); // Adjust delay as needed
-        } else {
-          console.error("Error creating conversation");
-        }
+          if (response) {
+            // Refresh the conversation list
+            const response = await dispatch(conversationList(userId, token));
+
+            // Debugging log
+            console.log("Updated conversations:", response);
+
+            setTimeout(() => {
+              navigation.navigate("Messaging", {
+                screen: "ChatMessaging",
+                params: {
+                  item: item.user,
+                  conversations: response,
+                  isOnline: onlineUsers,
+                },
+              });
+            }, 500); // Adjust delay as needed
+          } else {
+            console.error("Error creating conversation");
+          }
         }
       } catch (error) {
         console.error(
@@ -318,14 +334,16 @@ const OrderList = ({ navigation }) => {
         return { color: "#555555" }; // Darker Gray
     }
   };
-  
 
   const renderOrder = ({ item }) => {
-    const formattedDate = new Date(item?.createdAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
+    const formattedDate = new Date(item?.createdAt).toLocaleDateString(
+      "en-US",
+      {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }
+    );
 
     return (
       <View style={styles.orderCard}>
@@ -333,23 +351,27 @@ const OrderList = ({ navigation }) => {
           <View style={styles.orderDetails}>
             <Text style={styles.orderId}>Order #{item?._id}</Text>
             <Text style={styles.customerName}>
-            <Text style={styles.label}>Customer:</Text>  {item?.user?.firstName} {item?.user?.lastName}
+              <Text style={styles.label}>Customer:</Text>{" "}
+              {item?.user?.firstName} {item?.user?.lastName}
             </Text>
-            <Text style={styles.orderDate}><Text style={styles.label}>Date</Text>  {formattedDate}</Text>
-            { item?.totalAmount !== 0 && 
-            (
-            <Text style={styles.orderInfo}>
-              <Text style={styles.label}>Total Price:</Text>  ₱ {item?.totalAmount}
+            <Text style={styles.orderDate}>
+              <Text style={styles.label}>Date</Text> {formattedDate}
             </Text>
-            )
-            }
+            {item?.totalAmount !== 0 && (
+              <Text style={styles.orderInfo}>
+                <Text style={styles.label}>Total Price:</Text> ₱{" "}
+                {item?.totalAmount}
+              </Text>
+            )}
             <Text style={styles.orderInfo}>
-            <Text style={styles.label}>Address:</Text> {item?.shippingAddress?.address},{" "}
-              {item?.shippingAddress?.city}
+              <Text style={styles.label}>Address:</Text>{" "}
+              {item?.shippingAddress?.address}, {item?.shippingAddress?.city}
             </Text>
             <Text
               style={[
-                item?.payStatus === "Paid" ? styles?.paidStatus : styles?.unpaidStatus,
+                item?.payStatus === "Paid"
+                  ? styles?.paidStatus
+                  : styles?.unpaidStatus,
               ]}
             >
               Payment: {item?.payStatus === "Paid" ? "Paid" : "Unpaid"}
@@ -376,12 +398,12 @@ const OrderList = ({ navigation }) => {
                         )}
 
                         <View style={styles.textContainer}>
-                 
-    {orderItem.product?.productName && (
-      <Text style={styles.orderItemName}>{orderItem.product.productName}</Text>
-    )}
-   
- 
+                          {orderItem.product?.productName && (
+                            <Text style={styles.orderItemName}>
+                              {orderItem.product.productName}
+                            </Text>
+                          )}
+
                           <Text style={styles.orderItemPrice}>
                             Size: {orderItem.inventoryProduct?.unitName}{" "}
                             {orderItem.inventoryProduct?.metricUnit}
@@ -392,21 +414,37 @@ const OrderList = ({ navigation }) => {
                           <Text style={styles.orderItemQuantity}>
                             Quantity: {orderItem?.quantity}
                           </Text>
-                          <View style={{  flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 5  }}>
-                          <Text
-                            style={[
-                              styles[`status${orderItem?.orderStatus}`],
-                              getStatusColor(orderItem?.orderStatus),
-                            ]}
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              marginTop: 5,
+                            }}
                           >
-                            <Text style={{ color: "black" }}>Status: </Text>
-                            {orderItem?.orderStatus}
-                          </Text>
-                          { orderItem?.orderStatus === "Cancelled" && (
-                          <TouchableOpacity style={styles.buttonCancelled} onPress={() => navigation.navigate("Reason", { order: orderItem })}>
-                          <Text style={styles.buttonTextCancelled}>View</Text>
-                          </TouchableOpacity>
-                          )}
+                            <Text
+                              style={[
+                                styles[`status${orderItem?.orderStatus}`],
+                                getStatusColor(orderItem?.orderStatus),
+                              ]}
+                            >
+                              <Text style={{ color: "black" }}>Status: </Text>
+                              {orderItem?.orderStatus}
+                            </Text>
+                            {orderItem?.orderStatus === "Cancelled" && (
+                              <TouchableOpacity
+                                style={styles.buttonCancelled}
+                                onPress={() =>
+                                  navigation.navigate("Reason", {
+                                    order: orderItem,
+                                  })
+                                }
+                              >
+                                <Text style={styles.buttonTextCancelled}>
+                                  View
+                                </Text>
+                              </TouchableOpacity>
+                            )}
                           </View>
                         </View>
                       </View>
@@ -450,7 +488,9 @@ const OrderList = ({ navigation }) => {
                               (orderItem) =>
                                 orderItem?.orderStatus !== "Cancelled"
                             )
-                            .map((orderItem) => orderItem?.inventoryProduct?._id),
+                            .map(
+                              (orderItem) => orderItem?.inventoryProduct?._id
+                            ),
                           item
                         )
                       }
@@ -483,7 +523,9 @@ const OrderList = ({ navigation }) => {
                               (orderItem) =>
                                 orderItem?.orderStatus !== "Cancelled"
                             )
-                            .map((orderItem) => orderItem?.inventoryProduct?._id),
+                            .map(
+                              (orderItem) => orderItem?.inventoryProduct?._id
+                            ),
                           item
                         )
                       }
@@ -504,23 +546,19 @@ const OrderList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.drawerButton}
-          onPress={() => navigation.toggleDrawer()}
-        >
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Order List</Text>
-      </View> */}
+      <SelectedTab
+        selectedTab={selectedTab}
+        tabs={choicesTab}
+        onTabChange={setSelectedTab}
+        isOrder={true}
+      />
       {orderloading ? (
         <ActivityIndicator size="large" color="black" style={styles.loader} />
       ) : (
         <>
-          {filteredOrders && filteredOrders?.length > 0 ? (
+          {filterTab && filterTab?.length > 0 ? (
             <FlatList
-              data={filteredOrders}
+              data={filterTab}
               keyExtractor={(item) => item?._id}
               renderItem={renderOrder}
               ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -683,10 +721,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "bold",
   },
+  noOrdersText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#888",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F9F9F9",
+  }
 });
-
-
-
-
 
 export default OrderList;

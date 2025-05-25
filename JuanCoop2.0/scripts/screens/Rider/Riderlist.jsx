@@ -18,7 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { removeDriver } from "@redux/Actions/driverActions";
 import { Alert } from "react-native";
-
+import { SelectedTab } from "@shared/SelectedTab";
 const Riderlist = () => {
   const context = useContext(AuthGlobal);
   const userId = context.stateUser?.userProfile?._id;
@@ -142,57 +142,14 @@ const Riderlist = () => {
     </View>
   );
 
+  const choicesTab = [
+    { label: "Assign", value: "Assign" },
+    { label: "Rider", value: "Rider" },
+  ]
+
   return (
     <View style={styles.container}>
-      <View style={styles.header2}>
-        <TouchableOpacity
-          style={styles.drawerButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle2}>Rider List</Text>
-
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => {
-            navigation.navigate("Register");
-            console.log("Button Pressed");
-          }}
-        >
-          <Text style={styles.buttonText}>Add Rider</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === "Assign" && styles.activeTab]}
-          onPress={() => navigation.navigate("AssignList")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "Assign" && styles.activeTabText,
-            ]}
-          >
-            Assign
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === "Rider" && styles.activeTab]}
-          onPress={() => setActiveTab("Rider")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "Rider" && styles.activeTabText,
-            ]}
-          >
-            Rider
-          </Text>
-        </TouchableOpacity>
-      </View>
-
+      <SelectedTab selectedTab={activeTab} tabs={choicesTab} onTabChange={setActiveTab} />
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : drivers?.length === 0 || error ? (

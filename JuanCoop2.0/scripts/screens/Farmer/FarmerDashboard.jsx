@@ -564,16 +564,6 @@ const FarmerDashboard = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.drawerButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Dashboard</Text>
-      </View>
-
       <View style={styles.bannerContainer}>
         <Text style={styles.bannerText}>⚠️ Out of Stock:</Text>
         <FlatList

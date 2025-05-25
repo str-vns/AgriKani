@@ -7,8 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { conversationList } from '@redux/Actions/converstationActions';
 import { getUsers } from '@redux/Actions/userActions';
 import { useSocket } from '../../../../SocketIo';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { listMessages } from "@redux/Actions/messageActions";
+import { getToken, isOnline, isUsersOnline } from "../../../utils/usage";
 
 const UserChatlist = () => {
   const dispatch = useDispatch();
@@ -22,8 +21,8 @@ const UserChatlist = () => {
   const { users } = useSelector((state) => state.getThemUser);
   const [selectedChatId, setSelectedChatId] = useState(null); 
   const [token, setToken] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const [isOnline, setIsOnline] = useState(false);
+  const onlineUsers = isOnline({ userId: UserId})
+  const isUserOnline = isUsersOnline({ userId: UserId, onlineUsers: onlineUsers });
   const [arrivedMessages, setArrivedMessages] = useState([]);
   const [refreshing, setRefreshing] = useState(false); 
   const validConversations = Array.isArray(conversations) ? conversations : [];
@@ -85,43 +84,10 @@ useEffect(() => {
     }
   }, [conversations, UserId, token]);
 
-  // Get online users
-  useEffect(() => {
-    socket.emit("addUser", UserId);
-  
-    socket.on("getUsers", (users) => {
-      const onlineUsers = users.filter(user => user.online && user.userId !== null);
-      // console.log("Filtered online users:", onlineUsers);  
-      setOnlineUsers(onlineUsers);  
-    });
-  
-    return () => {
-      socket.off("getUsers");
-    };
-  
-  }, [socket, UserId]);  
-  
-  //isOnline 
-  useEffect(() => {
-    // console.log("All Users:", users);
-    // console.log("Online Users:", onlineUsers);
-  
-    if (users && onlineUsers.length > 0) {
-      const userIsOnline = users.some(user =>
-        onlineUsers.some(onlineUser => 
-          onlineUser.userId === user.details._id && onlineUser.online && onlineUser.userId !== null
-        )
-      ); 
-  
-      setIsOnline(userIsOnline); 
-    } else {
-      setIsOnline(false); 
-    }
-  }, [users, onlineUsers]);
-
-
-  const isUserOnline = (userId) => {
-    return onlineUsers.some(onlineUser => onlineUser.userId === userId && onlineUser.online);
+   const isOpenOnline = (userId) => {
+    return onlineUsers.some(
+      (onlineUser) => onlineUser.userId === userId && onlineUser.online
+    );
   };
 
   const onRefresh = async () => {
@@ -159,7 +125,7 @@ useEffect(() => {
           {item.details?.image?.url ? (
             <View>
             <Image source={{ uri: item.details.image.url }} style={styles.profileImage} />
-             <View style={isUserOnline(item.details._id) ? styles.onlineIndicator : styles.offlineIndicator} />
+             <View style={isOpenOnline(item.details._id) ? styles.onlineIndicator : styles.offlineIndicator} />
             </View>
           ) : (
             <View>

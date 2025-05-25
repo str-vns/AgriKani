@@ -93,41 +93,6 @@ const UserChatlist = () => {
     }
   }, [conversations, UserId, token]);
 
-  // Get online users
-  // useEffect(() => {
-  //   socket.emit("addUser", UserId);
-
-  //   socket.on("getUsers", (users) => {
-  //     const onlineUsers = users.filter(
-  //       (user) => user.online && user.userId !== null
-  //     );
-  //     // console.log("Filtered online users:", onlineUsers);
-  //     setOnlineUsers(onlineUsers);
-  //   });
-
-  //   return () => {
-  //     socket.off("getUsers");
-  //   };
-  // }, [socket, UserId]);
-
-  //isOnline
-  // useEffect(() => {
-  //   // console.log("All Users:", users);
-  //   // console.log("Online Users:", onlineUsers);
-
-  //   if (users && onlineUsers.length > 0) {
-  //     const userIsOnline = users.some(user =>
-  //       onlineUsers.some(onlineUser =>
-  //         onlineUser.userId === user.details._id && onlineUser.online && onlineUser.userId !== null
-  //       )
-  //     );
-
-  //     setIsOnline(userIsOnline);
-  //   } else {
-  //     setIsOnline(false);
-  //   }
-  // }, [users, onlineUsers]);
-
   const isOpenOnline = (userId) => {
     return onlineUsers.some(
       (onlineUser) => onlineUser.userId === userId && onlineUser.online

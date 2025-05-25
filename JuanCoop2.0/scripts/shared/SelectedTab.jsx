@@ -6,10 +6,27 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import { use } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 export const SelectedTab = (props) => {
     const { isOrder } = props;
     const [selectedTab, setSelectedTab] = useState(props.selectedTab);
+    const navigation = useNavigation();
+    console.log("SelectedTab props:", selectedTab);
+    const navigateToTab = (tabValue) => {
+      if (selectedTab === tabValue) return; // Prevent unnecessary navigation
+      setSelectedTab(tabValue);
+      if (tabValue === "Rider") {
+        navigation.navigate("Riderlist");
+      } else if (tabValue === "Assign") {
+        navigation.navigate("AssignList");
+      } else if (tabValue === "MApproved") {
+        navigation.navigate("MemberActive");
+      } else if (tabValue === "MPending") {
+        navigation.navigate("MemberList");
+      }
+    }
 
     const tabButtons = props.tabs && props.tabs.map((tab) => (
     <TouchableOpacity
@@ -19,6 +36,7 @@ export const SelectedTab = (props) => {
         selectedTab === tab.value && styles.activeTab,
       ]}
       onPress={() => {
+        navigateToTab(tab.value);
         setSelectedTab(tab.value);
         if (props.onTabChange) props.onTabChange(tab.value);
       }}
@@ -41,7 +59,7 @@ export const SelectedTab = (props) => {
           {tabButtons}
         </ScrollView>
       ) : (
-        <View style={styles.tabContainer}>
+        <View style={styles.isNotTabContiner}>
           {tabButtons}
         </View>
       )}
