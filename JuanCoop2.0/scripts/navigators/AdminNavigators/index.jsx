@@ -29,49 +29,209 @@ import WithdrawsList from "@screens/admin/Withdraws/WithdrawsList";
 import RefundDetails from "@screens/admin/Refund/RefundDetails";
 import RefundProcess from "@screens/admin/Refund/RefundProcess";
 import RefundSuccess from "@screens/admin/Refund/RefundSuccess";
+import { DrawerDesign, BackButton, ListContainer } from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
   return (
-    <Box safeArea flex={1}>
-      <Stack.Navigator
-        initialRouteName="AdminDashboards"
+    <Stack.Navigator
+      initialRouteName="AdminDashboards"
+      screenOptions={{
+        header: (props) => <DrawerDesign {...props} title="Dashboard" />,
+      }}
+    >
+      <Stack.Screen
+        name="AdminDashboards"
+        component={Dashboards}
         screenOptions={{
-          headerShown: false,
+          header: (props) => <DrawerDesign {...props} title="Dashboard" />,
         }}
-      >
-        <Stack.Screen name="AdminDashboards" component={Dashboards} />
-        <Stack.Screen name="Forum" component={Forum} />
-        <Stack.Screen name="BlogList" component={BlogList} />
-        <Stack.Screen name="BlogCreate" component={BlogCreate} options={{ headerShown: true,   title:"Create Blog" }} />
-        <Stack.Screen name="BlogUpdate" component={BlogUpdate} options={{ headerShown: true,   title:"Update Blog" }}/>
-        <Stack.Screen name="BlogCard" component={BlogCard} />
-        <Stack.Screen name="UserList" component={UserList} options={{ headerShown: true,   title:"User List" }}/>
-        <Stack.Screen name="CoopList" component={CoopLists} options={{ headerShown: true,   title:"Cooperative List" }}/>
-        <Stack.Screen name="CoopActive" component={CoopActive} options={{ headerShown: true,   title:"Cooperative List" }}/>
-        <Stack.Screen name="CoopDetails" component={CoopDetails} options={{ headerShown: true,   title:"Cooperative Details" }}/>
-        <Stack.Screen name="DriverList" component={DriverList} options={{ headerShown: true,   title:"Driver List" }}/>
-        <Stack.Screen name="DriverDetails" component={DriverDetails}options={{ headerShown: true,   title:"Driver Details" }} />
-        <Stack.Screen name="DriverActive" component={DriverActive} options={{ headerShown: true,   title:"Driver List" }}/>
-
-        <Stack.Screen name="barGraph" component={barGraph} />
-
-        <Stack.Screen name="CategoryList" component={CategoryList} />
-        <Stack.Screen name="CategoryCreate" component={CategoryCreate} options={{ headerShown: true,   title:"Create Category" }}/>
-        <Stack.Screen name="CategoryUpdate" component={CategoryUpdate} options={{ headerShown: true,   title:"Update Category" }}/>
-
-        <Stack.Screen name="TypeList" component={TypeList} />
-
-        <Stack.Screen name="TypeCreate" component={TypeCreate} />
-        <Stack.Screen name="TypeUpdate" component={TypeUpdate} />
-        <Stack.Screen name="WithdrawsList" component={WithdrawsList} options={{ headerShown: true,   title:"Withdraw Request" }}/>
-        <Stack.Screen name="WithdrawsSuccess" component={WithdrawsSuccess} options={{ headerShown: true,   title:"Withdraw Request" }}/>
-        <Stack.Screen name="WithdrawsSingle" component={WithdrawsSingle} options={{ headerShown: true,   title:"Withdraw Details" }} />
-        <Stack.Screen name="RefundProcess" component={RefundProcess} />
-        <Stack.Screen name="RefundSuccess" component={RefundSuccess} />
-        <Stack.Screen name="RefundDetails" component={RefundDetails} options={{ headerShown: true,   title:"Refund Details" }}/>
-      </Stack.Navigator>
-    </Box>
+      />
+      <Stack.Screen name="Forum" component={Forum} />
+      <Stack.Screen
+        name="BlogList"
+        component={BlogList}
+        options={{
+          header: (props) => (
+            <ListContainer
+              {...props}
+              title="Blog List"
+              isCreate={true}
+              isScreen="BlogList"
+            />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="BlogCreate"
+        component={BlogCreate}
+        options={{
+          header: (props) => <BackButton {...props} title="Create Blog" />,
+        }}
+      />
+      <Stack.Screen
+        name="BlogUpdate"
+        component={BlogUpdate}
+        options={{
+          header: (props) => <BackButton {...props} title="Update Blog" />,
+        }}
+      />
+      <Stack.Screen name="BlogCard" component={BlogCard} />
+      <Stack.Screen
+        name="UserList"
+        component={UserList}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="User List" />,
+        }}
+      />
+      <Stack.Screen
+        name="CoopList"
+        component={CoopLists}
+        options={{
+          header: (props) => (
+            <DrawerDesign {...props} title="Cooperative List" />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="CoopActive"
+        component={CoopActive}
+        options={{
+          header: (props) => (
+            <DrawerDesign {...props} title="Cooperative List" />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="CoopDetails"
+        component={CoopDetails}
+        options={{
+          header: (props) => (
+            <BackButton {...props} title="Cooperative Details" />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="DriverList"
+        component={DriverList}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Driver List" />,
+        }}
+      />
+      <Stack.Screen
+        name="DriverDetails"
+        component={DriverDetails}
+        options={{
+          header: (props) => <BackButton {...props} title="Driver Details" />,
+        }}
+      />
+      <Stack.Screen
+        name="DriverActive"
+        component={DriverActive}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Driver List" />,
+        }}
+      />
+      <Stack.Screen name="barGraph" component={barGraph} />
+      <Stack.Screen
+        name="CategoryList"
+        component={CategoryList}
+        options={{
+          header: (props) => (
+            <ListContainer
+              {...props}
+              title="Category List"
+              isCreate={true}
+              isScreen="CategoryList"
+            />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="CategoryCreate"
+        component={CategoryCreate}
+        options={{
+          header: (props) => <BackButton {...props} title="Create Category" />,
+        }}
+      />
+      <Stack.Screen
+        name="CategoryUpdate"
+        component={CategoryUpdate}
+        options={{
+          header: (props) => <BackButton {...props} title="Update Category" />,
+        }}
+      />
+      <Stack.Screen
+        name="TypeList"
+        component={TypeList}
+        options={{
+          header: (props) => (
+            <ListContainer
+              {...props}
+              title="Type List"
+              isCreate={true}
+              isScreen="TypeList"
+            />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="TypeCreate"
+        component={TypeCreate}
+        options={{
+          header: (props) => <BackButton {...props} title="Create Type" />,
+        }}
+      />
+      <Stack.Screen
+        name="TypeUpdate"
+        component={TypeUpdate}
+        options={{
+          header: (props) => <BackButton {...props} title="Update Type" />,
+        }}
+      />
+      <Stack.Screen
+        name="WithdrawsList"
+        component={WithdrawsList}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Withdraw List" />,
+        }}
+      />
+      <Stack.Screen
+        name="WithdrawsSuccess"
+        component={WithdrawsSuccess}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Withdraw List" />,
+        }}
+      />
+      <Stack.Screen
+        name="WithdrawsSingle"
+        component={WithdrawsSingle}
+        options={{
+          header: (props) => <BackButton {...props} title="Withdraw Details" />,
+        }}
+      />
+      <Stack.Screen
+        name="RefundProcess"
+        component={RefundProcess}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Refund Request" />,
+        }}
+      />
+      <Stack.Screen
+        name="RefundSuccess"
+        component={RefundSuccess}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Refund Request" />,
+        }}
+      />
+      <Stack.Screen
+        name="RefundDetails"
+        component={RefundDetails}
+        options={{
+          header: (props) => <BackButton {...props} title="Withdraw Details" />,
+        }}
+      />
+    </Stack.Navigator>
   );
 };
 

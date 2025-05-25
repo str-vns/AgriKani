@@ -14,13 +14,14 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { allCoops } from "@redux/Actions/coopActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SelectedTab } from "@shared/SelectedTab";
 
 const CooplistActive = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const { loading, coops, error } = useSelector((state) => state.allofCoops);
-  const [selectedTab, setSelectedTab] = useState("Approved");
+  const [selectedTab, setSelectedTab] = useState("CApproved");
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -57,73 +58,18 @@ const CooplistActive = () => {
     }
   }, [dispatch, token]);
 
+const choicesTab = [
+    { label: "Pending", value: "CPending" },
+    { label: "Approved", value: "CApproved" },
+  ]
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Coop List</Text>
-      </View> */}
-       {/* <View style={styles.header}>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()}
-              >
-                <Ionicons name="arrow-back" size={28} color="black" />
-              </TouchableOpacity>
-              <Text style={styles.headerTitle}>Cooperative List</Text>
-            </View> */}
-
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "Not_Approved" && styles.activeTab,
-          ]}
-          onPress={() => {
-            navigation.navigate("CoopList");
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Not_Approved" && styles.activeTabText,
-            ]}
-          >
-            Not Approved
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "Approved" && styles.activeTab,
-          ]}
-          onPress={() => {
-            setSelectedTab("Approved");
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Approved" && styles.activeTabText,
-            ]}
-          >
-            Approved
-          </Text>
-        </TouchableOpacity>
-      </View>
-      {/* Content */}
+  
+     <SelectedTab selectedTab={selectedTab} tabs={choicesTab} onTabChange={setSelectedTab} />
+    
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : coops?.length === 0 || error ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No cooperative found.</Text>
-        </View>
       ) : (
         <FlatList
           data={coops}
@@ -154,6 +100,11 @@ const CooplistActive = () => {
               </TouchableOpacity>
             </View>
           )}
+           ListEmptyComponent={
+                    <View style={styles.emptyContainer}>
+                      <Text style={styles.emptyText}>No cooperative found</Text>
+                    </View>
+                  }
         />
       )}
     </View>

@@ -25,7 +25,25 @@ export const SelectedTab = (props) => {
         navigation.navigate("MemberActive");
       } else if (tabValue === "MPending") {
         navigation.navigate("MemberList");
+      } else if (tabValue === "CApproved") {
+        navigation.navigate("CoopActive");
+      } else if (tabValue === "CPending") {
+        navigation.navigate("CoopList");
+      } else if (tabValue === "DApproved") {
+        navigation.navigate("DriverActive");
+      } else if (tabValue === "DPending") {
+        navigation.navigate("DriverList");
+      } else if (tabValue === "WPending") {
+        navigation.navigate("WithdrawsList");
+      } else if (tabValue === "WApproved") {
+        navigation.navigate("WithdrawsSuccess");
+      } else if (tabValue === "RPending") {
+        navigation.navigate("RefundProcess");
+      } else if (tabValue === "RApproved") {
+        navigation.navigate("RefundSuccess");
       }
+      
+
     }
 
     const tabButtons = props.tabs && props.tabs.map((tab) => (

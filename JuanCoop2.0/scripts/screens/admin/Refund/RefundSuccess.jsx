@@ -6,13 +6,13 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getSuccessRefund } from "@redux/Actions/transactionActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { SelectedTab } from "@shared/SelectedTab";
 const RefundSuccess = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const [refreshing, setRefreshing] = useState(false);
     const {refundloading, refund, refunderror} = useSelector((state) => state.refund)
-    const [selectedTab, setSelectedTab] = useState("Success");
+    const [selectedTab, setSelectedTab] = useState("RApproved");
     const [token, setToken] = useState(null);
    
     useEffect(() => {
@@ -49,59 +49,18 @@ const RefundSuccess = () => {
       }
     }, [dispatch, token]);
   
+    const choicesTab = [
+    { label: "Pending", value: "RPending" },
+    { label: "Success", value: "RApproved" },
+  ];
     return (
       <View style={styles.container}>
-  
-        <View style={styles.header}>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={() => navigation.goBack()}
-                >
-                  <Ionicons name="arrow-back" size={28} color="black" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Refund Request List</Text>
-            </View>
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[
-              styles.tabButton,
-              selectedTab === "Pending" && styles.activeTab,
-            ]}
-            onPress={() => {
-                navigation.navigate("RefundProcess");
-              }}
-
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedTab === "Pending" && styles.activeTabText,
-              ]}
-            >
-              Pending
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.tabButton,
-              selectedTab === "Success" && styles.activeTab,
-            ]}
-            onPress={() => {
-                setSelectedTab("Success");
-              }}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedTab === "Success" && styles.activeTabText,
-              ]}
-            >
-              Success 
-            </Text>
-          </TouchableOpacity>
-        </View>
-  
-        {/* Content */}
+   <SelectedTab
+          selectedTab={selectedTab}
+          tabs={choicesTab}
+          onTabChange={setSelectedTab}
+        />
+       
         {refundloading ? (
           <ActivityIndicator size="large" color="blue" style={styles.loader} />
         ) : refund?.length === 0 || refunderror ? (
