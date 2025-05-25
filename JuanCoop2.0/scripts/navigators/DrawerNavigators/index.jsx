@@ -259,23 +259,6 @@ const Index = () => {
           component={AdminNavigators}
         />
 
-        <Drawer.Screen
-          name="WithdrawList"
-          component={WithdrawList}
-          options={{
-            headerShown: false,
-            tabBarShowLabel: false,
-          }}
-        />
-
-        <Drawer.Screen
-          name="WithdrawsList"
-          component={WithdrawsList}
-          options={{
-            headerShown: false,
-            tabBarShowLabel: false,
-          }}
-        />
 
       <Drawer.Screen
         name="WithdrawsList"
@@ -298,16 +281,14 @@ const Index = () => {
         name="AboutUs"
         component={AboutUs}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <DrawerDesign {...props} title="About Us" />,
         }}
       />
       <Drawer.Screen
         name="Tutorial"
         component={Tutorial}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <DrawerDesign {...props} title="Tutorial Videos" />,
         }}
       />   
       <Drawer.Screen
