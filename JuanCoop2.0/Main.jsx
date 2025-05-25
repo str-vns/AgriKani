@@ -7,7 +7,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigationState, useNavigation } from "@react-navigation/native";
 import HomeScreen from "@navigators/Home";
 import RegisterScreen from "@navigators/SignInNavigators";
 import ReviewsNavigators from "@navigators/ReviewsNavigators";
@@ -24,10 +24,9 @@ import RiderNavigators from "@navigators/RiderNavigators";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { isLogin } from "@redux/Actions/Auth.actions";
 import { Text } from "native-base";
-import messaging from '@react-native-firebase/messaging';
-import * as Notification from 'expo-notifications';
+import messaging from "@react-native-firebase/messaging";
+import * as Notification from "expo-notifications";
 import Landing from "@screens/User/Landing";
-
 const Stack = createStackNavigator();
 
 Notification.setNotificationHandler({
@@ -43,6 +42,8 @@ const Main = () => {
   const navigation = useNavigation();
   const UserRoles = context?.stateUser?.userProfile || null;
   const [loading, setLoading] = useState(true);
+  const routes = useNavigationState((state) => state.routes);
+  const currentRoute = routes[routes.length - 1]?.name;
 
   const requestNotificationPermission = async () => {
     const { status: existingStatus } = await Notification.getPermissionsAsync();
@@ -166,52 +167,36 @@ const Main = () => {
     initialize();
   }, []);
 
-  const handleBackPress = () => {
-    // const currentRoute = navigation.getCurrentRoute()?.name;
-    // console.log("Current Route:", navigation.getCurrentRoute());
-    // if (currentRoute === "Coop") {
-    //   Alert.alert("Exit App", "Exiting the application?", [
-    //     {
-    //       text: "Cancel",
-    //       onPress: () => null,
-    //       style: "cancel",
-    //     },
-    //     {
-    //       text: "Ok",
-    //       onPress: () => BackHandler.exitApp(),
-    //     },
-    //   ]);
-    //   return true;
-    // } else {
+ const handleBackPress = () => {
+  console.log("Current Route Name:", currentRoute);
 
-    //   navigation.goBack();
-    //   return true;
-    // }
-    Alert.alert("Hold on!", "Are you sure you want to go back?", [
+  if (currentRoute === "Coop") {
+    return true;
+  } else if (navigation.canGoBack()) {
+    navigation.goBack();
+    return true;
+  } else {
+   Alert.alert("Exit App", "Exiting the application?", [
       {
         text: "Cancel",
         onPress: () => null,
         style: "cancel",
       },
-      { text: "YES", onPress: () => BackHandler.exitApp() },
+      {
+        text: "Ok",
+        onPress: () => BackHandler.exitApp(),
+      },
     ]);
+
     return true;
-  };
+  }
+};
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const backHandler = BackHandler.addEventListener(
-        "hardwareBackPress",
-        handleBackPress
-      );
+useEffect(() => {
+  const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+  return () => backHandler.remove();
+}, [currentRoute]);
 
-      return () => {
-        backHandler.remove();
-      };
-    }, [navigation])
-  );
-
-  
   if (context.stateUser?.isLoading === false) {
     <View style={styles.loaderContainer}>
       <ActivityIndicator size="large" color="#0000ff" />
@@ -266,7 +251,10 @@ const Main = () => {
       );
     } else {
       return (
-        <Stack.Navigator initialRouteName="Landing" screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          initialRouteName="Landing"
+          screenOptions={{ headerShown: false }}
+        >
           <Stack.Screen name="Landing" component={Landing} />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
