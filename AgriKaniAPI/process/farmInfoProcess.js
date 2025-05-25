@@ -8,6 +8,7 @@ const User = require("../models/user");
 const Orders = require("../models/order");
 const { sendEmail } = require("../utils/sendMail");
 const Wallet = require("../models/wallets");
+const { sendFcmNotification } = require("../services/sendFcmNotif");
 // NOTE Three DOTS MEANS OK IN COMMENT
 
 //create ...
@@ -57,6 +58,22 @@ exports.CreateFarmProcess = async (req) => {
   
   if (!wallet) throw new ErrorHandler("Wallet not created");
 
+   const admin = await User.findById("6728323269587b48f9b4fd48")
+
+      if (!admin) throw new ErrorHandler("Admin not exist");
+      await sendFcmNotification(
+        admin,
+        "New Driver Registration",
+        `A new driver has registered with the email ${req.body.email}`,
+      );
+  
+      await Notification.create({
+        user: admin._id,
+        title: "New Driver Registration",
+        type: "driver",
+        content: `A new driver has registered with the email ${req.body.email}`,
+      });
+       
   return farm;
 };
 
@@ -414,6 +431,12 @@ exports.ApproveCoop = async (id, req) => {
       await user.save();
     }
   
+     await sendFcmNotification(
+        user,
+        "Approved Cooperative Registration",
+        `A new cooperative has been approved with the email ${req.body.email}`,
+      );
+
     return coopUpdate;
   
   } catch (error) {
@@ -512,6 +535,13 @@ exports.DisapproveCoop = async (id) => {
     `,
   };
 
+  
+     await sendFcmNotification(
+        coopExist.user,
+        "Disapproved Cooperative Registration",
+        `A new cooperative has been disapproved because of incomplete information with the email ${coopExist.user.email}`,
+      );
+
   await sendEmail(mailOptions);
 
     const publicIds = coopExist.requirements.businessPermit.public_id;
@@ -543,3 +573,4 @@ exports.singleFarmInfo = async (id) => {
 
   return singleFarm;
 };
+
