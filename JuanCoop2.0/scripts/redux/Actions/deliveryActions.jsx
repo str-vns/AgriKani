@@ -90,37 +90,41 @@ export const getDeliveryTracking = (deliveryId, token) => async (dispatch) => {
 }
 
 export const getDeliveryDriver = (deliveryId, mark, token) => async (dispatch) => {
-    try {
-
-        const params = {
-            latitude: mark.latitude,
-            longitude: mark.longitude,
-        };
-
-        dispatch({
-            type: GET_DELIVERY_DRIVER_REQUEST,
-        });
-
-
-        const response = await axios.get(`${baseURL}delivery/driver/${deliveryId}`, {
-            params: params,  
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        dispatch({
-            type: GET_DELIVERY_DRIVER_SUCCESS,
-            payload: response.data.details,
-        });
-
-    } catch (error) {
-        dispatch({
-            type: GET_DELIVERY_DRIVER_FAIL,
-            payload: error.response.data,
-        });
-        console.error("Error getting delivery driver:", error);
+  try {
+    if (!deliveryId || !mark || !token) {
+      throw new Error("Missing required parameters for getDeliveryDriver.");
     }
+
+    const params = {
+      latitude: mark.latitude,
+      longitude: mark.longitude,
+    };
+
+    dispatch({
+      type: GET_DELIVERY_DRIVER_REQUEST,
+    });
+
+    const response = await axios.get(
+      `${baseURL}delivery/driver/${deliveryId}`,
+      {
+        params,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    dispatch({
+      type: GET_DELIVERY_DRIVER_SUCCESS,
+      payload: response.data.details,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_DELIVERY_DRIVER_FAIL,
+      payload: error.response?.data || error.message,
+    });
+    console.error("Error getting delivery driver:", error);
+  }
 };
 
 export const getHistoryDelivery = (deliveryId, token) => async (dispatch) => {

@@ -62,16 +62,6 @@ const Details = (props) => {
 
   return (
     <View style={styles.detailsContainer}>
-      <View style={styles.header2}>
-        <TouchableOpacity
-          style={styles.drawerButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle2}>Delivery List</Text>
-      </View>
-
       <ScrollView style={styles.container}>
         <View style={styles.customerInfo}>
           <Text style={styles.text}>
@@ -144,7 +134,7 @@ const Details = (props) => {
           </Text>
         </View>
 
-        {deliveryDetails?.status === "delivered" ? null : (
+        {deliveryDetails?.status === "delivered" || deliveryDetails?.status === "failed" ? null : (
           <TouchableOpacity
             style={styles.deliverButton}
             onPress={() => deliveryNow(deliveryDetails)}

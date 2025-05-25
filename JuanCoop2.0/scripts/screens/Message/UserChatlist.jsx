@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,9 +17,9 @@ const UserChatlist = () => {
   const scrollRef = useRef();
   const socket = useSocket();
   const UserId = context?.stateUser?.userProfile?._id;
-  const { loading, conversations } = useSelector((state) => state.converList);
+  const { conversations, error } = useSelector((state) => state.converList);
   const { messages } = useSelector((state) => state.getMessages);
-  const { users } = useSelector((state) => state.getThemUser);
+  const { loading, users } = useSelector((state) => state.getThemUser);
   const [selectedChatId, setSelectedChatId] = useState(null); 
   const [token, setToken] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -28,6 +28,7 @@ const UserChatlist = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const validConversations = Array.isArray(conversations) ? conversations : [];
+  console.log("users", users);
 const userIds = users.map((user) => user.details._id);
 const myConvos = validConversations.filter((convo) =>
   convo.members.some((memberId) => userIds.includes(memberId))
@@ -208,6 +209,13 @@ useEffect(() => {
 
   return (
     <View style={styles.container}>
+    {loading ? (
+      <ActivityIndicator size="large" color="#0000ff" style={{ flex: 1, justifyContent: 'center' }} />
+    ) : conversations.length === 0 || error? (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ fontSize: 18, color: '#777' }}>No conversations available</Text>
+      </View>
+    ) : (
       <FlatList
         ref={scrollRef}
         data={users} 
@@ -216,6 +224,7 @@ useEffect(() => {
         refreshing={refreshing} 
         onRefresh={onRefresh}
       />
+    )}
     </View>
   );
 };

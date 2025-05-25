@@ -239,14 +239,6 @@ const calculateFinalTotal = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("ProductContainer")}>
-          <Icon name="arrow-back" type="material" color="#FFFFFF" size={28} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          Shopping Cart <Text style={styles.itemCount}>({cartItems.length})</Text>
-        </Text>
-      </View>
       {cartItems.length > 0 ? (
         <FlatList
           data={cartItems}

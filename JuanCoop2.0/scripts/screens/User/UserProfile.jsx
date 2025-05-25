@@ -41,7 +41,7 @@ const UserProfile = () => {
   const filterMember2 = Array.isArray(members)
     ? members.filter((member) => member?.userId?._id === userId)
     : [];
-  console.log("members: ", filterMember2);
+
   // console.log("token: ", token)
 
   // useEffect(() => {
@@ -88,29 +88,16 @@ const UserProfile = () => {
       dispatch(matchCooperative(token));
       dispatch(memberAllList(token));
       dispatch(Profileuser(userId, token));
+      context.reloadUser()
     }, [dispatch, userId, token])
   );
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === "ios" ? "padding" : "height"} 
-      style={{ flex: 1 }}
-    >
       <ScrollView 
-        contentContainerStyle={{ flexGrow: 1 }} // Ensures full height for scrolling
-        keyboardShouldPersistTaps="handled" // Allows tapping outside to dismiss keyboard
+        contentContainerStyle={{ flexGrow: 1 }} 
+        keyboardShouldPersistTaps="handled" 
       >
- {/* <View style={styles.header}>
-  <TouchableOpacity
-    style={styles.backButton}
-    onPress={() => navigation.goBack()}
-  >
-    <Ionicons name="arrow-back" size={34} color="black" />
-  </TouchableOpacity>
 
-  <Text style={styles.headerTitle}>User Profile</Text>
-</View> */}
 
   
         <View style={styles.container}>
@@ -206,8 +193,6 @@ const UserProfile = () => {
           </View>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
-  </TouchableWithoutFeedback>
   
   );
 };

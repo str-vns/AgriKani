@@ -131,12 +131,6 @@ const AssignFile = () => {
 
   return (
       <View style={styles.containerNo}>
-          <View style={styles.header}>
-            <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
-              <Ionicons name="menu" size={34} color="black" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>History</Text>
-          </View>
         <View style={styles.container}>
           
           {Deliveryloading ? (

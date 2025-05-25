@@ -51,7 +51,7 @@ const UserEditProfile = () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
       setHasCameraPermission(cameraStatus.status === "granted");
     })();
-  });
+  },[]);
 
   // token
   useEffect(() => {
@@ -197,16 +197,6 @@ const UserEditProfile = () => {
       style={styles.container}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {/* <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={34} color="black" />
-          </TouchableOpacity>
-
-          <Text style={styles.headerTitle}>Edit Profile</Text>
-        </View> */}
 
         <TouchableOpacity style={styles.profilePicContainer}>
           {user?.image?.url ? (

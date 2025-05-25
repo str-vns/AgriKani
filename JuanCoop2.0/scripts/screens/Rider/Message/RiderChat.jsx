@@ -9,9 +9,9 @@ import {
   Image,
   StyleSheet,
 } from "react-native";
-import Message from "./UserMessage";
+import Message from "./RiderMessage";
 import { useSelector, useDispatch } from "react-redux";
-import { useSocket } from "../../../SocketIo";
+import { useSocket } from "../../../../SocketIo";
 import { listMessages, sendingMessage } from "@redux/Actions/messageActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -19,10 +19,9 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { sendNotifications } from "@redux/Actions/notificationActions";
 import messaging from "@react-native-firebase/messaging";
-import { useNavigation } from "@react-navigation/native";
+
 const UserChat = (props) => {
   const { item, conversations, isOnline } = props.route.params;
-  const navigation = useNavigation();
   const dispatch = useDispatch();
   const socket = useSocket();
   const scrollRef = useRef(null);
@@ -35,11 +34,14 @@ const UserChat = (props) => {
   const [images, setImages] = useState([]);
   const [fcmToken, setFcmToken] = useState("");
   const validConversations = Array.isArray(conversations) ? conversations : [];
-  console.log("validConversations", item?._id)
+  console.log("validConversations", conversations);
   const myConvo = validConversations.find((convo) =>
     convo.members.includes(item?._id)
   );
+
   const isOnlinerUser = isOnline.find((user) => user.userId === item?._id);
+
+  console.log("isOnlinerUser", isOnlinerUser);
   useEffect(() => {
     socket.on("getMessage", (data) => {
       setArrivedMessages((prevMessages) => [
@@ -81,9 +83,11 @@ const UserChat = (props) => {
   }, [token, myConvo, dispatch]);
 
   useEffect(() => {
-    if (scrollRef.current && messages && messages.length > 0) {
-      scrollRef.current.scrollToEnd({ animated: false });
-    }
+    setTimeout(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollToEnd({ animated: true });
+      }
+    }, 100); // Adjust delay as needed
   }, [messages, arrivedMessages]);
 
   const pickImage = async () => {
@@ -107,14 +111,13 @@ const UserChat = (props) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  const sendMessage = async () => {
-    if (newMessage.trim() || images.length) {
-      // Ensure conversation exists
-      if (!myConvo) {
-        console.log("Conversation does not exist yet.");
-        return;
-      }
+  const sendMessage = () => {
+    if (!myConvo) {
+      console.error("Conversation not found or item is undefined.");
+      return;
+    }
   
+    if (newMessage.trim() || images.length) {
       const message = {
         sender: UserId,
         text: newMessage,
@@ -122,7 +125,6 @@ const UserChat = (props) => {
         image: images,
       };
   
-      // Emit message via socket
       socket.emit("sendMessage", {
         senderId: UserId,
         receiverId: myConvo.members.find((member) => member !== UserId),
@@ -130,47 +132,43 @@ const UserChat = (props) => {
         image: images,
       });
   
-      // Send notification if the receiver is offline
       if (!isOnlinerUser) {
         const notification = {
           title: `New message`,
           content: `You have a new message from ${context?.stateUser?.userProfile?.firstName} ${context?.stateUser?.userProfile?.lastName}`,
-          user: item._id,
-          url: item.image.url,
+          user: item?._id,
+          url: item?.image?.url || "",
           fcmToken: fcmToken,
           type: "message",
         };
         dispatch(sendNotifications(notification, token));
       }
   
-      // Dispatch the message to Redux
       dispatch(sendingMessage(message, token));
-  
-      // Update the state to immediately reflect the new message
-      setArrivedMessages((prev) => [...prev, message]);
-  
-      // Reset input
       setNewMessage("");
       setImages([]);
+      setArrivedMessages((prev) => [...prev, message]);
     }
   };
 
   return (
     <View style={styles.container}>
-      {messages || arrivedMessages &&  messages.length > 0 || arrivedMessages.length > 0 ? (
-        <FlatList
-          ref={scrollRef}
-          data={[...messages, ...arrivedMessages]} 
-          renderItem={({ item, index }) => (
-            <Message key={index} messages={item} own={item.sender === UserId} />
-          )}
-          keyExtractor={(item, index) => item._id || index.toString()}
-          contentContainerStyle={styles.flatListContent}
-          showsVerticalScrollIndicator={false}
-          onContentSizeChange={() =>
-            scrollRef.current?.scrollToEnd({ animated: true })
-          }
-        />
+       {messages || arrivedMessages &&  messages.length > 0 || arrivedMessages.length > 0 ? (
+       <FlatList
+       ref={scrollRef}
+       data={[...messages, ...arrivedMessages]} 
+       renderItem={({ item, index }) => (
+         <Message key={index} messages={item} own={item.sender === UserId} />
+       )}
+       keyExtractor={(item, index) => item._id || index.toString()}
+       contentContainerStyle={styles.flatListContent}
+       showsVerticalScrollIndicator={false}
+       onContentSizeChange={() => {
+         if (scrollRef.current) {
+           scrollRef.current.scrollToEnd({ animated: true });
+         }
+       }}
+     />
       ) : (
         <Text style={styles.noMessages}>No messages available</Text>
       )}

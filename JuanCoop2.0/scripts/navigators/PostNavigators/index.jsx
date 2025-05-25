@@ -4,6 +4,7 @@ import UserPostList from "@src/screens/Post/UserPostList";
 import UserPostScreen from "@src/screens/Post/UserPostScreen";
 import PostList from "@src/screens/admin/Post/postList";
 import CommunityForum from "@src/screens/Post/CommunityForum";
+import { DrawerDesign, BackButton } from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -28,7 +29,7 @@ const Index = () => {
       <Stack.Screen
         name="CommunityForum"
         component={CommunityForum}
-        options={{ headerShown:true,title:"Disccusion Board" }}
+        options={{ header: (props) => <DrawerDesign {...props} title="Discussion Board" />, }}
         
       />
     </Stack.Navigator>

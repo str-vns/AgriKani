@@ -5,14 +5,11 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Feather from "@expo/vector-icons/Feather";
-import {
-  DrawerActions,
-  useFocusEffect,
-  useNavigation,
-} from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import styles from "../../../components/styles";
 import CategoryFilter from "../Filter/CategoryFilter";
 import ProductList from "./ProductList";
@@ -23,9 +20,8 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Profileuser } from "@redux/Actions/userActions";
 import { categoryList } from "@src/redux/Actions/categoryActions";
-import { WishlistUser } from "@redux/Actions/userActions";
-import UserFooter from "../Others/UserFooter";
 import messaging from "@react-native-firebase/messaging";
+
 const ProductContainer = () => {
   const { products, error } = useSelector((state) => state.allProducts);
   const { coops } = useSelector((state) => state.allofCoops);
@@ -34,7 +30,7 @@ const ProductContainer = () => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
-
+  const [refreshing, setRefreshing] = useState(false);
   const [focus, setFocus] = useState(false);
   const [token, setToken] = useState();
   const [active, setActive] = useState([]);
@@ -121,24 +117,38 @@ const ProductContainer = () => {
     });
     setSearchText("");
   };
-  return (
+
+  function shuffleArray(array) {
+    return array
+      .map((item) => ({ item, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ item }) => item);
+  }
+
+  const shuffledProducts =
+    products && products.length > 0 ? shuffleArray(products) : [];
+
+    const onRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    Promise.all([
+      dispatch(getProduct()),
+      dispatch(categoryList()),
+      dispatch(allCoops()),
+    ]).finally(() => setRefreshing(false));
+  }, [dispatch]);
+  return loading ? (
+  <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+    <ActivityIndicator size="large" color="#007bff" />
+  </View>
+) : (
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
+       refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-          style={styles.burgerIconContainer}
-        >
-          <Feather name="menu" size={28} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.welcomeText}>
-          Hi, {context?.stateUser?.userProfile?.firstName || "Guest"}
-        </Text>
-      </View>
-
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchBar}
@@ -180,9 +190,9 @@ const ProductContainer = () => {
 
       <Text style={styles.sectionTitle}>All Products</Text>
       <ScrollView>
-        {products && products.length > 0 ? (
+        {shuffledProducts && shuffledProducts.length > 0 ? (
           <View style={styles.productContainer}>
-            {products.map((item) => {
+            {shuffledProducts.map((item) => {
               return (
                 <ProductList key={item?._id?.$oid || item?._id} item={item} />
               );

@@ -9,23 +9,20 @@ import {
   RefreshControl,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { Profileuser } from "@redux/Actions/userActions";
 import {
   getDeliveryDriver,
   updateDeliveryStatus,
 } from "@redux/Actions/deliveryActions";
-import { Picker } from "@react-native-picker/picker";
-import {
-  driverProfile,
-  updateAvailability,
-} from "@redux/Actions/driverActions";
+import { driverProfile } from "@redux/Actions/driverActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { Alert } from "react-native";
 import { useSocket } from "@SocketIo";
+import { SelectedTab } from "@shared/SelectedTab";
+import { isOnline } from "../../../scripts/utils/usage";
 
 const Deliveries = () => {
   const context = useContext(AuthGlobal);
@@ -33,19 +30,14 @@ const Deliveries = () => {
   const navigation = useNavigation();
   const socket = useSocket();
   const userId = context?.stateUser?.userProfile?._id;
-  const { Deliveryloading, deliveries, Deliveryerror } = useSelector(
-    (state) => state.deliveryList
-  );
-  const { Profileloading, Profiledriver, ProfileError } = useSelector(
-    (state) => state.driverProfile
-  );
-  const [activeTab, setActiveTab] = useState("Deliveries");
+  const { Deliveryloading, deliveries, Deliveryerror } = useSelector((state) => state.deliveryList);
+  const [activeTab, setActiveTab] = useState("Pending");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [token, setToken] = useState(null);
   const [markerCoordinate, setMarkerCoordinate] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  const onlineUsers = isOnline({ userId });
 
   useEffect(() => {
     const getCurrentLocation = async () => {
@@ -68,7 +60,6 @@ const Deliveries = () => {
         console.error("Error getting Location:", error);
       }
     };
-
     getCurrentLocation();
   }, []);
 
@@ -111,31 +102,6 @@ const Deliveries = () => {
       fetchData();
     }, [userId, dispatch, markerCoordinate])
   );
-
-  useEffect(() => {
-    if (!socket) {
-      console.warn("Socket is not initialized.");
-      return;
-    }
-
-    if (userId) {
-      socket.emit("addUser", userId);
-    } else {
-      console.warn("User ID is missing.");
-    }
-
-    socket.on("getUsers", (users) => {
-      const onlineUsers = users.filter(
-        (user) => user?.online && user?.userId !== null
-      );
-      console.log("Online users: ", onlineUsers);
-      setOnlineUsers(onlineUsers);
-    });
-
-    return () => {
-      socket.off("getUsers");
-    };
-  }, [socket, userId]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -200,6 +166,30 @@ const Deliveries = () => {
     ]);
   };
 
+  const choicesTab = [
+    { label: "Pending", value: "Pending" },
+    { label: "On Delivery", value: "Delivering" },
+    { label: "Delivered", value: "Delivered" },
+    { label: "Failed", value: "Failed" },
+  ];
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    onRefresh(); 
+  };
+  
+  const activeTabLabel = choicesTab.find(tab => tab.value.toLowerCase() === activeTab.toLowerCase())?.label || activeTab;
+   
+  const filterTab = deliveries
+    ? deliveries.filter((delivery) =>
+        Array.isArray(delivery?.status)
+          ? delivery.status.some(
+              (item) => item?.status === activeTabLabel.toLowerCase()
+            )
+          : delivery.status === activeTab.toLowerCase()
+      )
+    : [];
+
   const renderOrderItem = ({ item }) => (
     <View style={styles.orderCard}>
       <View style={styles.orderInfo}>
@@ -216,148 +206,48 @@ const Deliveries = () => {
           </Text>
         </Text>
       </View>
-      {item.status === "failed" ? null : (
         <View style={styles.actions}>
+          {item.status === "pending" || item.status === "delivering" || item.status === "re-deliver" ? (
+            <TouchableOpacity
+              style={styles.deliverButton}
+              onPress={() => deliveryNow(item)}
+            >
+              <Text style={styles.buttonText}>Deliver now</Text>
+            </TouchableOpacity>
+          ) : null}
           <TouchableOpacity
-            style={styles.deliverButton}
-            onPress={() => deliveryNow(item)}
-          >
-            <Text style={styles.buttonText}>Deliver now</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          
             style={styles.detailsButton}
             onPress={() => navigation.navigate("Details", { deliveryId: item })}
           >
             <Text style={styles.detailsText}>View Details</Text>
           </TouchableOpacity>
         </View>
-      )}
     </View>
   );
 
-  const handleChange = () => {
-    Alert.alert(
-      "Update Availability",
-      "Are you sure you want to update your availability status?",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel",
-        },
-        {
-          text: "OK",
-          onPress: async () => {
-            try {
-              dispatch(updateAvailability(userId, token));
-              setTimeout(() => {
-                onRefresh();
-              }, 1000);
-              console.log("Availability updated successfully");
-            } catch (error) {
-              console.error("Error updating availability: ", error);
-            }
-          },
-        },
-      ]
-    );
-  };
-
   return (
     <View style={styles.container}>
-      <View style={styles.header2}>
-        <TouchableOpacity
-          style={styles.drawerButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle2}>Delivery List</Text>
-        <View style={styles.drawerContainer}>
-          <Text style={styles.TextTop}>Availability </Text>
-          {Profileloading ? (
-            <View style={[styles.circle, { backgroundColor: "gray" }]}>
-              <Text style={styles.circleText}></Text>
-            </View>
-          ) : (
-            <View
-              style={[
-                styles.circle,
-                {
-                  backgroundColor: Profiledriver?.isAvailable
-                    ? "green"
-                    : "gray",
-                },
-              ]}
-            >
-              <Text style={styles.circleText}></Text>
-            </View>
-          )}
-        </View>
-        {/* Picker for toggling availability */}
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={Profiledriver?.isAvailable ? "true" : "false"}
-            onValueChange={handleChange}
-            style={styles.picker}
-          >
-            <Picker.Item
-              label="Update Availability Status"
-              value=""
-              enabled={false}
-            />
-            {Profiledriver?.isAvailable ? (
-              <Picker.Item label="Not Available" value="false" />
-            ) : (
-              <Picker.Item label="Available" value="true" />
-            )}
-          </Picker>
-        </View>
-      </View>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === "Deliveries" && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab("Deliveries")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "Deliveries" && styles.activeTabText,
-            ]}
-          >
-            Deliveries
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === "Completed" && styles.activeTab,
-          ]}
-          onPress={() => navigation.navigate("Completed")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "Completed" && styles.activeTabText,
-            ]}
-          >
-            Completed
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <SelectedTab
+        selectedTab={activeTab}
+        tabs={choicesTab}
+        onTabChange={handleTabChange}
+        isOrder={true}
+      />
 
       {Deliveryloading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : (deliveries && deliveries?.length === 0) || Deliveryerror ? (
+      ) : (filterTab && filterTab?.length === 0) || Deliveryerror ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No Deliveries found.</Text>
+          <Text style={styles.emptyText}>
+            {activeTab === "Pending"
+              ? `No ${activeTabLabel} deliveries found.`
+              : `No ${activeTabLabel} Deliveries Found `}
+          </Text>
         </View>
       ) : (
         <FlatList
-          data={deliveries}
+          data={filterTab}
           keyExtractor={(item) => item?._id}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -376,17 +266,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 
-  header2: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 15,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    elevation: 3,
-  },
   headerTitle2: {
     fontSize: 22,
     fontWeight: "700",
