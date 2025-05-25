@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Driver = require("../models/driver");
 const Farm = require("../models/farm");
+const Notification = require("../models/notification");
 const Otp = require("../models/otp");
 const bcrypt = require("bcrypt");
 const ErrorHandler = require("../utils/errorHandler");
@@ -12,6 +13,7 @@ const { sendEmail } = require("../utils/sendMail");
 const { id } = require("date-fns/locale");
 const { bufferedPageRange } = require("pdfkit");
 const admin = require('firebase-admin');
+const { sendFcmNotification } = require("../services/sendFcmNotif");
 
 exports.registerDriverProcess = async (req) => {
   try {
@@ -66,7 +68,7 @@ exports.registerDriverProcess = async (req) => {
 
     if (!driversLicenseImages)
       throw new ErrorHandler("At least one image is required");
-
+    
     const gender = req.body.gender ? req.body.gender : GENDER.PNTS;
 
     const driver = await Driver.create({
@@ -76,6 +78,22 @@ exports.registerDriverProcess = async (req) => {
       image: images,
       driversLicenseImage: driversLicenseImages,
       coopId: coopExist._id,
+    });
+
+    const user = await User.findById("6728323269587b48f9b4fd48")
+    console.log("user", user);
+    if (!user) throw new ErrorHandler("Admin not exist");
+    await sendFcmNotification(
+      user,
+      "New Driver Registration",
+      `A new driver has registered with the email ${req.body.email}`,
+    );
+
+    await Notification.create({
+      user: user._id,
+      title: "New Driver Registration",
+      type: "driver",
+      content: `A new driver has registered with the email ${req.body.email}`,
     });
 
     return driver;
@@ -222,7 +240,7 @@ exports.approveDriverProcess = async (id, req) => {
         Juan Coop
       </p>
       </div>
-                 <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1734260381/images/olwhjvr5dvjhrgbwrcsa.png" alt="AgriKaAni Logo" style="max-width: 25%; height: auto;" />
+                 <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1734251327/images/vuybhnzdnysq50jw3mrk.png" alt="AgriKaAni Logo" style="max-width: 25%; height: auto;" />
                 <h4>Hi! ${driver.firstName}, ${driver.lastName}<h4>
                 <h1>Your Driver is Approved!</h1>
                 <p>Your driver has been Approve!</p>
@@ -612,63 +630,62 @@ exports.getSingleDriverProcess = async (id) => {
   return driver;
 };
 
-const sendFcmNotification = async (user, title, content, fcmToken) => {
-  console.log('user', user);
-  if (!user.deviceToken || user.deviceToken.length === 0) {
-    console.log("No device tokens found for the user.");
-    return;
-  }
+// const sendFcmNotification = async (user, title, content, fcmToken) => {
+//   if (!user.deviceToken || user.deviceToken.length === 0) {
+//     console.log("No device tokens found for the user.");
+//     return;
+//   }
 
   
-  console.log("Device tokens found for the user:", user);
-  let registrationTokens = user.deviceToken;
-  if (fcmToken) {
-    registrationTokens = registrationTokens.filter(
-      (token) => token !== fcmToken
-    );
-  }
+//   console.log("Device tokens found for the user:", user);
+//   let registrationTokens = user.deviceToken;
+//   if (fcmToken) {
+//     registrationTokens = registrationTokens.filter(
+//       (token) => token !== fcmToken
+//     );
+//   }
 
-  if (registrationTokens.length === 0) {
-    console.log("No valid tokens available for sending notifications.");
-    return;
-  }
+//   if (registrationTokens.length === 0) {
+//     console.log("No valid tokens available for sending notifications.");
+//     return;
+//   }
 
-  const message = {
-    data: {
-      key1: "value1",
-      key2: "value2",
-      key3: "value3",
-    },
-    notification: {
-      title,
-      body: content,
-    },
-    apns: {
-      payload: {
-        aps: {
-          badges: 42,
-        },
-      },
-    },
-    tokens: registrationTokens,
-  };
+//   const message = {
+//     data: {
+//       key1: "value1",
+//       key2: "value2",
+//       key3: "value3",
+//     },
+//     notification: {
+//       title,
+//       body: content,
+//     },
+//     apns: {
+//       payload: {
+//         aps: {
+//           badges: 42,
+//         },
+//       },
+//     },
+//     tokens: registrationTokens,
+//   };
 
-  try {
-    console.log("Sending notification to the user:", user.email);
-    const response = await admin.messaging().sendEachForMulticast(message);
-    console.log("Notification sent:", response);
+//   try {
+//     console.log("Sending notification to the user:", user.email);
+//     const response = await admin.messaging().sendEachForMulticast(message);
+//     console.log("Notification sent:", response);
 
-    if (response.failureCount > 0) {
-      const failedTokens = [];
-      response.responses.forEach((resp, idx) => {
-        if (!resp.success) {
-          console.log("Error sending to token:", response.responses[idx].error);
-          failedTokens.push(user.deviceToken[idx]);
-        }
-      });
-      console.log("Failed tokens:", failedTokens);
-    }
-  } catch (error) {
-    console.error("Error sending notification:", error);
-  }
-};
+//     if (response.failureCount > 0) {
+//       const failedTokens = [];
+//       response.responses.forEach((resp, idx) => {
+//         if (!resp.success) {
+//           console.log("Error sending to token:", response.responses[idx].error);
+//           failedTokens.push(user.deviceToken[idx]);
+//         }
+//       });
+//       console.log("Failed tokens:", failedTokens);
+//     }
+//   } catch (error) {
+//     console.error("Error sending notification:", error);
+//   }
+// };
