@@ -26,6 +26,7 @@ module.exports = function(api) {
             "@config": "./config",
             "@components" : "./components",
             "@SocketIo" : "./SocketIo",
+            "@utils": "./scripts/utils",
           }
         }]
       ]

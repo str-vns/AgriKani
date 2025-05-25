@@ -18,7 +18,6 @@ const UserSidebar = () => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.userOnly);
   const userslogin = context.stateUser?.userProfile || null;
   const [ setLoadings ] = useState(true);
 
@@ -36,12 +35,12 @@ const UserSidebar = () => {
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Address", icon: "location-outline", key: "address" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
+        { label: "Track Order", icon: "location-outline", key: "track-order" },
     { label: "Notifications",  icon: "notifications-outline", key: "notifications", },
-    { label: "Directions", icon: "navigate-outline", key: "CoopDistance" },
     context.stateUser?.userProfile?.roles?.includes("Customer") && 
     context.stateUser?.userProfile?.roles?.includes("Member") ? 
     { label: "Discussion", icon: "create-outline", key: "Forum" } : null,
-    { label: "Track Order", icon: "location-outline", key: "track-order" },
+    { label: "Directions", icon: "navigate-outline", key: "CoopDistance" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     { label: "About Us", icon: "information-circle-outline", key: "AboutUs" },
   ].filter(item => item !== null);
@@ -91,6 +90,7 @@ const UserSidebar = () => {
   const DriverItems = [
     { label: "Deliveries", icon: "cube-outline", key: "deliveries" },
     { label: "Profile", icon: "person-outline", key: "profile" },
+        { label: "Messages", icon: "chatbubble-outline", key: "messages" },
     { label: "History", icon: "time-outline", key: "history" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
   ]
@@ -211,6 +211,8 @@ const UserSidebar = () => {
       navigation.navigate("Profile");
     } else if (key === "history") {
       navigation.navigate("History");
+    } else if (key === "messages") {
+      navigation.navigate("Messages");  
     }else if (key === "tutorial") {
       navigation.navigate("Tutorial");
     }
@@ -250,7 +252,6 @@ const UserSidebar = () => {
             <Text style={styles.profileName}>
               {userslogin?.firstName} {userslogin?.lastName}
             </Text>
-            <Text style={styles.profileRole}>User</Text>
           </>
         ) : context?.stateUser?.isAuthenticated &&
           userslogin?.roles &&

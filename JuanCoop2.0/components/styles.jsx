@@ -1,4 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const { width, height } = Dimensions.get("window"); // <-- Add this line
+
 //Dashboard
 const styles = StyleSheet.create({
   container: {
@@ -6,133 +9,130 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   scrollContent: {
-    paddingBottom: 100,
+    paddingBottom: height * 0.12, // Example: 12% of screen height
+    marginTop: height * 0.025,
+    paddingHorizontal: width * 0.04,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
-    paddingHorizontal: 16,
-    marginTop: 20,
+    marginBottom: height * 0.025,
+    paddingHorizontal: width * 0.04,
+    marginTop: height * 0.025,
   },
   burgerIconContainer: {
-    padding: 5,
-    marginRight: 10,
+    padding: width * 0.012,
+    marginRight: width * 0.025,
   },
   welcomeText: {
-    fontSize: 24,
+    fontSize: width * 0.06,
     fontWeight: "bold",
     flex: 1,
     textAlign: "left",
-    color: "#666b5e", // Adding the color here
+    color: "#666b5e",
   },
   searchContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#fefdf9",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    marginBottom: 20,
-    marginHorizontal: 16,
+    borderRadius: width * 0.02,
+    paddingHorizontal: width * 0.04,
+    paddingVertical: height * 0.012,
+    marginBottom: height * 0.025,
+    marginHorizontal: width * 0.04,
   },
-  
   searchBar: {
     flex: 1,
-    fontSize: 16,
+    fontSize: width * 0.04,
   },
   filterIcon: {
-    marginLeft: 10,
+    marginLeft: width * 0.025,
   },
   categoryScrollContainer: {
     flexDirection: "row",
-    marginBottom: 20,
-    paddingLeft: 16,
+    marginBottom: height * 0.025,
+    paddingLeft: width * 0.04,
   },
   categoryBox: {
     alignItems: "center",
     backgroundColor: "#fef8e5",
-    padding: 10,
-    borderRadius: 8,
-    marginRight: 16,
-    width: 80,
+    padding: width * 0.025,
+    borderRadius: width * 0.02,
+    marginRight: width * 0.04,
+    width: width * 0.21,
   },
   categoryIcon: {
-    width: 60, // Adjust size as needed
-    height: 50, 
-    resizeMode: 'contain', // Ensures the image fits properly
-    marginBottom: 5,
+    width: width * 0.15,
+    height: height * 0.07,
+    resizeMode: 'contain',
+    marginBottom: height * 0.006,
   },
   categoryText: {
-    fontSize: 14,
+    fontSize: width * 0.035,
     fontWeight: "bold",
-     width: '100%',
-    overflow: 'hidden', 
-    textOverflow: 'ellipsis', 
+    width: '100%',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     textAlign: "center",
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: width * 0.05,
     fontWeight: "bold",
-    marginBottom: 10,
-    paddingHorizontal: 16,
-    
+    marginBottom: height * 0.012,
+    paddingHorizontal: width * 0.04,
   },
   productContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    paddingHorizontal: 20 ,
-  
+    paddingHorizontal: width * 0.05,
   },
   productBox: {
-    width: 150,
-    height:200,
+    width: width * 0.38,
+    height: height * 0.25,
     backgroundColor: "#fefdf9",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 20,
+    padding: width * 0.025,
+    borderRadius: width * 0.02,
+    marginBottom: height * 0.025,
     alignItems: "center",
-    position: "relative",  // Keep relative positioning to allow absolute positioning of the icon
-  
+    position: "relative",
   },
-  
   productImage: {
-    width: 120,
-    height: 110,
-    marginBottom: 10,
-    borderRadius: 8,  // Keep the border radius to round the corners
-    overflow: "hidden",  // Ensure the wishlist icon stays inside the rounded image corners
+    width: width * 0.31,
+    height: height * 0.14,
+    marginBottom: height * 0.012,
+    borderRadius: width * 0.02,
+    overflow: "hidden",
   },
   productName: {
-    fontSize: 14,
+    fontSize: width * 0.035,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: height * 0.006,
     textAlign: "center",
   },
   productPrice: {
-    fontSize: 12,
+    fontSize: width * 0.032,
     fontWeight: "bold",
     color: "#888888",
   },
   wishlistIcon: {
     position: "absolute",
-    top: 5,  // Adjust to place icon on the top inside the image
-    right: 5,  // Adjust to place icon on the right inside the image
-    zIndex: 1,  // Make sure the icon stays above the image
-    backgroundColor: "	rgb(232,232,232)",  // Optional: add a semi-transparent background for visibility
-    borderRadius: 12,  // Optional: to give the icon a rounded background
-    padding: 5,  // Optional: adjust for better touch area
+    top: height * 0.006,
+    right: width * 0.012,
+    zIndex: 1,
+    backgroundColor: "rgb(232,232,232)",
+    borderRadius: width * 0.03,
+    padding: width * 0.012,
   },
   plusIcon: {
     position: "absolute",
-    bottom: 10,
-    right: 10,
+    bottom: height * 0.012,
+    right: width * 0.025,
     backgroundColor: "#f7b900",
-    padding: 8,
-    borderRadius: 20,
+    padding: width * 0.02,
+    borderRadius: width * 0.05,
   },
   footer: {
     position: "absolute",

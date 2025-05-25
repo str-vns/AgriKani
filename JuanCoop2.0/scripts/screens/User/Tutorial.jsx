@@ -116,8 +116,6 @@ const Tutorial = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.header}> Tutorial Videos </Text>
-
         <TextInput
           style={styles.searchInput}
           placeholder="Search videos..."

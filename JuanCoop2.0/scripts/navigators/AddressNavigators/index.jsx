@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import UserAddress from "@src/screens/Address/UserAddress";
 import UserAddressFormScreen from "@src/screens/Address/UserAddressFormScreen";
 import UserAddressEdit from "@screens/Address/UserAddressEdit";
+import { DrawerDesign, BackButton } from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -11,18 +12,19 @@ const Index = () => {
       <Stack.Screen
         name="UserAddress"
         component={UserAddress}
-        options={{ headerShown: true,title: "User Address"  }}
+        options={{ header: (props) => <DrawerDesign {...props} title="Address" />,}}
       />
       <Stack.Screen
         name="UserAddressFormScreen"
         component={UserAddressFormScreen}
-        options={{headerShown: true,title: "Add Address"}}
+        options={{header: (props) => <BackButton {...props} title="New Address" />,}}
       />
 
       <Stack.Screen
         name="UserAddressEdit"
         component={UserAddressEdit}
-        options={{ headerShown: true,title: "Edit Address" }}
+        options={{ header: (props) => <BackButton {...props} title="Update Address" />,
+        }}
       />
     </Stack.Navigator>
   );

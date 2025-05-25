@@ -74,17 +74,14 @@ const onRefresh = useCallback(async () => {
 console.log("members: ", members);
   return (
     <View style={styles.container}>
-    <View style={styles.header}>
-    <TouchableOpacity style={styles.menuButton} onPress={() => navigation.goBack()}>
-      <Ionicons name="arrow-back" size={34} color="black" />
-    </TouchableOpacity>
 
-      <Text style={styles.headerTitle}>Member List</Text>
-      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('MembersRegistration')}>
-        <Ionicons name="add-circle-outline" size={24} color="#fff" />
-        <Text style={styles.addButtonText}>Join Member</Text>
-      </TouchableOpacity>
-    </View>
+
+     <View style={{ flexDirection: "row", justifyContent: "flex-end", alignItems: "center", paddingHorizontal: 20, paddingTop: 25 }}>
+  <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('MembersRegistration')}>
+    <Ionicons name="add-circle-outline" size={24} color="#fff" />
+    <Text style={styles.addButtonText}>Join Member</Text>
+  </TouchableOpacity>
+</View>
 
     <ScrollView refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -192,6 +189,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 5,
+        
       },
       addButtonText: {
         color: "#fff",

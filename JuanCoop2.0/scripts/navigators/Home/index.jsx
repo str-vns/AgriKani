@@ -1,12 +1,4 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import React, { useState, useContext } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import CoopFarmProfile from "@screens/Farmer/FarmerProfile";
 import SingleProduct from "@screens/Product/SingleProduct";
@@ -20,92 +12,83 @@ import SearchProduct from "@screens/Filter/SearchProduct";
 import CoopDistance from "@screens/User/UserDistance";
 import NotificationList from "@screens/Notification/NotificationList";
 import AddReviews from "@screens/Review/UserAddReview";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
+import AuthGlobal from "@redux/Store/AuthGlobal";
+import {
+  DrawerDesign,
+  BackButton,
+  MessageBackButton,
+  CartBackButton,
+} from "@shared/DrawerDesign";
+import { useSelector } from "react-redux";
 const Stack = createStackNavigator();
 
 const HomeNavigation = () => {
-  const navigation = useNavigation();
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const [isOnline, setIsOnline] = useState(false);
+  const cartItems = useSelector((state) => state.cartItems);
+  const context = useContext(AuthGlobal);
+  
   return (
     <>
-      <Stack.Navigator>
-
+      <Stack.Navigator initialRouteName="ProductContainer">
         <Stack.Screen
           name="ProductContainer"
           component={ProductContainer}
-          options={{ headerShown: false, tabBarShowLabel: false }}
+          options={{
+            header: (props) => <DrawerDesign {...props} title={`Hi, ${context?.stateUser?.userProfile?.firstName || "Guest"}`} />,
+          }}
         />
 
         <Stack.Screen
           name="Wishlist"
           component={Wishlist}
-          options={{ headerShown: true }}
+          options={{ header: (props) => <BackButton {...props} title="Wishlist" /> }}
         />
 
         <Stack.Screen
           name="Messages"
           component={Messages}
-          options={{ headerShown: true }}
+          options={{
+            header: (props) => <DrawerDesign {...props} title="Message" />,
+          }}
         />
 
-      <Stack.Screen
-        name="NotificationList"
-        component={NotificationList}
-        options={{ headerShown: true,title: "Notification"
-
-        }}
-      />
+        <Stack.Screen
+          name="NotificationList"
+          component={NotificationList}
+          options={{
+            header: (props) => <DrawerDesign {...props} title="Notification" />,
+          }}
+        />
 
         <Stack.Screen
           name="ChatMessages"
           component={ChatMessages}
-          options={({ route }) => {
-            const { item } = route.params;
-            console.log("Item: ", item);
-            const firstName = item?.firstName || "";
-            const lastName = item?.lastName || "";
-            const profileImage =
-              item?.image?.url ||
-              "https://as2.ftcdn.net/v2/jpg/02/48/15/85/1000_F_248158543_jK3q4R8EQh0AhRtjp5n6CLXGpa0lxJvX.jpg";
-
-            return {
-              headerTitle: () => (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={{ uri: profileImage }}
-                    style={{ width: 40, height: 40, borderRadius: 20 }}
-                  />
-
-                  <Text
-                    style={{ fontSize: 18, fontWeight: "bold", marginLeft: 8 }}
-                  >
-                    {`${firstName} ${lastName}`}
-                  </Text>
-                </View>
-              ),
-              headerTitleAlign: "left",
-              headerLeft: () => (
-                            <TouchableOpacity onPress={() => navigation.navigate("Messages")}>
-                              <Ionicons name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
-                            </TouchableOpacity>
-                          ),
-            };
-          }}
+          options={({ route }) => ({
+            header: (props) => (
+              <MessageBackButton
+                {...props}
+                title="Message"
+                item={route.params.item}
+              />
+            ),
+          })}
         />
 
         <Stack.Screen
           name="SingleProduct"
           component={SingleProduct}
-          options={{ headerShown: true }}
+          options={({ route }) => ({
+            header: (props) => (
+              <BackButton {...props} title={route.params.item.productName} />
+            ),
+          })}
         />
 
         <Stack.Screen
           name="CoopFarmProfile"
           options={{
-            headerShown: true,
-            tabBarShowLabel: false,title:"Cooperative Profile"
+            header: (props) => (
+              <BackButton {...props} title="Cooperative Profile" />
+            ),
           }}
           component={CoopFarmProfile}
         />
@@ -113,34 +96,46 @@ const HomeNavigation = () => {
         <Stack.Screen
           name="Cart"
           component={Cart}
-          options={{ headerShown: false }}
+          options={{
+            header: (props) => (
+              <CartBackButton
+                {...props}
+                title={`Shopping Cart (${cartItems.length})`}
+              />
+            ),
+          }}
         />
 
         <Stack.Screen
           name="SearchProduct"
           component={SearchProduct}
-          options={{ headerShown: true, title:"Search Result",tabBarShowLabel: false }}
+          options={{
+            headerShown: true,
+            title: "Search Result",
+            tabBarShowLabel: false,
+          }}
         />
 
         <Stack.Screen
           name="CoopDistance"
           component={CoopDistance}
-          options={{ headerShown: false, tabBarShowLabel: false }}
+          options={{
+            header: (props) => <DrawerDesign {...props} title="Location" />,
+          }}
         />
 
-  <Stack.Screen
-        name="AddReviews"
-        component={AddReviews}
-        options={{
-          headerShown: false, 
-          tabBarShowLabel: false,
-        }}
-      />
+        <Stack.Screen
+          name="AddReviews"
+          component={AddReviews}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
+        />
       </Stack.Navigator>
       <UserFooter />
     </>
   );
 };
-
 
 export default HomeNavigation;

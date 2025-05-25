@@ -15,6 +15,8 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { useSelector, useDispatch } from "react-redux";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SelectedTab } from "@shared/SelectedTab";
+
 import {
   fetchUserOrders,
   updateOrderStatus,
@@ -33,7 +35,23 @@ const UserOrderList = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [refresh, setRefresh] = React.useState(false);
   const [refreshing, setRefreshing] = useState(false);
+const [selectedTab, setSelectedTab] = useState("Pending");
   // const filteredOrders = orders?.map((order) => ({...order,orderItems: order.orderItems.filter((item) => item.orderStatus !== "Cancelled"), })).filter((order) => order.orderItems.length > 0);
+
+ const filterTab = orders
+  ?.map((order) => ({
+    ...order,
+    orderItems: order.orderItems.filter((item) => item.orderStatus === selectedTab),
+  }))
+  .filter((order) => order.orderItems.length > 0);
+
+  const choicesTab = [
+    { label: "Pending", value: "Pending" },
+    { label: "Processing", value: "Processing" },
+    { label: "Shipping", value: "Shipping" },
+    { label: "Delivered", value: "Delivered" },
+    { label: "Cancelled", value: "Cancelled" },
+  ]
 
   useEffect(() => {
     const fetchJwt = async () => {
@@ -78,24 +96,6 @@ const UserOrderList = () => {
       coopUser,
       paymentMethod,
     });
-    //   setRefresh(true);
-    //   try {
-
-    //     const status =
-    //     {
-    //       orderStatus: "Cancelled",
-    //       inventoryProduct: inventortId,
-    //     }
-
-    //     dispatch(updateOrderStatus(orderId, status,  token));
-
-    //     onRefresh()
-    //  } catch (error) {
-    //    console.error("Error deleting or refreshing orders:", error);
-    //  } finally {
-
-    //    setRefresh(false);
-    //  }
   };
 
   const handleOpenReviewModal = (order) => {
@@ -119,8 +119,7 @@ const UserOrderList = () => {
 
   const renderItem = ({ item }) => {
     const isExpanded = expandedOrders[item._id];
-    console.log(item.orderItems[0]._id);
-    return (
+    return (            
       <View style={styles.orderCard}>
         <View style={styles.orderHeader}>
           <Text style={styles.orderId}>Order ID: {item._id}</Text>
@@ -305,17 +304,17 @@ const UserOrderList = () => {
 
   return (
     <View style={styles.container}>
+       <SelectedTab selectedTab={selectedTab} tabs = {choicesTab} onTabChange={setSelectedTab} isOrder={true} />
       {loading ? (
         <ActivityIndicator />
-      ) : orders && orders.length > 0 ? (
+      ) : filterTab && filterTab.length > 0 ? (
         <FlatList
-          data={orders}
+          data={filterTab}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       ) : (
         <Text style={styles.noOrdersText}>No orders found.</Text>
@@ -327,7 +326,7 @@ const UserOrderList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "white",
   },
   orderCard: {
     backgroundColor: "#ffffff",
@@ -341,6 +340,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    marginTop: 15,  
+    borderWidth: 1,
+    borderColor: "#e1e1e1",
   },
   orderHeader: {
     flexDirection: "column", // Stack children vertically
