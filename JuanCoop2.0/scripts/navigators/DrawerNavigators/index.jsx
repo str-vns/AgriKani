@@ -29,6 +29,9 @@ import WithdrawsList from "@screens/admin/Withdraws/WithdrawsList";
 import RefundProcess from "@screens/admin/Refund/RefundProcess";
 import AboutUs from "@screens/User/AboutUs";
 import Tutorial from "@screens/User/Tutorial";
+import Landing from "@screens/User/Landing";
+import ProductContainer from "@screens/Product/ProductContainer";
+import CoopDistance from "@screens/User/UserDistance";
 import Main from "../../../Main";
 import Sidebar from "@src/screens/Filter/UserSidebar";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -274,28 +277,63 @@ const Index = () => {
           }}
         />
 
-        <Drawer.Screen
-          name="RefundProcess"
-          component={RefundProcess}
-          options={{
-            headerShown: false,
-            tabBarShowLabel: false,
-          }}
-        />
-        <Drawer.Screen
-          name="AboutUs"
-          component={AboutUs}
-          options={{
-       header: (props) => <DrawerDesign {...props} title="About Us" />,
-          }}
-        />
-        <Drawer.Screen
-          name="Tutorial"
-          component={Tutorial}
-          options={{
-            header: (props) => <DrawerDesign {...props} title="Tutorial Videos" />,
-          }}
-        />
+      <Drawer.Screen
+        name="WithdrawsList"
+        component={WithdrawsList}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+      
+      <Drawer.Screen
+        name="RefundProcess"
+        component={RefundProcess}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />  
+      <Drawer.Screen
+        name="AboutUs"
+        component={AboutUs}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+      <Drawer.Screen
+        name="Tutorial"
+        component={Tutorial}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />   
+      <Drawer.Screen
+        name="Landing"
+        component={Landing}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+      <Drawer.Screen
+        name="ProductContainer"
+        component={ProductContainer}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
+      <Drawer.Screen
+        name="CoopDistance"
+        component={CoopDistance}
+        options={{
+          headerShown: false,
+          tabBarShowLabel: false,
+        }}
+      />
 
         <Drawer.Screen
           name="ChatMessaging"

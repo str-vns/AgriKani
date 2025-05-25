@@ -183,7 +183,7 @@ const UserSignIn = () => {
       setError("");
       setIsLoading(false);
       console.log("Navigating to Home");
-      navigation.navigate("Home", { screen: "Home" });
+      navigation.navigate("Landing");
     } else if (
       context?.stateUser?.isAuthenticated &&
       userInfo.roles.includes("Driver")
@@ -251,12 +251,12 @@ const UserSignIn = () => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View style={styles.container}>
-        <Text style={styles.title}>JuanCoop</Text>
+        <Text style={styles.title}>JuanKooP</Text>
 
         <Image source={require("@assets/img/logo.png")} style={styles.logo} />
 
         <Text style={styles.subtitle}>Login to your account</Text>
-        <Text style={styles.instructions}>Welcome to JuanCoop</Text>
+        <Text style={styles.instructions}>Welcome to JuanKooP</Text>
 
         <TextInput
           placeholder="Enter your Email"
@@ -296,7 +296,7 @@ const UserSignIn = () => {
     style={[styles.linkText, styles.rightAlign]}
     onPress={() => navigation.navigate("ForgotPass")}
   >
-    forgot Password?
+    Forgot Password?
   </Text>
         
         {error ? <Error message={error} /> : null}

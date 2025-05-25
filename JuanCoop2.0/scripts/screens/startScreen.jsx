@@ -13,7 +13,7 @@ const StartScreen = ({ navigation }) => {
 
         {/* Subtitle */}
         <Text style={styles.subtitle}>
-          Empowering Farmers, Uniting Communities for Agricultural Success
+          Empowering Cooperatives, Uniting Communities for Agricultural Success
         </Text>
 
         {/* Next Button */}

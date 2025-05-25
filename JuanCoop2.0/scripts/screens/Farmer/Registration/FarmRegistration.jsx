@@ -285,7 +285,7 @@ const deleteImage = (index) => {
         <Text style={styles.label}>Coop Name</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter Farm Name"
+          placeholder="Enter Coop Name"
           value={farmName}
           onChangeText={setFarmName}
         />
@@ -293,7 +293,7 @@ const deleteImage = (index) => {
         <Text style={styles.label}>Coop Address</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter Farm Address"
+          placeholder="Enter Coop Address"
           value={myaddress}
           onChangeText={setMyAddress}
         />

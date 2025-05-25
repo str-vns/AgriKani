@@ -31,7 +31,8 @@ const UserSidebar = () => {
   }, []);
 
   const userItems = [
-    { label: "Home", icon: "home-outline", key: "home" },
+    { label: "Home", icon: "home-outline", key: "Landing" },
+    { label: "Buy Now", icon: "cart-outline", key: "home" },
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Address", icon: "location-outline", key: "address" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
@@ -81,7 +82,8 @@ const UserSidebar = () => {
   ];
 
   const NoItems = [
-    { label: "Home", icon: "home-outline", key: "home" },
+    { label: "Home", icon: "home-outline", key: "Landing" },
+    { label: "Buy Now", icon: "cart-outline", key: "home" },
     { label: "Distance", icon: "navigate-outline", key: "CoopDistance" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     { label: "About Us", icon: "information-circle-outline", key: "AboutUs" },
@@ -98,7 +100,10 @@ const UserSidebar = () => {
   const handlePress = (key) => {
     setActiveItem(key);
 
-    if (key === "home") {
+    if (key === "Landing") {
+      navigation.navigate("Landing");
+    }
+    else if(key === "home") {
       navigation.navigate("Home", { screen: "ProductContainer" });
     } else if (key === "profile") {
       navigation.navigate("Profile");
@@ -124,12 +129,17 @@ const UserSidebar = () => {
   const NoPress = (key) => {
     setActiveItem(key);
 
-    if (key === "home") {
+    if (key === "Landing") {
+      navigation.navigate("Landing");
+    }
+    else if (key === "home") {
       navigation.navigate("Home", { screen: "ProductContainer" });
     } else if (key === "CoopDistance") {
       navigation.navigate("Home", { screen: "CoopDistance" });
     }else if (key === "tutorial") {
       navigation.navigate("Tutorial");
+    }else if (key === "AboutUs") {
+      navigation.navigate("AboutUs");
     }
   };
 

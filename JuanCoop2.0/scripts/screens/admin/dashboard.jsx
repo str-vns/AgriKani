@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  StyleSheet
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BarChart, PieChart } from 'react-native-chart-kit';
+import { PieChart } from 'react-native-chart-kit';
 import { useNavigation } from '@react-navigation/native';
-import styles from '../Farmer/css/styles';
 import { Profileuser } from "@redux/Actions/userActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { singleInventory } from '@redux/Actions/inventoryActions';
@@ -16,15 +22,16 @@ const Dashboard = () => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
+  const screenWidth = Dimensions.get('window').width;
 
-  const { overalldashboards: dashboard, overalldashboardloading: loading, overalldashboarderror: error } = useSelector(
+  const { overalldashboards: dashboard } = useSelector(
     (state) => state.overalldashboards || {}
   );
 
-  const screenWidth = Dimensions.get('window').width;
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+
   const InventoryInfo = useSelector((state) => state.sinvent?.Invsuccess?.details);
 
   useEffect(() => {
@@ -44,11 +51,9 @@ const Dashboard = () => {
           setErrors('No JWT token found.');
         }
       } catch (error) {
-        console.error('Error retrieving JWT:', error);
         setErrors('Failed to retrieve JWT token.');
       }
     };
-
     fetchUserData();
   }, [userId, dispatch]);
 
@@ -58,7 +63,6 @@ const Dashboard = () => {
       interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % InventoryInfo?.length);
       }, 4000);
-
       return () => clearInterval(interval);
     }
     return () => {};
@@ -66,21 +70,13 @@ const Dashboard = () => {
 
   const salesTrends = dashboard?.salesTrends || { daily: 0, weekly: 0, monthly: 0 };
   const rankedProducts = dashboard?.rankedProducts || [];
-
-  const salesTrendsData = {
-    labels: ["Daily", "Weekly", "Monthly"],
-    datasets: [
-      {
-        data: [salesTrends.daily || 0, salesTrends.weekly || 0, salesTrends.monthly || 0],
-      },
-    ],
-  };
+  const topCoops = dashboard?.topCoops || [];
 
   const topProductsData = rankedProducts.map((p) => ({
     name: p.productName || "Unknown",
     population: p.totalQuantitySold || 0,
     color: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-    legendFontColor: "#7F7F7F",
+    legendFontColor: "#000",
     legendFontSize: 12,
   }));
 
@@ -92,44 +88,58 @@ const Dashboard = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Dashboard</Text>
       </View>
-      
+
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Daily Sales</Text>
-          <Text style={styles.statValue}>₱{salesTrends.daily}</Text>
+          <Text style={styles.statTitle}>Total Revenue</Text>
+          <Text style={styles.statValue}>₱{dashboard?.totalRevenue?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || '0.00'}</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Weekly Sales</Text>
-          <Text style={styles.statValue}>₱{salesTrends.weekly}</Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statTitle}>Monthly Sales</Text>
-          <Text style={styles.statValue}>₱{salesTrends.monthly}</Text>
+          <Text style={styles.statTitle}>Weekly Orders</Text>
+          <Text style={styles.statValue}>{dashboard?.totalOrders || 0}</Text>
         </View>
       </View>
 
-      <View style={styles.totalOrdersCard}>
-        <Text style={styles.totalOrdersTitle}>Total Orders</Text>
-        <Text style={styles.totalOrdersValue}>{dashboard?.totalOrders ?? 0}</Text>
+      <View style={styles.statsContainer}>
+        <View style={styles.statCard}>
+          <Text style={styles.statTitle}>Daily Sales</Text>
+          <Text style={styles.statValue}>₱{salesTrends.daily?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statTitle}>Weekly Sales</Text>
+          <Text style={styles.statValue}>₱{salesTrends.weekly?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statTitle}>Monthly Sales</Text>
+          <Text style={styles.statValue}>₱{salesTrends.monthly?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</Text>
+        </View>
       </View>
 
       <View style={styles.chartsContainer}>
         <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>Sales Trends</Text>
-          <BarChart
-            data={salesTrendsData}
-            width={screenWidth - 40}
-            height={220}
-            chartConfig={{
-              backgroundColor: "#fff",
-              backgroundGradientFrom: "#f5f5f5",
-              backgroundGradientTo: "#e5e5e5",
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(63, 81, 181, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            }}
-            style={styles.chart}
-          />
+          <Text style={styles.chartTitle}>Top Cooperatives</Text>
+          {topCoops.length === 0 ? (
+            <Text style={styles.noDataText}>No data available</Text>
+          ) : (
+            <View style={{ marginTop: 10 }}>
+              <View style={styles.tableHeader}>
+                <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>#</Text>
+                <Text style={[styles.tableCell, { flex: 3, fontWeight: 'bold' }]}>Cooperative</Text>
+                <Text style={[styles.tableCell, { flex: 2, fontWeight: 'bold' }]}>Revenue (₱)</Text>
+              </View>
+              {topCoops
+                .sort((a, b) => b.totalRevenue - a.totalRevenue)
+                .map((coop, index) => (
+                  <View key={index} style={styles.tableRow}>
+                    <Text style={[styles.tableCell, { flex: 1 }]}>{index + 1}</Text>
+                    <Text style={[styles.tableCell, { flex: 3 }]}>{coop.coopName || 'Unknown'}</Text>
+                    <Text style={[styles.tableCell, { flex: 2 }]}>
+                      ₱{(coop.totalRevenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </Text>
+                  </View>
+                ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.chartCard}>
@@ -152,5 +162,89 @@ const Dashboard = () => {
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    paddingTop: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEB99',
+    paddingBottom: 10,
+  },
+  drawerButton: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
+    flexWrap: 'wrap',
+  },
+  statCard: {
+    backgroundColor: '#FFF8DC',
+    borderRadius: 8,
+    padding: 10,
+    width: '45%',
+    marginBottom: 10,
+    elevation: 2,
+  },
+  statTitle: {
+    fontSize: 14,
+    color: '#000',
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  chartsContainer: {
+    padding: 10,
+  },
+  chartCard: {
+    backgroundColor: '#FFFAE5',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+    elevation: 3,
+  },
+  chartTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#000',
+  },
+  noDataText: {
+    textAlign: 'center',
+    color: '#888',
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#FFE082',
+    paddingVertical: 8,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderColor: '#f0c14b',
+  },
+  tableCell: {
+    fontSize: 14,
+    paddingHorizontal: 5,
+    color: '#000',
+  },
+});
 
 export default Dashboard;
