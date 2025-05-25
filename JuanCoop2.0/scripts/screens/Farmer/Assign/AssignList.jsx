@@ -15,6 +15,7 @@ import { shippedOrder } from "@redux/Actions/orderActions";
 import { deliveryList } from "@redux/Actions/deliveryActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SelectedTab } from "@shared/SelectedTab";
 
 const AssignList = () => {
   const context = useContext(AuthGlobal);
@@ -107,6 +108,10 @@ const AssignList = () => {
     return text.charAt(0).toUpperCase() + text.slice(1);
   };
 
+   const choicesTab = [
+    { label: "Assign", value: "Assign" },
+    { label: "Rider", value: "Rider" },
+  ]
   const renderOrderItem = ({ item }) => {
     const isDelivered = checkIfDelivered(item?.orderItems);
     return (
@@ -135,60 +140,7 @@ const AssignList = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header2}>
-        <TouchableOpacity
-          style={styles.drawerButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle2}>Assign List</Text>
-
-          <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => {
-                navigation.navigate("HistoryCoop");
-              }}
-            >
-              <Text style={styles.buttonText}><Ionicons name="time-outline" size="30"/></Text>
-            </TouchableOpacity>
-
-      </View>
-
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === "Assign" && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab("Assign")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "Assign" && styles.activeTabText,
-            ]}
-          >
-            Assign
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === "Rider" && styles.activeTab,
-          ]}
-          onPress={() => navigation.navigate("Riderlist")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "Rider" && styles.activeTabText,
-            ]}
-          >
-            Rider
-          </Text>
-        </TouchableOpacity>
-      </View>
+ <SelectedTab selectedTab={activeTab} tabs={choicesTab} onTabChange={setActiveTab} />
 
       {shiploading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
