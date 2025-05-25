@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
+import React, { useState, useEffect, useContext, useCallback, Fragment } from "react";
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ import {
   inventoryDashboard,
 } from "@redux/Actions/inventoryActions";
 import { fetchCoopDashboardData } from "@redux/Actions/orderActions";
+import { getSingleCoop } from "@redux/Actions/productActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { useSocket } from "../../../SocketIo";
@@ -54,6 +55,8 @@ const FarmerDashboard = () => {
   const screenWidth = Dimensions.get("window").width;
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
+  const userProfile = context?.stateUser?.userProfile;
+  const { coops } = useSelector((state) => state.allofCoops);
   const [loadingData, setLoading] = useState(false);
   const [token, setToken] = useState(null);
   const [errors, setErrors] = useState(null);
@@ -63,6 +66,10 @@ const FarmerDashboard = () => {
   const [dailyWeather, setDailyWeather] = useState(null);
   const InventoryInfo = Invsuccess?.details;
   const [fcmToken, setFcmToken] = useState("");
+  const { coop } = useSelector((state) => state.singleCoop);
+
+  console.log("InvDash", InvDash);
+  console.log("userId", coops);
 
   // console.log("type", type);
   const weatherIcons = {
@@ -176,6 +183,7 @@ const FarmerDashboard = () => {
             dispatch(Profileuser(userId, res));
             dispatch(singleInventory(userId, res));
             dispatch(inventoryDashboard(invItem, res));
+            dispatch(getSingleCoop(userId));
           } else {
             setErrors("User ID is missing.");
           }
@@ -258,6 +266,7 @@ const FarmerDashboard = () => {
     legendFontColor: "#333",
     legendFontSize: 12,
   }));
+
 
   if (loading) {
     return (
@@ -345,6 +354,21 @@ const FarmerDashboard = () => {
       return;
     }
 
+    const labels = filteredChartData.labels;
+    const data = filteredChartData.datasets[0].data;
+
+    const now = new Date();
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    };
+    const timestamp = now.toLocaleString("en-US", options); // Example: "May 24, 2025, 2:56 PM"
+
+
     try {
       const InventoryContent = `
      <html>
@@ -411,25 +435,43 @@ const FarmerDashboard = () => {
         font-size: 14px;
         margin-top: 5px;
         color: #555;
+      }.timestamp {
+        font-size: 12px;
+        color: #666;
+        margin-top: 10px;
       }
+
     </style>
   </head>
   <body>
     <div class="center-container">
       <div class="inline-image">
         <img src="https://res.cloudinary.com/diljhwf3a/image/upload/v1746856018/files/mkenwabkxpdtpa6vmwul.png" alt="Inventory Icon">
-        <h2>JuanCoop</h2>
+        <h2>JuanKooP</h2>
       </div>
     </div>
     <div class="text-container">
-      <h1>Inventory</h1>
-      <p class="date">Date: ${InvDash?.[0]?.currentDay}</p>
+      <h1>${coop?.farmName}</h1>
+      <h2 style="color: gray;">${coop?.address}</h2>
+      <h2>Inventory</h2>
+      <p style="text-align: right;" class="timestamp">Generated on: ${timestamp}</p>
     </div>
 
-    ${InvDash[0]?.products
+    <div class="section">
+      <h2>Dashboard Overview</h2>
+      <ul>
+        <li>Total Revenue: ₱${dashboard?.totalRevenue?.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</li>
+        <li>Total Orders: ${dashboard?.totalOrders || 0}</li>
+        <li>Total Customers: ${dashboard?.totalCustomers || 0}</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Product Inventory</h2>
+      ${InvDash[0]?.products
       .map(
         (product) => `
-          <h2>${product?.productName}</h2>
+          <h3>${product?.productName}</h3>
           <table>
             <thead>
               <tr>
@@ -454,6 +496,52 @@ const FarmerDashboard = () => {
         `
       )
       ?.join("")}
+    </div>
+      <div class="section">
+          <h2>Order Status Summary</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${orderStatusData
+                ?.map(
+                  (status) => `
+                    <tr>
+                      <td>${status.name}</td>
+                      <td>${status.population}</td>
+                    </tr>`
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+        <div class="section"> 
+      <h2>Sales Data (${selectedRange.charAt(0).toUpperCase() + selectedRange.slice(1)})</h2>
+      <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+        <thead style="background-color: #f2f2f2;">
+          <tr>
+            <th>${selectedRange === "daily" ? "Date" : selectedRange === "monthly" ? "Month" : "Year"}</th>
+            <th>Total Sales (₱)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${labels
+            .map(
+              (label, index) => `
+                <tr>
+                  <td>${label}</td>
+                  <td>₱${data[index]?.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+              `
+            )
+            .join("")}
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>
     `;
@@ -521,9 +609,7 @@ const FarmerDashboard = () => {
         <View style={styles.weatherContainer}>
           {loadingWCurrent ? (
             <ActivityIndicator size="large" color="#4CAF50" />
-          ) : errorWCurrent ||
-            weatherCurrent === null ||
-            weatherCurrent.length === 0 ? (
+          ) : errorWCurrent || weatherCurrent === null ? (
             <Text style={styles.UnavailableText}>
               Weather is Unavailable Currently...
             </Text>
@@ -537,22 +623,22 @@ const FarmerDashboard = () => {
               <View style={styles.overlay}>
                 <Image
                   source={
-                    weatherIcons[weather?.data[0]?.weather?.icon] ||
+                    weatherIcons[weatherCurrent?.data[0]?.weather?.icon] ||
                     weatherIcons["default"]
                   }
                   style={styles.cloudImage}
                 />
                 <Text style={styles.weatherText}>
-                  City: {weather?.data[0].city_name}
+                  City: {weatherCurrent?.data[0].city_name}
                 </Text>
                 <Text style={styles.weatherText}>
-                  Temperature: {weather?.data[0].temp}°C
+                  Temperature: {weatherCurrent?.data[0].temp}°C
                 </Text>
                 <Text style={styles.weatherText}>
-                  Weather: {weather?.data[0].weather.description}
+                  Weather: {weatherCurrent?.data[0].weather.description}
                 </Text>
                 <Text style={styles.weatherText}>
-                  Wind Speed: {weather?.data[0].wind_spd} m/s
+                  Wind Speed: {weatherCurrent?.data[0].wind_spd} m/s
                 </Text>
               </View>
             </View>
@@ -561,14 +647,15 @@ const FarmerDashboard = () => {
           {loadingWDaily ? (
             <ActivityIndicator size="large" color="#4CAF50" />
           ) : errorWDaily ||
-            weatherDaily === null ||
-            weatherDaily.length === 0 ? (
+            !weatherDaily ||
+            !weatherDaily.data ||
+            weatherDaily.data.length === 0 ? (
             <Text style={styles.UnavailableText}>
               Weather is Unavailable Currently...
             </Text>
           ) : (
             <ScrollView horizontal={true}>
-              {dailyWeather.data.map((item, index) => (
+              {weatherDaily.data.map((item, index) => (
                 <View
                   key={item._id || index}
                   style={styles.dailyWeatherContainer}
@@ -772,17 +859,19 @@ const FarmerDashboard = () => {
               Top 5 Selling Products
             </Text>
             {dashboard.topSellingProducts.map((product, index) => (
-              <View
-                key={product.productId}
-                style={styles.coopdashboardTopProductRow}
-              >
-                <Text style={styles.coopdashboardTopProductText}>
-                  {index + 1}. {product.productName}
-                </Text>
-                <Text style={styles.coopdashboardTopProductText}>
-                  {product.totalSold} sold
-                </Text>
-              </View>
+              <Fragment key={index}>
+                <View
+                  key={product.productId}
+                  style={styles.coopdashboardTopProductRow}
+                >
+                  <Text style={styles.coopdashboardTopProductText}>
+                    {index + 1}. {product.productName}
+                  </Text>
+                  <Text style={styles.coopdashboardTopProductText}>
+                    {product.totalSold} sold
+                  </Text>
+                </View>
+              </Fragment>
             ))}
           </View>
         )}

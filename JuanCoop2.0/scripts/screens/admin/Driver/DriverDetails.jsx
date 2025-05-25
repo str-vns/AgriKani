@@ -146,10 +146,10 @@ const DriverDetails = (props) => {
             <Text style={styles.address}>Gender: {driver?.gender}</Text>
             <Text style={styles.address}>Phone Number: {driver?.phoneNum}</Text>
             <Text style={styles.address}>
-              Farm Driver: {driver?.coopId?.farmName}
+              Cooperative Driver: {driver?.coopId?.farmName}
             </Text>
             <Text style={styles.address}>
-              Farm Address: {driver?.coopId?.address},{" "}
+              Cooperative Address: {driver?.coopId?.address},{" "}
               {driver?.coopId?.barangay}, {driver?.coopId?.city}
             </Text>
             <Text

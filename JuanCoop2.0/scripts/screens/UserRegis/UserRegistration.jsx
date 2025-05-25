@@ -208,7 +208,7 @@ const UserRegistration = () => {
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.container}>
-        <Text style={styles.title}>Agriconnect</Text>
+        <Text style={styles.title}>JuanKooP</Text>
         <Image source={require("@assets/img/logo.png")} style={styles.logo} />
         <Text style={styles.subtitle}>User Registration</Text>
         <Text style={styles.instructions}>

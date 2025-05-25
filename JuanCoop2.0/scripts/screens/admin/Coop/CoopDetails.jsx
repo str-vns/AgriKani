@@ -163,7 +163,7 @@ const CoopDetails = (props) => {
             <Text style={styles.coopName}>
               {coops?.user?.firstName} {coops?.user?.lastName}
             </Text>
-            <Text style={styles.farmName}>Farm Name: {coops?.farmName}</Text>
+            <Text style={styles.farmName}>Cooperative Name: {coops?.farmName}</Text>
             <Text style={styles.coopEmail}>Email: {coops?.user?.email}</Text>
             <Text style={styles.address}>Address: {coops?.address}</Text>
             <Text style={styles.address}>Barangay: {coops?.barangay}</Text>
