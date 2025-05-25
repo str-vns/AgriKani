@@ -67,9 +67,6 @@ const TypeUpdate = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={backButton}>
-        <Ionicons name="arrow-back" size={24} color="#333" />
-      </TouchableOpacity>
 
       <Text style={styles.title}>Update Type</Text>
 

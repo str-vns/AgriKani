@@ -14,13 +14,14 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { inactiveCooperative } from "@redux/Actions/coopActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SelectedTab } from "@shared/SelectedTab";
 
 const Cooplist = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const { loading, coops, error } = useSelector((state) => state.allofCoops);
-  const [selectedTab, setSelectedTab] = useState("Pending");
+  const [selectedTab, setSelectedTab] = useState("CPending");
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -56,99 +57,61 @@ const Cooplist = () => {
     }
   }, [dispatch, token]);
 
+  const choicesTab = [
+    { label: "Pending", value: "CPending" },
+    { label: "Approved", value: "CApproved" },
+  ]
+
+  
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={28} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Cooperatives List</Text>
-      </View> */}
+  <View style={styles.container}>
+    <SelectedTab selectedTab={selectedTab} tabs={choicesTab} onTabChange={setSelectedTab} />
 
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "Pending" && styles.activeTab,
-          ]}
-          onPress={() => {
-            setSelectedTab("Pending");
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Pending" && styles.activeTabText,
-            ]}
-          >
-            Not Approved
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "Approved" && styles.activeTab,
-          ]}
-          onPress={() => {
-            navigation.navigate("CoopActive");
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Approved" && styles.activeTabText,
-            ]}
-          >
-            Approved
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Content */}
-      {loading ? (
-        <ActivityIndicator size="large" color="blue" style={styles.loader} />
-      ) : coops?.length === 0 || error ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No cooperative found.</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={coops}
-          keyExtractor={(item) => item?._id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          contentContainerStyle={styles.listContainer}
-          renderItem={({ item }) => (
-            <View style={styles.userItem}>
-              <Image
-                source={{
-                  uri: item?.image[0]?.url || "https://via.placeholder.com/150", // Fallback to placeholder image
-                }}
-                style={styles.profileImage}
-              />
-              <View style={styles.userDetails}>
-                <Text style={styles.userName}>{item?.farmName}</Text>
-                <Text style={styles.userEmail}>{item?.user?.email}</Text>
-                <Text style={styles.userRole}>Address: {item?.address}</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("CoopDetails", { coop: item })
-                }
-              >
-                <Text style={styles.viewButton}>View</Text>
-              </TouchableOpacity>
+    {loading ? (
+      <ActivityIndicator size="large" color="blue" style={styles.loader} />
+    ) : (
+      <FlatList
+        data={coops}
+        keyExtractor={(item) => item?._id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        contentContainerStyle={[
+          styles.listContainer,
+          (!coops || coops.length === 0) && { flex: 1, justifyContent: "center", alignItems: "center" }
+        ]}
+        renderItem={({ item }) => (
+          <View style={styles.userItem}>
+            <Image
+              source={{
+                uri: item?.image[0]?.url || "https://via.placeholder.com/150",
+              }}
+              style={styles.profileImage}
+            />
+            <View style={styles.userDetails}>
+              <Text style={styles.userName}>{item?.farmName}</Text>
+              <Text style={styles.userEmail}>{item?.user?.email}</Text>
+              <Text style={styles.userRole}>Address: {item?.address}</Text>
             </View>
-          )}
-        />
-      )}
-    </View>
-  );
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("CoopDetails", { coop: item })
+              }
+            >
+              <Text style={styles.viewButton}>View</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No cooperative found</Text>
+          </View>
+        }
+      />
+    )}
+  </View>
+);
+
 };
 
 export default Cooplist;

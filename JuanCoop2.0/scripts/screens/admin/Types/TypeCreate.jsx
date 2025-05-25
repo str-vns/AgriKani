@@ -69,10 +69,7 @@ const TypeCreate = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.navigate("TypeList")} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
-
+  
       <Text style={styles.title}>Create New Type</Text>
 
       <TextInput

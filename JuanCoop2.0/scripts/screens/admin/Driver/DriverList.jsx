@@ -1,18 +1,27 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator, Image, } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+  ActivityIndicator,
+  Image,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { listDriverDisapproved } from "@redux/Actions/driverActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SelectedTab } from "@shared/SelectedTab";
 
 const DriverList = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const { loading, drivers, error } = useSelector((state) => state.driverList);
-  const [selectedTab, setSelectedTab] = useState("Pending");
+  const [selectedTab, setSelectedTab] = useState("DPending");
   const [token, setToken] = useState(null);
 
   useEffect(() => {
@@ -49,68 +58,19 @@ const DriverList = () => {
     }
   }, [dispatch, token]);
 
+  const choicesTab = [
+    { label: "Pending", value: "DPending" },
+    { label: "Approved", value: "DApproved" },
+  ];
+
   return (
     <View style={styles.container}>
-      {/* Header */}
-      {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Driver List</Text>
-      </View> */}
-
-      {/* <View style={styles.header}>
-              <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.goBack()}
-              >
-                <Ionicons name="arrow-back" size={28} color="black" />
-              </TouchableOpacity>
-              <Text style={styles.headerTitle}>Drivers List</Text>
-          </View> */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "Pending" && styles.activeTab,
-          ]}
-          onPress={() => {
-            setSelectedTab("Pending");
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Pending" && styles.activeTabText,
-            ]}
-          >
-            Not Approved
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "Approved" && styles.activeTab,
-          ]}
-          onPress={() => {
-            navigation.navigate("DriverActive");
-          }}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Approved" && styles.activeTabText,
-            ]}
-          >
-            Approved
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Content */}
+      <SelectedTab
+        selectedTab={selectedTab}
+        tabs={choicesTab}
+        onTabChange={setSelectedTab}
+      />
+     
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
       ) : drivers?.length === 0 || error ? (
@@ -125,6 +85,11 @@ const DriverList = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No drivers available.</Text>
+            </View>
+          }
           renderItem={({ item }) => (
             <View style={styles.userItem}>
               <Image
@@ -134,7 +99,10 @@ const DriverList = () => {
                 style={styles.profileImage}
               />
               <View style={styles.userDetails}>
-                <Text style={styles.userName}>{item?.firstName}{item?.lastName}</Text>
+                <Text style={styles.userName}>
+                  {item?.firstName}
+                  {item?.lastName}
+                </Text>
                 <Text style={styles.userEmail}>{item?.email}</Text>
               </View>
               <TouchableOpacity

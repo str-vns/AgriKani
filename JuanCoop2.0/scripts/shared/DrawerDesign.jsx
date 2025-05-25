@@ -205,6 +205,15 @@ export const ListContainer = (props) => {
     } else if (isScreen === "Assign History") {
       navigation.navigate("AssignHistory", { item: item });
       return;
+    } else if (isScreen === "BlogList") { 
+      navigation.navigate("BlogCreate");
+      return;
+    } else if (isScreen === "CategoryList") {
+      navigation.navigate("CategoryCreate");
+      return;
+    } else if (isScreen === "TypeList") {
+      navigation.navigate("TypeCreate");
+      return;
     }
   };
 

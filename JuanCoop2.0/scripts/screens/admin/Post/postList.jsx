@@ -17,15 +17,15 @@ import {
 } from '@src/redux/Actions/postActions';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
+import { SelectedTab } from "@shared/SelectedTab";
 
 const PostList = () => {
   const dispatch = useDispatch();
   const postState = useSelector((state) => state.post);
   const { loading, posts } = postState;
-  const navigation = useNavigation(); // Get navigation object
-  
+  const navigation = useNavigation(); 
   const [selectedTab, setSelectedTab] = useState("Pending");
-  const [refreshing, setRefreshing] = useState(false); // State for refresh control
+  const [refreshing, setRefreshing] = useState(false); 
 
   useEffect(() => {
     dispatch(getPost());
@@ -63,40 +63,20 @@ const PostList = () => {
     selectedTab === "Pending" ? post.status !== "approved" : post.status === "approved"
   );
 
+  const choicesTab = [
+    { label: "Pending", value: "Pending" },
+    { label: "Approved", value: "Approved" },
+  ];
+
   return (
+    <View style={styles.container}>
+      <SelectedTab selectedTab={selectedTab} tabs={choicesTab} onTabChange={setSelectedTab} />
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      {/* <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={28} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Post List</Text>
-      </View> */}
-
-      {/* ✅ Tab Buttons for Switching Views */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tabButton, selectedTab === "Pending" && styles.activeTab]}
-          onPress={() => setSelectedTab("Pending")}
-        >
-          <Text style={[styles.tabText, selectedTab === "Pending" && styles.activeTabText]}>
-            Not Approved
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tabButton, selectedTab === "Approved" && styles.activeTab]}
-          onPress={() => setSelectedTab("Approved")}
-        >
-          <Text style={[styles.tabText, selectedTab === "Approved" && styles.activeTabText]}>
-            Approved
-          </Text>
-        </TouchableOpacity>
-      </View>
+     
 
       {/* ✅ Display Filtered Posts */}
       {loading && (
@@ -133,16 +113,16 @@ const PostList = () => {
       ) : (
         !loading && <Text style={styles.noPostsText}>No posts available.</Text>
       )}
+
     </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
-    
+    backgroundColor: "#fff", 
   },
   header: {
     flexDirection: "row",
