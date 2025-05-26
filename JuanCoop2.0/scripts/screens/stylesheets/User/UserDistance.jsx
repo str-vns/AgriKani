@@ -1,18 +1,20 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+const { width, height } = Dimensions.get("window");
 
 export default StyleSheet.create({
   overallContainer: {
-    backgroundColor: "#f4f4f4", // Clean and modern background
+    backgroundColor: "#ffffff",
     flex: 1,
   },
   mapContainer: {
-    height: 550,
-    marginTop: 12,
-    borderRadius: 12,
+    height: height * 0.60,
+    marginTop: height * 0.015,
+    borderRadius: width * 0.03,
     overflow: "hidden",
     borderColor: "#ccc",
-    borderWidth: 1.2,
-    marginHorizontal: 12,
+    borderWidth: width * 0.003,
+    marginHorizontal: width * 0.03,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
@@ -25,90 +27,83 @@ export default StyleSheet.create({
   cardContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 14,
-    marginHorizontal: 12,
-    marginBottom: 8,
+    padding: width * 0.035,
+    marginHorizontal: width * 0.03,
+    marginBottom: height * 0.01,
     backgroundColor: "white",
-    borderRadius: 10,
+    borderRadius: width * 0.025,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    marginTop: height * 0.03,
+    borderWidth: width * 0.003,
+    borderColor: "#e1e1e1",
   },
   imageContainer: {
-    width: 45, // Reduced size for a more compact look
-    height: 45,
-    marginRight: 14, // Adjusted spacing for balance
-    borderRadius: 8, // Slightly less rounded for a sharper look
+    width: width * 0.12,
+    height: width * 0.12,
+    marginRight: width * 0.035,
+    borderRadius: width * 0.02,
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#ccc", // Slightly darker for a more refined appearance
+    borderWidth: width * 0.003,
+    borderColor: "#ccc",
   },
-  
   image: {
     width: "100%",
     height: "100%",
   },
-  
   detailsContainer: {
     flex: 1,
   },
-  
   farmName: {
-    fontSize: 16, // Reduced from 18 for a more balanced look
-    fontWeight: "600", // Kept strong but slightly lighter
-    marginBottom: 3,
-    color: "#002b5e", // A deeper blue for a more professional feel
+    fontSize: width * 0.045,
+    fontWeight: "600",
+    marginBottom: height * 0.003,
+    color: "#002b5e",
   },
-  
   address: {
-    fontSize: 13, // Smaller for a subtle yet readable look
-    color: "#444", // Darker for better readability
-    marginBottom: 5,
+    fontSize: width * 0.035,
+    color: "#444",
+    marginBottom: height * 0.006,
   },
-  
   viewButton: {
-    backgroundColor: "#00489a", // Slightly darker shade for formality
-    paddingVertical: 10, // Reduced padding for a sleeker button
-    paddingHorizontal: 16,
-    borderRadius: 8, // Slightly sharper edges for a modern look
+    backgroundColor: "#00489a",
+    paddingVertical: height * 0.012,
+    paddingHorizontal: width * 0.04,
+    borderRadius: width * 0.02,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15, // Softer shadow for a subtle effect
+    shadowOpacity: 0.15,
     shadowRadius: 2,
     elevation: 3,
   },
-  
   buttonText: {
     color: "#ffffff",
-    fontSize: 12, // Smaller text but still clear
-    fontWeight: "500", // Less bold for a more elegant look
+    fontSize: width * 0.032,
+    fontWeight: "500",
     textAlign: "center",
-    letterSpacing: 0.6, // Slightly reduced spacing for a refined appearance
+    letterSpacing: 0.6,
     textTransform: "uppercase",
   },
-  
   detailContainerNull: {
     backgroundColor: "white",
-    padding: 12, // Reduced padding for a more compact look
-    margin: 10,
-    borderRadius: 8,
+    padding: width * 0.03,
+    margin: width * 0.025,
+    borderRadius: width * 0.02,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 1.5,
     alignItems: "center",
   },
-  
   textNullDetail: {
     textAlign: "center",
-    fontSize: 14, // Reduced font size for a more formal look
-    color: "#444", // Slightly darker for better readability
-    fontWeight: "500", // Keeps it professional and clean
+    fontSize: width * 0.037,
+    color: "#444",
+    fontWeight: "500",
   },
-  
-  
 });

@@ -92,33 +92,10 @@ const InventoryDetail = (props) => {
     );
   };
 
-  const handleCreateProduct = (item) => {
-    console.log("Create Product");
-    navigation.navigate("inventoryCreate", { item });
-  };
-
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Inventory List</Text>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={() => {
-            handleCreateProduct(InvItem);
-          }}
-        >
-          <Text style={styles.buttonText}>Add inventory</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Content */}
+    
+    
       {Invloading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
       ) : (

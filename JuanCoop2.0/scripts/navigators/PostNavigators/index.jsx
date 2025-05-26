@@ -4,6 +4,7 @@ import UserPostList from "@src/screens/Post/UserPostList";
 import UserPostScreen from "@src/screens/Post/UserPostScreen";
 import PostList from "@src/screens/admin/Post/postList";
 import CommunityForum from "@src/screens/Post/CommunityForum";
+import { DrawerDesign, BackButton } from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
@@ -13,22 +14,22 @@ const Index = () => {
        <Stack.Screen
         name="UserPostList"
         component={UserPostList}
-        options={{ headerShown: true , title:"Your Post"}}
+        options={{ header: (props) => <BackButton {...props} title="Your Post" />,}}
       />
        <Stack.Screen
         name="PostList"
         component={PostList}
-        options={{ headerShown: true }}
+        options={{ header: (props) => <BackButton {...props} title="Post List" />, }}
       />
       <Stack.Screen
         name="UserPostScreen"
         component={UserPostScreen}
-        options={{ headerShown: true,title:"Create Post" }}
+        options={{ header: (props) => <BackButton {...props} title="Create" />, }}
       />
       <Stack.Screen
         name="CommunityForum"
         component={CommunityForum}
-        options={{ headerShown:true,title:"Disccusion Board" }}
+        options={{ header: (props) => <DrawerDesign {...props} title="Discussion Board" />, }}
         
       />
     </Stack.Navigator>

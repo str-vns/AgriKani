@@ -76,19 +76,7 @@ const CategoryList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Content */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Category List</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddBlog}>
-          <Ionicons name="add" size={28} color="black" />
-        </TouchableOpacity>
-      </View>
+   
 
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />

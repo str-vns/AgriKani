@@ -67,7 +67,7 @@ const ProductCard = (props) => {
       if (userId) {
         socket.emit("addUser", userId);
       } else {
-        console.warn("User ID is missing.");
+        // console.warn("User ID is missing.");
       }
   
       socket.on("getUsers", (users) => {

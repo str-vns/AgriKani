@@ -8,7 +8,7 @@ export const SocketProvider = ({ children }) => {
 
     useEffect(() => {
 
-      const socketConnection = io( `${Constants?.expoConfig?.extra?.MAIN_ORIGIN}`, {
+      const socketConnection = io(Constants?.expoConfig?.extra?.MAIN_ORIGIN, {
         transports: ["websocket"],
         cors: {
           origin: [

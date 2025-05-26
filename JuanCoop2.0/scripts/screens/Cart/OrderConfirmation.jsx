@@ -160,7 +160,7 @@ const OrderConfirmation = ({ route }) => {
         )}
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Home", { screen: "Home" })}>
-        <Text style={styles.backToHome}>Back to Dashboard</Text>
+        <Text style={styles.backToHome}>Back to Home</Text>
       </TouchableOpacity>
     </View>
   );

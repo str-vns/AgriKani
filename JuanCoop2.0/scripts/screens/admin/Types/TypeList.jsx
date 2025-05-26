@@ -54,11 +54,6 @@ const TypeList = ({ navigation }) => {
     }
   }, [dispatch]);
 
-  // Add new type handler
-  const handleAddType = () => {
-    navigation.navigate("TypeCreate");
-  };
-
   // Edit type handler
   const handleEditType = (type) => {
     navigation.navigate("TypeUpdate", { type });
@@ -89,20 +84,7 @@ const TypeList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Type List</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddType}>
-          <Ionicons name="add" size={28} color="black" />
-        </TouchableOpacity>
-      </View>
-
+  
       {/* Content */}
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />

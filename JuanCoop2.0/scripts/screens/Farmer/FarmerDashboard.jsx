@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   PermissionsAndroid,
   Platform,
+  Modal,
 } from "react-native";
 import {
   weatherDailyActions,
@@ -67,9 +68,7 @@ const FarmerDashboard = () => {
   const InventoryInfo = Invsuccess?.details;
   const [fcmToken, setFcmToken] = useState("");
   const { coop } = useSelector((state) => state.singleCoop);
-
-  console.log("InvDash", InvDash);
-  console.log("userId", coops);
+  const [weatherModalVisible, setWeatherModalVisible] = useState(false);
 
   // console.log("type", type);
   const weatherIcons = {
@@ -151,7 +150,7 @@ const FarmerDashboard = () => {
       if (userId) {
         socket.emit("addUser", userId);
       } else {
-        console.warn("User ID is missing.");
+        // console.warn("User ID is missing.");
       }
 
       socket.on("getUsers", (users) => {
@@ -267,6 +266,137 @@ const FarmerDashboard = () => {
     legendFontSize: 12,
   }));
 
+  // Weather Modal Content
+  const WeatherModalContent = () => (
+    <Modal
+      visible={weatherModalVisible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => setWeatherModalVisible(false)}
+    >
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <View
+          style={{
+            width: "90%",
+            backgroundColor: "#fff",
+            borderRadius: 16,
+            padding: 24,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 8,
+            elevation: 5,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              color: "#333",
+              textAlign: "center",
+              marginBottom: 16,
+              letterSpacing: 1,
+            }}
+          >
+            Weather Information
+          </Text>
+          <View style={{ marginBottom: 16 }}>
+            {loadingWCurrent ? (
+              <ActivityIndicator size="large" color="#4CAF50" />
+            ) : errorWCurrent || weatherCurrent === null ? (
+              <Text style={{ color: "#b00", textAlign: "center" }}>
+                Weather is Unavailable Currently...
+              </Text>
+            ) : (
+              <View style={{ alignItems: "center" }}>
+                <Image
+                  source={
+                    weatherIcons[weatherCurrent?.data[0]?.weather?.icon] ||
+                    weatherIcons["default"]
+                  }
+                  style={{ width: 80, height: 80, marginBottom: 8 }}
+                />
+                <Text style={{ fontSize: 18, fontWeight: "600" }}>
+                  City: {weatherCurrent?.data[0].city_name}
+                </Text>
+                <Text>Temperature: {weatherCurrent?.data[0].temp}°C</Text>
+                <Text>
+                  Weather: {weatherCurrent?.data[0].weather.description}
+                </Text>
+                <Text>Wind Speed: {weatherCurrent?.data[0].wind_spd} m/s</Text>
+              </View>
+            )}
+          </View>
+          <View>
+            {loadingWDaily ? (
+              <ActivityIndicator size="large" color="#4CAF50" />
+            ) : errorWDaily ||
+              !weatherDaily ||
+              !weatherDaily.data ||
+              weatherDaily.data.length === 0 ? (
+              <Text style={{ color: "#b00", textAlign: "center" }}>
+                Weather is Unavailable Currently...
+              </Text>
+            ) : (
+              <ScrollView horizontal={true} style={{ marginBottom: 8 }}>
+                {weatherDaily.data.map((item, index) => (
+                  <View
+                    key={item._id || index}
+                    style={{
+                      backgroundColor: "#f7f7f7",
+                      borderRadius: 10,
+                      marginRight: 10,
+                      padding: 10,
+                      alignItems: "center",
+                      minWidth: 100,
+                    }}
+                  >
+                    <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
+                      {item.valid_date}
+                    </Text>
+                    <Image
+                      source={
+                        weatherIcons[item?.weather?.icon] ||
+                        weatherIcons["default"]
+                      }
+                      style={{ width: 40, height: 40, marginBottom: 4 }}
+                    />
+                    <Text
+                      style={{ fontSize: 12, color: "#555" }}
+                      ellipsizeMode="tail"
+                      numberOfLines={1}
+                    >
+                      {item.weather.description}
+                    </Text>
+                    <Text style={{ fontWeight: "bold" }}>{item.temp}°C</Text>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+          <TouchableOpacity
+            style={{
+              marginTop: 16,
+              backgroundColor: "#EDC001",
+              borderRadius: 8,
+              paddingVertical: 10,
+              alignItems: "center",
+            }}
+            onPress={() => setWeatherModalVisible(false)}
+          >
+            <Text style={{ color: "#222", fontWeight: "bold" }}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 
   if (loading) {
     return (
@@ -564,6 +694,7 @@ const FarmerDashboard = () => {
 
   return (
     <ScrollView style={styles.container}>
+      <WeatherModalContent />
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.drawerButton}
@@ -572,8 +703,14 @@ const FarmerDashboard = () => {
           <Ionicons name="menu" size={34} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Dashboard</Text>
+        {/* Weather Icon Button */}
+        <TouchableOpacity
+          style={{ marginLeft: "auto", marginRight: 10 }}
+          onPress={() => setWeatherModalVisible(true)}
+        >
+          <Ionicons name="cloud-outline" size={32} color="#EDC001" />
+        </TouchableOpacity>
       </View>
-
       <View style={styles.bannerContainer}>
         <Text style={styles.bannerText}>⚠️ Out of Stock:</Text>
         <FlatList
@@ -605,105 +742,14 @@ const FarmerDashboard = () => {
           <Text style={styles.coopdashboardTitle}>Cooperative Dashboard</Text>
         </View>
 
-        {/* Weather Section */}
-        <View style={styles.weatherContainer}>
-          {loadingWCurrent ? (
-            <ActivityIndicator size="large" color="#4CAF50" />
-          ) : errorWCurrent || weatherCurrent === null ? (
-            <Text style={styles.UnavailableText}>
-              Weather is Unavailable Currently...
-            </Text>
-          ) : (
-            <View style={styles.weatherBox}>
-              <Image
-                blurRadius={70}
-                source={require("@assets/img/bg.jpg")}
-                style={styles.backgroundImage}
-              />
-              <View style={styles.overlay}>
-                <Image
-                  source={
-                    weatherIcons[weatherCurrent?.data[0]?.weather?.icon] ||
-                    weatherIcons["default"]
-                  }
-                  style={styles.cloudImage}
-                />
-                <Text style={styles.weatherText}>
-                  City: {weatherCurrent?.data[0].city_name}
-                </Text>
-                <Text style={styles.weatherText}>
-                  Temperature: {weatherCurrent?.data[0].temp}°C
-                </Text>
-                <Text style={styles.weatherText}>
-                  Weather: {weatherCurrent?.data[0].weather.description}
-                </Text>
-                <Text style={styles.weatherText}>
-                  Wind Speed: {weatherCurrent?.data[0].wind_spd} m/s
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {loadingWDaily ? (
-            <ActivityIndicator size="large" color="#4CAF50" />
-          ) : errorWDaily ||
-            !weatherDaily ||
-            !weatherDaily.data ||
-            weatherDaily.data.length === 0 ? (
-            <Text style={styles.UnavailableText}>
-              Weather is Unavailable Currently...
-            </Text>
-          ) : (
-            <ScrollView horizontal={true}>
-              {weatherDaily.data.map((item, index) => (
-                <View
-                  key={item._id || index}
-                  style={styles.dailyWeatherContainer}
-                >
-                  <View style={styles.dailyWeatherBox}>
-                    <Image
-                      blurRadius={70}
-                      source={require("../../../assets/img/bg.jpg")}
-                      style={styles.backgroundImageDaily}
-                    />
-                    <View style={styles.dailyOverlay}>
-                      <Text style={styles.dailyWeatherDate}>
-                        {item.valid_date}
-                      </Text>
-                      <Image
-                        source={
-                          weatherIcons[item?.weather?.icon] ||
-                          weatherIcons["default"]
-                        }
-                        style={styles.dailyWeatherCloudImage}
-                      />
-                      <Text
-                        style={styles.dailyWeatherText}
-                        ellipsizeMode="tail"
-                        numberOfLines={1}
-                      >
-                        {item.weather.description}
-                      </Text>
-                      <Text style={styles.dailyWeatherTempText}>
-                        {item.temp}°C
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          )}
-          
-        </View>
-
         <View style={styles.coopdashboardSummaryContainer}>
           {[
             {
-              title: "Total Revenue",
+              title: "Sales",
               value: `₱ ${Number(dashboard?.totalRevenue || 0).toFixed(2)}`,
             },
             { title: "Orders", value: dashboard?.totalOrders },
-            { title: "Customers", value: dashboard?.totalCustomers },
+            { title: "Customer", value: dashboard?.totalCustomers },
           ].map((item, index) => (
             <View key={index} style={styles.coopdashboardSummaryCard}>
               <Text style={styles.coopdashboardSummaryTitle}>{item.title}</Text>

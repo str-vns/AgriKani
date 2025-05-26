@@ -9,94 +9,64 @@ import Review from "@src/screens/Cart/UserReview";
 import PaymayaForm from "@screens/Cart/paymayaForm";
 import GcashForm from "@screens/Cart/gcashForm";
 import OrderConfirmation from "@src/screens/Cart/OrderConfirmation";
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Alert, BackHandler } from "react-native";
-
+import { BackButton, OrderConfirmationHeader } from "@shared/DrawerDesign";
 const Index = () => {
-  const navigation = useNavigation()
-  // useEffect(() => {
-  //   const backAction = () => {
-  //     // Access the current route
-  //     const currentRoute = navigation.getState().routes[navigation.getState().index];
-  //     console.log("Current Route: ", currentRoute);
-  //     // If the route has its own nested state, we can check for routeNames
-  //     if (currentRoute.state && currentRoute.state.routeNames) {
-  //       const routeNames = currentRoute.state.routeNames;
-  //       console.log("Route Names: ", routeNames);
-        
-  //       // For example, if you need to access a specific route name from routeNames
-  //       const routeName = routeNames[7];  // Check if index 7 exists
-  //       console.log("Selected route name: ", routeName);
-        
-  //       // You can use this routeName to check for specific navigation logic
-  //       if (routeName === "test") {
-  //         Alert.alert("Alert", "You cannot go back to the review page.", [
-  //           { text: "OK", onPress: () => null }
-  //         ]);
-  //         return true; // Prevent the back action
-  //       }
-  //     }
-
-  //     return false; // Allow the default back action if no match
-  //   };
-
-  //   const backHandler = BackHandler.addEventListener(
-  //     "hardwareBackPress",
-  //     backAction
-  //   );
-
-  //   // Cleanup the back handler when the component is unmounted
-  //   return () => backHandler.remove();
-  // }, [navigation]);
   return (
     <Stack.Navigator>
       <Stack.Screen
         name="AddressList"
         component={AddressList}
-        options={{ headerShown: true, title:"Address List" }}
+        options={{
+          header: (props) => <BackButton {...props} title="Address List" />,
+        }}
       />
       <Stack.Screen
         name="AddressForm"
         component={AddressForm}
-        options={{ headerShown: true }}
+        options={{
+          header: (props) => <BackButton {...props} title="Address Form" />,
+        }}
       />
       <Stack.Screen
         name="AddressEdit"
         component={AddressEdit}
-        options={{ headerShown: true }}
+        options={{
+          header: (props) => <BackButton {...props} title="Address Edit" />,
+        }}
       />
       <Stack.Screen
         name="Payment"
         component={Payment}
-        options={{ headerShown: true }}
+        options={{
+          header: (props) => <BackButton {...props} title="Payment" />,
+        }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="Paymaya"
         component={PaymayaForm}
-        options={{ headerShown: true }}
+        options={{ header: (props) => <BackButton {...props} title="Paymaya" /> }}
       />
       <Stack.Screen
         name="Gcash"
         component={GcashForm}
-        options={{ headerShown: true }}
+        options={{ header: (props) => <BackButton {...props} title="Gcash" /> }}
       />
-        <Stack.Screen
+      <Stack.Screen
         name="Review"
         component={Review}
-        options={{ headerShown: true }}
+        options={{ header: (props) => <BackButton {...props} title="Review" /> }}
       />
-     <Stack.Screen
+      <Stack.Screen
         name="OrderConfirmation"
         component={OrderConfirmation}
         options={{
-          headerShown: true,
-          gestureEnabled: false, 
-          title:"Order Confirmation",
+          header: (props) => <OrderConfirmationHeader {...props} title="Order Confirmation" />,
+          gestureEnabled: false,
           headerLeft: () => null,
         }}
       />
-
-
     </Stack.Navigator>
   );
 };

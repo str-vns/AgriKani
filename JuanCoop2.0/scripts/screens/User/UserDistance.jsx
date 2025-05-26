@@ -88,8 +88,6 @@ const UserDistance = () => {
           webViewRef.current.postMessage(JSON.stringify({markerCoordinate, coops}));
         }
       }, [markerCoordinate, coops]);
-
-  console.log("MarkerIcon", MarkerIcon)
     const mapHtml = `
  <!DOCTYPE html>
 <html lang="en">
@@ -262,10 +260,7 @@ const UserDistance = () => {
       </View>
 
       {/* Scrollable List */}
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer} 
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView>
         {filterCoops && filterCoops.length > 0 ? (
           filterCoops.map((coop, index) => (
             <View style={styles.cardContainer} key={index}>

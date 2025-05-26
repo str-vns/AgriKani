@@ -17,6 +17,7 @@ import { useSocket } from "../../../SocketIo"
 import { useDispatch, useSelector } from "react-redux";
 import { singleNotification } from "@redux/Actions/notificationActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setCartItems } from '@redux/Actions/cartActions';
 
 const UserFooter = () => {
   const { notifloading, notification, notiferror } = useSelector((state) => state.getNotif);
@@ -30,13 +31,18 @@ const UserFooter = () => {
   const [notif, setNotif] = useState([]);
   const [token, setToken] = useState(null);
   const numCartItems = cartItems.length;
-  console.log("notif", numCartItems);
   
+
   useEffect(() => {
     const fetchJwt = async () => {
       try {
         const res = await AsyncStorage.getItem("jwt");
         setToken(res);
+        const storedCart = await AsyncStorage.getItem('cartItems');
+        if (storedCart) {
+        const cartItems = JSON.parse(storedCart);
+        dispatch(setCartItems(cartItems));
+      }
       } catch (error) {
         console.error("Error retrieving JWT: ", error);
       }
@@ -56,8 +62,6 @@ const UserFooter = () => {
     }
   }, [socket]);
 
-
-
  useFocusEffect(
     useCallback(() => {
       dispatch(singleNotification(userId, token));
@@ -69,7 +73,6 @@ const UserFooter = () => {
   const numNotif = notification.filter((notif) => notif.readAt === null).length;
   const overallNotif = Number(numNotif) + notif.length;
  
-  console.log("notif", overallNotif);
   const handleMessage = () => {
     {
       context?.stateUser?.isAuthenticated
@@ -143,14 +146,17 @@ const handleNotif = () => {
             opacity={selected === 0 ? 1 : 0.5}
             py="2"
             flex={1}
-            onPress={() => handleNotif()}
+            onPress={() => {
+              setSelected(0);
+              handleNotif();
+            }}
           >
             <Center>
-          {(numNotif > 0 || notif.length > 0) && (
-  <View style={styles.notifCircle}>
-    <Text style={styles.text}>{overallNotif}</Text>
-  </View>
-)}
+              {(numNotif > 0 || notif.length > 0) && (
+                <View style={styles.notifCircle}>
+                  <Text style={styles.text}>{overallNotif}</Text>
+                </View>
+              )}
               <Icon
                 mb="1"
                 as={
@@ -173,7 +179,6 @@ const handleNotif = () => {
           <Pressable
             cursor="pointer"
             onPress={() => {
-              setSelected(2);
               navigation.navigate("Home", { screen: "Cart" });
             }}
             p="4"
@@ -205,7 +210,10 @@ const handleNotif = () => {
             opacity={selected === 3 ? 1 : 0.5}
             py="2"
             flex={1}
-            onPress={() => handleWish()}
+            onPress={() => {
+              handleWish();
+              setSelected(3);
+            }}
           >
             <Center>
               <Icon
@@ -232,7 +240,7 @@ const handleNotif = () => {
             opacity={selected === 4 ? 1 : 0.5}
             py="2"
             flex={1}
-            onPress={() => handleMessage()}
+            onPress={() => {handleMessage(); setSelected(4);}}
           >
             <Center>
               <Icon

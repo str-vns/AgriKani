@@ -32,30 +32,33 @@ import GcashWithdraw from "@screens/Farmer/Withdraw/GcashWithdrawForm";
 import CreateWithdraw from "@screens/Farmer/Withdraw/CreateWithdraw";
 import BlogListCoop from "@screens/Farmer/Blog/BlogListCoop";
 import BlogCards from "@screens/Farmer/Blog/BlogCards";
-
+import { DrawerDesign, BackButton, ListContainer } from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
 const Index = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="CoopDashboard">
       <Stack.Screen
         name="CoopDashboard"
         component={CoopDashboard}
-        options={{ headerShown: false,title:"Coop Dashboard", tabBarShowLabel: false }}
+        options={{ headerShown: false }}
+        // options={{
+        //   header: (props) => <DrawerDesign {...props} title="Dashboard" />,
+        // }}
       />
 
       <Stack.Screen
         name="FNotificationList"
         component={FNotificationList}
-        options={{ headerShown: true, title:"Notification",headerBackTitleVisible: true , tabBarShowLabel: false }}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Notification" />,
+        }}
       />
 
       <Stack.Screen
         name="OrderList"
         options={{
-          headerShown: true,
-          title:"Order List",
-          tabBarShowLabel: false,
+          header: (props) => <DrawerDesign {...props} title="Order List" />,
         }}
         component={OrderCoop}
       />
@@ -63,9 +66,7 @@ const Index = () => {
       <Stack.Screen
         name="MemberList"
         options={{
-          headerShown: true,
-          title:"Member List",
-          tabBarShowLabel: false,
+          header: (props) => <DrawerDesign {...props} title="Member List" />,
         }}
         component={MemberList}
       />
@@ -73,9 +74,7 @@ const Index = () => {
       <Stack.Screen
         name="MemberActive"
         options={{
-          headerShown: true,
-          title:"Member List",
-          tabBarShowLabel: false,
+           header: (props) => <DrawerDesign {...props} title="Member List" />,
         }}
         component={MemberActive}
       />
@@ -83,26 +82,30 @@ const Index = () => {
       <Stack.Screen
         name="MemberSingle"
         options={{
-          headerShown:true,
-          title:"Details",
-          tabBarShowLabel: false,
+           header: (props) => <BackButton {...props} title="Member Details" />,
         }}
         component={MemberSingle}
       />
 
       <Stack.Screen
         name="AssignList"
-        options={{
-          headerShown: false,
-          tabBarShowLabel: false,
-        }}
+        options={({ route }) => ({
+          header: (props) => (
+            <ListContainer
+              {...props}
+              title="History"
+              isScreen="Assign History"
+              isCreate={true}
+            />
+          ),
+        })}
         component={AssignList}
       />
 
       <Stack.Screen
         name="HistoryCoop"
         component={HistoryCoop}
-        options={{ headerShown: false }}
+        options={{  header: (props) => <BackButton {...props} title="History" />,}}
       />
 
       <Stack.Screen
@@ -114,33 +117,44 @@ const Index = () => {
       <Stack.Screen
         name="ReviewList"
         component={ReviewList}
-        options={{ headerShown: true,   title:"Review List" }}
+        options={{  header: (props) => <DrawerDesign {...props} title="Review List" />, }}
       />
 
       <Stack.Screen
         name="Reviews"
         component={Reviews}
-        options={{ headerShown: true,title:"Review Summary" }}
+        options={{ header: (props) => <BackButton {...props} title="Review Summary" />, }}
       />
 
       <Stack.Screen
         name="InventoryList"
         component={InventoryList}
-        options={{ headerShown: true,title:"Inventory List" }}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Inventory List" />,
+        }}
       />
 
       <Stack.Screen
         name="InventoryDetail"
         component={InventoryDetail}
-        options={{ headerShown: false }}
+        options={({ route }) => ({
+          header: (props) => (
+            <ListContainer
+              {...props}
+              title="Inventory Detail"
+              isCreate={true}
+              isScreen="Inventory"
+              item={route.params?.Inv}
+            />
+          ),
+        })}
       />
 
       <Stack.Screen
         name="inventoryCreate"
         component={inventoryCreate}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Add Inventory" />,
         }}
       />
 
@@ -148,37 +162,53 @@ const Index = () => {
         name="inventoryUpdate"
         component={inventoryUpdate}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Update Inventory" />,
         }}
       />
 
       <Stack.Screen
         name="Riderlist"
         component={Riderlist}
-        options={{ headerShown: false }}
+        options={({ route }) => ({
+          header: (props) => (
+            <ListContainer
+              {...props}
+              title="Rider List"
+              isCreate={true}
+              isScreen="Rider"
+            />
+          ),
+        })}
       />
       <Stack.Screen
         name="Register"
         component={Register}
-        options={{ headerShown: true }}
+        options={{
+          header: (props) => <BackButton {...props} title="Register" />,
+        }}
       />
 
       <Stack.Screen
         name="RiderDetails"
         component={RiderDetails}
-        options={{ headerShown: true , title:"Rider Details"}}
+        options={{
+          header: (props) => <BackButton {...props} title="Rider Details" />,
+        }}
       />
       <Stack.Screen
         name="AssignLocation"
         component={AssignLocation}
-        options={{ headerShown: false }}
+        options={{
+          header: (props) => <BackButton {...props} title="Register" />,
+        }}
       />
 
       <Stack.Screen
         name="MaxCapacity"
         component={MaxCapacity}
-        options={{ headerShown: false }}
+        options={{
+          header: (props) => <BackButton {...props} title="Rider Capacity" />,
+        }}
       />
       <Stack.Screen
         name="History"
@@ -189,7 +219,9 @@ const Index = () => {
       <Stack.Screen
         name="Assign"
         component={Assign}
-        options={{ headerShown: true, title:"Assigned Orders" }}
+        options={{
+          header: (props) => <BackButton {...props} title="Assigned" />,
+        }}
       />
 
       <Stack.Screen
@@ -205,8 +237,7 @@ const Index = () => {
         name="Reason"
         component={Reason}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+           header: (props) => <BackButton {...props} title="Reason of Cancel" />,
         }}
       />
 
@@ -220,9 +251,7 @@ const Index = () => {
         name="WithdrawList"
         component={WithdrawList}
         options={{
-          headerShown: true,
-          title:"Wallet",
-          tabBarShowLabel: false,
+ header: (props) => <DrawerDesign {...props} title="Wallet" />,
         }}
       />
 
@@ -230,8 +259,7 @@ const Index = () => {
         name="PaymentMethod"
         component={PaymentMethod}
         options={{
-          headerShown: true,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Payment Method" />,
         }}
       />
 
@@ -239,8 +267,7 @@ const Index = () => {
         name="PaymayaWithdraw"
         component={PaymayaWithdraw}
         options={{
-          headerShown: true,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Paymaya Withdraw" />,
         }}
       />
 
@@ -248,8 +275,7 @@ const Index = () => {
         name="GcashWithdraw"
         component={GcashWithdraw}
         options={{
-          headerShown: true,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Gcash Withdraw" />,
         }}
       />
 
@@ -257,21 +283,19 @@ const Index = () => {
         name="CreateWithdraw"
         component={CreateWithdraw}
         options={{
-          headerShown: true,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Create Withdraw" />,
         }}
       />
       <Stack.Screen
         name="BlogListCoop"
         component={BlogListCoop}
-        options={{ headerShown: false }}
+        options={{ header: (props) => <DrawerDesign {...props} title="Blogs" />, }}
       />
       <Stack.Screen
         name="BlogCards"
         component={BlogCards}
-        options={{ headerShown: false }}
+        options={{ header: (props) => <BackButton {...props} title="Blog" />, }}
       />
-      
     </Stack.Navigator>
   );
 };

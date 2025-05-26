@@ -52,7 +52,6 @@ const AboutUs = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.section}>
-        <Text style={styles.title}>About Us</Text>
         <Text style={styles.description}>
           JuanKooP is a platform designed to support cooperatives in Bulacan by providing a digital space where they can connect, collaborate, and grow. Our goal is to make it easier for cooperatives to manage their products, reach more customers, and improve their operations through accessible technology.
         </Text>

@@ -41,12 +41,7 @@ const ClientCancelled = (props) => {
   return (
    <SafeAreaView style={styles.safeContainer}>
          <ScrollView>
-          <View style={styles.header}>
-                   <TouchableOpacity style={styles.drawerButton} onPress={() => navigation.openDrawer()}>
-                     <Ionicons name="menu" size={34} color="black" />
-                   </TouchableOpacity>
-                   <Text style={styles.headerTitle}>Reason of Cancel</Text>
-                 </View>
+       
           <View style={styles.container}>
           <Image 
      source={

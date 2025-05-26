@@ -2,10 +2,12 @@ const Wallet = require("../models/wallets");
 const User = require("../models/user");
 const Transaction = require("../models/transaction");
 const ErrorHandler = require("../utils/errorHandler");
+const Notification = require("../models/notification");
 const Order = require("../models/order");
 const Cancelled = require("../models/cancelled");
 const { STATUSCODE, ROLE } = require("../constants/index");
 const { default: mongoose } = require("mongoose");
+const { sendFcmNotification } = require("../services/sendFcmNotif");
 
 exports.createWithdrawProcess = async (req) => {
   console.log(req.body);
@@ -28,6 +30,24 @@ exports.createWithdrawProcess = async (req) => {
   if (!wallet) {
     throw new ErrorHandler("Wallet not found", STATUSCODE.NOT_FOUND);
   }
+
+      const user = await User.findById("6728323269587b48f9b4fd48")
+
+      if (!user) throw new ErrorHandler("Admin not exist");
+      
+      await sendFcmNotification(
+        user,
+        "New Wallet Withdrawal",
+        `A new wallet withdrawal has been requested by ${users.firstName} ${users.lastName} with the amount of ${req.body.amount}.`,
+        user.deviceToken,
+      );
+
+      await Notification.create({
+        user: user._id,
+        title: "New Wallet Withdrawal",
+        type: "driver",
+        content: `A new wallet withdrawal has been requested by ${users.firstName} ${users.lastName} with the amount of ${req.body.amount}.`,
+      });
 
   wallet.balance -= req.body.amount;
   await wallet.save();
@@ -120,6 +140,23 @@ exports.createRefundProcess = async (req) => {
 
   wallet.balance -= req.body.amount;
   await wallet.save();
+ 
+   const user = await User.findById("6728323269587b48f9b4fd48")
+      if (!user) throw new ErrorHandler("Admin not exist");
+
+       await sendFcmNotification(
+        user,
+        "New Refund Request",
+        `A new Refund Request has been requested by ${users.firstName} ${users.lastName} with the amount of ${req.body.amount}.`,
+        user.deviceToken,
+      );
+
+      await Notification.create({
+        user: user._id,
+        title: "New Refund Request",
+        type: "driver",
+        content: `A new Refund Request has been requested by ${users.firstName} ${users.lastName} with the amount of ${req.body.amount}.`,
+      });
 
   return withdraw;
 };

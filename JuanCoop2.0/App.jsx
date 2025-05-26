@@ -16,7 +16,7 @@ export default function App() {
     setAppReady(true);
     SplashScreen.hide();
   }
-
+  
   return (
     <Auth>
       <SocketProvider>

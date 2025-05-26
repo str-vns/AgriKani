@@ -65,7 +65,6 @@ const MemberSingle = (props) => {
     navigation.navigate("MemberList");
   }
 
- console.log(members);
 
   return (
   

@@ -1,11 +1,19 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, RefreshControl, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getSuccessTransactions } from "@redux/Actions/transactionActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { allCoops } from "@redux/Actions/coopActions";
 
 const WithdrawsSuccess = () => {
     const dispatch = useDispatch();
@@ -14,6 +22,7 @@ const WithdrawsSuccess = () => {
     const {withdrawloading, withdraw, withdrawerror} = useSelector((state) => state.transaction)
     const [selectedTab, setSelectedTab] = useState("Success");
     const [token, setToken] = useState(null);
+    const { loading, coops, error } = useSelector((state) => state.allofCoops);
    
     useEffect(() => {
       const fetchJwt = async () => {
@@ -31,6 +40,7 @@ const WithdrawsSuccess = () => {
     useFocusEffect(
       useCallback(() => {
         dispatch(getSuccessTransactions(token));
+        dispatch(allCoops(token));
         return () => {
           console.log("Cleaning up on screen unfocus...");
         };
@@ -42,6 +52,7 @@ const WithdrawsSuccess = () => {
       setRefreshing(true);
       try {
         dispatch(getSuccessTransactions(token));
+        dispatch(allCoops(token));
       } catch (err) {
         console.error("Error refreshing users:", err);
       } finally {
@@ -120,35 +131,42 @@ const WithdrawsSuccess = () => {
               <View style={styles.userItem}>
   
                 <View style={styles.userDetails}>
-                  <Text style={styles.userName}>{item?.accountName}</Text>
-                  <Text style={styles.userEmail}>Manager: {item?.user?.firstName}{item?.user?.lastName}</Text>
+                  <Text style={styles.userName}>{coops?.find((coop) => coop.user?._id === item.user?._id)?.farmName || "Farm Name Not Found"}</Text>
+                  <Text style={styles.userEmail}>Request By: {item?.accountName}</Text>
                   <Text style={styles.userEmail} >Status: {" "}
                   <Text 
                     style={[
-                      styles.userEmail, 
-                      { color: item?.transactionStatus === "SUCCESS" ? "green" : 
-                              item?.transactionStatus === "PENDING" ? "orange" : 
-                              item?.transactionStatus === "FAILED" ? "red" : "black" } // Default to black
+                      styles.userEmail,
+                      {
+                        color:
+                          item?.transactionStatus === "SUCCESS"
+                            ? "green"
+                            : item?.transactionStatus === "PENDING"
+                            ? "orange"
+                            : item?.transactionStatus === "FAILED"
+                            ? "red"
+                            : "black",
+                      }, // Default to black
                     ]}
                   >
                     {item?.transactionStatus}
                   </Text>
                 </Text>
-                  <Text style={styles.userEmail}>Amount: ₱ {item?.amount}</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate("WithdrawsSingle", { withdrawData: item })
-                  }
-                >
-                  <Text style={styles.viewButton}>View</Text>
-                </TouchableOpacity>
+                <Text style={styles.userEmail}>Amount: ₱ {item?.amount}</Text>
               </View>
-            )}
-          />
-        )}
-      </View>
-    );
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("WithdrawsSingle", { withdrawData: item })
+                }
+              >
+                <Text style={styles.viewButton}>View</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      )}
+    </View>
+  );
 };
 
 export default WithdrawsSuccess;

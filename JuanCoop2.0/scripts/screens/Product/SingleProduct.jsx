@@ -22,7 +22,7 @@ import { WishlistUser } from "@redux/Actions/userActions";
 import { Icon } from "react-native-elements";
 import { Profileuser } from "@redux/Actions/userActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
-import { useSocket } from "../../../SocketIo";
+import { MiniModalpop } from "@shared/MiniCardPop";
 
 const SingleProduct = ({ route }) => {
   const context = useContext(AuthGlobal);
@@ -57,6 +57,8 @@ const SingleProduct = ({ route }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false); // Added loading state
   const { user, error } = useSelector((state) => state.userOnly);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [addContent, setAddContent] = useState(1);
   const productId = _id;
 
   useFocusEffect(
@@ -136,6 +138,8 @@ const SingleProduct = ({ route }) => {
   const handleAddToCart = async () => {
     try {
       if (product?.stock?.length === 1) {
+        setModalVisible(true);
+        setAddContent(1);
         const cartItem = {
           inventoryId: product?.stock[0]?._id,
           id: product?._id,
@@ -151,10 +155,10 @@ const SingleProduct = ({ route }) => {
 
         AsyncStorage.setItem("cartItem", JSON.stringify(cartItem));
 
-        Alert.alert("Item added to cart");
-
         dispatch(addToCart(cartItem));
+
       } else if (selectedSize) {
+               setAddContent(1);
         const cartItem = {
           inventoryId: selectedSize?._id,
           id: product?._id,
@@ -169,17 +173,41 @@ const SingleProduct = ({ route }) => {
           maxQuantity: selectedSize?.quantity,
         };
 
-        Alert.alert("Item added to cart");
+        setModalVisible(true);
         dispatch(addToCart(cartItem));
+
       } else {
-        Alert.alert("Please select a size or ensure stock is available.");
+        setAddContent(2);
       }
+          setTimeout(() => {
+          setModalVisible(false);
+        }, 3000);
     } catch (error) {
+      setAddContent(3);
       console.error("Error adding item to cart:", error);
-      Alert.alert("An error occurred while adding the item to the cart.");
+          setTimeout(() => {
+          setModalVisible(false);
+        }, 3000);
     }
   };
 
+  const Maincontent = [
+    {
+      id: 1,
+      content: "🥳 Added to Cart",
+      color: "#77DD77",
+    },
+    {
+      id: 2,
+      content: "🤓☝️ Please Select a Size or Ensure Stock is Available",
+      color: "#FFEE8C",
+    },
+    {
+      id: 3,
+      content: "😔 Can\'t Add to Cart at the Moment",
+      color: "#FF6961",
+    },
+  ]
   useFocusEffect(
     useCallback(() => {
       if (product && product?.coop?._id) {
@@ -365,8 +393,12 @@ const SingleProduct = ({ route }) => {
           <Text style={{ paddingLeft: 15 }}>No Reviews</Text>
         )}
       </ScrollView>
-
       <View style={styles.buttonContainer}>
+               <MiniModalpop
+        content={Maincontent[addContent - 1]?.content}
+        visible={modalVisible}
+        color={Maincontent[addContent - 1]?.color}
+        />
         <TouchableOpacity
           style={styles.addToCartButton}
           onPress={handleAddToCart}

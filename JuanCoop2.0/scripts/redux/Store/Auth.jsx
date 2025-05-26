@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useReducer, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import authReducer from '@redux/Reducers/Auth.reducers';
@@ -24,7 +24,7 @@ const Auth = (props) => {
         if (token && userInfo) {
           const decodedToken = jwtDecode(token);
           const parsedUserInfo = JSON.parse(userInfo);
-
+          console.log('User Info:', parsedUserInfo);
           dispatch(setCurrentUser(decodedToken, parsedUserInfo));
         }
 
@@ -38,6 +38,28 @@ const Auth = (props) => {
     checkLoginStatus();
   }, [dispatch]);
 
+  const reloadUser = useCallback(async () => {
+    try {
+      const token = await AsyncStorage.getItem('jwt');
+      const userInfo = await AsyncStorage.getItem('user');
+
+      if (token && userInfo) {
+        const decodedToken = jwtDecode(token);
+        const parsedUserInfo = JSON.parse(userInfo);
+        dispatch(setCurrentUser(decodedToken, parsedUserInfo));
+      }
+      setShowChild(true);
+    } catch (error) {
+      console.error('Error checking login status:', error);
+      setShowChild(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    reloadUser();
+  }, [reloadUser]);
+
+
   if (!showChild) {
     return null;
   } else {
@@ -46,6 +68,7 @@ const Auth = (props) => {
         value={{
           stateUser,
           dispatch,
+          reloadUser,
         }}
       >
         {props.children}

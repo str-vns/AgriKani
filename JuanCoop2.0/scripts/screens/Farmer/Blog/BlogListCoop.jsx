@@ -49,12 +49,12 @@ const BlogListCoop = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
           <Ionicons name="menu-outline" size={34} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Blog List</Text>
-      </View>
+      </View> */}
 
       {/* Content */}
       {loading ? (

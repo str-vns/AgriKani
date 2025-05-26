@@ -35,12 +35,11 @@ const UserChat = (props) => {
   const [images, setImages] = useState([]);
   const [fcmToken, setFcmToken] = useState("");
   const validConversations = Array.isArray(conversations) ? conversations : [];
+  console.log("validConversations", item?._id)
   const myConvo = validConversations.find((convo) =>
     convo.members.includes(item?._id)
   );
   const isOnlinerUser = isOnline.find((user) => user.userId === item?._id);
-
-  console.log("isOnlinerUser", isOnlinerUser);
   useEffect(() => {
     socket.on("getMessage", (data) => {
       setArrivedMessages((prevMessages) => [

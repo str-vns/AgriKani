@@ -1,22 +1,32 @@
 import React, { useContext, useEffect, useState } from "react";
-import { createDrawerNavigator, DrawerContentScrollView, } from "@react-navigation/drawer";
-import { Box, Pressable, VStack, Text, HStack, Divider, Icon, } from "native-base";
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+} from "@react-navigation/drawer";
+import {
+  Box,
+  Pressable,
+  VStack,
+  Text,
+  HStack,
+  Divider,
+  Icon,
+} from "native-base";
 import "react-native-gesture-handler";
 import AdminNavigators from "@navigators/AdminNavigators";
 import AddressNavigators from "@navigators/AddressNavigators";
 import PostNavigators from "@navigators/PostNavigators";
 import CoopNavigators from "@navigators/CoopNavigators";
 import HomeScreen from "@navigators/Home";
-import ReviewsNavigators from '@navigators/ReviewsNavigators'
+import ReviewsNavigators from "@navigators/ReviewsNavigators";
 import UserNavigators from "@navigators/UserNavigators";
 import CoopProductNavigators from "@navigators/CoopProductNavigators";
 import MessagesNavigators from "@navigators/MessagesNavigators";
-import BlogNavigators from "@navigators/BlogNavigators"
-import RiderNavigators from "@navigators/RiderNavigators"
+import BlogNavigators from "@navigators/BlogNavigators";
+import RiderNavigators from "@navigators/RiderNavigators";
 import WithdrawList from "@screens/Farmer/Withdraw/WithdrawList";
 import WithdrawsList from "@screens/admin/Withdraws/WithdrawsList";
 import RefundProcess from "@screens/admin/Refund/RefundProcess";
-
 import AboutUs from "@screens/User/AboutUs";
 import Tutorial from "@screens/User/Tutorial";
 import Landing from "@screens/User/Landing";
@@ -28,13 +38,15 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { isLogin } from "@redux/Actions/Auth.actions";
 import { ActivityIndicator } from "react-native";
+import { DrawerDesign } from "@shared/DrawerDesign";
+
 global.__reanimatedWorkletInit = () => {};
 
 const Drawer = createDrawerNavigator();
 
 const Index = () => {
-const context = useContext(AuthGlobal);
-  console.log("context", context)
+  const context = useContext(AuthGlobal);
+  console.log("context", context);
 
   useEffect(() => {
     const initialize = async () => {
@@ -44,7 +56,6 @@ const context = useContext(AuthGlobal);
     initialize();
   }, []);
 
- 
   // if (loading) {
   //   // Show loading spinner while the app is being initialized
   //   return (
@@ -156,7 +167,11 @@ const context = useContext(AuthGlobal);
         <Drawer.Screen
           name="PostList"
           initialParams={{ screen: "PostList" }}
-          options={{ headerShown: true, tabBarShowLabel: false,title:"Post List" }}
+          options={{
+            headerShown: true,
+            tabBarShowLabel: false,
+            title: "Post List",
+          }}
           component={PostNavigators}
         />
 
@@ -166,7 +181,7 @@ const context = useContext(AuthGlobal);
           options={{ headerShown: false, tabBarShowLabel: false }}
           component={AdminNavigators}
         />
-        
+
         <Drawer.Screen
           name="Reviews"
           options={{ headerShown: false, tabBarShowLabel: false }}
@@ -178,7 +193,7 @@ const context = useContext(AuthGlobal);
           options={{ headerShown: false, tabBarShowLabel: false }}
           component={AdminNavigators}
         />
-        <Drawer.Screen 
+        <Drawer.Screen
           name="MemberList"
           initialParams={{ screen: "MemberList" }}
           options={{ headerShown: false, tabBarShowLabel: false }}
@@ -217,41 +232,33 @@ const context = useContext(AuthGlobal);
         />
 
         <Drawer.Screen
-            name="InventoryList"
-            initialParams={{ screen: "InventoryList" }}
-            options={{ headerShown: false, tabBarShowLabel: false }}
-            component={CoopNavigators}
+          name="InventoryList"
+          initialParams={{ screen: "InventoryList" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={CoopNavigators}
         />
 
         <Drawer.Screen
-            name="ReviewList"
-            initialParams={{ screen: "ReviewList" }}
-            options={{ headerShown: false, tabBarShowLabel: false }}
-            component={CoopNavigators}
-        />
-        
-          <Drawer.Screen
-            name="CategoryList"
-            initialParams={{ screen: "CategoryList " }}
-            options={{ headerShown: false, tabBarShowLabel: false }}
-            component={AdminNavigators}
+          name="ReviewList"
+          initialParams={{ screen: "ReviewList" }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={CoopNavigators}
         />
 
-     <Drawer.Screen
-            name="TypeList"
-            initialParams={{ screen: "TypeList " }}
-            options={{ headerShown: false, tabBarShowLabel: false }}
-            component={AdminNavigators}
-        />
-        
         <Drawer.Screen
-        name="WithdrawList"
-        component={WithdrawList}
-        options={{
-          headerShown: false,
-          tabBarShowLabel: false,
-        }}
-      />
+          name="CategoryList"
+          initialParams={{ screen: "CategoryList " }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={AdminNavigators}
+        />
+
+        <Drawer.Screen
+          name="TypeList"
+          initialParams={{ screen: "TypeList " }}
+          options={{ headerShown: false, tabBarShowLabel: false }}
+          component={AdminNavigators}
+        />
+
 
       <Drawer.Screen
         name="WithdrawsList"
@@ -274,16 +281,14 @@ const context = useContext(AuthGlobal);
         name="AboutUs"
         component={AboutUs}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <DrawerDesign {...props} title="About Us" />,
         }}
       />
       <Drawer.Screen
         name="Tutorial"
         component={Tutorial}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <DrawerDesign {...props} title="Tutorial Videos" />,
         }}
       />   
       <Drawer.Screen
@@ -311,11 +316,18 @@ const context = useContext(AuthGlobal);
         }}
       />
 
+        <Drawer.Screen
+          name="ChatMessaging"
+          component={RiderNavigators}
+          initialParams={{ screen: "ChatMessaging" }}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
+        />
       </Drawer.Navigator>
     </Box>
   );
 };
-  
-
 
 export default Index;

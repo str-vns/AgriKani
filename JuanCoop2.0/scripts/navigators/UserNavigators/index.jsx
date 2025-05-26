@@ -18,6 +18,7 @@ import PaymayaCancelled from "@screens/Cancelled/Paymaya_Refund";
 import OnlinePayCancelled from "@screens/Cancelled/OnlinePay_Refund";
 import MemberList from "@screens/UserRegis/MemberList";
 import CoopFarmProfile from "@screens/Farmer/FarmerProfile";
+import { DrawerDesign, BackButton } from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
 const UserNavigation = () => {
@@ -27,8 +28,7 @@ const UserNavigation = () => {
         name="Profile"
         component={Profile}
         options={{
-          headerShown: true,title: "User Profile",
-        headerBackTitleVisible: true
+          header: (props) => <DrawerDesign {...props} title="Profile" />,
         }}
       />
 
@@ -36,8 +36,7 @@ const UserNavigation = () => {
         name="EditProfile"
         component={EditProfile}
         options={{
-          headerShown: true,title: "Edit Profile",
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Profile" />,
         }}
       />
 
@@ -54,8 +53,9 @@ const UserNavigation = () => {
         name="CoopRegistration"
         component={CoopRegistration}
         options={{
-          headerShown: true,title:"Coop Registration",
-          tabBarShowLabel: false,
+          header: (props) => (
+            <BackButton {...props} title="Registation" onBack="Profile" />
+          ),
         }}
       />
       <Stack.Screen
@@ -70,8 +70,14 @@ const UserNavigation = () => {
         name="MemberList"
         component={MemberList}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Member List" />,
+        }}
+      />
+      <Stack.Screen
+        name="MembersRegistration"
+        component={MembersRegistration}
+        options={{
+          header: (props) => <BackButton {...props} title="Registration" />,
         }}
       />
 
@@ -85,20 +91,9 @@ const UserNavigation = () => {
       />
 
       <Stack.Screen
-        name="MembersRegistration"
-        component={MembersRegistration}
-        options={{
-          headerShown: true,title: "Member Registration",
-          tabBarShowLabel: false,
-        }}
-      />
-
-      <Stack.Screen
         name="EditFarm"
         options={{
-          headerShown: true,
-          title:"Edit Farm",
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Update Farm" />,
         }}
         component={EditFarm}
       />
@@ -106,7 +101,9 @@ const UserNavigation = () => {
       <Stack.Screen
         name="UserOrderList"
         component={UserOrderList}
-        options={{ headerShown: true,title:"Order List" }}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Order List" />,
+        }}
       />
 
       <Stack.Screen

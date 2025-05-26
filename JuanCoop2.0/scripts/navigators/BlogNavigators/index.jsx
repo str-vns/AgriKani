@@ -4,6 +4,7 @@ import { View } from 'react-native'; // Use View instead of div
 // import BlogLists from '@screens/Farmer/Blog/BlogList';
 import BlogListCoop from '@screens/Farmer/Blog/BlogListCoop';
 import BlogCards from '@screens/Farmer/Blog/BlogCards';
+import { BackButton } from '@shared/DrawerDesign'; 
 
 const Stack = createNativeStackNavigator();
 
@@ -13,8 +14,7 @@ const Index = () => {
       <Stack.Screen
         name="BlogListCoop"
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <DrawerDesign {...props} title="Review List" />,
         }}
         component={BlogListCoop}
       />
@@ -22,8 +22,7 @@ const Index = () => {
         name="BlogCards"
         component={BlogCards}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <DrawerDesign {...props} title="Blog Cards" />,
         }}
       />
     </View>

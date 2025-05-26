@@ -27,6 +27,7 @@ const Assign = (props) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
@@ -55,14 +56,6 @@ const Assign = (props) => {
     }, [userId, dispatch])
   );
 
-  const handleAssign = (id) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === id ? { ...order, status: "Assigned" } : order
-      )
-    );
-  };
-
   const getStatusColor = (status) => {
     switch (status) {
       case "pending":
@@ -74,7 +67,7 @@ const Assign = (props) => {
       case "re-deliver":
         return "purple";
       case "failed":
-        return "red";
+        return "#FF6961";
       case "delivered":
         return "green";
       default:

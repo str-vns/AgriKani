@@ -42,11 +42,6 @@ const BlogList = ({ navigation }) => {
     }
   }, [dispatch]);
 
-  // Navigate to create blog page
-  const handleAddBlog = () => {
-    navigation.navigate("BlogCreate");
-  };
-
   // Navigate to blog edit page
   const handleEditBlog = (item) => {
     navigation.navigate("BlogUpdate", { item });
@@ -83,18 +78,7 @@ const BlogList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.openDrawer()}>
-          <Ionicons name="menu-outline" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Blog List</Text>
-        <TouchableOpacity style={styles.addButton} onPress={handleAddBlog}>
-          <Ionicons name="add" size={28} color="black" />
-        </TouchableOpacity>
-      </View>
 
-      {/* Content */}
       {loading ? (
         <ActivityIndicator size="large" color="blue" style={styles.loader} />
       ) : error ? (
