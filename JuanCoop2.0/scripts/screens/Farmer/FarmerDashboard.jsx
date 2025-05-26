@@ -12,20 +12,16 @@ import {
   ScrollView,
   Dimensions,
   FlatList,
-  Image,
   ActivityIndicator,
   PermissionsAndroid,
   Platform,
-  Modal,
 } from "react-native";
 import {
   weatherDailyActions,
   weatherCurrentActions,
-  clearErrors,
 } from "@redux/Actions/weatherActions";
-import { Ionicons } from "@expo/vector-icons";
 import { BarChart, PieChart } from "react-native-chart-kit";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect, } from "@react-navigation/native";
 import styles from "./css/styles";
 import { Profileuser } from "@redux/Actions/userActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -89,7 +85,6 @@ const FarmerDashboard = ({ route }) => {
       if (userId) {
         socket.emit("addUser", userId);
       } else {
-        // console.warn("User ID is missing.");
       }
 
       socket.on("getUsers", (users) => {
@@ -183,11 +178,11 @@ const FarmerDashboard = ({ route }) => {
   const formatLabel = (id) => {
     switch (selectedRange) {
       case "daily":
-        return "day"; // "May 1", "May 2", etc.
+        return "day"; 
       case "monthly":
-        return "month"; // "April 2025", "May 2025", etc.
+        return "month"; 
       case "yearly":
-        return "year"; // "2025"
+        return "year"; 
       default:
         return "day";
     }
