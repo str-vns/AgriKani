@@ -1,15 +1,14 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import styles from "@screens/stylesheets/Shared/Drawer/styles";
-import {
-  driverProfile,
-  updateAvailability,
-} from "@redux/Actions/driverActions";
+import { isWeather } from "@utils/weahterData";
+import { updateAvailability } from "@redux/Actions/driverActions";
 import { useSelector } from "react-redux";
+
 export const handleBackPress = (navigation, onBack) => {
   if (!onBack) {
     navigation.goBack();
@@ -187,9 +186,9 @@ export const OrderConfirmationHeader = (props) => {
 
 export const ListContainer = (props) => {
   const { title, isCreate, isScreen, item, onBack } = props;
-
   const navigation = useNavigation();
-
+  const [isWeather, setIsWeather] = useState(false);
+  console.log("isWeather", isWeather);  
   const handleCreate = () => {
     if (isScreen === "Inventory") {
       navigation.navigate("inventoryCreate", { item: item });
@@ -205,7 +204,7 @@ export const ListContainer = (props) => {
     } else if (isScreen === "Assign History") {
       navigation.navigate("AssignHistory", { item: item });
       return;
-    } else if (isScreen === "BlogList") { 
+    } else if (isScreen === "BlogList") {
       navigation.navigate("BlogCreate");
       return;
     } else if (isScreen === "CategoryList") {
@@ -214,7 +213,7 @@ export const ListContainer = (props) => {
     } else if (isScreen === "TypeList") {
       navigation.navigate("TypeCreate");
       return;
-    }
+    } 
   };
 
   return (
@@ -246,7 +245,16 @@ export const ListContainer = (props) => {
             onPress={() => handleCreate()}
           >
             {isScreen === "Assign History" ? (
-              <Ionicons name="time-outline" size={28} color="black"  />
+              <Ionicons name="time-outline" size={28} color="black" />
+            ) : isScreen === "CoopDash" ? (
+              <TouchableOpacity
+                onPress={() =>
+                 { 
+                   navigation.navigate("CoopDashboard", { isModal: true });
+                }}
+              >
+                <Ionicons name="cloud" size={28} color="#EDC001" />
+              </TouchableOpacity>
             ) : (
               <Ionicons name="add" size={28} color="black" />
             )}

@@ -41,10 +41,16 @@ const Index = () => {
       <Stack.Screen
         name="CoopDashboard"
         component={CoopDashboard}
-        options={{ headerShown: false }}
-        // options={{
-        //   header: (props) => <DrawerDesign {...props} title="Dashboard" />,
-        // }}
+        options={({ route }) => ({
+          header: (props) => (
+            <ListContainer
+              {...props}
+              title="Dashboard"
+              isScreen="CoopDash"
+              isCreate={true}
+            />
+          ),
+        })}
       />
 
       <Stack.Screen
@@ -74,7 +80,7 @@ const Index = () => {
       <Stack.Screen
         name="MemberActive"
         options={{
-           header: (props) => <DrawerDesign {...props} title="Member List" />,
+          header: (props) => <DrawerDesign {...props} title="Member List" />,
         }}
         component={MemberActive}
       />
@@ -82,7 +88,7 @@ const Index = () => {
       <Stack.Screen
         name="MemberSingle"
         options={{
-           header: (props) => <BackButton {...props} title="Member Details" />,
+          header: (props) => <BackButton {...props} title="Member Details" />,
         }}
         component={MemberSingle}
       />
@@ -105,7 +111,9 @@ const Index = () => {
       <Stack.Screen
         name="HistoryCoop"
         component={HistoryCoop}
-        options={{  header: (props) => <BackButton {...props} title="History" />,}}
+        options={{
+          header: (props) => <BackButton {...props} title="History" />,
+        }}
       />
 
       <Stack.Screen
@@ -117,13 +125,17 @@ const Index = () => {
       <Stack.Screen
         name="ReviewList"
         component={ReviewList}
-        options={{  header: (props) => <DrawerDesign {...props} title="Review List" />, }}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Review List" />,
+        }}
       />
 
       <Stack.Screen
         name="Reviews"
         component={Reviews}
-        options={{ header: (props) => <BackButton {...props} title="Review Summary" />, }}
+        options={{
+          header: (props) => <BackButton {...props} title="Review Summary" />,
+        }}
       />
 
       <Stack.Screen
@@ -237,7 +249,7 @@ const Index = () => {
         name="Reason"
         component={Reason}
         options={{
-           header: (props) => <BackButton {...props} title="Reason of Cancel" />,
+          header: (props) => <BackButton {...props} title="Reason of Cancel" />,
         }}
       />
 
@@ -251,7 +263,7 @@ const Index = () => {
         name="WithdrawList"
         component={WithdrawList}
         options={{
- header: (props) => <DrawerDesign {...props} title="Wallet" />,
+          header: (props) => <DrawerDesign {...props} title="Wallet" />,
         }}
       />
 
@@ -289,12 +301,14 @@ const Index = () => {
       <Stack.Screen
         name="BlogListCoop"
         component={BlogListCoop}
-        options={{ header: (props) => <DrawerDesign {...props} title="Blogs" />, }}
+        options={{
+          header: (props) => <DrawerDesign {...props} title="Blogs" />,
+        }}
       />
       <Stack.Screen
         name="BlogCards"
         component={BlogCards}
-        options={{ header: (props) => <BackButton {...props} title="Blog" />, }}
+        options={{ header: (props) => <BackButton {...props} title="Blog" /> }}
       />
     </Stack.Navigator>
   );

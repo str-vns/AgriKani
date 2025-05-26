@@ -27,6 +27,7 @@ module.exports = function(api) {
             "@components" : "./components",
             "@SocketIo" : "./SocketIo",
             "@utils": "./scripts/utils",
+            "@stylesheets": "./scripts/screens/stylesheets",
           }
         }]
       ]

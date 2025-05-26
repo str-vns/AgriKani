@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext, useCallback, Fragment } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+  Fragment,
+} from "react";
 import {
   View,
   Text,
@@ -35,10 +41,10 @@ import { useSocket } from "../../../SocketIo";
 import { Picker } from "@react-native-picker/picker";
 import * as Print from "expo-print";
 import RNFS from "react-native-fs";
+import { WeatherModalContent } from "../../utils/weahterData";
 
-const FarmerDashboard = () => {
+const FarmerDashboard = ({ route }) => {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
   const socket = useSocket();
   const { loadingWCurrent, weatherCurrent, errorWCurrent } = useSelector(
     (state) => state.weatherCurrent
@@ -64,84 +70,17 @@ const FarmerDashboard = () => {
   const [type, setType] = useState("daily");
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [dailyWeather, setDailyWeather] = useState(null);
   const InventoryInfo = Invsuccess?.details;
-  const [fcmToken, setFcmToken] = useState("");
   const { coop } = useSelector((state) => state.singleCoop);
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
-
-  // console.log("type", type);
-  const weatherIcons = {
-    a01d: require("../../../assets/weather/a01d.png"),
-    a01n: require("../../../assets/weather/a01n.png"),
-    a02d: require("../../../assets/weather/a02d.png"),
-    a02n: require("../../../assets/weather/a02n.png"),
-    a03d: require("../../../assets/weather/a03d.png"),
-    a03n: require("../../../assets/weather/a03n.png"),
-    a04d: require("../../../assets/weather/a04d.png"),
-    a04n: require("../../../assets/weather/a04n.png"),
-    a05d: require("../../../assets/weather/a05d.png"),
-    a05n: require("../../../assets/weather/a05n.png"),
-    a06d: require("../../../assets/weather/a06d.png"),
-    a06n: require("../../../assets/weather/a06n.png"),
-    c01d: require("../../../assets/weather/c01d.png"),
-    c01n: require("../../../assets/weather/c01n.png"),
-    c02d: require("../../../assets/weather/c02d.png"),
-    c02n: require("../../../assets/weather/c02n.png"),
-    c03d: require("../../../assets/weather/c03d.png"),
-    c03n: require("../../../assets/weather/c03n.png"),
-    c04d: require("../../../assets/weather/c04d.png"),
-    c04n: require("../../../assets/weather/c04n.png"),
-    d01d: require("../../../assets/weather/d01d.png"),
-    d01n: require("../../../assets/weather/d01n.png"),
-    d02d: require("../../../assets/weather/d02d.png"),
-    d02n: require("../../../assets/weather/d02n.png"),
-    d03d: require("../../../assets/weather/d03d.png"),
-    d03n: require("../../../assets/weather/d03n.png"),
-    f01d: require("../../../assets/weather/f01d.png"),
-    f01n: require("../../../assets/weather/f01n.png"),
-    r01d: require("../../../assets/weather/r01d.png"),
-    r01n: require("../../../assets/weather/r01n.png"),
-    r02d: require("../../../assets/weather/r02d.png"),
-    r02n: require("../../../assets/weather/r02n.png"),
-    r03d: require("../../../assets/weather/r03d.png"),
-    r03n: require("../../../assets/weather/r03n.png"),
-    r04d: require("../../../assets/weather/r04d.png"),
-    r04n: require("../../../assets/weather/r04n.png"),
-    r05d: require("../../../assets/weather/r05d.png"),
-    r05n: require("../../../assets/weather/r05n.png"),
-    r06d: require("../../../assets/weather/r06d.png"),
-    r06n: require("../../../assets/weather/r06n.png"),
-    s01d: require("../../../assets/weather/s01d.png"),
-    s01n: require("../../../assets/weather/s01n.png"),
-    s02d: require("../../../assets/weather/s02d.png"),
-    s02n: require("../../../assets/weather/s02n.png"),
-    s03d: require("../../../assets/weather/s03d.png"),
-    s03n: require("../../../assets/weather/s03n.png"),
-    s04d: require("../../../assets/weather/s04d.png"),
-    s04n: require("../../../assets/weather/s04n.png"),
-    s05d: require("../../../assets/weather/s05d.png"),
-    s05n: require("../../../assets/weather/s05n.png"),
-    s06d: require("../../../assets/weather/s06d.png"),
-    s06n: require("../../../assets/weather/s06n.png"),
-    t01d: require("../../../assets/weather/t01d.png"),
-    t01n: require("../../../assets/weather/t01n.png"),
-    t02d: require("../../../assets/weather/t02d.png"),
-    t02n: require("../../../assets/weather/t02n.png"),
-    t03d: require("../../../assets/weather/t03d.png"),
-    t03n: require("../../../assets/weather/t03n.png"),
-    t04d: require("../../../assets/weather/t04d.png"),
-    t04n: require("../../../assets/weather/t04n.png"),
-    t05d: require("../../../assets/weather/t05d.png"),
-    t05n: require("../../../assets/weather/t05n.png"),
-    default: require("../../../assets/weather/c01d.png"),
-  };
 
   useFocusEffect(
     useCallback(() => {
       dispatch(weatherCurrentActions());
       dispatch(weatherDailyActions());
-
+      if (route.params?.isModal) {
+        setWeatherModalVisible(true);
+      }
       if (!socket) {
         console.warn("Socket is not initialized.");
         return;
@@ -164,7 +103,7 @@ const FarmerDashboard = () => {
       return () => {
         socket.off("getUsers");
       };
-    }, [socket, userId])
+    }, [socket, userId, route.params])
   );
 
   useEffect(() => {
@@ -205,12 +144,12 @@ const FarmerDashboard = () => {
     if (InventoryInfo?.length > 0) {
       interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % InventoryInfo?.length);
-      }, 4000); // Set to 4 seconds (4000 ms)
+      }, 4000);
 
-      return () => clearInterval(interval); // Cleanup interval on component unmount or length changeA
+      return () => clearInterval(interval);
     }
 
-    return () => {}; // Cleanup function if no outOfStockProducts
+    return () => {};
   }, [InventoryInfo?.length]);
 
   useEffect(() => {
@@ -267,136 +206,6 @@ const FarmerDashboard = () => {
   }));
 
   // Weather Modal Content
-  const WeatherModalContent = () => (
-    <Modal
-      visible={weatherModalVisible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={() => setWeatherModalVisible(false)}
-    >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.5)",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            width: "90%",
-            backgroundColor: "#fff",
-            borderRadius: 16,
-            padding: 24,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
-            elevation: 5,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 22,
-              fontWeight: "bold",
-              color: "#333",
-              textAlign: "center",
-              marginBottom: 16,
-              letterSpacing: 1,
-            }}
-          >
-            Weather Information
-          </Text>
-          <View style={{ marginBottom: 16 }}>
-            {loadingWCurrent ? (
-              <ActivityIndicator size="large" color="#4CAF50" />
-            ) : errorWCurrent || weatherCurrent === null ? (
-              <Text style={{ color: "#b00", textAlign: "center" }}>
-                Weather is Unavailable Currently...
-              </Text>
-            ) : (
-              <View style={{ alignItems: "center" }}>
-                <Image
-                  source={
-                    weatherIcons[weatherCurrent?.data[0]?.weather?.icon] ||
-                    weatherIcons["default"]
-                  }
-                  style={{ width: 80, height: 80, marginBottom: 8 }}
-                />
-                <Text style={{ fontSize: 18, fontWeight: "600" }}>
-                  City: {weatherCurrent?.data[0].city_name}
-                </Text>
-                <Text>Temperature: {weatherCurrent?.data[0].temp}°C</Text>
-                <Text>
-                  Weather: {weatherCurrent?.data[0].weather.description}
-                </Text>
-                <Text>Wind Speed: {weatherCurrent?.data[0].wind_spd} m/s</Text>
-              </View>
-            )}
-          </View>
-          <View>
-            {loadingWDaily ? (
-              <ActivityIndicator size="large" color="#4CAF50" />
-            ) : errorWDaily ||
-              !weatherDaily ||
-              !weatherDaily.data ||
-              weatherDaily.data.length === 0 ? (
-              <Text style={{ color: "#b00", textAlign: "center" }}>
-                Weather is Unavailable Currently...
-              </Text>
-            ) : (
-              <ScrollView horizontal={true} style={{ marginBottom: 8 }}>
-                {weatherDaily.data.map((item, index) => (
-                  <View
-                    key={item._id || index}
-                    style={{
-                      backgroundColor: "#f7f7f7",
-                      borderRadius: 10,
-                      marginRight: 10,
-                      padding: 10,
-                      alignItems: "center",
-                      minWidth: 100,
-                    }}
-                  >
-                    <Text style={{ fontWeight: "bold", marginBottom: 4 }}>
-                      {item.valid_date}
-                    </Text>
-                    <Image
-                      source={
-                        weatherIcons[item?.weather?.icon] ||
-                        weatherIcons["default"]
-                      }
-                      style={{ width: 40, height: 40, marginBottom: 4 }}
-                    />
-                    <Text
-                      style={{ fontSize: 12, color: "#555" }}
-                      ellipsizeMode="tail"
-                      numberOfLines={1}
-                    >
-                      {item.weather.description}
-                    </Text>
-                    <Text style={{ fontWeight: "bold" }}>{item.temp}°C</Text>
-                  </View>
-                ))}
-              </ScrollView>
-            )}
-          </View>
-          <TouchableOpacity
-            style={{
-              marginTop: 16,
-              backgroundColor: "#EDC001",
-              borderRadius: 8,
-              paddingVertical: 10,
-              alignItems: "center",
-            }}
-            onPress={() => setWeatherModalVisible(false)}
-          >
-            <Text style={{ color: "#222", fontWeight: "bold" }}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
 
   if (loading) {
     return (
@@ -498,7 +307,6 @@ const FarmerDashboard = () => {
     };
     const timestamp = now.toLocaleString("en-US", options); // Example: "May 24, 2025, 2:56 PM"
 
-
     try {
       const InventoryContent = `
      <html>
@@ -590,7 +398,10 @@ const FarmerDashboard = () => {
     <div class="section">
       <h2>Dashboard Overview</h2>
       <ul>
-        <li>Total Revenue: ₱${dashboard?.totalRevenue?.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</li>
+        <li>Total Revenue: ₱${dashboard?.totalRevenue?.toLocaleString("en-PH", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}</li>
         <li>Total Orders: ${dashboard?.totalOrders || 0}</li>
         <li>Total Customers: ${dashboard?.totalCustomers || 0}</li>
       </ul>
@@ -599,8 +410,8 @@ const FarmerDashboard = () => {
     <div class="section">
       <h2>Product Inventory</h2>
       ${InvDash[0]?.products
-      .map(
-        (product) => `
+        .map(
+          (product) => `
           <h3>${product?.productName}</h3>
           <table>
             <thead>
@@ -624,8 +435,8 @@ const FarmerDashboard = () => {
             </tbody>
           </table>
         `
-      )
-      ?.join("")}
+        )
+        ?.join("")}
     </div>
       <div class="section">
           <h2>Order Status Summary</h2>
@@ -650,11 +461,19 @@ const FarmerDashboard = () => {
           </table>
         </div>
         <div class="section"> 
-      <h2>Sales Data (${selectedRange.charAt(0).toUpperCase() + selectedRange.slice(1)})</h2>
+      <h2>Sales Data (${
+        selectedRange.charAt(0).toUpperCase() + selectedRange.slice(1)
+      })</h2>
       <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
         <thead style="background-color: #f2f2f2;">
           <tr>
-            <th>${selectedRange === "daily" ? "Date" : selectedRange === "monthly" ? "Month" : "Year"}</th>
+            <th>${
+              selectedRange === "daily"
+                ? "Date"
+                : selectedRange === "monthly"
+                ? "Month"
+                : "Year"
+            }</th>
             <th>Total Sales (₱)</th>
           </tr>
         </thead>
@@ -664,7 +483,10 @@ const FarmerDashboard = () => {
               (label, index) => `
                 <tr>
                   <td>${label}</td>
-                  <td>₱${data[index]?.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                  <td>₱${data[index]?.toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}</td>
                 </tr>
               `
             )
@@ -694,23 +516,17 @@ const FarmerDashboard = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <WeatherModalContent />
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.drawerButton}
-          onPress={() => navigation.openDrawer()}
-        >
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Dashboard</Text>
-        {/* Weather Icon Button */}
-        <TouchableOpacity
-          style={{ marginLeft: "auto", marginRight: 10 }}
-          onPress={() => setWeatherModalVisible(true)}
-        >
-          <Ionicons name="cloud-outline" size={32} color="#EDC001" />
-        </TouchableOpacity>
-      </View>
+      <WeatherModalContent
+        weatherModalVisible={weatherModalVisible}
+        onClose={() => setWeatherModalVisible(false)}
+        weatherCurrent={weatherCurrent}
+        weatherDaily={weatherDaily}
+        loadingWCurrent={loadingWCurrent}
+        loadingWDaily={loadingWDaily}
+        errorWCurrent={errorWCurrent}
+        errorWDaily={errorWDaily}
+      />
+
       <View style={styles.bannerContainer}>
         <Text style={styles.bannerText}>⚠️ Out of Stock:</Text>
         <FlatList
