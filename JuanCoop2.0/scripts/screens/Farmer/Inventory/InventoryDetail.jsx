@@ -1,24 +1,15 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  RefreshControl,
-  ActivityIndicator,
-  Image,
-  Alert 
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, FlatList, RefreshControl, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import styles from "@screens/stylesheets/Admin/Coop/Inventorylist";
+import styles from "@stylesheets/Shared/List/style";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { inventoryProducts, deleteInventory } from "@redux/Actions/inventoryActions";
-import AuthGlobal from "@redux/Store/AuthGlobal";
+import { inventoryProducts, deleteInventory, } from "@redux/Actions/inventoryActions";
+import { InventoryItems } from "@shared/List";
+import Loader from "@shared/Loader";
+import NoItem from "@shared/NoItem"; 
 
 const InventoryDetail = (props) => {
-  const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const InvItem = props?.route?.params?.Inv;
@@ -80,7 +71,7 @@ const InventoryDetail = (props) => {
           text: "Delete",
           onPress: () => {
             dispatch(deleteInventory(id, token));
-  
+
             setTimeout(() => {
               Alert.alert("Success", "Inventory item deleted successfully.");
               onRefresh();
@@ -94,56 +85,30 @@ const InventoryDetail = (props) => {
 
   return (
     <View style={styles.container}>
-    
-    
       {Invloading ? (
-        <ActivityIndicator size="large" color="blue" style={styles.loader} />
+        <Loader />
       ) : (
         <FlatList
           data={Invsuccess}
           keyExtractor={(item) => item?._id}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
+          ListEmptyComponent={
+            Inverror ? (
+              <NoItem title="Inventory" />
+            ) : (
+              <NoItem title="Inventory" />
+            )
+          }
           renderItem={({ item }) => (
-            <View style={styles.userItem}>
-              <View style={styles.userDetails}>
-                <Text style={styles.userName}>
-                  Inventory Unit: {item?.unitName} {item?.metricUnit}
-                </Text>
-                <Text style={styles.userEmail}>Quantity: {item?.quantity}</Text>
-                <Text style={styles.userEmail}>Price: {item?.price}</Text>
-                <Text style={styles.userEmail}>
-                  Status:
-                  <Text
-                    style={[
-                      styles.userEmail,
-                      {
-                        color:
-                          item?.status?.toLowerCase() === "active"
-                            ? "green"
-                            : "gray",
-                      },
-                    ]}
-                  >
-                    {item?.status?.charAt(0).toUpperCase() +
-                      item?.status?.slice(1)}
-                  </Text>
-                </Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => handleEditInventory(item)}
-                style={{ marginRight: 15 }}
-              >
-                <Ionicons name="pencil" size={25} color="green" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => handleDeleteInventory(item._id)}
-                style={{ marginRight: 15 }}
-              >
-                <Ionicons name="trash" size={25} color="red" />
-              </TouchableOpacity>
-            </View>
+            <InventoryItems
+              item={item}
+              onEdit={handleEditInventory}
+              onDelete={handleDeleteInventory}
+              isArchive={false}
+            />
           )}
         />
       )}

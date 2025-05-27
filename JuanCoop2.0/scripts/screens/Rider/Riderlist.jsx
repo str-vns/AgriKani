@@ -6,9 +6,7 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
   RefreshControl,
-  
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -19,6 +17,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeDriver } from "@redux/Actions/driverActions";
 import { Alert } from "react-native";
 import { SelectedTab } from "@shared/SelectedTab";
+import styles from "@stylesheets/Rider/Riderlist";
+import Loader from "@shared/Loader";
+import NoItem from "@shared/NoItem";
+
 const Riderlist = () => {
   const context = useContext(AuthGlobal);
   const userId = context.stateUser?.userProfile?._id;
@@ -151,11 +153,9 @@ const Riderlist = () => {
     <View style={styles.container}>
       <SelectedTab selectedTab={activeTab} tabs={choicesTab} onTabChange={setActiveTab} />
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <Loader />
       ) : drivers?.length === 0 || error ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No Driver found.</Text>
-        </View>
+        <NoItem title ="Riders"  />
       ) : (
         <FlatList
           data={drivers}
@@ -173,154 +173,3 @@ const Riderlist = () => {
 
 export default Riderlist;
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#FFFFFF",
-    paddingBottom:70,
-  },
-  header2: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 15,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-    elevation: 3,
-  },
-  headerTitle2: {
-    fontSize: 22,
-    fontWeight: "700",
-    flex: 1,
-    textAlign: "center",
-    color: "#333",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 10,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: "center",
-    borderBottomWidth: 2,
-    borderBottomColor: "#ddd",
-  },
-  activeTab: {
-    borderBottomColor: "#FFC107",
-  },
-  tabText: {
-    fontSize: 16,
-    color: "#666",
-  },
-  activeTabText: {
-    color: "#FFC107",
-    fontWeight: "bold",
-  },
-  drawerButton: {
-    marginRight: 10,
-  },
-  headerButton: {
-    backgroundColor: "#06b6d4",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  listContainer: {
-    padding: 10,
-    paddingBottom: 70,
-  },
-  riderContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-    padding: 15,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3,
-    elevation: 4,
-  
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  infoContainer: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between", // Better spacing
-    marginTop: 8,
-  },
-  historyButton: {
-    backgroundColor: "#FFA500",
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginRight: 10,
-  },
-  historyButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  assignButton: {
-    backgroundColor: "#008CBA", // Changed from green to navy blue
-    paddingVertical: 8,
-    paddingHorizontal: 35,
-    borderRadius: 8,
-    marginRight: 10, // Added margin for spacing
-  },
-  assignButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  viewButton: {
-    backgroundColor: "#1E3A8A", // Changed from green to navy blue
-    paddingVertical: 8,
-    paddingHorizontal: 35,
-    borderRadius: 8,
-  },
-  viewButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emptyText: {
-    fontSize: 18,
-    color: "#777",
-  },
-  itemContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    marginLeft: -10,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-});

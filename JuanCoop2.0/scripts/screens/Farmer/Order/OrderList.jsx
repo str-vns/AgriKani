@@ -4,16 +4,10 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  Alert,
-  StyleSheet,
-  ScrollView,
   Image,
-  ActivityIndicator,
   RefreshControl,
 } from "react-native";
-import { allCoopOrders } from "@redux/Actions/coopActions";
 import { fetchCoopOrders } from "@redux/Actions/orderActions";
-import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,6 +22,9 @@ import { createConversation } from "@redux/Actions/converstationActions";
 import { conversationList } from "@redux/Actions/converstationActions";
 import { getUsers } from "@redux/Actions/userActions";
 import { SelectedTab } from "@shared/SelectedTab";
+import styles from "@stylesheets/Order/styles";
+import Loader from "@shared/Loader";
+import NoItem from "@shared/NoItem";
 
 const OrderList = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -349,13 +346,13 @@ const OrderList = ({ navigation }) => {
       <View style={styles.orderCard}>
         <View style={styles.orderContent}>
           <View style={styles.orderDetails}>
+            <Text style={styles.orderDate}>
+              <Text style={styles.label}>Date:</Text> {formattedDate}
+            </Text>
             <Text style={styles.orderId}>Order #{item?._id}</Text>
             <Text style={styles.customerName}>
               <Text style={styles.label}>Customer:</Text>{" "}
               {item?.user?.firstName} {item?.user?.lastName}
-            </Text>
-            <Text style={styles.orderDate}>
-              <Text style={styles.label}>Date</Text> {formattedDate}
             </Text>
             {item?.totalAmount !== 0 && (
               <Text style={styles.orderInfo}>
@@ -398,12 +395,26 @@ const OrderList = ({ navigation }) => {
                         )}
 
                         <View style={styles.textContainer}>
-                          {orderItem.product?.productName && (
-                            <Text style={styles.orderItemName}>
-                              {orderItem.product.productName}
+                          <View style={styles.orderItemText}>
+                            {orderItem.product?.productName && (
+                              <Text
+                                style={styles.orderItemName}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                              >
+                                {orderItem.product.productName}
+                              </Text>
+                            )}
+                            <Text
+                              style={[
+                                styles[`status${orderItem?.orderStatus}`],
+                                getStatusColor(orderItem?.orderStatus),
+                              ]}
+                            >
+                              <Text style={{ color: "black" }}></Text>
+                              {orderItem?.orderStatus}
                             </Text>
-                          )}
-
+                          </View>
                           <Text style={styles.orderItemPrice}>
                             Size: {orderItem.inventoryProduct?.unitName}{" "}
                             {orderItem.inventoryProduct?.metricUnit}
@@ -415,31 +426,25 @@ const OrderList = ({ navigation }) => {
                             Quantity: {orderItem?.quantity}
                           </Text>
                           <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              marginTop: 5,
-                            }}
+                            style={styles.buttonContainerOrder}
                           >
-                            <Text
-                              style={[
-                                styles[`status${orderItem?.orderStatus}`],
-                                getStatusColor(orderItem?.orderStatus),
-                              ]}
-                            >
-                              <Text style={{ color: "black" }}>Status: </Text>
-                              {orderItem?.orderStatus}
-                            </Text>
                             {orderItem?.orderStatus === "Cancelled" && (
                               <TouchableOpacity
-                                style={styles.buttonCancelled}
+                                style={[
+                                  styles.buttonCancelled,
+                                  { alignSelf: "flex-end" },
+                                ]}
                                 onPress={() =>
                                   navigation.navigate("Reason", {
                                     order: orderItem,
                                   })
                                 }
                               >
+                                <Icon
+                                  name="remove-red-eye"
+                                  size={20}
+                                  color="#fff"
+                                />
                                 <Text style={styles.buttonTextCancelled}>
                                   View
                                 </Text>
@@ -461,7 +466,7 @@ const OrderList = ({ navigation }) => {
                   disabled={loading}
                   onPress={() => chatNow(item)}
                 >
-                  <Icon name="rate-review" size={20} color="#fff" />
+                  <Icon name="chat" size={20} color="#fff" />
                   <Text style={styles.chatButtonText}>Chat</Text>
                 </TouchableOpacity>
 
@@ -553,7 +558,7 @@ const OrderList = ({ navigation }) => {
         isOrder={true}
       />
       {orderloading ? (
-        <ActivityIndicator size="large" color="black" style={styles.loader} />
+        <Loader />
       ) : (
         <>
           {filterTab && filterTab?.length > 0 ? (
@@ -561,176 +566,24 @@ const OrderList = ({ navigation }) => {
               data={filterTab}
               keyExtractor={(item) => item?._id}
               renderItem={renderOrder}
-              ItemSeparatorComponent={() => <View style={styles.separator} />}
               refreshControl={
                 <RefreshControl refreshing={refresh} onRefresh={onRefresh} />
               }
               ListEmptyComponent={
-                <Text style={styles.noOrdersText}>No orders found.</Text>
+                ordererror ? (
+                  <NoItem title="Orders" />
+                ) : (
+                  <NoItem title="Orders" />
+                )
               }
             />
           ) : (
-            <Text style={styles.noOrdersText}>No orders found.</Text>
+            <NoItem title="Orders" />
           )}
         </>
       )}
     </View>
   );
 };
-const styles = StyleSheet.create({
-  orderCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 12,
-    marginHorizontal: 16,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  chatButton: {
-    backgroundColor: "#008CBA", // A professional blueish color
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  chatButtonText: {
-    fontSize: 14,
-    color: "#fff",
-    fontWeight: "600",
-  },
-  orderContent: {
-    flex: 1,
-  },
-  orderDetails: {
-    marginBottom: 12,
-  },
-  orderId: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#222",
-  },
-  customerName: {
-    fontSize: 14,
-    color: "#444",
-    marginVertical: 3,
-  },
-  orderDate: {
-    fontSize: 14,
-    color: "#666",
-  },
-  orderInfo: {
-    fontSize: 14,
-    color: "#333",
-    marginVertical: 3,
-  },
-  label: {
-    fontWeight: "bold",
-    color: "#111",
-  },
-  paymentStatus: {
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  paidStatus: {
-    color: "#228B22", // Darker green for a classier look
-  },
-  unpaidStatus: {
-    color: "#D32F2F",
-  },
-  orderItemContainer: {
-    flexDirection: "row",
-    backgroundColor: "#F4F4F4",
-    borderRadius: 10,
-    padding: 12,
-    marginTop: 6,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  imageAndTextContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  orderImage: {
-    width: 55,
-    height: 55,
-    borderRadius: 10,
-    marginRight: 12,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  orderItemName: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "#222",
-  },
-  orderItemPrice: {
-    fontSize: 14,
-    color: "#555",
-  },
-  orderItemQuantity: {
-    fontSize: 14,
-    color: "#777",
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 12,
-  },
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FF9800", // More professional orange
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  reviewButton: {
-    backgroundColor: "#2E7D32", // A deeper, premium green
-  },
-  ShippingButton: {
-    backgroundColor: "#1565C0", // Professional navy blue
-  },
-  buttonText: {
-    fontSize: 14,
-    color: "#fff",
-    fontWeight: "600",
-    marginLeft: 6,
-  },
-  buttonCancelled: {
-    backgroundColor: "#B71C1C", // Darker red for a refined cancellation button
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-  },
-  buttonTextCancelled: {
-    color: "#fff",
-    fontSize: 13,
-    fontWeight: "bold",
-  },
-  noOrdersText: {
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
-    color: "#888",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#F9F9F9",
-  }
-});
 
 export default OrderList;

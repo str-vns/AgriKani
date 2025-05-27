@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     padding: normalize(20),
+    flexGrow: 1,
   },
   orderItemContainer: {
     padding: normalize(15), // Padding around the item container

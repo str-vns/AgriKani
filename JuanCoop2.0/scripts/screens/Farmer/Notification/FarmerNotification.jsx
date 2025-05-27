@@ -7,9 +7,8 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { singleNotification, readAllNotifications, readNotification } from "@redux/Actions/notificationActions";
-import styles from "../../stylesheets/Notification/NotificationList";
+import styles from "@stylesheets/Notification/NotificationList";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";

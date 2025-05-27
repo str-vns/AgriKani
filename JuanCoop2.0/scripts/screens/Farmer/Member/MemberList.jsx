@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { memberInactive } from "@redux/Actions/memberActions";
@@ -16,6 +15,9 @@ import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SelectedTab } from "@shared/SelectedTab";
+import Loader from "@shared/Loader";
+import NoItem from "@shared/NoItem";
+
 const Memberlist = () => {
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
@@ -54,57 +56,65 @@ const Memberlist = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [ userId, token]);
+  }, [userId, token]);
 
-    const choicesTab = [
+  const choicesTab = [
     { label: "Pending", value: "MPending" },
     { label: "Approved", value: "MApproved" },
-  ]
+  ];
 
   return (
     <View style={styles.container}>
-<SelectedTab selectedTab={selectedTab} tabs={choicesTab} onTabChange={setSelectedTab} />
+      <SelectedTab
+        selectedTab={selectedTab}
+        tabs={choicesTab}
+        onTabChange={setSelectedTab}
+      />
 
-      {/* Content */}
       {loading ? (
-  <ActivityIndicator size="large" color="blue" style={styles.loader} />
-) : members && members.length === 0 || error ? (
-  <View style={styles.emptyContainer}>
-    <Text style={styles.emptyText}>No Members found.</Text>
-  </View>
-) : (
-  <FlatList
-    data={members}
-    keyExtractor={(item) => item._id}
-    refreshControl={
-      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-    }
-    contentContainerStyle={styles.listContainer}
-    renderItem={({ item }) => (
-      <View style={styles.userItem}>
-        <Image
-          source={{
-            uri: item?.userId?.image?.url || "https://via.placeholder.com/150", // Fallback to placeholder image
-          }}
-          style={styles.profileImage}
-        />
-        <View style={styles.userDetails}>
-          <Text style={styles.userName}>
-            {item?.userId?.firstName} {item?.userId?.lastName}
-          </Text>
-          <Text style={styles.userEmail}>{item?.userId?.email}</Text>
-        </View>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("MemberSingle", { member: item })
+        <Loader />
+      ) : (members && members.length === 0) || error ? (
+        <NoItem title={"members"} />
+      ) : (
+        <FlatList
+          data={members}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-        >
-          <Text style={styles.viewButton}>View</Text>
-        </TouchableOpacity>
-      </View>
-    )}
-  />
-)}
+          ListEmptyComponent={<NoItem title={"members"} />}
+          contentContainerStyle={
+            !members || members.length === 0
+              ? styles.centering
+              : styles.listContainer
+          }
+          renderItem={({ item }) => (
+            <View style={styles.userItem}>
+              <Image
+                source={{
+                  uri:
+                    item?.userId?.image?.url ||
+                    "https://via.placeholder.com/150",
+                }}
+                style={styles.profileImage}
+              />
+              <View style={styles.userDetails}>
+                <Text style={styles.userName}>
+                  {item?.userId?.firstName} {item?.userId?.lastName}
+                </Text>
+                <Text style={styles.userEmail}>{item?.userId?.email}</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("MemberSingle", { member: item })
+                }
+              >
+                <Text style={styles.viewButton}>View</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 };

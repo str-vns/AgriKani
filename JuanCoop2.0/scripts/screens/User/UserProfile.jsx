@@ -4,24 +4,17 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Image,
-  Modal,
-  Button,
   ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
-  TouchableWithoutFeedback,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { matchCooperative } from "@redux/Actions/coopActions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { memberAllList } from "@redux/Actions/memberActions";
 import { Profileuser } from "@redux/Actions/userActions";
+import styles from "@screens/stylesheets/User/UserProfile"; // Adjust the import path as necessary
 
 const UserProfile = () => {
   const context = useContext(AuthGlobal);
@@ -32,8 +25,6 @@ const UserProfile = () => {
   const { members } = useSelector((state) => state.memberList);
   const userId = context?.stateUser?.userProfile?._id;
   const [token, setToken] = useState();
-  const [loadings, setLoadings] = useState(true);
-  const [errors, setErrors] = useState(null);
   const userInfo = context.stateUser.user.CustomerInfo;
   const filterUser = Array.isArray(coops)
     ? coops.filter((coop) => coop?.user?._id === userId)
@@ -42,32 +33,6 @@ const UserProfile = () => {
     ? members.filter((member) => member?.userId?._id === userId)
     : [];
 
-  // console.log("token: ", token)
-
-  // useEffect(() => {
-  //   const fetchUserData = async () => {
-  //     setLoadings(true);
-  //     try {
-  //       const res = await AsyncStorage.getItem('jwt');
-  //       if (res) {
-  //         setToken(res);
-
-  //        new Promise((resolve) => setTimeout(resolve, 1000));
-
-  //        dispatch(Profileuser(userId, res));
-  //       } else {
-  //         setErrors('No JWT token found.');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error retrieving JWT:', error);
-  //       setErrors('Failed to retrieve JWT token.');
-  //     } finally {
-  //       setLoadings(false);
-  //     }
-  //   };
-
-  //   fetchUserData();
-  // }, [userId, dispatch]);
 
   useEffect(() => {
     const fetchJwt = async () => {
@@ -197,150 +162,5 @@ const UserProfile = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-  },
-  
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "left",
-    width: "auto", // Keeps it natural width
-    marginLeft: 10, // Moves it further left if needed
-  },
-  
-  profileSection: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  emailText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: "#777",
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 10,
-    borderColor: "#ddd",
-    borderWidth: 1,
-  },
-  updateButton: {
-    backgroundColor: "#f7b900",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  modalButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 15,
-    backgroundColor: "#fff",
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    flex: 1,
-    textAlign: "center",
-    color: "#333",
-  },
-  registrationContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  registrationOptionsContainer: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  editFarmButton: {
-    backgroundColor: "#4CAF50",
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
-    width: "80%",
-    alignItems: "center",
-  },
-  editFarmButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  registerCoopButton: {
-    backgroundColor: "#2196F3",
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
-    width: "80%",
-    alignItems: "center",
-  },
-  registerCoopButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  joinMemberContainer: {
-    marginTop: 15,
-    alignItems: "center",
-  },
-  joinMemberText: {
-    fontSize: 16,
-    color: "#333",
-    marginBottom: 5,
-  },
-  joinMemberLinkButton: {
-    marginTop: 5,
-  },
-  joinMemberLinkText: {
-    color: "#007BFF",
-    fontSize: 16,
-    textDecorationLine: "underline",
-  },
-});
 
 export default UserProfile;

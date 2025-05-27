@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { useDispatch } from "react-redux";
 import { Alert } from "react-native";
+import styles from "@stylesheets/Withdraw/create";
+
 const CreateWithdraw = (props) => {
   const navigation = useNavigation()
   const context = useContext(AuthGlobal);
@@ -92,39 +94,5 @@ const CreateWithdraw = (props) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#f8f9fa",
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 10,
-    color: "#333",
-  },
-  info: {
-    fontSize: 18,
-    paddingVertical: 5,
-    color: "#555",
-  },
-  buttonContainer: {
-    marginTop: 20,
-  },
-  confirmButton: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
 
 export default CreateWithdraw;
