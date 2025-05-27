@@ -9,13 +9,15 @@ import {
   RefreshControl,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import styles from "@stylesheets/Rider/AssignList";
 import { useDispatch, useSelector } from "react-redux";
 import { shippedOrder } from "@redux/Actions/orderActions";
 import { deliveryList } from "@redux/Actions/deliveryActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SelectedTab } from "@shared/SelectedTab";
+import Loader from "@shared/Loader";
+import NoItem from "@shared/NoItem";
 
 const AssignList = () => {
   const context = useContext(AuthGlobal);
@@ -126,14 +128,12 @@ const AssignList = () => {
           </Text>
         </View>
 
-        {/* {!isDelivered && (  // If no matching delivery found, show the "Assign now" button */}
           <TouchableOpacity
             style={styles.deliverButton}
             onPress={() => navigation.navigate("AssingDetails", { order: item })}
           >
             <Text style={styles.buttonText}>View</Text>
           </TouchableOpacity>
-        {/* )} */}
       </View>
     );
   };
@@ -143,11 +143,9 @@ const AssignList = () => {
  <SelectedTab selectedTab={activeTab} tabs={choicesTab} onTabChange={setActiveTab} />
 
       {shiploading ? (
-        <ActivityIndicator size="large" color="blue" style={styles.loader} />
+        <Loader />
       ) : orders && orders.length === 0 || shiperror ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No Shipped Product found.</Text>
-        </View>
+        <NoItem title="No Shipping Assigned" />
       ) : (
         <FlatList
           data={orders}
@@ -162,131 +160,5 @@ const AssignList = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-
-  header2: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 15,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    elevation: 3,
-},
-headerTitle2: {
-    fontSize: 22,
-    fontWeight: '700',
-    flex: 1,
-    textAlign: 'center',
-    color: '#333',
-},
-drawerButton: {
-  marginRight: 10,
-},
-  header: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 10,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: "center",
-    borderBottomWidth: 2,
-    borderBottomColor: "#ddd",
-  },
-  activeTab: {
-    borderBottomColor: "#FFC107",
-  },
-  tabText: {
-    fontSize: 16,
-    color: "#666",
-  },
-  activeTabText: {
-    color: "#FFC107",
-    fontWeight: "bold",
-  },
-  listContainer: {
-    paddingHorizontal: 10,
-  },
-  orderCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    elevation: 3,
-  },
-  orderInfo: {
-    flex: 2,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  orderNumber: {
-    fontSize: 14,
-    color: "#666",
-  },
-  status: {
-    color: "#FFC107",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  actions: {
-    flexDirection: "column", // Stack buttons vertically
-    alignItems: "flex-end", // Align buttons to the right
-  },
-  deliverButton: {
-    backgroundColor: "#FFC107",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    marginBottom: 10, // Add space between buttons
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  detailsButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  detailsText: {
-    color: "#007BFF",
-    fontSize: 14,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emptyText: {
-    fontSize: 18,
-    color: "#777",
-  },
-  headerButton: {
-    paddingHorizontal: 12,
-  },
-  buttonText: {
-    color: 'black',
-    fontWeight: 'bold',
-  },
-});
 
 export default AssignList;

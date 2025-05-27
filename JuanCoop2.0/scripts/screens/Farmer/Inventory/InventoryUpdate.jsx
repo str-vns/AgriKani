@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Picker } from "@react-native-picker/picker";
 import { Text, TextInput, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "native-base";
 import { updateInventory } from "@redux/Actions/inventoryActions";
 
@@ -160,7 +159,7 @@ const InventoryUpdate = (props) => {
   {Invloading ? (
     <ActivityIndicator size="small" color="#fff" />
   ) : (
-    <Text style={styles.saveButtonText}>Add Inventory</Text>
+    <Text style={styles.saveButtonText}>Update Inventory</Text>
   )}
 </TouchableOpacity>
         </ScrollView>

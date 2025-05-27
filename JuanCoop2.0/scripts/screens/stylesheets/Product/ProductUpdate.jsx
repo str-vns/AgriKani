@@ -1,135 +1,144 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React from "react";
+import { StyleSheet, Dimensions, PixelRatio } from "react-native";
+import { colorCode } from "@screens/stylesheets/colorCode";
+const { width, height } = Dimensions.get("window");
+const baseWidth = 360; // Based on your design size
+const baseHeight = 640;
+
+const scaleWidth = (size) => (width / baseWidth) * size;
+const scaleHeight = (size) => (height / baseHeight) * size;
+
+const normalize = (size, based = "width") => {
+  const newSize = based === "height" ? scaleHeight(size) : scaleWidth(size);
+  return Math.round(PixelRatio.roundToNearestPixel(newSize));
+};
 
 export default StyleSheet.create({
-    container: {
-        marginVertical: 10,
-      },
-      label: {
-        fontSize: 16,
-        marginBottom: 5,
-      },
-      dropdown: {
-        padding: 15,
-        backgroundColor: "#f0f0f0",
-        borderRadius: 5,
-      },
-      dropdownText: {
-        fontSize: 16,
-      },
-      modalBackground: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-      },
-      modalContainer: {
-        width: "80%",
-        maxHeight: "80%", // Limits height to avoid exceeding screen
-        backgroundColor: "#fff",
-        borderRadius: 10,
-        padding: 20,
-        overflow: "hidden", // Ensures content stays within bounds
-      },
-      checkbox: {
-        width: 20,
-        height: 20,
-        borderWidth: 1,
-        borderColor: "#000",
-        borderRadius: 3,
-        alignItems: "center",
-        justifyContent: "center",
-      },
-      checkboxTick: {
-        width: 12,
-        height: 12,
-        backgroundColor: "#000",
-      },
-      checkboxLabel: {
-        marginLeft: 10,
-      },
-      closeButton: {
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: "#007BFF",
-        borderRadius: 5,
-        alignItems: "center",
-      },
-      closeButtonText: {
-        color: "#fff",
-        fontSize: 16,
-      },
-      checkboxGrid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between",
-      },
-      checkboxContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        width: "48%",
-        marginVertical: 5,
-      },
-      selectImageButton: {
-        fontSize: 18,
-        marginBottom: 10,
-        textAlign: "center",
-      },
-      imageContainer: {
-        position: "relative",
-        marginRight: 10,
-      },
-      image: {
-        width: 100,
-        height: 100,
-        borderRadius: 8,
-        overflow: "hidden",
-      },
-      deleteButton: {
-        position: "absolute",
-        top: 5,
-        right: 5,
-        backgroundColor: "white",
-        borderRadius: 12,
-        padding: 5,
-      },
-      error: {
-        color: "red",
-      },
-    
-      inventoryCard: {
-        padding: 10,
-        paddingHorizontal: 40,
-        borderWidth: 2,
-        borderColor: 'black',
-        borderRadius: 8,
-        marginHorizontal: 10,
-        backgroundColor: 'white',
-        justifyContent: 'center',
-        alignItems: 'flex-start', 
-      },
-      cardContent: {
-        flex: 1,
-        flexDirection: 'row', 
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      },
-      stockInfo: {
-        justifyContent: 'center',
-      },
-      stockTextLarge: {
-        fontSize: 12,
-        fontWeight: 'bold',
-      },
-      stockTextSmall: {
-        fontSize: 12,
-        color: 'black',
-      },
-      actionButtons: {
-        flexDirection: 'row',
-        marginLeft: 10,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      },
-     
-})
+  container: {
+    flex: 1,
+    backgroundColor: colorCode.lightYellow,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: colorCode.black,
+    padding: normalize(10),
+    borderRadius: normalize(20),
+    marginBottom: normalize(15),
+    backgroundColor: colorCode.white,
+  },
+  dropdownText: {
+    fontSize: normalize(16),
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    width: width * 0.8,
+    maxHeight: height * 0.8,
+    backgroundColor: colorCode.white,
+    borderRadius: normalize(10),
+    padding: normalize(20),
+    overflow: "hidden",
+  },
+  checkbox: {
+    width: normalize(20),
+    height: normalize(20),
+    borderWidth: 1,
+    borderColor: colorCode.black,
+    borderRadius: normalize(3),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxTick: {
+    width: normalize(12),
+    height: normalize(12),
+    backgroundColor: colorCode.black,
+  },
+  checkboxLabel: {
+    marginLeft: normalize(10),
+  },
+  closeButton: {
+    marginTop: normalize(20, "height"),
+    padding: normalize(10),
+    backgroundColor: colorCode.CyberYellow,
+    borderRadius: normalize(15),
+    alignItems: "center",
+  },
+  closeButtonText: {
+    fontSize: normalize(15),
+    color: colorCode.black,
+    fontWeight: "bold",
+  },
+  checkboxGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "48%",
+    marginVertical: normalize(5, "height"),
+  },
+  selectImageButton: {
+    fontSize: normalize(18),
+    marginTop: normalize(10, "height"),
+    marginBottom: normalize(10, "height"),
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  imageContainer: {
+    position: "relative",
+    marginRight: normalize(10),
+  },
+  image: {
+    width: normalize(100),
+    height: normalize(100),
+    borderRadius: normalize(8),
+    overflow: "hidden",
+  },
+  deleteButton: {
+    position: "absolute",
+    top: normalize(5),
+    right: normalize(5),
+    backgroundColor: colorCode.error,
+    borderRadius: normalize(12),
+    padding: normalize(5),
+  },
+  error: {
+    color: colorCode.error,
+  },
+
+  trikyHeader: {
+    padding: normalize(15),
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colorCode.black,
+    padding: normalize(10),
+    borderRadius: normalize(20),
+    marginBottom: normalize(15),
+    backgroundColor: colorCode.white,
+  },
+  labelText: {
+    fontSize: normalize(16),
+    fontWeight: "bold",
+    marginBottom: normalize(5, "height"),
+    marginLeft: normalize(10),
+  },
+  saveButton: {
+    backgroundColor: colorCode.CyberYellow,
+    padding: normalize(15),
+    borderRadius: normalize(15),
+    alignItems: "center",
+    marginTop: normalize(30),
+  },
+  saveButtonText: {
+    fontSize: normalize(18),
+    color: colorCode.black,
+    fontWeight: "bold",
+  },
+});

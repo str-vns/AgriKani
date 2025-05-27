@@ -12,7 +12,7 @@ import {
   ScrollView,
   Dimensions,
   FlatList,
-  ActivityIndicator,
+  RefreshControl,
   PermissionsAndroid,
   Platform,
 } from "react-native";
@@ -21,7 +21,7 @@ import {
   weatherCurrentActions,
 } from "@redux/Actions/weatherActions";
 import { BarChart, PieChart } from "react-native-chart-kit";
-import { useFocusEffect, } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import styles from "./css/styles";
 import { Profileuser } from "@redux/Actions/userActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
@@ -37,7 +37,8 @@ import { useSocket } from "../../../SocketIo";
 import { Picker } from "@react-native-picker/picker";
 import * as Print from "expo-print";
 import RNFS from "react-native-fs";
-import { WeatherModalContent } from "../../utils/weahterData";
+import { WeatherModalContent } from "@utils/weahterData";
+import Loader from "@shared/Loader";
 
 const FarmerDashboard = ({ route }) => {
   const dispatch = useDispatch();
@@ -58,7 +59,6 @@ const FarmerDashboard = ({ route }) => {
   const screenWidth = Dimensions.get("window").width;
   const context = useContext(AuthGlobal);
   const userId = context?.stateUser?.userProfile?._id;
-  const userProfile = context?.stateUser?.userProfile;
   const { coops } = useSelector((state) => state.allofCoops);
   const [loadingData, setLoading] = useState(false);
   const [token, setToken] = useState(null);
@@ -69,6 +69,8 @@ const FarmerDashboard = ({ route }) => {
   const InventoryInfo = Invsuccess?.details;
   const { coop } = useSelector((state) => state.singleCoop);
   const [weatherModalVisible, setWeatherModalVisible] = useState(false);
+  const [selectedRange, setSelectedRange] = useState("daily");
+  const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -160,7 +162,6 @@ const FarmerDashboard = ({ route }) => {
     };
     dispatch(inventoryDashboard(invItem, token));
   };
-  const [selectedRange, setSelectedRange] = useState("daily");
 
   const salesData = () => {
     switch (selectedRange) {
@@ -178,11 +179,11 @@ const FarmerDashboard = ({ route }) => {
   const formatLabel = (id) => {
     switch (selectedRange) {
       case "daily":
-        return "day"; 
+        return "day";
       case "monthly":
-        return "month"; 
+        return "month";
       case "yearly":
-        return "year"; 
+        return "year";
       default:
         return "day";
     }
@@ -200,16 +201,6 @@ const FarmerDashboard = ({ route }) => {
     legendFontSize: 12,
   }));
 
-  // Weather Modal Content
-
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#4CAF50" />
-        <Text>Loading Dashboard...</Text>
-      </View>
-    );
-  }
 
   if (error) {
     return (
@@ -509,12 +500,32 @@ const FarmerDashboard = ({ route }) => {
     }
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(fetchCoopDashboardData(userId));
+    dispatch(weatherCurrentActions());
+    dispatch(weatherDailyActions());
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
+  }, [dispatch, userId]);
+
   return (
-    <ScrollView style={styles.container}>
-      <WeatherModalContent
-        weatherModalVisible={weatherModalVisible}
-        onClose={() => setWeatherModalVisible(false)}
-        weatherCurrent={weatherCurrent}
+    <>
+      {loading ? (
+        <Loader />
+      ) : (
+        <ScrollView
+          style={styles.container}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <WeatherModalContent
+            weatherModalVisible={weatherModalVisible}
+            onClose={() => setWeatherModalVisible(false)}
+            weatherCurrent={weatherCurrent}
         weatherDaily={weatherDaily}
         loadingWCurrent={loadingWCurrent}
         loadingWDaily={loadingWDaily}
@@ -733,7 +744,10 @@ const FarmerDashboard = ({ route }) => {
           </View>
         )}
       </View>
+
     </ScrollView>
+     )}
+     </>
   );
 };
 

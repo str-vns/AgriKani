@@ -15,6 +15,9 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getCoopProducts } from "@redux/Actions/productActions";
 import AuthGlobal from "@redux/Store/AuthGlobal";
+import styles from "@screens/stylesheets/Reviews/list";
+import Loader from "@shared/Loader";
+import NoItem from "@shared/NoItem";
 
 const RatingList = () => {
   const context = useContext(AuthGlobal);
@@ -57,27 +60,33 @@ const RatingList = () => {
     }
   }, [dispatch]);
 
+  const nullData = []
   return (
     <View style={styles.container}>
-      {/* <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={28} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Product Review List</Text>
-      </View> */}
       {loading ? (
-        <ActivityIndicator size="large" color="blue" style={styles.loader} />
+        <Loader />
       ) : (
         <FlatList
           data={coopProducts}
           keyExtractor={(item) => item?._id}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          ListEmptyComponent={
+            <NoItem title="Reviews" />
+          }
+           contentContainerStyle={
+                      !coopProducts || coopProducts.length === 0
+                        ? styles.centering
+                        : null
+                    }
           renderItem={({ item }) => (
             <View style={styles.userItem}>
               <Image source={{ uri: item?.image[0]?.url || "https://via.placeholder.com/150" }} style={styles.profileImage} />
               <View style={styles.userDetails}>
                 <Text style={styles.userName}>{item?.productName}</Text>
-                <Text style={styles.userEmail}>{item?.description}</Text>
+                <Text style={styles.userEmail}
+                ellipsizeMode="tail"
+                numberOfLines={2}
+                >{item?.description}</Text>
                
               </View>
               <TouchableOpacity onPress={() => navigation.navigate("Reviews", { reviews: item })}>
@@ -90,64 +99,5 @@ const RatingList = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 10,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  backButton: {
-    marginRight: 10,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  loader: {
-    marginTop: 20,
-  },
-  userItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  userDetails: {
-    flex: 1,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  userEmail: {
-    fontSize: 14,
-    color: "#666",
-  },
-  userRole: {
-    fontSize: 14,
-    color: "#333",
-  },
-  viewButton: {
-    color: "#FFA500",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-});
 
 export default RatingList;

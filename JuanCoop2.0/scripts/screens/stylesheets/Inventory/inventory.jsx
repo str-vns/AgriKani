@@ -1,103 +1,101 @@
-import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions, PixelRatio } from "react-native";
+import { colorCode } from "@screens/stylesheets/colorCode";
 
+const { width, height } = Dimensions.get("window");
+const baseWidth = 360;
+const baseHeight = 640;
+
+const scaleWidth = (size) => (width / baseWidth) * size;
+const scaleHeight = (size) => (height / baseHeight) * size;
+
+const normalize = (size, based = "width") => {
+  const newSize = based === "height" ? scaleHeight(size) : scaleWidth(size);
+  return Math.round(PixelRatio.roundToNearestPixel(newSize));
+};
+  
 export default StyleSheet.create({
   container: {
-    marginVertical: 10,
+    flex: 1,
+    backgroundColor: colorCode.lightYellow,
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
+
   splitContainer: {
     flexDirection: "row",
     borderWidth: 1,
-    borderRadius: 4,
+    borderRadius: normalize(20),
     overflow: "hidden",
-    marginBottom: 15,
-    backgroundColor: "#f9f9f9",
-    borderColor: "#ccc",
+    marginBottom: normalize(15),
+    backgroundColor: colorCode.white,
+    borderColor: colorCode.black,
   },
   inputLeft: {
     flex: 1,
     textAlign: "center",
     borderRightWidth: 1,
-    backgroundColor: "#f9f9f9",
-    borderColor: "#ccc",
-    fontSize: 16,
-   
+    backgroundColor: colorCode.white,
+    borderColor: colorCode.black,
+    fontSize: normalize(16),
   },
   inputRight: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#f9f9f9",
-    borderColor: "#ccc",
+    backgroundColor: colorCode.white,
+    borderColor: colorCode.black,
+    fontSize: normalize(16),
   },
   pickerStyle: {
     width: "100%",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    paddingTop: 15,
-    paddingBottom: 15,
-    borderRadius: 5,
-    marginBottom: 15,
-    backgroundColor: "#f9f9f9",
+    borderColor: colorCode.black,
+    padding: normalize(10),
+    paddingTop: normalize(15, "height"),
+    paddingBottom: normalize(15, "height"),
+    borderRadius: normalize(20),
+    marginBottom: normalize(15),
+    backgroundColor: colorCode.white,
   },
   scrollViewContainer: {
-    padding: 20,
+    padding: normalize(20),
   },
   backButton: {
-    marginRight: 10,
+    marginRight: normalize(10),
   },
   label: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 5,
-    color: "#000",
+    fontSize: normalize(16),
+    fontWeight: "bold",
+    marginBottom: normalize(5, "height"),
+    marginLeft: normalize(10),
+    color: colorCode.black,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: normalize(22),
     fontWeight: "700",
     flex: 1,
     textAlign: "center",
     color: "#333",
   },
   saveButton: {
-    backgroundColor: "#FEC120",
-    padding: 15,
-    borderRadius: 5,
+    backgroundColor: colorCode.CyberYellow,
+    padding: normalize(15),
+    borderRadius: normalize(15),
     alignItems: "center",
-    marginTop: 30,
+    marginTop: normalize(30),
   },
   saveButtonText: {
-    fontSize: 18,
-    color: "#000",
+    fontSize: normalize(18),
+    color: colorCode.black,
     fontWeight: "bold",
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 15,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    elevation: 3,
-    marginTop: -10,
-},  
-error: {
-    color: "red",
-    fontSize: 16,
-    marginBottom: 10,
+  error: {
+    color: colorCode.red,
+    fontSize: normalize(16),
+    marginBottom: normalize(10),
     justifyContent: "center",
     textAlign: "center",
-
-},
-disabledButton: {
-    backgroundColor: '#a0a0a0', // Dimmed color for disabled state
+  },
+  disabledButton: {
+    backgroundColor: '#a0a0a0',
   },
 });

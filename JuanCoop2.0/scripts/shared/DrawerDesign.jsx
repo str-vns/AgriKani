@@ -1,11 +1,10 @@
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import styles from "@screens/stylesheets/Shared/Drawer/styles";
-import { isWeather } from "@utils/weahterData";
 import { updateAvailability } from "@redux/Actions/driverActions";
 import { useSelector } from "react-redux";
 

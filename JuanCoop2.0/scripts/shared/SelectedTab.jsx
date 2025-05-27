@@ -13,9 +13,10 @@ export const SelectedTab = (props) => {
     const { isOrder } = props;
     const [selectedTab, setSelectedTab] = useState(props.selectedTab);
     const navigation = useNavigation();
-    console.log("SelectedTab props:", selectedTab);
+
+
     const navigateToTab = (tabValue) => {
-      if (selectedTab === tabValue) return; // Prevent unnecessary navigation
+      if (selectedTab === tabValue) return; 
       setSelectedTab(tabValue);
       if (tabValue === "Rider") {
         navigation.navigate("Riderlist");
@@ -77,7 +78,7 @@ export const SelectedTab = (props) => {
           {tabButtons}
         </ScrollView>
       ) : (
-        <View style={styles.isNotTabContiner}>
+        <View style={styles.isNotTabContainer}>
           {tabButtons}
         </View>
       )}

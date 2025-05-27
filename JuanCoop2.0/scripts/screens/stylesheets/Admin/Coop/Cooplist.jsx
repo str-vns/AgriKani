@@ -1,39 +1,22 @@
-import React from "react";
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, PixelRatio } from "react-native";
+import { colorCode } from "@screens/stylesheets/colorCode";
 
-// Get screen dimensions
-var { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
+const baseWidth = 360;
+const baseHeight = 640;
+
+const scaleWidth = (size) => (width / baseWidth) * size;
+const scaleHeight = (size) => (height / baseHeight) * size;
+
+const normalize = (size, based = "width") => {
+  const newSize = based === "height" ? scaleHeight(size) : scaleWidth(size);
+  return Math.round(PixelRatio.roundToNearestPixel(newSize));
+};
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
-    width: width,  // Adjust width based on screen size
-    height: height, // Adjust height based on screen size
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignItems: "left",
-    padding: 20,
-    backgroundColor: "#ffffff",
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-  backButton: {
-    marginRight: 10,
-  },
-  menuButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  loader: {
-    marginTop: 20,
+    backgroundColor: colorCode.lightYellow,
   },
   errorContainer: {
     flex: 1,
@@ -41,7 +24,7 @@ export default StyleSheet.create({
     justifyContent: "center",
   },
   errorText: {
-    fontSize: 16,
+    fontSize: normalize(16),
     color: "red",
   },
   emptyContainer: {
@@ -50,233 +33,233 @@ export default StyleSheet.create({
     justifyContent: "center",
   },
   emptyText: {
-    fontSize: 18,
+    fontSize: normalize(18),
     color: "#777",
   },
   listContainer: {
-    paddingHorizontal: 16,
-    width: width * 0.9, // Adjust width as a percentage of the screen
+    paddingHorizontal: normalize(16),
+    width: width * 0.9,
   },
   userItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 16,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    marginVertical: 8,
+    padding: normalize(16),
+    backgroundColor: colorCode.white,
+    borderRadius: normalize(8),
+    marginVertical: normalize(8, "height"),
     elevation: 2,
-    width: width * 0.9, // Adjust width based on screen size
+    width: width * 0.9,
+  },
+  centering: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 16,
+    width: normalize(50),
+    height: normalize(50),
+    borderRadius: normalize(25),
+    marginRight: normalize(16),
   },
   userDetails: {
     flex: 1,
   },
   userName: {
-    fontSize: 18,
+    fontSize: normalize(18),
     fontWeight: "bold",
     color: "#333",
   },
   userEmail: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: "#555",
-    marginVertical: 4,
+    marginVertical: normalize(4, "height"),
   },
   userRole: {
-    fontSize: 12,
+    fontSize: normalize(12),
     color: "#777",
   },
   tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-    width: width * 0.9, // Adjust width based on screen size
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: normalize(20, "height"),
+    width: width * 0.9,
   },
   tabButton: {
-    padding: 10,
-    marginHorizontal: 10,
+    padding: normalize(10),
+    marginHorizontal: normalize(10),
     borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    borderBottomColor: "transparent",
   },
   activeTab: {
-    borderBottomColor: '#FFA500',
+    borderBottomColor: "#FFA500",
   },
   tabText: {
-    fontSize: 16,
-    color: '#888',
+    fontSize: normalize(16),
+    color: "#888",
   },
   activeTabText: {
-    color: '#FFA500', 
+    color: "#FFA500",
   },
   viewButton: {
-    color: '#FFA500',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: "#FFA500",
+    fontSize: normalize(16),
+    fontWeight: "bold",
   },
   coopContainer: {
     flexDirection: "row",
-    margin: 10,
-    padding: 30,
-    width: width * 0.9, // Adjust width based on screen size
+    margin: normalize(10),
+    padding: normalize(30),
+    width: width * 0.9,
   },
   coopImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginRight: 15,
+    width: normalize(100),
+    height: normalize(100),
+    borderRadius: normalize(50),
+    marginRight: normalize(15),
   },
   coopDetails: {
     flex: 1,
     justifyContent: "center",
   },
   coopName: {
-    fontSize: 18,
+    fontSize: normalize(18),
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: normalize(5, "height"),
   },
   farmName: {
-    fontSize: 16,
+    fontSize: normalize(16),
     color: "#555",
-    marginBottom: 5,
+    marginBottom: normalize(5, "height"),
   },
   coopEmail: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: "#888",
-    marginBottom: 5,
+    marginBottom: normalize(5, "height"),
   },
   address: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: "#666",
-    marginBottom: 5,
+    marginBottom: normalize(5, "height"),
   },
   requirement: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: "#444",
-    marginBottom: 5,
+    marginBottom: normalize(5, "height"),
+    fontWeight: "bold",
+    textAlign: "center",
   },
   status: {
-    fontSize: 14,
+    fontSize: normalize(14),
     fontWeight: "bold",
-    marginTop: 10,
+    marginTop: normalize(10, "height"),
   },
   approved: {
     color: "green",
   },
   notApproved: {
     color: "red",
-  }, 
+  },
   link: {
-    fontSize: 14,
-    color: "#007BFF", // Blue color for the link
+    fontSize: normalize(14),
+    color: "#007BFF",
     textDecorationLine: "underline",
-    marginBottom: 5,
+    marginBottom: normalize(5, "height"),
   },
   containerFile: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 10,
-    paddingHorizontal: 15,
-    width: width * 0.9, // Adjust width based on screen size
+    marginVertical: normalize(10, "height"),
+    paddingHorizontal: normalize(15),
+    width: width * 0.9,
   },
   labelFile: {
-    fontSize: 16,
+    fontSize: normalize(16),
     color: "#333",
     fontWeight: "bold",
-    marginRight: 10,
+    marginRight: normalize(10),
   },
   buttonFile: {
     backgroundColor: "#007BFF",
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 5,
+    paddingVertical: normalize(8, "height"),
+    paddingHorizontal: normalize(15),
+    borderRadius: normalize(5),
     justifyContent: "flex-end",
     alignItems: "flex-end",
   },
   buttonTextFile: {
     color: "#fff",
-    fontSize: 14,
+    fontSize: normalize(14),
     fontWeight: "600",
   },
   containerFileAll: {
-    padding: 10,
-    borderRadius: 5,
-    paddingHorizontal: 50,
+    padding: normalize(10),
+    borderRadius: normalize(5),
+    paddingHorizontal: normalize(50),
     justifyContent: "center",
     alignItems: "flex-end",
   },
   buttonContainer: {
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center", 
-    marginTop: 20,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 20,
-    width: width * 0.9, // Adjust width based on screen size
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: normalize(20, "height"),
+    marginLeft: normalize(20),
+    marginRight: normalize(20),
+    marginBottom: normalize(20, "height"),
+    width: width * 0.9,
   },
   approvedButton: {
     backgroundColor: "#FFA500",
-    padding: 16,
-    paddingHorizontal: 50,
-    borderRadius: 5,
+    padding: normalize(16),
+    paddingHorizontal: normalize(50),
+    borderRadius: normalize(5),
     justifyContent: "center",
     alignItems: "center",
   },
   buttonApproveText: {
     color: "black",
-    fontSize: 16,
+    fontSize: normalize(16),
     fontWeight: "bold",
   },
   textProvide: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: "#FF0000",
-    marginBottom: 5,
+    marginBottom: normalize(5, "height"),
   },
   imageContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: normalize(10, "height"),
+    marginBottom: normalize(10, "height"),
   },
   imageLook: {
     width: "100%",
-    height: 200, // Fixed height for image, can adjust if needed
-    borderRadius: 10,
-  },
-  requirement: {
-    fontSize: 14,
-    color: "#444",
-    marginBottom: 5,
-    fontWeight: "bold",
-    textAlign: "center",
+    height: normalize(200, "height"),
+    borderRadius: normalize(10),
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   closeButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 20,
+    position: "absolute",
+    top: normalize(20, "height"),
+    right: normalize(20, "height"),
+    backgroundColor: "#fff",
+    padding: normalize(10),
+    borderRadius: normalize(20),
   },
   closeText: {
-    color: '#000',
-    fontWeight: 'bold',
+    color: "#000",
+    fontWeight: "bold",
   },
-  imageShow:{
+  imageShow: {
     width: "100%",
     height: "80%",
-    borderRadius: 10,
-  }
+    borderRadius: normalize(10),
+  },
 });

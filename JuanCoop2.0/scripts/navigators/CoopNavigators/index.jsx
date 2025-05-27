@@ -166,16 +166,16 @@ const Index = () => {
         name="inventoryCreate"
         component={inventoryCreate}
         options={{
-          header: (props) => <BackButton {...props} title="Add Inventory" />,
+          header: (props) => <BackButton {...props} title="Add Inventory"  />,
         }}
       />
 
       <Stack.Screen
         name="inventoryUpdate"
         component={inventoryUpdate}
-        options={{
-          header: (props) => <BackButton {...props} title="Update Inventory" />,
-        }}
+        options={({ route }) => ({
+          header: (props) => <BackButton {...props} title={`Inventory - ${route.params?.item?.unitName}${route.params?.item?.metricUnit}`} />, 
+        })}
       />
 
       <Stack.Screen
