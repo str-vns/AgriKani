@@ -50,6 +50,7 @@ export const isUsersOnline = (users, onlineUsers) => {
 };
 
 export const getToken = async() => {
+  
   try {
     const res = await AsyncStorage.getItem("jwt");
     return res;

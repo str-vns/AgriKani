@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import styles from "@screens/stylesheets/Shared/Drawer/styles";
 import { updateAvailability } from "@redux/Actions/driverActions";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import AuthGlobal from "@redux/Store/AuthGlobal";
+import { getToken } from "@utils/usage";
+import { driverProfile } from "@redux/Actions/driverActions";
 
 export const handleBackPress = (navigation, onBack) => {
   if (!onBack) {
@@ -18,10 +21,32 @@ export const handleBackPress = (navigation, onBack) => {
 
 export const DrawerDesign = (props) => {
   const { title, isDelivery } = props;
-  const { Profileloading, Profiledriver, ProfileError } = useSelector(
-    (state) => state.driverProfile
-  );
+  const context = useContext(AuthGlobal);
+  const userId = context?.stateUser?.userProfile?._id;
+  const [token, setToken] = useState(null);
+  const dispatch = useDispatch();
+  const { Profileloading, Profiledriver } = useSelector((state) => state.driverProfile);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const t = await getToken();
+      setToken(t);
+    };
+    fetchToken();
+  }, []);
+
+   const onRefresh = useCallback(async () => {
+      setRefreshing(true);
+      try {
+        dispatch(driverProfile(userId, token));
+      } catch (err) {
+        console.error("Error refreshing users:", err);
+      } finally {
+        setRefreshing(false);
+      }
+    }, [userId, token]);
 
   const handleChange = () => {
     Alert.alert(
@@ -41,7 +66,7 @@ export const DrawerDesign = (props) => {
               setTimeout(() => {
                 onRefresh();
               }, 1000);
-              console.log("Availability updated successfully");
+
             } catch (error) {
               console.error("Error updating availability: ", error);
             }
@@ -187,7 +212,7 @@ export const ListContainer = (props) => {
   const { title, isCreate, isScreen, item, onBack } = props;
   const navigation = useNavigation();
   const [isWeather, setIsWeather] = useState(false);
-  console.log("isWeather", isWeather);  
+  console.log("isWeather", isWeather);
   const handleCreate = () => {
     if (isScreen === "Inventory") {
       navigation.navigate("inventoryCreate", { item: item });
@@ -212,7 +237,7 @@ export const ListContainer = (props) => {
     } else if (isScreen === "TypeList") {
       navigation.navigate("TypeCreate");
       return;
-    } 
+    }
   };
 
   return (
@@ -247,9 +272,8 @@ export const ListContainer = (props) => {
               <Ionicons name="time-outline" size={28} color="black" />
             ) : isScreen === "CoopDash" ? (
               <TouchableOpacity
-                onPress={() =>
-                 { 
-                   navigation.navigate("CoopDashboard", { isModal: true });
+                onPress={() => {
+                  navigation.navigate("CoopDashboard", { isModal: true });
                 }}
               >
                 <Ionicons name="cloud" size={28} color="#EDC001" />

@@ -152,7 +152,7 @@ const UserTracking = (props) => {
   const handleZoomIn = () => {
     setZoomLevel(15);
   };
- console.log("deliveries", deliveries.assignedTo?.userId);
+
   const riderChat = async () => {
     const riderUserId = deliveries?.assignedTo?.userId;
     const currentUserId = user?._id;
@@ -163,7 +163,13 @@ const UserTracking = (props) => {
           navigation.navigate("Messages", {
             screen: "ChatMessages",
             params: {
-              item: deliveries?.assignedTo,
+               item: {
+                    _id: deliveries?.assignedTo?.userId,
+                    firstName: deliveries?.assignedTo?.firstName,
+                    lastName: deliveries?.assignedTo?.lastName,
+                    image: deliveries?.assignedTo?.image,
+                    phoneNum: deliveries?.assignedTo?.phoneNum,
+                  },
               conversations: conversations,
               isOnline: onlineUsers,
             },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Text, View, StyleSheet, Button, Dimensions, Alert, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, Button, Alert, TouchableOpacity } from "react-native";
 import { CameraView, Camera } from "expo-camera";
 import {updateDeliveryStatus } from "@redux/Actions/deliveryActions";   
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -10,12 +10,8 @@ import { useDispatch } from "react-redux";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { useSocket } from "../../../SocketIo";
 import * as Location from 'expo-location'
-
-const { width, height } = Dimensions.get('window');
-const finderWidth = 280;
-const finderHeight = 230;
-const viewMinX = (width - finderWidth) / 2;
-const viewMinY = (height - finderHeight) / 2;
+import styles from "@stylesheets/Delivery/qrScan";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
  const QrScan = (props) => {
   const context = useContext(AuthGlobal);
@@ -89,7 +85,6 @@ const viewMinY = (height - finderHeight) / 2;
       if (deliveryId === delivery_ID) {
         setScanned(true);
   
-        // Prepare notification
         const notification = {
           title: `Order: ${orderId}`,
           content: `Your order has been Delivered, Enjoy your product.`,
@@ -98,7 +93,6 @@ const viewMinY = (height - finderHeight) / 2;
           type: "order",
         };
   
-        // Send notification via socket
         socket.emit("sendNotification", {
           senderName: userName,
           receiverName: userId,
@@ -164,7 +158,11 @@ const viewMinY = (height - finderHeight) / 2;
 
   return (
     <View style={styles.container}>
-    {/* Camera Scan at the Top */}
+     <View style={styles.backButton}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="chevron-back" size={20} color="#333" />
+          </TouchableOpacity>
+        </View>
     <View style={styles.cameraContainer}>
       <CameraView
         onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
@@ -188,52 +186,5 @@ const viewMinY = (height - finderHeight) / 2;
   </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  cameraContainer: {
-    flex: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  detailsContainer: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 15,
-    alignItems: "center",
-  },
-  scanButtonContainer: {
-    position: "absolute",
-    bottom: 20,
-    alignSelf: "center",
-  },
-  driverName: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  infoText: {
-    fontSize: 16,
-    marginTop: 5,
-  },
-  actionsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
-    marginTop: 20,
-  },
-  dropOffButton: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-});
-
 
 export default QrScan;
