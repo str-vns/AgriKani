@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';  
 import styles from '@stylesheets/Message/UserMessage';
-import Loader from '@shared/Loader';
-import NoItem from '@shared/NoItem';
 import moment from 'moment';
 
 const UserMessage = ({ messages, own }) => {

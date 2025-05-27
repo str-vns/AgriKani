@@ -19,15 +19,19 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { sendNotifications } from "@redux/Actions/notificationActions";
 import messaging from "@react-native-firebase/messaging";
+import styles from "@stylesheets/Message/UserChat";
+import Loader from "@shared/Loader";
+import NoItem from "@shared/NoItem";
 
 const UserChat = (props) => {
   const { item, conversations, isOnline } = props.route.params;
+  console.log("UserChat item", item);
   const dispatch = useDispatch();
   const socket = useSocket();
   const scrollRef = useRef(null);
   const context = useContext(AuthGlobal);
   const UserId = context?.stateUser?.userProfile?._id;
-  const { messages } = useSelector((state) => state.getMessages);
+  const { loading, messages, error } = useSelector((state) => state.getMessages);
   const [token, setToken] = useState(null);
   const [arrivedMessages, setArrivedMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
@@ -60,7 +64,6 @@ const UserChat = (props) => {
     };
   }, [socket]);
 
-
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -74,7 +77,6 @@ const UserChat = (props) => {
     };
     fetchJwt();
   }, []);
-
 
   useEffect(() => {
     if (token && myConvo) {
@@ -110,13 +112,13 @@ const UserChat = (props) => {
   const deleteImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
-
+  console.log(myConvo)
   const sendMessage = () => {
     if (!myConvo) {
       console.error("Conversation not found or item is undefined.");
       return;
     }
-  
+
     if (newMessage.trim() || images.length) {
       const message = {
         sender: UserId,
@@ -124,14 +126,14 @@ const UserChat = (props) => {
         conversationId: myConvo._id,
         image: images,
       };
-  
+
       socket.emit("sendMessage", {
         senderId: UserId,
         receiverId: myConvo.members.find((member) => member !== UserId),
         text: newMessage,
         image: images,
       });
-  
+
       if (!isOnlinerUser) {
         const notification = {
           title: `New message`,
@@ -143,7 +145,7 @@ const UserChat = (props) => {
         };
         dispatch(sendNotifications(notification, token));
       }
-  
+
       dispatch(sendingMessage(message, token));
       setNewMessage("");
       setImages([]);
@@ -153,127 +155,52 @@ const UserChat = (props) => {
 
   return (
     <View style={styles.container}>
-       {messages || arrivedMessages &&  messages.length > 0 || arrivedMessages.length > 0 ? (
-       <FlatList
-       ref={scrollRef}
-       data={[...messages, ...arrivedMessages]} 
-       renderItem={({ item, index }) => (
-         <Message key={index} messages={item} own={item.sender === UserId} />
-       )}
-       keyExtractor={(item, index) => item._id || index.toString()}
-       contentContainerStyle={styles.flatListContent}
-       showsVerticalScrollIndicator={false}
-       onContentSizeChange={() => {
-         if (scrollRef.current) {
-           scrollRef.current.scrollToEnd({ animated: true });
-         }
-       }}
-     />
-      ) : (
-        <Text style={styles.noMessages}>No messages available</Text>
-      )}
-      <ScrollView horizontal>
-        {images.map((imageUri, index) => (
-          <View key={index} style={styles.imageContainer}>
-            <Image source={{ uri: imageUri }} style={styles.image} />
-            <TouchableOpacity
-              onPress={() => deleteImage(index)}
-              style={styles.deleteButton}
-            >
-              <Ionicons name="close-outline" size={25} color="black" />
-            </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
-      <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Type something..."
-          style={styles.textInput}
-          onChangeText={(text) => setNewMessage(text)}
-          value={newMessage}
-        />
-        {/* <TouchableOpacity onPress={pickImage}>
-          <Ionicons
-            name="images-outline"
-            size={30}
-            color="black"
-            style={styles.iconRight}
+      <>
+        {loading ? (
+          <Loader />
+        ) : error ? (
+          <NoItem title="Conversation" />
+        ) : messages ||
+          (arrivedMessages && messages.length > 0) ||
+          arrivedMessages.length > 0 ? (
+          <FlatList
+            ref={scrollRef}
+            data={[...messages, ...arrivedMessages]}
+            renderItem={({ item, index }) => (
+              <Message
+                key={index}
+                messages={item}
+                own={item.sender === UserId}
+              />
+            )}
+            keyExtractor={(item, index) => item._id || index.toString()}
+            contentContainerStyle={styles.flatListContent}
+            showsVerticalScrollIndicator={false}
+            onContentSizeChange={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollToEnd({ animated: true });
+              }
+            }}
           />
-        </TouchableOpacity> */}
-
-        <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-          <Text style={styles.sendButtonText}>Send</Text>
-        </TouchableOpacity>
-      </View>
+        ) : (
+          <Text style={styles.noMessages}>No messages available</Text>
+        )}
+      
+        <View style={styles.inputContainer}>
+          <TextInput
+            placeholder="Type something..."
+            style={styles.textInput}
+            onChangeText={(text) => setNewMessage(text)}
+            value={newMessage}
+            multiline
+          />
+          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+            <Text style={styles.sendButtonText}>Send</Text>
+          </TouchableOpacity>
+        </View>
+      </>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingBottom:50,
-  },
-  flatListContent: {
-    paddingBottom: 80,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#e1e1e1",
-    bottom: 12,
-  },
-  textInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#e1e1e1",
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginRight: 10,
-  },
-  sendButton: {
-    backgroundColor: "#f7b900",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    justifyContent: "center",
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    
-  },
-  imageContainer: {
-    position: "relative",
-    marginRight: 10,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-  },
-  deleteButton: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "white",
-    borderRadius: 12,
-    padding: 5,
-  },
-  noMessages: {
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 18,
-    color: "#808080",
-  },
-
-  iconRight: {
-    marginRight: 10,
-    top: 8,
-  },
-});
 
 export default UserChat;

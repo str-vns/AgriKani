@@ -1,6 +1,5 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Start from "@src/screens/Rider/Start";
 import Deliveries from "@src/screens/Rider/Deliveries";
 import Details from "@src/screens/Rider/Details";
 import Location from "@src/screens/Rider/Location";

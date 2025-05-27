@@ -2,9 +2,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
   FlatList,
   RefreshControl,
 } from "react-native";
@@ -20,15 +18,16 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import { Alert } from "react-native";
-import { useSocket } from "@SocketIo";
 import { SelectedTab } from "@shared/SelectedTab";
-import { isOnline } from "../../../scripts/utils/usage";
+import { isOnline } from "@utils/usage";
+import Loader from "@shared/Loader";
+import NoItem from "@shared/NoItem";
+import styles from "@stylesheets/Delivery/deliver";
 
 const Deliveries = () => {
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const socket = useSocket();
   const userId = context?.stateUser?.userProfile?._id;
   const { Deliveryloading, deliveries, Deliveryerror } = useSelector((state) => state.deliveryList);
   const [activeTab, setActiveTab] = useState("Pending");
@@ -145,7 +144,7 @@ const Deliveries = () => {
   };
 
   const deliveryNow = (item) => {
-    Alert.alert("Delivery", "Are you sure you want to deliver this item?", [
+    Alert.alert("📦 Delivery", "Are you sure you want to deliver this item?", [
       {
         text: "No",
         onPress: () => console.log("Cancel Pressed"),
@@ -236,13 +235,13 @@ const Deliveries = () => {
       />
 
       {Deliveryloading ? (
-        <ActivityIndicator size="large" color="blue" style={styles.loader} />
+        <Loader />
       ) : (filterTab && filterTab?.length === 0) || Deliveryerror ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>
             {activeTab === "Pending"
-              ? `No ${activeTabLabel} deliveries found.`
-              : `No ${activeTabLabel} Deliveries Found `}
+              ?    <NoItem title={`${activeTabLabel}`} />
+              :    <NoItem title={`${activeTabLabel}`} />}
           </Text>
         </View>
       ) : (
@@ -252,6 +251,9 @@ const Deliveries = () => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
+          ListEmptyComponent={
+            <NoItem title={`${activeTabLabel}`} />
+          }
           contentContainerStyle={styles.listContainer}
           renderItem={renderOrderItem}
         />
@@ -259,146 +261,5 @@ const Deliveries = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-
-  headerTitle2: {
-    fontSize: 22,
-    fontWeight: "700",
-    flex: 1,
-    textAlign: "center",
-    color: "#333",
-  },
-  drawerButton: {
-    marginRight: 10,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 10,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: "center",
-    borderBottomWidth: 2,
-    borderBottomColor: "#ddd",
-  },
-  activeTab: {
-    borderBottomColor: "#FFC107",
-  },
-  tabText: {
-    fontSize: 16,
-    color: "#666",
-  },
-  activeTabText: {
-    color: "#FFC107",
-    fontWeight: "bold",
-  },
-  listContainer: {
-    paddingHorizontal: 10,
-  },
-  orderCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    elevation: 3,
-  },
-  orderInfo: {
-    flex: 2,
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  orderNumber: {
-    fontSize: 14,
-    color: "#666",
-  },
-  status: {
-    color: "#FFC107",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  actions: {
-    flexDirection: "column", // Stack buttons vertically
-    alignItems: "flex-end", // Align buttons to the right
-  },
-  deliverButton: {
-    backgroundColor: "#FFC107",
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-    marginBottom: 10, // Add space between buttons
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
-  detailsButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  detailsText: {
-    color: "#007BFF",
-    fontSize: 14,
-  },
-  emptyContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  emptyText: {
-    fontSize: 18,
-    color: "#777",
-  },
-  circle: {
-    width: 20,
-    height: 20,
-    borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
-    left: 36,
-  },
-  circleText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  pickerContainer: {
-    marginTop: 10,
-    width: "10%",
-    alignSelf: "flex-end",
-  },
-  picker: {
-    height: 20,
-    width: "100%",
-    backgroundColor: "#fff",
-    borderRadius: 5,
-  },
-  TextTop: {
-    fontSize: 12,
-    fontWeight: "bold",
-    left: 15,
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  drawerContainer: {
-    flexDirection: "column",
-  },
-});
 
 export default Deliveries;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, Modal, StyleSheet } from 'react-native';
-import ImageViewer from 'react-native-image-zoom-viewer';  
+import { View, Text, Image, TouchableOpacity, Modal } from 'react-native';
+import ImageViewer from 'react-native-image-zoom-viewer';
+import styles from '@stylesheets/Message/UserMessage';  
 import moment from 'moment';
 
 const UserMessage = ({ messages, own }) => {
@@ -33,7 +34,6 @@ const UserMessage = ({ messages, own }) => {
     >
       <Text style={styles.messageText}>{messageText}</Text>
 
-      {/* Handle images: first show image URLs if available */}
       {images.length > 0 &&
         images.map((item, index) => (
           <View key={index} style={styles.imageContainer}>
@@ -47,18 +47,16 @@ const UserMessage = ({ messages, own }) => {
         ))
       }
 
-      {/* Render the time of the message */}
       <Text style={styles.time}>
    {time} 
 </Text>
 
-      {/* Modal to display the full image */}
       {showImageModal && (
         <Modal
           transparent={true}
           animationType="fade"
           visible={showImageModal}
-          onRequestClose={closeModal}  // Allow closing modal via hardware back button on Android
+          onRequestClose={closeModal} 
         >
           <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
             <View style={styles.modalContainer}>
@@ -76,56 +74,5 @@ const UserMessage = ({ messages, own }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  messageContainer: {
-    marginVertical: 10,
-    marginHorizontal: 15,
-    padding: 10,
-    borderRadius: 10,
-    maxWidth: '80%',
-  },
-  messageText: {
-    fontSize: 16,
-  },
-  received: {
-    backgroundColor: '#fef8e5',
-    alignSelf: 'flex-start',
-  },
-  sent: {
-    backgroundColor: '#fefdf9',
-    alignSelf: 'flex-end',
-  },
-  time: {
-    fontSize: 12,
-    color: '#555',
-    alignSelf: 'flex-end',
-    marginTop: 5,
-    paddingLeft: 10,
-  },
-  imageContainer: {
-    marginVertical: 5,
-  },
-  messageImage: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
-    borderRadius: 10,
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default UserMessage;
