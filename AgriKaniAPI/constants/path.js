@@ -69,7 +69,7 @@ module.exports = {
   COMMENT: "/products/comment",
   COMMENT_COOP: "/cooperative/comment",
   COMMENT_COURIER: "/courier/comment",
-  
+  COMMENT_REPLY_COOP: "/cooperative/reply/comment",
   //Post
   POST_CREATE: "/p/create",
   POST: "/p",

@@ -88,6 +88,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
         const notification = {
           title: `Order: ${orderId}`,
           content: `Your order has been Delivered, Enjoy your product.`,
+          url: "https://res.cloudinary.com/diljhwf3a/image/upload/v1746856018/files/mkenwabkxpdtpa6vmwul.png",
           user: userId,
           fcmToken: fcmToken,
           type: "order",

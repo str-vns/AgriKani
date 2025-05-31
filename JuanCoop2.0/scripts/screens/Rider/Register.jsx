@@ -15,22 +15,20 @@ import { useNavigation } from "@react-navigation/native";
 import styles from "@screens/stylesheets/Rider/Register";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AuthGlobal from "@redux/Store/AuthGlobal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import messaging from "@react-native-firebase/messaging";
 import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 import { Picker } from "@react-native-picker/picker";
-import { useDispatch, useSelector } from "react-redux";
-import { OTPregister, checkEmail } from "@redux/Actions/userActions";
+import { useDispatch } from "react-redux";
+import { OTPregister } from "@redux/Actions/userActions";
 import axios from "axios";
 import baseURL from "@assets/commons/baseurl";
+
 
 const Register = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const userId = context.stateUser?.userProfile?._id;
-  const { isEmailAvailable } = useSelector((state) => state.checkDuplication);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -52,6 +50,7 @@ const Register = () => {
   const [checked, setChecked] = useState(false);
   const [termsModalVisible, setTermsModalVisible] = useState(false);
   const [privacyPolicyVisible, setPrivacyPolicyVisible] = useState(false);
+
   const handleTermCondition = () => {
     setTermsModalVisible(true);
   };
@@ -172,7 +171,7 @@ const Register = () => {
     const response = await axios.post(`${baseURL}check-driver-email`, {
       email,
     });
-    console.log("Response: ", response.data.details);
+
     if (
       !firstName ||
       !lastName ||

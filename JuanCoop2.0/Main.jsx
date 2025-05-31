@@ -24,9 +24,25 @@ import RiderNavigators from "@navigators/RiderNavigators";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import { isLogin } from "@redux/Actions/Auth.actions";
 import { Text } from "native-base";
-import messaging from "@react-native-firebase/messaging";
+import { getApp } from "@react-native-firebase/app";
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  onNotificationOpenedApp,
+  getInitialNotification,
+  setBackgroundMessageHandler,
+  requestPermission,
+  AuthorizationStatus,
+} from "@react-native-firebase/messaging";
 import * as Notification from "expo-notifications";
 import Landing from "@screens/User/Landing";
+import notifee, {
+  AndroidStyle,
+  AndroidImportance,
+} from "@notifee/react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const Stack = createStackNavigator();
 
 Notification.setNotificationHandler({
@@ -44,6 +60,8 @@ const Main = () => {
   const [loading, setLoading] = useState(true);
   const routes = useNavigationState((state) => state.routes);
   const currentRoute = routes[routes.length - 1]?.name;
+  const app = getApp();
+  const messaging = getMessaging(app);
 
   const requestNotificationPermission = async () => {
     const { status: existingStatus } = await Notification.getPermissionsAsync();
@@ -58,10 +76,10 @@ const Main = () => {
       console.log("Notification permission granted.");
 
       try {
-        const authStatus = await messaging().requestPermission();
+        const authStatus = await requestPermission(messaging);
         const enabled =
-          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+          authStatus === AuthorizationStatus.AUTHORIZED ||
+          authStatus === AuthorizationStatus.PROVISIONAL;
 
         if (enabled) {
           console.log("Authorization status:", authStatus);
@@ -84,9 +102,13 @@ const Main = () => {
       const permissionGranted = await requestNotificationPermission();
       if (permissionGranted) {
         try {
-          const FCMtoken = await messaging().getToken();
-
-          console.log("FCM Token:", FCMtoken);
+          const FCMtoken = await getToken(messaging);
+          if (FCMtoken) {
+            console.log("FCM Token:", FCMtoken);
+            await AsyncStorage.setItem("fcmToken", FCMtoken);
+          } else {
+            console.log("No FCM token received");
+          }
         } catch (error) {
           console.error("Error getting FCM token:", error);
         }
@@ -94,18 +116,17 @@ const Main = () => {
         console.log("No permission granted");
       }
 
-      messaging()
-        .getInitialNotification()
-        .then((remoteMessage) => {
-          if (remoteMessage) {
-            console.log(
-              "Notification caused app to open from quit state:",
-              remoteMessage.notification
-            );
-          }
-        });
+      getInitialNotification(messaging).then((remoteMessage) => {
+        if (remoteMessage) {
+          console.log(
+            "Notification caused app to open from quit state:",
+            remoteMessage.notification
+          );
+        }
+      });
 
-      const unsubscribeOnOpened = messaging().onNotificationOpenedApp(
+      const unsubscribeOnOpened = onNotificationOpenedApp(
+        messaging,
         (remoteMessage) => {
           console.log(
             "Notification caused app to open from background state:",
@@ -114,9 +135,13 @@ const Main = () => {
         }
       );
 
-      const unsubscribeBackground = messaging().setBackgroundMessageHandler(
+      const unsubscribeBackground = setBackgroundMessageHandler(
+        messaging,
         async (remoteMessage) => {
-          console.log("Message handled in the background:", remoteMessage);
+          console.log(
+            "Notification caused app to open from background state:",
+            remoteMessage.notification
+          );
         }
       );
 
@@ -130,33 +155,81 @@ const Main = () => {
   }, []);
 
   useEffect(() => {
-    const unsubscribeOnMessage = messaging().onMessage(
-      async (remoteMessage) => {
-        console.log(
-          "Notification received while app is in the foreground:",
-          remoteMessage.notification
-        );
+    async function createChannel() {
+      await notifee.createChannel({
+        id: "default",
+        name: "Default Channel",
+        importance: AndroidImportance.HIGH,
+      });
+    }
 
-        const { title, body, android } = remoteMessage.notification;
-        console.log("Title:", title);
-        console.log("Body:", body);
-        console.log("Image URL:", android?.imageUrl);
-        Notification.scheduleNotificationAsync({
-          content: {
-            title: title,
-            body: body,
-            sound: true,
-          },
-          trigger: null,
-        });
-      }
-    );
+    createChannel();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribeOnMessage = onMessage(messaging, onMessageReceived);
 
     return () => {
       unsubscribeOnMessage();
       console.log("Unsubscribed from onMessage listener");
     };
   }, []);
+
+  function onMessageReceived(message) {
+    if (!message.data || (!message.data.title && !message.data.body)) {
+      // Don't show notification if no useful data
+      console.log("No notification data, skipping display.");
+      return;
+    }
+
+    const { title, body, imageUrl, type } = message.data;
+    console.log("Received message:", message);
+    if (type !== "cancelled") {
+      const validImage =
+        typeof imageUrl === "string" && imageUrl.startsWith("http")
+          ? imageUrl
+          : "https://your-default-image-url.com/default.png";
+
+      notifee.displayNotification({
+        title: title || "Notification",
+        body: body || "",
+        android: {
+          channelId: "default",
+          smallIcon: "ic_launcher",
+          showTimestamp: true,
+          largeIcon: validImage,
+          importance: AndroidImportance.HIGH,
+          vibration: true,
+          style: {
+            type: AndroidStyle.BIGPICTURE,
+            picture: validImage,
+          },
+          pressAction: {
+            id: "default",
+          },
+        },
+      });
+    } else {
+      notifee.displayNotification({
+        title: title || "Notification",
+        body: body || "",
+        android: {
+          channelId: "default",
+          smallIcon: "ic_launcher",
+          showTimestamp: true,
+          importance: AndroidImportance.HIGH,
+          vibration: true,
+          style: {
+            type: AndroidStyle.BIGTEXT,
+            text: body || "",
+          },
+          pressAction: {
+            id: "default",
+          },
+        },
+      });
+    }
+  }
 
   useEffect(() => {
     const initialize = async () => {
@@ -167,35 +240,38 @@ const Main = () => {
     initialize();
   }, []);
 
- const handleBackPress = () => {
-  console.log("Current Route Name:", currentRoute);
+  const handleBackPress = () => {
+    console.log("Current Route Name:", currentRoute);
 
-  if (currentRoute === "Coop") {
-    return true;
-  } else if (navigation.canGoBack()) {
-    navigation.goBack();
-    return true;
-  } else {
-   Alert.alert("Exit App", "Exiting the application?", [
-      {
-        text: "Cancel",
-        onPress: () => null,
-        style: "cancel",
-      },
-      {
-        text: "Ok",
-        onPress: () => BackHandler.exitApp(),
-      },
-    ]);
+    if (currentRoute === "Coop") {
+      return true;
+    } else if (navigation.canGoBack()) {
+      navigation.goBack();
+      return true;
+    } else {
+      Alert.alert("Exit App", "Exiting the application?", [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel",
+        },
+        {
+          text: "Ok",
+          onPress: () => BackHandler.exitApp(),
+        },
+      ]);
 
-    return true;
-  }
-};
+      return true;
+    }
+  };
 
-useEffect(() => {
-  const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
-  return () => backHandler.remove();
-}, [currentRoute]);
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress
+    );
+    return () => backHandler.remove();
+  }, [currentRoute]);
 
   if (context.stateUser?.isLoading === false) {
     <View style={styles.loaderContainer}>

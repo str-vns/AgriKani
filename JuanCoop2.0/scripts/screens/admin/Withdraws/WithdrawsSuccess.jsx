@@ -7,20 +7,20 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getSuccessTransactions } from "@redux/Actions/transactionActions";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { allCoops } from "@redux/Actions/coopActions";
+import { SelectedTab } from "@shared/SelectedTab";
 
 const WithdrawsSuccess = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const [refreshing, setRefreshing] = useState(false);
     const {withdrawloading, withdraw, withdrawerror} = useSelector((state) => state.transaction)
-    const [selectedTab, setSelectedTab] = useState("Success");
+    const [selectedTab, setSelectedTab] = useState("WApproved");
     const [token, setToken] = useState(null);
     const { loading, coops, error } = useSelector((state) => state.allofCoops);
    
@@ -60,57 +60,19 @@ const WithdrawsSuccess = () => {
       }
     }, [dispatch, token]);
   
+    const choicesTab = [
+    { label: "Pending", value: "WPending" },
+    { label: "Success", value: "WApproved" },
+  ];
+
     return (
       <View style={styles.container}>
   
-        {/* <View style={styles.header}>
-                <TouchableOpacity
-                  style={styles.backButton}
-                  onPress={() => navigation.goBack()}
-                >
-                  <Ionicons name="arrow-back" size={28} color="black" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Withdraw Request List</Text>
-            </View> */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[
-              styles.tabButton,
-              selectedTab === "Pending" && styles.activeTab,
-            ]}
-            onPress={() => {
-                navigation.navigate("WithdrawsList");
-              }}
-
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedTab === "Pending" && styles.activeTabText,
-              ]}
-            >
-              Pending
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.tabButton,
-              selectedTab === "Success" && styles.activeTab,
-            ]}
-            onPress={() => {
-                setSelectedTab("Success");
-              }}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedTab === "Success" && styles.activeTabText,
-              ]}
-            >
-              Success 
-            </Text>
-          </TouchableOpacity>
-        </View>
+       <SelectedTab
+              selectedTab={selectedTab}
+              tabs={choicesTab}
+              onTabChange={setSelectedTab}
+            />
   
         {/* Content */}
         {withdrawloading ? (

@@ -55,3 +55,16 @@ exports.CreatePostComment = [
   }),
 ];
 
+exports.CreateCoopReplyReview = [
+  upload.array("image"),
+  CheckField(["comment", "user"]),
+  asyncHandler(async (req, res, next) => {
+    const review = await commentProcess.CreateCoopReplyReview(req);
+
+    return SuccessHandler(
+      res,
+      `Review: ${review?.firstName} ${review?.lastName} has been created successfully`,
+      review
+    );
+  }),
+];

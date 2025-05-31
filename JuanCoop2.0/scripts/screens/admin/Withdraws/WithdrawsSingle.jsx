@@ -10,16 +10,14 @@ import {
   ActivityIndicator,
   Modal,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import styles from "@screens/stylesheets/Admin/Coop/Cooplist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { driverApproved, driverRejected } from "@redux/Actions/driverActions";
 import { updateWithdraw } from "@redux/Actions/transactionActions";
 import messaging from "@react-native-firebase/messaging";
 import { sendNotifications } from "@redux/Actions/notificationActions";
-import { useSocket } from "../../../../SocketIo";
+import { useSocket } from "@SocketIo";
 
 const WithdrawsSingle = (props) => {
   const trans = props.route.params.withdrawData;

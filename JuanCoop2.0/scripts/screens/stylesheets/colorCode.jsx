@@ -21,4 +21,5 @@ export const colorCode = {
   blue: "#0000FF",
   PASTELGREEN: "#77dd77",
   PASTELBLUE: "#0E86D4",
+  PASTELRED: "#FF6961",
 };

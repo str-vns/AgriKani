@@ -29,6 +29,12 @@ const commentRoutes = [
     roles: [],
     handler: commentController.CreatePostComment,
   },
+  {
+    method: METHOD.POST,
+    path: PATH.COMMENT_REPLY_COOP,
+    roles: [],
+    handler: commentController.CreateCoopReplyReview,
+  }
 ];
 
 

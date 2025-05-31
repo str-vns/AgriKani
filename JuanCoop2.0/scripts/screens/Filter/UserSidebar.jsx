@@ -1,8 +1,8 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import styles from "@screens/stylesheets/Filter/UserSidebar"
+import styles from "@screens/stylesheets/Filter/UserSidebar";
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect, useNavigation } from "@react-navigation/native"; 
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { logoutUser } from "@redux/Actions/Auth.actions";
@@ -19,7 +19,7 @@ const UserSidebar = () => {
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const userslogin = context.stateUser?.userProfile || null;
-  const [ setLoadings ] = useState(true);
+  const [setLoadings] = useState(true);
 
   useEffect(() => {
     const initialize = async () => {
@@ -36,25 +36,38 @@ const UserSidebar = () => {
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Address", icon: "location-outline", key: "address" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
-        { label: "Track Order", icon: "location-outline", key: "track-order" },
-    { label: "Notifications",  icon: "notifications-outline", key: "notifications", },
-    context.stateUser?.userProfile?.roles?.includes("Customer") && 
-    context.stateUser?.userProfile?.roles?.includes("Member") ? 
-    { label: "Discussion", icon: "create-outline", key: "Forum" } : null,
+    { label: "Track Order", icon: "location-outline", key: "track-order" },
+    {
+      label: "Notifications",
+      icon: "notifications-outline",
+      key: "notifications",
+    },
+    context.stateUser?.userProfile?.roles?.includes("Customer") &&
+    context.stateUser?.userProfile?.roles?.includes("Member")
+      ? { label: "Discussion", icon: "create-outline", key: "Forum" }
+      : null,
     { label: "Directions", icon: "navigate-outline", key: "CoopDistance" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
     { label: "About Us", icon: "information-circle-outline", key: "AboutUs" },
-  ].filter(item => item !== null);
+  ].filter((item) => item !== null);
 
   const CoopItems = [
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
     { label: "Profile", icon: "person-outline", key: "profile" },
     { label: "Product", icon: "cube-outline", key: "product" },
-    { label: "Product Archive", icon: "archive-outline", key: "productArchive" },
+    {
+      label: "Product Archive",
+      icon: "archive-outline",
+      key: "productArchive",
+    },
     { label: "Inventory", icon: "archive-outline", key: "inventory" },
     { label: "Orders", icon: "clipboard-outline", key: "orders" },
     { label: "Messages", icon: "chatbubble-outline", key: "messages" },
-    { label: "Notifications", icon: "notifications-outline", key: "notifications" },
+    {
+      label: "Notifications",
+      icon: "notifications-outline",
+      key: "notifications",
+    },
     { label: "Rider", icon: "car-outline", key: "rider" },
     { label: "Wallet", icon: "wallet-outline", key: "wallet" },
     { label: "Members", icon: "people-outline", key: "members" },
@@ -62,23 +75,20 @@ const UserSidebar = () => {
     { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Discussion", icon: "create-outline", key: "Forum" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
-    
-   
-  ]
+  ];
 
   const AdminItems = [
     { label: "Dashboard", icon: "analytics-outline", key: "dashboard" },
     { label: "User", icon: "person-circle-outline", key: "user" }, //
     { label: "Cooperative", icon: "storefront-outline", key: "coop" },
     { label: "Driver", icon: "car-outline", key: "driver" },
-    { label: "News", icon: "newspaper-outline", key: "news" }, 
+    { label: "News", icon: "newspaper-outline", key: "news" },
     { label: "Discussion", icon: "people-outline", key: "community" },
     { label: "Categories", icon: "list-outline", key: "category" },
     { label: "Types", icon: "layers-outline", key: "types" },
     { label: "Withdraws", icon: "wallet-outline", key: "withdraws" },
     { label: "Refund", icon: "refresh-outline", key: "refund" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
-   
   ];
 
   const NoItems = [
@@ -92,18 +102,17 @@ const UserSidebar = () => {
   const DriverItems = [
     { label: "Deliveries", icon: "cube-outline", key: "deliveries" },
     { label: "Profile", icon: "person-outline", key: "profile" },
-        { label: "Messages", icon: "chatbubble-outline", key: "messages" },
+    { label: "Messages", icon: "chatbubble-outline", key: "messages" },
     { label: "History", icon: "time-outline", key: "history" },
     { label: "Tutorial", icon: "book-outline", key: "tutorial" },
-  ]
+  ];
 
   const handlePress = (key) => {
     setActiveItem(key);
 
     if (key === "Landing") {
       navigation.navigate("Landing");
-    }
-    else if(key === "home") {
+    } else if (key === "home") {
       navigation.navigate("Home", { screen: "ProductContainer" });
     } else if (key === "profile") {
       navigation.navigate("Profile");
@@ -115,8 +124,8 @@ const UserSidebar = () => {
       navigation.navigate("UserOrderList");
     } else if (key === "CoopDistance") {
       navigation.navigate("Home", { screen: "CoopDistance" });
-    } else if (key === "notifications"){
-      navigation.navigate("Home", { screen: "NotificationList" })
+    } else if (key === "notifications") {
+      navigation.navigate("Home", { screen: "NotificationList" });
     } else if (key === "Forum") {
       navigation.navigate("CommunityForum");
     } else if (key === "tutorial") {
@@ -131,14 +140,13 @@ const UserSidebar = () => {
 
     if (key === "Landing") {
       navigation.navigate("Landing");
-    }
-    else if (key === "home") {
+    } else if (key === "home") {
       navigation.navigate("Home", { screen: "ProductContainer" });
     } else if (key === "CoopDistance") {
       navigation.navigate("Home", { screen: "CoopDistance" });
-    }else if (key === "tutorial") {
+    } else if (key === "tutorial") {
       navigation.navigate("Tutorial");
-    }else if (key === "AboutUs") {
+    } else if (key === "AboutUs") {
       navigation.navigate("AboutUs");
     }
   };
@@ -163,17 +171,17 @@ const UserSidebar = () => {
       navigation.navigate("CommunityForum");
     } else if (key === "orders") {
       navigation.navigate("OrderList");
-    } else if (key === "notifications"){
-      navigation.navigate( "FNotificationList" )
-    } else if (key === "members"){
-      navigation.navigate( "MemberList" )
-    } else if (key === "rider"){
-      navigation.navigate( "Riderlist" )
-    } else if (key === "reviews"){
+    } else if (key === "notifications") {
+      navigation.navigate("FNotificationList");
+    } else if (key === "members") {
+      navigation.navigate("MemberList");
+    } else if (key === "rider") {
+      navigation.navigate("Riderlist");
+    } else if (key === "reviews") {
       navigation.navigate("ReviewList");
-    } else if (key === "inventory"){
+    } else if (key === "inventory") {
       navigation.navigate("InventoryList");
-    } else if (key === "wallet"){
+    } else if (key === "wallet") {
       navigation.navigate("WithdrawList");
     } else if (key === "tutorial") {
       navigation.navigate("Tutorial");
@@ -199,14 +207,14 @@ const UserSidebar = () => {
       navigation.navigate("PostList");
     } else if (key === "barGraph") {
       navigation.navigate("barGraph");
-    }else if (key === "category") {
+    } else if (key === "category") {
       navigation.navigate("CategoryList");
-    }else if (key === "types") {
+    } else if (key === "types") {
       navigation.navigate("TypeList");
-    } else if (key === "withdraws"){
-      navigation.navigate("WithdrawsList")
-    } else if (key === "refund"){
-      navigation.navigate("RefundProcess")
+    } else if (key === "withdraws") {
+      navigation.navigate("WithdrawsList");
+    } else if (key === "refund") {
+      navigation.navigate("RefundProcess");
     } else if (key === "tutorial") {
       navigation.navigate("Tutorial");
     }
@@ -222,11 +230,11 @@ const UserSidebar = () => {
     } else if (key === "history") {
       navigation.navigate("History");
     } else if (key === "messages") {
-      navigation.navigate("Messages");  
-    }else if (key === "tutorial") {
+      navigation.navigate("Messages");
+    } else if (key === "tutorial") {
       navigation.navigate("Tutorial");
     }
-  }
+  };
 
   const handleLogoutSocket = () => {
     console.log(`Client emitting removeUser with socket.id: ${socket?.id}`);
@@ -267,21 +275,20 @@ const UserSidebar = () => {
           userslogin?.roles &&
           userslogin?.roles.includes("Admin") ? (
           <Text style={styles.profileRole}>Admin</Text>
-        ) : 
-        context?.stateUser?.isAuthenticated &&
-        userslogin?.roles &&
-        userslogin?.roles.includes("Driver") ? (
-        <>
-          <Image
-            source={{ uri: userslogin?.image?.url }}
-            style={styles.profileImage}
-          />
-          <Text style={styles.profileName}>
-            {userslogin?.firstName} {userslogin?.lastName}
-          </Text>
-          <Text style={styles.profileRole}>Driver</Text>
-        </>
-      ) : null}
+        ) : context?.stateUser?.isAuthenticated &&
+          userslogin?.roles &&
+          userslogin?.roles.includes("Driver") ? (
+          <>
+            <Image
+              source={{ uri: userslogin?.image?.url }}
+              style={styles.profileImage}
+            />
+            <Text style={styles.profileName}>
+              {userslogin?.firstName} {userslogin?.lastName}
+            </Text>
+            <Text style={styles.profileRole}>Driver</Text>
+          </>
+        ) : null}
       </View>
 
       {context?.stateUser &&
@@ -326,9 +333,9 @@ const UserSidebar = () => {
               style={[styles.menuItem, styles.logoutButton]}
               onPress={() => {
                 handleLogoutSocket();
-                AsyncStorage.removeItem("jwt"), 
-                AsyncStorage.removeItem("cartItems"),
-                dispatch(clearCart());
+                AsyncStorage.removeItem("jwt"),
+                  AsyncStorage.removeItem("cartItems"),
+                  dispatch(clearCart());
                 logoutUser(context.dispatch);
                 navigation.navigate("Home");
                 dispatch(getProduct());
@@ -379,9 +386,9 @@ const UserSidebar = () => {
               style={[styles.menuItem, styles.logoutButton]}
               onPress={() => {
                 handleLogoutSocket();
-                AsyncStorage.removeItem("jwt"), 
-                AsyncStorage.removeItem("cartItems"),
-                dispatch(clearCart());
+                AsyncStorage.removeItem("jwt"),
+                  AsyncStorage.removeItem("cartItems"),
+                  dispatch(clearCart());
                 logoutUser(context.dispatch);
                 navigation.navigate("Home");
                 dispatch(getProduct());
@@ -397,9 +404,61 @@ const UserSidebar = () => {
         userslogin?.roles[0] &&
         userslogin?.roles[0]?.includes("Admin") ? (
         <>
-        <ScrollView>
+          <ScrollView>
+            <View style={styles.menuContainer}>
+              {AdminItems.map((item) => (
+                <TouchableOpacity
+                  key={item.key}
+                  style={[
+                    styles.menuItem,
+                    activeItem === item.key
+                      ? { backgroundColor: "#fef8e5" }
+                      : null,
+                  ]}
+                  onPress={() => AdminPress(item.key)}
+                >
+                  <Ionicons
+                    name={item.icon}
+                    size={24}
+                    color={activeItem === item.key ? "#000" : "#666"}
+                  />
+                  <Text
+                    style={[
+                      styles.menuLabel,
+                      activeItem === item.key ? styles.activeLabel : null,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+          <View style={styles.footerContainer}>
+            <TouchableOpacity
+              style={[styles.menuItem, styles.logoutButton]}
+              onPress={() => {
+                handleLogoutSocket();
+                AsyncStorage.removeItem("jwt"),
+                  AsyncStorage.removeItem("cartItems"),
+                  dispatch(clearCart());
+                logoutUser(context.dispatch);
+                navigation.navigate("Home");
+                dispatch(getProduct());
+              }}
+            >
+              <Ionicons name="log-out-outline" size={24} color="#fff" />
+              <Text style={styles.logoutLabel}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      ) : context?.stateUser &&
+        context?.stateUser?.isAuthenticated &&
+        userslogin?.roles[0] &&
+        userslogin?.roles[0]?.includes("Driver") ? (
+        <>
           <View style={styles.menuContainer}>
-            {AdminItems.map((item) => (
+            {DriverItems.map((item) => (
               <TouchableOpacity
                 key={item.key}
                 style={[
@@ -408,7 +467,7 @@ const UserSidebar = () => {
                     ? { backgroundColor: "#fef8e5" }
                     : null,
                 ]}
-                onPress={() => AdminPress(item.key)}
+                onPress={() => DriverPress(item.key)}
               >
                 <Ionicons
                   name={item.icon}
@@ -426,16 +485,13 @@ const UserSidebar = () => {
               </TouchableOpacity>
             ))}
           </View>
-          </ScrollView>
           <View style={styles.footerContainer}>
             <TouchableOpacity
               style={[styles.menuItem, styles.logoutButton]}
               onPress={() => {
                 handleLogoutSocket();
-                AsyncStorage.removeItem("jwt"),
-                AsyncStorage.removeItem("cartItems"),
-                 dispatch(clearCart());
-                 logoutUser(context.dispatch);
+                AsyncStorage.removeItem("jwt"), dispatch(clearCart());
+                logoutUser(context.dispatch);
                 navigation.navigate("Home");
                 dispatch(getProduct());
               }}
@@ -445,57 +501,7 @@ const UserSidebar = () => {
             </TouchableOpacity>
           </View>
         </>
-      ) : context?.stateUser &&
-      context?.stateUser?.isAuthenticated &&
-      userslogin?.roles[0] &&
-      userslogin?.roles[0]?.includes("Driver") ? (
-      <>
-        <View style={styles.menuContainer}>
-          {DriverItems.map((item) => (
-            <TouchableOpacity
-              key={item.key}
-              style={[
-                styles.menuItem,
-                activeItem === item.key
-                  ? { backgroundColor: "#fef8e5" }
-                  : null,
-              ]}
-              onPress={() => DriverPress(item.key)}
-            >
-              <Ionicons
-                name={item.icon}
-                size={24}
-                color={activeItem === item.key ? "#000" : "#666"}
-              />
-              <Text
-                style={[
-                  styles.menuLabel,
-                  activeItem === item.key ? styles.activeLabel : null,
-                ]}
-              >
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <View style={styles.footerContainer}>
-          <TouchableOpacity
-            style={[styles.menuItem, styles.logoutButton]}
-            onPress={() => {
-              handleLogoutSocket();
-              AsyncStorage.removeItem("jwt"), 
-              dispatch(clearCart());
-              logoutUser(context.dispatch);
-              navigation.navigate("Home");
-              dispatch(getProduct());
-            }}
-          >
-            <Ionicons name="log-out-outline" size={24} color="#fff" />
-            <Text style={styles.logoutLabel}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      </>
-    ) : (
+      ) : (
         <>
           <View style={styles.menuContainer}>
             {NoItems.map((item) => (
@@ -542,6 +548,5 @@ const UserSidebar = () => {
     </View>
   );
 };
-
 
 export default UserSidebar;

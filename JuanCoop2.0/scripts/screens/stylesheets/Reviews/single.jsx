@@ -89,4 +89,33 @@ export default StyleSheet.create({
     color: colorCode.lightGray,
     marginTop: normalize(10, "height"),
   },
+  reviewImage: {
+    width: normalize(100),
+    height: normalize(100),
+    borderRadius: normalize(8),
+    marginRight: normalize(10),
+    marginTop: normalize(5, "height"),
+    marginBottom: normalize(5, "height"),
+    resizeMode: "cover",
+    borderColor: colorCode.darkGray,  
+    borderWidth: 1,
+  },
+ reviewImageTitle:{
+    fontSize: normalize(14),
+    fontWeight: "bold"
+  },
+  replyButton: {
+    backgroundColor: colorCode.CyberYellow,
+    padding: normalize(10),
+    paddingHorizontal: normalize(25),
+    borderRadius: normalize(20),
+    alignItems: "flex-end",
+    alignSelf: "flex-end",
+    marginTop: normalize(10, "height"),
+    borderWidth: 1,
+  },
+  replyButtonText: {
+    color: colorCode.black,
+    fontSize: normalize(14),
+  },
 });

@@ -36,7 +36,6 @@ const UserOrderList = () => {
   const [refresh, setRefresh] = React.useState(false);
   const [refreshing, setRefreshing] = useState(false);
 const [selectedTab, setSelectedTab] = useState("Pending");
-  // const filteredOrders = orders?.map((order) => ({...order,orderItems: order.orderItems.filter((item) => item.orderStatus !== "Cancelled"), })).filter((order) => order.orderItems.length > 0);
 
  const filterTab = orders
   ?.map((order) => ({
@@ -194,6 +193,7 @@ const [selectedTab, setSelectedTab] = useState("Pending");
                       orderItem?._id,
                       orderItem?.coopUser,
                       item?.paymentMethod
+
                     )
                   }
                 >

@@ -3,7 +3,6 @@ const validator = require("validator");
 const { RESOURCE } = require("../constants/index");
 const { ref } = require("pdfkit");
 
-
 const productSchema = new mongoose.Schema({
   productName: {
     type: String,
@@ -14,34 +13,40 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please enter the product description!"],
   },
-  stock:[
+  stock: [
     {
-       type: mongoose.Schema.ObjectId,
-       ref: RESOURCE.INVENTORYM,
-    }
+      type: mongoose.Schema.ObjectId,
+      ref: RESOURCE.INVENTORYM,
+    },
   ],
-  category: [{
-    type: String,
-    ref: RESOURCE.CATEGORYS,
-  }],
-  type: [{
-    type: String,
-    ref: RESOURCE.TYPE,
-  }],
-  image: [{
-    public_id: {
+  category: [
+    {
       type: String,
-      required: true,
+      ref: RESOURCE.CATEGORYS,
     },
-    url: {
+  ],
+  type: [
+    {
       type: String,
-      required: true,
+      ref: RESOURCE.TYPE,
     },
-    originalname: {
-      type: String,
-      required: true,
+  ],
+  image: [
+    {
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+      originalname: {
+        type: String,
+        required: true,
+      },
     },
-  }],
+  ],
   numOfReviews: {
     type: Number,
     default: 0,
@@ -89,7 +94,7 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
-      sentimentScore:{
+      sentimentScore: {
         type: Number,
         default: 0,
       },
@@ -109,6 +114,39 @@ const productSchema = new mongoose.Schema({
           },
         },
       ],
+      replyComment: [
+        {
+          commenting: {
+            type: String,
+            required: true,
+          },
+          user: {
+            type: mongoose.Schema.ObjectId,
+            ref: "user",
+            required: true,
+          },
+          image: [
+            {
+              public_id: {
+                type: String,
+                required: true,
+              },
+              url: {
+                type: String,
+                required: true,
+              },
+              originalname: {
+                type: String,
+                required: true,
+              },
+            },
+          ],
+          createdAt: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
       createdAt: {
         type: Date,
         default: Date.now,
@@ -120,12 +158,12 @@ const productSchema = new mongoose.Schema({
     ref: RESOURCE.FARMINFO,
     required: true,
   },
-  activeAt:{
+  activeAt: {
     type: String,
     enum: ["active", "inactive"],
     default: "inactive",
   },
-  apporivedAt:{
+  apporivedAt: {
     type: Date,
     default: null,
   },
@@ -134,7 +172,7 @@ const productSchema = new mongoose.Schema({
     default: Date.now,
   },
   deletedAt: {
-    type: Date, 
+    type: Date,
     default: null,
   },
 });

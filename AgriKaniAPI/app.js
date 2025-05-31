@@ -34,8 +34,9 @@ const wallet = require("./routes/wallets");
 const transaction = require("./routes/transaction")
 const weather = require("./routes/weather");
 const axios = require("axios");
+const User = require("./models/user");
 const { sendEmail } = require("./utils/sendMail");
-
+const { sendFcmNotification } = require("./services/sendFcmNotif");
 
 // app.use("/", (req, res)=> res.status(200).send("Welcome to Jcoop API"));
 app.use(cors(corsOptions));

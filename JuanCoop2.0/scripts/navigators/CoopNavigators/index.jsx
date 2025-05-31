@@ -32,6 +32,8 @@ import GcashWithdraw from "@screens/Farmer/Withdraw/GcashWithdrawForm";
 import CreateWithdraw from "@screens/Farmer/Withdraw/CreateWithdraw";
 import BlogListCoop from "@screens/Farmer/Blog/BlogListCoop";
 import BlogCards from "@screens/Farmer/Blog/BlogCards";
+import ReplyReview from "@screens/Farmer/Review/ReplyReview";
+
 import { DrawerDesign, BackButton, ListContainer } from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
@@ -240,8 +242,7 @@ const Index = () => {
         name="InfoCancelled"
         component={InfoCancelled}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Cancelled Order" />,
         }}
       />
 
@@ -256,7 +257,9 @@ const Index = () => {
       <Stack.Screen
         name="OtpRider"
         component={Otp}
-        options={{ headerShown: false }}
+        options={{ 
+          header: (props) => <BackButton {...props} title="OTP Verification" />,
+        }}
       />
 
       <Stack.Screen
@@ -310,6 +313,15 @@ const Index = () => {
         component={BlogCards}
         options={{ header: (props) => <BackButton {...props} title="Blog" /> }}
       />
+
+       <Stack.Screen
+        name="ReplyReview"
+        component={ReplyReview}
+        options={{
+          header: (props) => <BackButton {...props} title="Reply"  />,
+        }}
+      />
+            
     </Stack.Navigator>
   );
 };

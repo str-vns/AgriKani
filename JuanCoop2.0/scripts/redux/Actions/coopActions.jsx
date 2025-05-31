@@ -255,8 +255,8 @@ export const singleCooperative = (coopId, token) => async (dispatch) => {
     };
 
     const { data } = await axios.get(`${baseURL}coop/${coopId}`, config);
-
     dispatch({ type: COOP_SINGLE_SUCCESS, payload: data.details });
+    return data.details;
   } catch (error) {
     dispatch({
       type: COOP_SINGLE_FAIL,
@@ -307,7 +307,8 @@ export const inactiveCooperative = (token) => async (dispatch) => {
   }
 };
 
-export const activeCooperative = (coopId, userId, token) => async (dispatch) => {
+export const activeCooperative =
+  (coopId, userId, token) => async (dispatch) => {
     try {
       dispatch({ type: COOP_ACTIVE_REQUEST });
 

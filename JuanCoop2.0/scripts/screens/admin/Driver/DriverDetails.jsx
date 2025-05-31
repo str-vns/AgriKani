@@ -10,13 +10,11 @@ import {
   ActivityIndicator,
   Modal,
   StyleSheet,
-  RefreshControl, // Import RefreshControl
+  RefreshControl,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ImageViewer from "react-native-image-zoom-viewer";
 import { driverApproved, driverRejected } from "@redux/Actions/driverActions";
 import messaging from "@react-native-firebase/messaging";
 

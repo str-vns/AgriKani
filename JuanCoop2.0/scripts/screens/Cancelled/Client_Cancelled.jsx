@@ -32,6 +32,7 @@ const Client_Cancelled = (props) => {
      const [fcmToken, setFcmToken] = useState(null);
      const [refresh, setRefresh] = useState(false);
 
+     console.log("cancelled data", props.route.params);
      const reasons = [
        "Changed my mind",
        "Found a better deal",
@@ -116,11 +117,12 @@ const Client_Cancelled = (props) => {
                     dispatch(updateOrderStatus(orderId, status, token));
                     
                     const notification = {
-                        title: `Order Cancelled`,
-                        content: `The order has been cancelled by the User ${userName} ${lastName}.`,
+                        title: `🥕 Order Cancelled`,
+                        content: `The order has been cancelled by the User ${userName}${lastName}.`,
                         user: coop?.user?._id,
                         fcmToken: fcmToken,
-                        type: "order",
+                        type: "cancelled",
+                        url: "https://res.cloudinary.com/diljhwf3a/image/upload/v1746856018/files/mkenwabkxpdtpa6vmwul.png",
                     };
                     
                     socket.emit("sendNotification", {
@@ -158,6 +160,7 @@ const Client_Cancelled = (props) => {
             lastName: lastName,
             inventoryProduct: inventoryId,
             orderId: orderId,
+
        }
               navigation.navigate("OnlinePay_Cancelled", { cancelledData: cancelledInfo, others: otherInfo });
             } else {
@@ -166,7 +169,7 @@ const Client_Cancelled = (props) => {
                     cancelledBy: context.stateUser.userProfile._id,
                     content: selectedReason,
                 };
-                dispatch(createCancelled(cancel, token));
+                // dispatch(createCancelled(cancel, token));
 
                 setRefresh(true);
                 try {
@@ -174,23 +177,25 @@ const Client_Cancelled = (props) => {
                         orderStatus: "Cancelled",
                         inventoryProduct: inventoryId,
                     };
-                    dispatch(updateOrderStatus(orderId, status, token));
+                    // dispatch(updateOrderStatus(orderId, status, token));
                     
                     const notification = {
-                        title: `Order Cancelled`,
-                        content: `The order has been cancelled by the User ${userName} ${lastName}.`,
+                        title: `🥕 Order Cancelled`,
+                        content: `The order has been cancelled by the User ${userName}${lastName}.`,
                         user: coop?.user?._id,
                         fcmToken: fcmToken,
-                        type: "order",
+                        type: "cancelled",
+                        url: "https://res.cloudinary.com/diljhwf3a/image/upload/v1746856018/files/mkenwabkxpdtpa6vmwul.png",
                     };
                     
+                    console.log("notification", notification);
                     socket.emit("sendNotification", {
                         senderName: userName,
                         receiverName: coop?.user?._id,
                         type: "order",
                     });
                     
-                    dispatch(sendNotifications(notification, token));
+                    // dispatch(sendNotifications(notification, token));
                     alert("Your order has been successfully cancelled.");
                 } catch (error) {
                     console.error("Error deleting or refreshing orders:", error);

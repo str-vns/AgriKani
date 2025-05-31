@@ -16,7 +16,6 @@ import axios from "axios";
 import baseURL from "@assets/commons/baseurl";
 
 export const sendNotifications = (notification, token) => async (dispatch) => {
-  console.log(notification);
   try {
     dispatch({ type: CREATE_NOTIFICATION_REQUEST });
 
