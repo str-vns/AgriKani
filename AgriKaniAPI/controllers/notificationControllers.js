@@ -6,7 +6,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const { STATUSCODE } = require("../constants/index");
 
 exports.createNotification = [
-    // CheckField(["title", "content", "user", "senderId"]),
+    CheckField(["title", "content", "user"]),
     asyncHandler(async (req, res) => {
         const notification = await notificationProcess.CreateNotification(req);
     

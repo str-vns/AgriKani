@@ -11,17 +11,16 @@ const ErrorHandler = require("../utils/errorHandler");
 const { analyzeMixedLanguage } = require("../utils/mixLanguage");
 
 exports.CreateProductReview = async (req) => {
-  console.log(req.body.user)
+  console.log(req.files)  
   const userId = req.body.user
   const orderId = req.body.order
-    // if (!mongoose.Types.ObjectId.isValid(req.body.user))
-    //     throw new ErrorHandler(`Invalid Address ID: ${req.body.user}`);
     const product = await Product.findById(req.body.productId)
     const users = await User.findById(req.body.user)
     
     const isReview = product.reviews.find(
       (prod) => prod.user?.toString() === userId?.toString() && prod.order?.toString() === orderId?.toString()
     );
+
     let image = product.reviews.image || []
     if(req.files || Array.isArray(req.files))
     {
@@ -37,8 +36,9 @@ exports.CreateProductReview = async (req) => {
           );
         image = await uploadImageMultiple(req.files)
     }
+
     var result = analyzeMixedLanguage(req.body.comment)
-    console.log(result)
+
     if(isReview) {
         product.reviews.forEach((review) => {
             if(review.user?.toString() === userId?.toString())
@@ -170,6 +170,46 @@ exports.CreateCoopReview = async (req) => {
     return farm
 }
 
+exports.CreateCoopReplyReview = async (req) => {
+  console.log(req.body);
+  if (!mongoose.Types.ObjectId.isValid(req.body.reviewId)) {
+    throw new ErrorHandler(`Invalid Review ID: ${req.body.reviewId}`);
+  }
+
+  const product = await Product.findOne({ "reviews._id": req.body.reviewId });
+  if (!product) {
+    throw new ErrorHandler(`Review not found with ID: ${req.body.reviewId}`);
+  }
+
+  const review = product.reviews.id(req.body.reviewId);
+  if (!review) {
+    throw new ErrorHandler(`Review not found with ID: ${req.body.reviewId}`);
+  }
+
+  const userId = req.body.user;
+
+  const isReview = review.replyComment?.find(
+    (prod) => prod.user?.toString() === userId?.toString()
+  );
+
+  if (isReview) {
+    review.replyComment.forEach((reply) => {
+      if (reply.user?.toString() === userId?.toString()) {
+        reply.commenting = req.body.comment;
+      }
+    });
+  } else {
+    review.replyComment.push({
+      commenting: req.body.comment,
+      user: userId,
+    });
+  }
+
+
+  await product.save({ validateBeforeSave: false });
+
+  return req.body.reviewId;
+};
 
 exports.CreateCourierReview = async (req) => {
   const userId = req.body.user

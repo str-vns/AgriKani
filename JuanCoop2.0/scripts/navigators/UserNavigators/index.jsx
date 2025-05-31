@@ -110,7 +110,7 @@ const UserNavigation = () => {
         name="AddReviews"
         component={AddReviews}
         options={{
-          headerShown: false,
+            header: (props) => <BackButton {...props} title="Review" />,
         }}
       />
 
@@ -133,7 +133,7 @@ const UserNavigation = () => {
         name="Client_Cancelled"
         component={ClientCancelled}
         options={{
-          headerShown: false,
+          header: (props) => <BackButton {...props} title="Cancelled" />,
         }}
       />
 
@@ -141,8 +141,7 @@ const UserNavigation = () => {
         name="OnlinePay_Cancelled"
         component={OnlinePayCancelled}
         options={{
-          headerShown: true,
-          title: "Refund",
+         header: (props) => <BackButton {...props} title="Online Payment" />,
         }}
       />
 
@@ -150,8 +149,7 @@ const UserNavigation = () => {
         name="Gcash_Cancelled"
         component={GcashCancelled}
         options={{
-          headerShown: true,
-          title: "Gcash Information",
+         header: (props) => <BackButton {...props} title="G Cash" />,
         }}
       />
 
@@ -159,8 +157,7 @@ const UserNavigation = () => {
         name="Paymaya_Cancelled"
         component={PaymayaCancelled}
         options={{
-          headerShown: true,
-          title: "Paymaya Information",
+          header: (props) => <BackButton {...props} title="Paymaya" />,
         }}
       />
 
@@ -168,8 +165,7 @@ const UserNavigation = () => {
         name="Confirm_Cancelled"
         component={ConfirmCancelled}
         options={{
-          headerShown: true,
-          title: "Refund",
+           header: (props) => <BackButton {...props} title="Refund" />,
         }}
       />
     </Stack.Navigator>

@@ -1,17 +1,24 @@
-import React from "react";
-import { View, Text, Image, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { Rating } from "react-native-elements";
+import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import styles from "@screens/stylesheets/Reviews/single";
+import { ImageShowModal } from "@shared/Modal";
 
 const RatingandReview = (props) => {
   const reviews = props?.route?.params?.reviews?.reviews || [];
-
+  const prod = props?.route?.params?.reviews;
+  const navigation = useNavigation();
+  const [imagePick, setImagePick] = useState(null);
+  const [isViewVisible, setIsViewVisible] = useState(false);
   const calculateAverage = (key) => {
     if (!reviews.length) return 0;
     const total = reviews.reduce((sum, review) => sum + (review[key] || 0), 0);
     return total / reviews.length;
   };
+
+  console.log("Reviews:", );
 
   const toPercentage = (rating) => Math.round((rating / 5) * 100);
 
@@ -43,21 +50,17 @@ const RatingandReview = (props) => {
     return "😡 Negative";
   };
 
+  const handleImageClick = (imageUrl) => {
+    setImagePick(imageUrl);
+    setIsViewVisible(true);
+  };
+
+  const handleReviewSubmit = (reviews) => {
+    navigation.navigate("ReplyReview", { reviews, prod: prod?._id });
+  };
   return (
     <View style={styles.container}>
-      {/* Header */}
-      {/* <View style={styles.header}>
-      <View style={styles.header}>
-              <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={28} color="black" />
-              </TouchableOpacity>
-
-            </View>
-        <Text style={styles.headerTitle}>Review Summary</Text>
-      </View> */}
-
       <ScrollView>
-        {/* Overall Ratings Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Overall Ratings</Text>
 
@@ -149,6 +152,38 @@ const RatingandReview = (props) => {
                   <Text style={styles.reviewMessage}>
                     Comment: {review?.comment || "No review message available."}
                   </Text>
+                  {review?.image?.length > 0 && (
+                    <View>
+                      <Text style={styles.reviewMessage}>Image:</Text>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                      >
+                        {review.image.map((image, imgIndex) => (
+                          <View key={imgIndex} style={{ marginRight: 10 }}>
+                            <TouchableOpacity
+                              onPress={() => handleImageClick(image.url)}
+                            >
+                              <Image
+                                key={imgIndex}
+                                source={{ uri: image.url }}
+                                style={styles.reviewImage}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+                  <TouchableOpacity
+                    style={styles.replyButton}
+                    onPress={() => handleReviewSubmit(review)}
+                  >
+                    <Text style={styles.replyText}>
+                      <Icon name="chatbubble-outline" size={13} color="#000" />{" "}
+                      Reply
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))
@@ -157,6 +192,13 @@ const RatingandReview = (props) => {
           )}
         </View>
       </ScrollView>
+      {isViewVisible && (
+        <ImageShowModal
+          modalVisible={isViewVisible}
+          selectedImage={imagePick || "https://via.placeholder.com/150"}
+          onPress={() => setIsViewVisible(false)}
+        />
+      )}
     </View>
   );
 };

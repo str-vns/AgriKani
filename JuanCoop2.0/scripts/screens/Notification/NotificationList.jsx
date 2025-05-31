@@ -15,6 +15,8 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthGlobal from "@redux/Store/AuthGlobal";
 import moment from 'moment';
+import axios from "axios";
+import notifee from '@notifee/react-native';
 
 const NotificationList = ({ navigation }) => {
   const navigate = useNavigation()
@@ -45,7 +47,6 @@ const NotificationList = ({ navigation }) => {
     }, [dispatch, token])
   );
 
- 
   const onRefresh = useCallback(async () => {
     setRefresh(true);
   
@@ -83,6 +84,8 @@ const NotificationList = ({ navigation }) => {
     }
   };
 
+  
+
   const renderOrder = ({ item }) => {
     return (
       <View style={styles.notificationsContainer}>
@@ -114,16 +117,6 @@ const NotificationList = ({ navigation }) => {
 
   return (
     <View style={userRole}>
-      {/* <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.drawerButton}
-          onPress={() => navigation.toggleDrawer()}
-        >
-          <Ionicons name="menu" size={34} color="black" />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Notificmmmation</Text>
-      </View> */}
       <TouchableOpacity
       onPress={() => handleReadAll()}
     >

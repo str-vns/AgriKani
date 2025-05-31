@@ -17,6 +17,9 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { getSingleProduct } from "@redux/Actions/productActions";
+import { CamModal } from "@shared/Modal";
+import styles from "@stylesheets/Reviews/userReview";
+import { colorCode } from "@stylesheets/colorCode";
 
 const UserAddReview = (props) => {
   const context = useContext(AuthGlobal);
@@ -27,17 +30,22 @@ const UserAddReview = (props) => {
   const transactionId = orderId;
   const navigation = useNavigation();
   const [review, setReview] = useState("");
+  const [reviewSeller, setReviewSeller] = useState("");
   const [stars, setStars] = useState(0);
-  const [dStars,  setDStars] = useState(0);
-  const [sStars,  setSStars] = useState(0);
+  const [dStars, setDStars] = useState(0);
+  const [sStars, setSStars] = useState(0);
   const [token, setToken] = useState(null);
   const [errormessage, setErrorMessage] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const maxImage = 5;
+  const [images, setImages] = useState([]);
+
+  console.log(context?.stateUser?.roles)
   const isReview = products?.reviews?.find(
     (prod) =>
       prod.user?.toString() === userId?.toString() &&
       prod.order?.toString() === transactionId?.toString()
   );
-  console.log("Is Review:", isReview);
 
   useFocusEffect(
     useCallback(() => {
@@ -76,8 +84,8 @@ const UserAddReview = (props) => {
   const handleSStar = (rating) => {
     setSStars(rating);
   };
-  
-  const handlePostReview = () => {
+
+  const handlePostReview = async() => {
     if (stars === 0) {
       setErrorMessage("Please rate the product");
       return;
@@ -90,35 +98,33 @@ const UserAddReview = (props) => {
       setErrorMessage("Please rate the seller's service");
       return;
     }
-  
+
     const comment = {
       user: userId,
       order: transactionId,
       productId: productId.product._id,
-      rating: stars,         // Product Quality Rating
-      driverRating: dStars,  // Delivery Speed Rating
-      serviceRating: sStars, // Seller Service Rating
+      rating: stars,
+      driverRating: dStars,
+      serviceRating: sStars,
       comment: review,
+      commentSeller: reviewSeller,
+      image: images,
     };
-  
-    console.log("📌 Submitting Review:", comment);
-  
-    dispatch(createComment(comment, token))
-      .then((response) => {
-        console.log("✅ Review Saved Successfully:", response);
-      })
-      .catch((error) => {
-        console.error("❌ Error Saving Review:", error);
-      });
-  
-    navigation.navigate("UserOrderList");
-    setReview("");
-    setStars(0);
-    setDStars(0);
-    setSStars(0);
-    setErrorMessage("");
+
+    const response = await dispatch(createComment(comment, token));
+
+    if (response.success) {
+      navigation.navigate("UserOrderList");
+      setReview("");
+      setStars(0);
+      setDStars(0);
+      setSStars(0);
+      setImages([]);
+      setErrorMessage("");
+    }
+
   };
-  
+
   useEffect(() => {
     if (isReview) {
       console.log("🔄 Existing Review Found:", isReview);
@@ -129,25 +135,39 @@ const UserAddReview = (props) => {
     }
   }, [isReview]);
   
-  const handleBack = () => {
-    console.log("Navigating back");
-    navigation.navigate("UserOrderList");
-  };
+  const starContainer = [
+    {
+      title: "Product Quality",
+      rating: stars,
+      onFinishRating: handleStar,
+      comment: review,
+      setComment: setReview,
+      placeholder: "Tell us about the product quality",
 
+    },
+    {
+      title: "Seller Service",
+      rating: sStars,
+      onFinishRating: handleSStar,
+      comment: reviewSeller,
+      setComment: setReviewSeller,  
+      placeholder: "Tell us about the seller's service & your Suggestions",
+    },
+    {
+      title: "Delivery Speed",
+      rating: dStars,
+      onFinishRating: handleDStar,
+
+    }
+  ]
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* <TouchableOpacity style={styles.backArrow} onPress={() => handleBack()}>
-        <Icon name="arrow-back-outline" size={24} color="#000" />
-      </TouchableOpacity>
-
-      <Text style={styles.title}>Product Ratings</Text> */}
-
       <Image
         source={require("@assets/img/yey.png")}
         style={styles.productImage}
         resizeMode="contain"
       />
-
+    
       <Text style={styles.question}>
         Please Leave Review To {productId.product.productName}
       </Text>
@@ -156,54 +176,81 @@ const UserAddReview = (props) => {
         you
       </Text>
 
-      <View style={styles.reviewSection}>
-        <Text style={styles.reviewCat}>Product Quality</Text>
+      {starContainer.map((item, index) => (
+   <View style={styles.reviewSection} key={index}>
+  
+        <Text style={styles.reviewCat}>{item.title}</Text>
         <AirbnbRating
           count={5}
-          defaultRating={stars}
-          onFinishRating={handleStar}
-          size={30}
+          showRating={false}
+          defaultRating={item.rating}
+          onFinishRating={item.onFinishRating}
+          size={20}
           starContainerStyle={styles.starContainer}
         />
-      </View>
 
-      {/* Text input */}
+        { item.title !== "Delivery Speed" && item.title !== "Seller Service" && (
       <TextInput
         style={styles.textInput}
-        placeholder="Tell us about your experience"
-        placeholderTextColor="#A9A9A9"
+        placeholder= {item.placeholder}
+        placeholderTextColor= {colorCode.darkGray}
+        textAlignVertical="top"
         multiline={true}
         numberOfLines={4}
-        value={review}
-        onChangeText={setReview}
+        value={item.comment}
+        maxLength={500}
+        onChangeText={item.setComment}
       />
+    )}
+    
+      {item.title === "Product Quality" && (
+        <>
+          <TouchableOpacity
+            style={styles.containerButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text>Add Image </Text>
+          </TouchableOpacity>
+          {images.length > 0 && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {images.map((image, index) => (
+                <View key={index} style={{ marginRight: 10 }}>
+                  <Image
+                    source={{ uri: image }}
+                    style={styles.imageSize}
+                    resizeMode="cover"
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      setImages((prev) => prev.filter((_, i) => i !== index));
+                    }}
+                    style={styles.closeButton}
+                  >
+                    <Icon name="close-circle" size={20} color={colorCode.PASTELRED} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          )}
+        </>
+      )}
 
-      {/* Seller Service Rating */}
-      <View style={styles.reviewSection}>
-        <Text style={styles.reviewCat}>Seller Service</Text>
-        <AirbnbRating
-          count={5}
-          defaultRating={sStars}
-          onFinishRating={handleSStar}
-          size={30}
-          starContainerStyle={styles.starContainer}
-        />
-      </View>
-
-      {/* Delivery Speed Rating */}
-      <View style={styles.reviewSection}>
-        <Text style={styles.reviewCat}>Delivery Speed</Text>
-        <AirbnbRating
-          count={5}
-          defaultRating={dStars}
-          onFinishRating={handleDStar}
-          size={30}
-          starContainerStyle={styles.starContainer}
-        />
-      </View>
-      
-
+   </View>
+      ))}
+   
       {errormessage ? <Error message={errormessage} /> : null}
+
+      {modalVisible && (
+        <CamModal
+          modalVisible={modalVisible}
+          onPress={setModalVisible}
+          isMultiple={maxImage}
+          isCurrent={images.length}
+          ImageReturn={(images) => {
+            setImages((prev) => [...prev, ...images].slice(0, maxImage));
+          }}
+        />
+      )}
 
       <TouchableOpacity style={styles.button} onPress={handlePostReview}>
         <Text style={styles.buttonText}>Post</Text>
@@ -211,81 +258,5 @@ const UserAddReview = (props) => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#F9F9F9",
-    paddingHorizontal: 16,
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  backArrow: {
-    position: "absolute",
-    left: 10,
-    top: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 20,
-  },
-  productImage: {
-    width: "100%",
-    height: 200,
-    marginBottom: 10,
-  },
-  question: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 10,
-  },
-  subText: {
-    fontSize: 14,
-    textAlign: "center",
-    color: "#A9A9A9",
-    marginBottom: 5,
-  },
-  textInput: {
-    height: 100,
-    borderColor: "#E0E0E0",
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
-    backgroundColor: "#FFFFFF",
-    textAlignVertical: "top",
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: "#FFC107",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  reviewSection: {
-    flexDirection: "column",
-    alignItems: "center", // Centers the entire section
-    marginBottom: 10,
-  },
-  reviewCat: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 5,
-    textAlign: "center",
-  },
-  starContainer: {
-    alignSelf: "center", // Centers stars
-    marginTop: -5, // Adjusts space between text and stars
-  },
-});
 
 export default UserAddReview;

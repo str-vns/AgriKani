@@ -181,7 +181,7 @@ export const OTPregister = (OtpData) => async (dispatch) => {
 };
 
 export const Profileuser = (userDataId, token) => async (dispatch) => {
-   console.log("userDataId", userDataId);
+
   try {
 
     dispatch({ type: USER_PROFILE_REQUEST });

@@ -7,19 +7,25 @@ import AuthGlobal from "@redux/Store/AuthGlobal";
 import { useDispatch } from "react-redux";
 import { Alert } from "react-native";
 import styles from "@stylesheets/Withdraw/create";
+import { sendNotifications } from "@redux/Actions/notificationActions";
+import messaging from "@react-native-firebase/messaging";
+import { singleCooperative } from "@redux/Actions/coopActions";
 
 const CreateWithdraw = (props) => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const context = useContext(AuthGlobal);
   const dispatch = useDispatch();
   const userId = context.stateUser?.userProfile?._id;
   const { paymentMethod, paymentData } = props.route.params;
   const [token, setToken] = useState(null);
+  const [fcmToken, setFcmToken] = useState(null);
 
   useEffect(() => {
     const fetchJwt = async () => {
       try {
         const res = await AsyncStorage.getItem("jwt");
+        const fcmToken = await messaging().getToken();
+        setFcmToken(fcmToken);
         if (res) {
           setToken(res);
         } else {
@@ -43,15 +49,35 @@ const CreateWithdraw = (props) => {
           onPress: async () => {
             const transactionData = {
               user: userId,
+              type: "WITHDRAW",
               amount: paymentData.amount,
               paymentMethod: paymentMethod,
               accountName: paymentData.name,
               accountNumber: paymentData.phone,
             };
-  
+
             try {
-              const transac = await dispatch(createTransaction(transactionData, token));
-  
+              const transac = await dispatch(
+                createTransaction(transactionData, token)
+              );
+
+              console.log("userId: ", userId);
+
+              const cooperative = await dispatch(
+                singleCooperative(userId, token)
+              );
+
+              const notification = {
+                title: "💳 New Transaction",
+                content: `A new request transaction has been created by ${cooperative.farmName} for withdrawal of ₱ ${paymentData.amount}.`,
+                type: "Withdraw",
+                user: "admin",
+                url: cooperative.image[0].url,
+                fcmToken: fcmToken,
+              };
+
+              await dispatch(sendNotifications(notification, token));
+
               if (transac === true) {
                 navigation.reset({
                   index: 0,
@@ -84,15 +110,13 @@ const CreateWithdraw = (props) => {
       <Text style={styles.label}>Amount:</Text>
       <Text style={styles.info}>₱ {paymentData.amount}</Text>
 
-
       <View style={styles.buttonContainer}>
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-        <Text style={styles.buttonText}>Confirm Withdraw</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+          <Text style={styles.buttonText}>Confirm Withdraw</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
-
 
 export default CreateWithdraw;

@@ -13,25 +13,31 @@ import { createDriver, clearErrors } from "@redux/Actions/driverActions";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Error from "@shared/Error";
+import messaging from "@react-native-firebase/messaging";
 import { OTPregister } from "@redux/Actions/userActions";
+import { sendNotifications } from "@redux/Actions/notificationActions";
+import { singleCooperative } from "@redux/Actions/coopActions";
 
 const Otp = (props) => {
   const registration = props.route.params;
   const navigation = useNavigation();
-  const dispatch = useDispatch()
-  const inputRefs = useRef([])
+  const dispatch = useDispatch();
+  const inputRefs = useRef([]);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const { loading, success, error } = useSelector((state) => state.driverApi);
   const [errors, setErrors] = useState("");
   const [timer, setTimer] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   const [token, setToken] = useState(null);
+  const [fcmToken, setFcmToken] = useState(null);
 
   useEffect(() => {
     const fetchJwt = async () => {
       try {
         const res = await AsyncStorage.getItem("jwt");
         setToken(res);
+        const fcmToken = await messaging().getToken();
+        setFcmToken(fcmToken);
       } catch (error) {
         console.error("Error retrieving JWT: ", error);
       }
@@ -49,31 +55,31 @@ const Otp = (props) => {
   };
 
   const handleKeyPress = (index, event) => {
-    if (event.nativeEvent.key === 'Backspace') {
-      if (otp[index] === '') {
+    if (event.nativeEvent.key === "Backspace") {
+      if (otp[index] === "") {
         if (index > 0) {
           inputRefs.current[index - 1]?.focus();
         }
       } else {
         const newOtp = [...otp];
-        newOtp[index] = '';
+        newOtp[index] = "";
         setOtp(newOtp);
       }
     }
   };
 
   const Resend = () => {
-      setIsDisabled(true);
-      setTimer(7 * 60);
-      dispatch(OTPregister({ email: registration.riderRegister.email }));
-  }
+    setIsDisabled(true);
+    setTimer(7 * 60);
+    dispatch(OTPregister({ email: registration.riderRegister.email }));
+  };
 
   useEffect(() => {
     let interval;
     if (isDisabled && timer > 0) {
       interval = setInterval(() => {
         setTimer((prevTimer) => prevTimer - 1);
-      }, 1000); 
+      }, 1000);
     }
 
     if (timer === 0) {
@@ -82,53 +88,44 @@ const Otp = (props) => {
     }
 
     return () => clearInterval(interval);
-  }, [isDisabled, timer])
-
-  // useEffect(() => {
-  //   if (error) {
-  //     setErrors("Wrong OTP entered. Please try again!");
-
-  //     setTimeout(() => {
-  //       dispatch(clearErrors());
-  //       setErrors(""); 
-  //     }, 5000); 
-  //   } else if (success === true) {
-  //     Alert.alert(
-  //       "Driver created successfully!",
-  //       "Please wait for admin approval.",
-  //       [
-  //         {
-  //           text: "OK",
-  //           onPress: () => {
-  //             dispatch(clearErrors());
-  //             navigation.navigate("Riderlist");
-  //           },
-  //         },
-  //       ]
-  //     );
-  //   }
-  // },[error, success])
+  }, [isDisabled, timer]);
 
   const handleVerify = async () => {
     const otpString = otp.join('');
-  
+
     const registerInfo = {
       otp: otpString,
-      ...registration,  
+      ...registration,
     };
-   
+
     if (otpString.length < 6) {
       setErrors("Please fill the OTP");
     } else {
       const result = await dispatch(createDriver(registerInfo, token));
 
       if (result === false) {
-        setErrors("Wrong OTP entered. Please try again!")
+        setErrors("Wrong OTP entered. Please try again!");
         setTimeout(() => {
-        dispatch(clearErrors());
-        setErrors(""); 
-      }, 5000); 
+          dispatch(clearErrors());
+          setErrors("");
+        }, 5000);
       } else if (result === true) {
+
+        const cooperative = await dispatch(
+          singleCooperative(registration.riderRegister.user, token)
+        );
+
+        const notification = {
+          title: "🏍️ New Rider Registration",
+          content: `A new rider has registered with the farm cooperative: ${cooperative.farmName}. Please review and approve.`,
+          type: "rider",
+          user: "admin",
+          url: cooperative.image[0].url,
+          fcmToken: fcmToken,
+        };
+
+        await dispatch(sendNotifications(notification, token));
+
         Alert.alert(
           "Driver created successfully!",
           "Please wait for admin approval.",
@@ -144,15 +141,10 @@ const Otp = (props) => {
         );
       }
     }
-
-   
   };
- 
 
   return (
     <View style={styles.container}>
-
-
       <Text style={styles.title}>Email verification</Text>
       <Text style={styles.subtitle}>Enter your OTP code</Text>
 
@@ -166,28 +158,31 @@ const Otp = (props) => {
             onKeyPress={(event) => handleKeyPress(index, event)}
             keyboardType="numeric"
             maxLength={1}
-            ref={(ref) => inputRefs.current[index] = ref}
+            ref={(ref) => (inputRefs.current[index] = ref)}
           />
         ))}
       </View>
 
-      
       <View style={styles.resendContainer}>
         <Text style={styles.resendText}>Didn’t receive code?</Text>
-        <TouchableOpacity   onPress={Resend}
-        disabled={isDisabled}  >
-          <Text style={styles.resendButton}>{isDisabled
-            ? `Resend available in ${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}`
-            : "Resend again"}</Text>
+        <TouchableOpacity onPress={Resend} disabled={isDisabled}>
+          <Text style={styles.resendButton}>
+            {isDisabled
+              ? `Resend available in ${Math.floor(timer / 60)}:${String(
+                  timer % 60
+                ).padStart(2, "0")}`
+              : "Resend again"}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {errors ? <Error message={errors} /> : null}
-      <TouchableOpacity style={styles.verifyButton} 
-       onPress={handleVerify} >
-          {loading ? (<ActivityIndicator size="small" color="#fff" /> )
-                : 
-                (<Text style={styles.verifyText}>Verify</Text>)}
+      <TouchableOpacity style={styles.verifyButton} onPress={handleVerify}>
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.verifyText}>Verify</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -238,7 +233,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f9f9f9",
     marginHorizontal: 5, // Add spacing between boxes
   },
-  
+
   resendContainer: {
     flexDirection: "row",
     justifyContent: "center",

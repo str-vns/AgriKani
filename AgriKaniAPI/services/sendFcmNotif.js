@@ -1,15 +1,32 @@
 const admin = require('firebase-admin');
+const serviceAccount = require('../notifacation-ko-firebase-adminsdk-sahjo-8e50ce651d.json');
 
-exports.sendFcmNotification = async (user, title, content, fcmToken) => {
+// NOTE Three DOTS MEANS OK IN COMMENT
+admin.initializeApp({
+  credential: admin.credential.cert({
+    type: process.env.TYPE,
+    projectId: process.env.PROJECT_ID,
+    privateKeyId: process.env.PRIVATE_KEY_ID,
+    privateKey: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
+    clientEmail: process.env.CLIENT_EMAIL,
+    clientId: process.env.CLIENT_ID,
+    authUri: process.env.AUTH_URI,
+    tokenUri: process.env.TOKEN_URI,
+    authProviderX509CertUrl: process.env.AUTH_PROVIDER_X509_CERT_URL,
+    clientX509CertUrl: process.env.CLIENT_X509_CERT_URL,
+    universeDomain: process.env.UNIVERSE_DOMAIN  
+  })
+})
+
+console.log('admin', admin.credential);
+exports.sendFcmNotification = async (user, title, content, type, url, fcmToken) => {
   console.log('user', user);
-  if (!user.deviceToken || user.deviceToken.length === 0) {
+  if (!user?.deviceToken || user?.deviceToken.length === 0) {
     console.log("No device tokens found for the user.");
     return;
   }
 
-  
-  console.log("Device tokens found for the user:", user);
-  let registrationTokens = user.deviceToken;
+  let registrationTokens = user?.deviceToken;
   if (fcmToken) {
     registrationTokens = registrationTokens.filter(
       (token) => token !== fcmToken
@@ -22,14 +39,16 @@ exports.sendFcmNotification = async (user, title, content, fcmToken) => {
   }
 
   const message = {
-    data: {
-      key1: "value1",
-      key2: "value2",
-      key3: "value3",
+    data:  {
+      title: title,
+      body: content,
+      imageUrl: url,
+      type: type || "default",
     },
     notification: {
-      title,
+      title: title,
       body: content,
+      imageUrl: url,
     },
     apns: {
       payload: {
@@ -42,20 +61,20 @@ exports.sendFcmNotification = async (user, title, content, fcmToken) => {
   };
 
   try {
-    console.log("Sending notification to the user:", user.email);
+    console.log("Sending notification to the user:", user?.email);
     const response = await admin.messaging().sendEachForMulticast(message);
     console.log("Notification sent:", response);
 
-    if (response.failureCount > 0) {
-      const failedTokens = [];
-      response.responses.forEach((resp, idx) => {
-        if (!resp.success) {
-          console.log("Error sending to token:", response.responses[idx].error);
-          failedTokens.push(user.deviceToken[idx]);
-        }
-      });
-      console.log("Failed tokens:", failedTokens);
-    }
+    // if (response.failureCount > 0) {
+    //   const failedTokens = [];
+    //   response.responses.forEach((resp, idx) => {
+    //     if (!resp.success) {
+    //       console.log("Error sending to token:", response.responses[idx].error);
+    //       failedTokens.push(user.deviceToken[idx]);
+    //     }
+    //   });
+    //   console.log("Failed tokens:", failedTokens);
+    // }
   } catch (error) {
     console.error("Error sending notification:", error);
   }

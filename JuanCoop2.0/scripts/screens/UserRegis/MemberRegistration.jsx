@@ -56,7 +56,6 @@ function MemberRegistration() {
     navigation.navigate("UserProfile");
   };
 
-  
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -77,7 +76,6 @@ function MemberRegistration() {
       dispatch(memberDetails(userId, token));
     }, [])
   );
-
 
   useEffect(() => {
     (async () => {
@@ -235,16 +233,6 @@ function MemberRegistration() {
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.container}>
-        {/* <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.drawerButton}
-            onPress={() => navigation.openDrawer()}
-          >
-            <Ionicons name="menu" size={34} color="black" />
-          </TouchableOpacity>
-
-          <Text style={styles.headerTitle}>Member Registration</Text>
-        </View> */}
         <Image source={require("@assets/img/logo.png")} style={styles.logo} />
         <Text style={styles.textHeaderInput}>Address</Text>
         <TextInput
@@ -271,44 +259,34 @@ function MemberRegistration() {
         />
         <Text style={styles.textHeaderInput}>Choose Cooperative To Join</Text>
         <View style={styles.CoopContainer}>
-        <Picker
-  selectedValue={coopId}
-  style={styles.pickerStyle}
-  onValueChange={(itemValue) => setCoopId(itemValue)}
->
-  {/* <Picker.Item label="Select Cooperative" value="" enabled={false} />
-  {coops && coops.length > 0 ? (
-    coops
-    .filter(coop => !members.some(member => member.coopId?._id === coop._id))
-      .map((coop, index) => (
-        <Picker.Item
-          key={index}
-          label={coop.farmName || "None"}
-          value={{ coopId: coop._id, userId: coop.user._id }}
-          style={styles.pickerText}
-        />
-      ))
-  ) : (
-    <Text>No Cooperative</Text>
-  )}
-</Picker> */}
-<Picker.Item label="Select Cooperative" value="" enabled={false} />
-{coops && coops.length > 0 ? (
-  coops
-    .filter(coop => !(members?.some(member => member.coopId?._id === coop._id) ?? false)) // Ensures it works even if members is undefined
-    .map((coop, index) => (
-      <Picker.Item
-        key={index}
-        label={coop.farmName || "None"}
-        value={{ coopId: coop._id, userId: coop.user._id }}
-        style={styles.pickerText}
-      />
-    ))
-) : (
-  <Text>No Cooperative</Text>
-)}
-</Picker>
-
+          <Picker
+            selectedValue={coopId}
+            style={styles.pickerStyle}
+            onValueChange={(itemValue) => setCoopId(itemValue)}
+          >
+            <Picker.Item label="Select Cooperative" value="" enabled={false} />
+            {coops && coops.length > 0 ? (
+              coops
+                .filter(
+                  (coop) =>
+                    !(
+                      members?.some(
+                        (member) => member.coopId?._id === coop._id
+                      ) ?? false
+                    )
+                )
+                .map((coop, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={coop.farmName || "None"}
+                    value={{ coopId: coop._id, userId: coop.user._id }}
+                    style={styles.pickerText}
+                  />
+                ))
+            ) : (
+              <Text>No Cooperative</Text>
+            )}
+          </Picker>
         </View>
 
         <Text style={styles.imageText}>Barangay Clearance</Text>
@@ -367,7 +345,6 @@ function MemberRegistration() {
           )}
         </TouchableOpacity>
 
-        {/* Barangay Clearance */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -413,7 +390,6 @@ function MemberRegistration() {
           </View>
         </Modal>
 
-        {/* Valid ID */}
         <Modal
           animationType="slide"
           transparent={true}

@@ -10,6 +10,7 @@ import { createCancelled } from "@src/redux/Actions/cancelledActions";
 import { useSocket } from "../../../SocketIo";
 import { sendNotifications } from "@redux/Actions/notificationActions";
 
+
 const Confirm_Cancelled = (props) => {
   const navigation = useNavigation();
   const context = useContext(AuthGlobal);
@@ -20,7 +21,6 @@ const Confirm_Cancelled = (props) => {
   const [token, setToken] = useState(null);
   const [refresh, setRefresh] = useState(false);
 
-  console.log("paymentData", paymentData);
   useEffect(() => {
     const fetchJwt = async () => {
       try {
@@ -44,7 +44,7 @@ const Confirm_Cancelled = (props) => {
       content: cancelledData?.content,
     };
     const cancellation = await dispatch(createCancelled(cancel, token));
-    
+
     setRefresh(true);
     try {
       const status = {
@@ -54,25 +54,27 @@ const Confirm_Cancelled = (props) => {
         accountName: paymentData?.name,
         accountNumber: paymentData?.phone,
         cancelledId: cancellation?._id,
-
       };
+
       dispatch(updateOrderStatus(others?.orderId, status, token));
 
       const notification = {
-        title: `Order Cancelled`,
+        title: `🥕 Order Cancelled`,
         content: `The order has been cancelled by the User ${others?.userName} ${others?.lastName}.`,
         user: others?.coopUser,
         fcmToken: others?.fcmToken,
-        type: "order",
+        type: "cancelled",
+        url: "https://res.cloudinary.com/diljhwf3a/image/upload/v1746856018/files/mkenwabkxpdtpa6vmwul.png",
       };
+
+      await dispatch(sendNotifications(notification, token));
 
       socket.emit("sendNotification", {
         senderName: others?.userName,
         receiverName: others?.coopUser,
-        type: "order",
+        type: "cancelled",
       });
 
-      dispatch(sendNotifications(notification, token));
       alert("Your order has been successfully cancelled.");
     } catch (error) {
       console.error("Error deleting or refreshing orders:", error);
@@ -82,7 +84,7 @@ const Confirm_Cancelled = (props) => {
       navigation.reset({
         index: 0,
         routes: [{ name: "UserOrderList" }],
-      })
+      });
     }
   };
 
@@ -95,7 +97,7 @@ const Confirm_Cancelled = (props) => {
         {
           text: "Confirm",
           onPress: async () => {
-            handlecancelled()
+            handlecancelled();
           },
         },
       ]
@@ -172,7 +174,5 @@ const styles = StyleSheet.create({
     letterSpacing: 1, // Creates a polished appearance
   },
 });
-
-
 
 export default Confirm_Cancelled;

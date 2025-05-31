@@ -19,10 +19,9 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { sendNotifications } from "@redux/Actions/notificationActions";
 import messaging from "@react-native-firebase/messaging";
-import { useNavigation } from "@react-navigation/native";
+
 const UserChat = (props) => {
   const { item, conversations, isOnline } = props.route.params;
-  const navigation = useNavigation();
   const dispatch = useDispatch();
   const socket = useSocket();
   const scrollRef = useRef(null);
@@ -35,10 +34,10 @@ const UserChat = (props) => {
   const [images, setImages] = useState([]);
   const [fcmToken, setFcmToken] = useState("");
   const validConversations = Array.isArray(conversations) ? conversations : [];
-  console.log("validConversations", item?._id)
   const myConvo = validConversations.find((convo) =>
     convo.members.includes(item?._id)
   );
+  
   const isOnlinerUser = isOnline.find((user) => user.userId === item?._id);
   useEffect(() => {
     socket.on("getMessage", (data) => {

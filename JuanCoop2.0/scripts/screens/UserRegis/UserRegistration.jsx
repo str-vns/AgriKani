@@ -163,6 +163,8 @@ const UserRegistration = () => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
     });
 
     if (!result.canceled) {

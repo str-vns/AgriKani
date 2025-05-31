@@ -46,8 +46,7 @@ const Drawer = createDrawerNavigator();
 
 const Index = () => {
   const context = useContext(AuthGlobal);
-  console.log("context", context);
-
+  
   useEffect(() => {
     const initialize = async () => {
       await context.dispatch(isLogin(context.dispatch));
