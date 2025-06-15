@@ -37,6 +37,7 @@ import {
 } from "@react-native-firebase/messaging";
 import * as Notification from "expo-notifications";
 import Landing from "@screens/User/Landing";
+import { DrawerDesign, BackButton } from "@shared/DrawerDesign";
 import notifee, {
   AndroidStyle,
   AndroidImportance,
@@ -289,15 +290,67 @@ const Main = () => {
       return (
         <Stack.Navigator
           initialRouteName="Coop"
-          screenOptions={{ headerShown: false }}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
         >
-          <Stack.Screen name="Coop" component={CoopNavigators} />
-          <Stack.Screen name="User" component={UserNavigators} />
-          <Stack.Screen name="CoopProduct" component={CoopProductNavigators} />
-          <Stack.Screen name="Post" component={PostNavigators} />
-          <Stack.Screen name="Messaging" component={MessagesNavigators} />
-          <Stack.Screen name="Blog" component={BlogNavigators} />
-          <Stack.Screen name="Rider" component={RiderNavigators} />
+          <Stack.Screen
+            name="Coop"
+            component={CoopNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="User"
+            component={UserNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="CoopProduct"
+            component={CoopProductNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="Post"
+            component={PostNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="Messaging"
+            component={MessagesNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="Blog"
+            component={BlogNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="Rider"
+            component={RiderNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
         </Stack.Navigator>
       );
     } else if (
@@ -307,9 +360,19 @@ const Main = () => {
       return (
         <Stack.Navigator
           initialRouteName="Admin"
-          screenOptions={{ headerShown: false }}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
         >
-          <Stack.Screen name="Admin" component={AdminNavigators} />
+          <Stack.Screen
+            name="Admin"
+            component={AdminNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
         </Stack.Navigator>
       );
     } else if (
@@ -319,29 +382,111 @@ const Main = () => {
       return (
         <Stack.Navigator
           initialRouteName="Rider"
-          screenOptions={{ headerShown: false }}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
         >
-          <Stack.Screen name="Rider" component={RiderNavigators} />
-          <Stack.Screen name="User" component={UserNavigators} />
+          <Stack.Screen
+            name="Rider"
+            component={RiderNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="User"
+            component={UserNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
         </Stack.Navigator>
       );
     } else {
       return (
         <Stack.Navigator
           initialRouteName="Landing"
-          screenOptions={{ headerShown: false }}
+          options={{
+            headerShown: false,
+            tabBarShowLabel: false,
+          }}
         >
-          <Stack.Screen name="Landing" component={Landing} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-          <Stack.Screen name="Address" component={AddressNavigators} />
-          <Stack.Screen name="CheckOut" component={CheckOutNavigators} />
-          <Stack.Screen name="User" component={UserNavigators} />
-          <Stack.Screen name="Reviews" component={ReviewsNavigators} />
+          <Stack.Screen
+            name="Landing"
+            component={Landing}
+            options={{
+              header: (props) => (
+                <DrawerDesign
+                  {...props}
+                  title={`Hi, ${
+                    context?.stateUser?.userProfile?.firstName || "Guest"
+                  }`}
+                />
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="RegisterScreen"
+            component={RegisterScreen}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="Address"
+            component={AddressNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="CheckOut"
+            component={CheckOutNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="User"
+            component={UserNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
+          <Stack.Screen
+            name="Reviews"
+            component={ReviewsNavigators}
+            options={{
+              headerShown: false,
+              tabBarShowLabel: false,
+            }}
+          />
           {context?.stateUser?.isAuthenticated &&
             UserRoles?.roles.includes("Customer") &&
             UserRoles?.roles.includes("Member") && (
-              <Stack.Screen name="Post" component={PostNavigators} />
+              <Stack.Screen
+                name="Post"
+                component={PostNavigators}
+                options={{
+                  headerShown: false,
+                  tabBarShowLabel: false,
+                }}
+              />
             )}
         </Stack.Navigator>
       );

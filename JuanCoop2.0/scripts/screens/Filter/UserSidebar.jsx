@@ -536,7 +536,8 @@ const UserSidebar = () => {
             <TouchableOpacity
               style={[styles.menuItem, styles.logoutButton]}
               onPress={() => {
-                navigation.navigate("RegisterScreen", { screen: "Login" });
+                navigation.navigate("RegisterScreen", { screen: "Login" })
+                ;
               }}
             >
               <Ionicons name="log-in-outline" size={24} color="#fff" />

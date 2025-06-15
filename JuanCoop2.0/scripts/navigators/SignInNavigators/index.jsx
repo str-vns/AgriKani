@@ -6,6 +6,7 @@ import OTP from "@src/screens/UserRegis/UserOTP";
 import ForgotPass from "@src/screens/UserRegis/ForgotPass";
 import Email from "@src/screens/UserRegis/Email";
 import NewPassword from "@src/screens/UserRegis/NewPassword";
+import { DrawerDesign, BackButton } from "@shared/DrawerDesign";
 const Stack = createNativeStackNavigator();
 
 const SignInNavigators = () => {
@@ -15,8 +16,7 @@ const SignInNavigators = () => {
         name="Login"
         component={Login}
         options={{
-          headerShown: false,
-          tabBarShowLabel: false,
+          header: (props) => <BackButton {...props} title="Login" />,
         }}
       />
       <Stack.Screen
@@ -35,7 +35,7 @@ const SignInNavigators = () => {
           tabBarShowLabel: false,
         }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="ForgotPass"
         component={ForgotPass}
         options={{
@@ -43,7 +43,7 @@ const SignInNavigators = () => {
           tabBarShowLabel: false,
         }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="Email"
         component={Email}
         options={{
@@ -51,7 +51,7 @@ const SignInNavigators = () => {
           tabBarShowLabel: false,
         }}
       />
-       <Stack.Screen
+      <Stack.Screen
         name="NewPassword"
         component={NewPassword}
         options={{
