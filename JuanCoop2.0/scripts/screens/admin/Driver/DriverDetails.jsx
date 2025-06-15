@@ -17,13 +17,14 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { driverApproved, driverRejected } from "@redux/Actions/driverActions";
 import messaging from "@react-native-firebase/messaging";
+import { ImageShowModal } from "@shared/Modal";
 
 const DriverDetails = (props) => {
   const driver = props.route.params.driver;
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [selectedImage, setSelectedImage] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [isViewVisible, setIsViewVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState(null);
   const [fcmToken, setFcmToken] = useState(null);
@@ -49,7 +50,7 @@ const DriverDetails = (props) => {
 
   const handleImageClick = (imageUrl) => {
     setSelectedImage(imageUrl);
-    setModalVisible(true);
+    setIsViewVisible(true);
   };
 
   const handleApprove = async (driverId) => {
@@ -210,22 +211,13 @@ const DriverDetails = (props) => {
           </View>
         ) : null}
 
-        <Modal
-          visible={modalVisible}
-          transparent={true}
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <ImageViewer
-              imageUrls={[
-                { url: selectedImage || "https://via.placeholder.com/150" },
-              ]}
-              enableSwipeDown={true}
-              onSwipeDown={() => setModalVisible(false)}
-              style={styles.imageShow}
-            />
-          </View>
-        </Modal>
+        {isViewVisible && (
+          <ImageShowModal
+            modalVisible={isViewVisible}
+            selectedImage={selectedImage || "https://via.placeholder.com/150"}
+            onPress={() => setIsViewVisible(false)}
+          />
+        )}
       </View>
     </ScrollView>
   );
@@ -250,10 +242,26 @@ const styles = StyleSheet.create({
   requirement: { fontSize: 16, fontWeight: "bold", marginBottom: 10 },
   imageContainer: { alignItems: "center" },
   imageLook: { width: 200, height: 200, marginBottom: 10 },
-  buttonContainer: { flexDirection: "row", justifyContent: "space-between", marginTop: 20 },
-  approvedButton: { flex: 1, backgroundColor: "#28a745", padding: 10, borderRadius: 5, alignItems: "center", marginRight: 10 },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  approvedButton: {
+    flex: 1,
+    backgroundColor: "#28a745",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginRight: 10,
+  },
   buttonApproveText: { color: "white", fontSize: 14, fontWeight: "bold" },
-  modalContainer: { flex: 1, backgroundColor: "rgba(0,0,0,0.9)", justifyContent: "center", alignItems: "center" },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   imageShow: { width: "100%", height: "100%" },
 });
 
