@@ -4,6 +4,14 @@ It a full - stack development Online Marketplace build using For mobile React-Na
 
 It allows the users to purchase product, login, joining in membership and for cooperative they a able to track inventory, Crud for products.
 
+## 🖥️ Programming Languages Used
+
+**Frontend (Mobile):**
+- JavaScript (React Native with Expo)
+
+**Backend:**
+- JavaScript (Node.js with Express)
+  
 ## 🎯 Project Objective
 - 🔐 Implement User Authentication
 - 💬 Enable Real-Time Messaging & Notifications:
@@ -29,7 +37,7 @@ It allows the users to purchase product, login, joining in membership and for co
   
 **Backend:**
 - React
-- MongoDB
+- MongoDB(NoSQL database)
 - Express
 - Node.js
 - WeatherBit IO
