@@ -1,4 +1,4 @@
-# 🗃️  JuanKoop: Empowering cooperatives,uniting communities for development (Capstone Project) - Online marketPlaces
+# 🗃️  JuanKoop: Empowering cooperatives,uniting communities for development (Capstone Project) - Online marketPlace
 This is a Capstone Project Developed as part of project for course Bachelor of Science in Information Technology at Technological University of the Philippines - Taguig
 It a full - stack development Online Marketplace build using For mobile React-Native Expo For FrontEnd and For Backend using MERN (Mongodb, Express, React, Nodejs.)
 
