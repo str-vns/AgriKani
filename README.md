@@ -55,11 +55,5 @@ It allows the users to purchase product, login, joining in membership and for co
 - Responsive user Interface
 - Search and Filter items 
 
-## 📦 Getting Started
-
-**Frontend Mobile:**
-1st - npm install
-2nd - npm start
-
 ## ✍️ Reflection
-
+As **str_vns**, I took on the role of a **Full Stack Developer** for this project.
