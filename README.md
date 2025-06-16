@@ -84,3 +84,15 @@ As for **Mapbox**, it was easy to integrate initially, but the cost limitations 
 In my OJT, I also realized areas that needed improvement. For example, our mobile app’s **code structure wasn’t reusable**, and many components were redundant. I wanted to fix it, but unfortunately, my groupmates couldn’t assist since they weren’t familiar with how to refactor the code.
 
 Despite the difficulties and burnout I experienced, this project was a **valuable and fun learning experience**. It showed me both the demands and rewards of being a Full Stack Developer. Most of all, it reminded me that I still have a lot of room to grow—especially in writing clean, reusable code and managing complexity in large projects.
+
+## 👥 Contributors
+
+This project was developed as a team capstone project by students from **Technological University of the Philippines – Taguig**.
+
+
+| Name                  | Role                     | Contributions                                                                                           |
+|-----------------------|--------------------------|----------------------------------------------------------------------------------------------------------|
+| **str_vns**           | Full Stack Developer     | Lead backend development (90%), Lead mobile frontend (75%), and web frontend (55%). Implemented real-time messaging, map integration, payment gateway (PayMongo), and authentication. |
+| **princessjoyy**      | Frontend Developer       | Designed mobile and web UI, implemented basic CRUD operations, and conducted application testing., Lead Web        |
+| **alexandraaquino04** | Frontend Developer       | Assisted with basic CRUD implementation, contributed to mobile and web UI design, and supported testing., Support Web       |
+| **Melgi**             | Documentation & Research | Authored documentation and contributed to research and project coordination.                            |
