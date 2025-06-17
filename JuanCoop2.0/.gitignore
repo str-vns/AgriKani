@@ -37,5 +37,7 @@ yarn-error.*
 
 .env
 app-example
-.notifacation-ko-firebase-adminsdk-sahjo-32288feeb0.json
+notifacation-ko-firebase-adminsdk-sahjo-32288feeb0.json
+eas.json
+google-services.json
 # firebase
