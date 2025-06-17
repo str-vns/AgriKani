@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('../notifacation-ko-firebase-adminsdk-sahjo-8e50ce651d.json');
+// const serviceAccount = require('../notifacation-ko-firebase-adminsdk-sahjo-8e50ce651d.json');
 
 // NOTE Three DOTS MEANS OK IN COMMENT
 admin.initializeApp({
